@@ -1558,6 +1558,36 @@ crossorigin="anonymous"></script>
             // Update the result counter
             document.getElementById("resultCounter").textContent = `Results: ${visibleCount}`;
         }
+
+
+        // Add this at the bottom of your existing script
+function storeAllItems() {
+    const allItems = [];
+    document.querySelectorAll('.column').forEach(column => {
+        const link = column.querySelector('a');
+        const img = column.querySelector('img');
+        const h4 = column.querySelector('h4');
+        const p = column.querySelector('p');
+        const category = Array.from(column.classList)
+                            .find(cls => cls !== 'column' && cls !== 'content');
+        
+        if (link && img && h4 && p && category) {
+            allItems.push({
+                id: link.getAttribute('href').split('/')[0], // Get unique identifier from href
+                title: h4.textContent.trim(),
+                price: p.textContent.trim(),
+                image: img.getAttribute('src'),
+                category: category,
+                link: link.getAttribute('href')
+            });
+        }
+    });
+    
+    localStorage.setItem('allItems', JSON.stringify(allItems));
+}
+
+// Call this function when page loads
+window.addEventListener('load', storeAllItems);
     </script>
 </body>
 </html>
