@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZamListing</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007" crossorigin="anonymous"></script>
 
   <style>
@@ -17,25 +17,39 @@
       padding: 20px;
       text-align: center;
     }
-    h1 {
-      color: #222;
+
+    .brand-title {
+      font-size: 38px;
+      font-weight: bold;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .filter-container {
-      margin: 20px 0;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
+    .brand-title .highlight {
+      color: #0077cc;
     }
 
-    .filter-container input,
-    .filter-container select {
-      padding: 10px;
+    .tagline {
+      font-size: 24px;
+      color: #444;
+      margin: 5px 0;
+    }
+
+    .subtitle {
       font-size: 16px;
-      width: 250px;
-      border-radius: 6px;
+      color: #777;
+    }
+
+    #searchInput {
+      width: 80%;
+      max-width: 400px;
+      padding: 10px;
+      margin: 20px auto;
+      font-size: 16px;
       border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .slider-container {
@@ -44,8 +58,7 @@
       gap: 20px;
       padding: 20px 0;
       scroll-behavior: smooth;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-wrap: nowrap;
     }
 
     .vehicle {
@@ -79,6 +92,7 @@
     .slider-container::-webkit-scrollbar {
       height: 8px;
     }
+
     .slider-container::-webkit-scrollbar-thumb {
       background: #ccc;
       border-radius: 4px;
@@ -120,50 +134,60 @@
     hr {
       margin: 20px 0;
     }
+
+    @media (max-width: 600px) {
+      .brand-title {
+        font-size: 28px;
+      }
+
+      .vehicle {
+        width: 200px;
+      }
+
+      #searchInput {
+        width: 90%;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <h1>Get your Service</h1>
-  <p>Click on a service below to proceed</p>
+  <header>
+    <div class="brand-title">Zam<span class="highlight">Listing</span></div>
+    <h2 class="tagline">Get your Service</h2>
+    <p class="subtitle">Click on a service below to proceed</p>
+  </header>
 
-  <!-- Filter Inputs -->
-  <div class="filter-container">
-    <input type="text" id="searchInput" placeholder="Search service or location..." oninput="filterVehicles()" />
-    <select id="dropdownFilter" onchange="filterVehicles()">
-      <option value="">-- Filter by Category --</option>
-      <option value="Taxi">Taxi</option>
-      <option value="Bike">Bike</option>
-      <option value="Canter">Canter</option>
-      <option value="Assorted">Assorted</option>
-      <option value="Ndola">Ndola</option>
-      <option value="Luangwa">Luangwa</option>
-    </select>
-  </div>
+  <input type="text" id="searchInput" placeholder="Search services...">
 
-  <div class="slider-container" id="vehicleList">
-    <a href="taxi.html" class="vehicle">
+  <div class="slider-container" id="vehicleContainer">
+    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luanshya">
       <img src="P2.jpg" alt="Taxi Hire Luanshya">
       <div class="caption">Taxi Hire Luanshya</div>
     </a>
-    <a href="taxi.html" class="vehicle">
+
+    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luangwa">
       <img src="P5.jpg" alt="Taxi Hire Luangwa">
       <div class="caption">Taxi Hire Luangwa</div>
     </a>
-    <a href="bike.html" class="vehicle">
+
+    <a href="bike.html" class="vehicle" data-name="Bike Hire Luangwa">
       <img src="P3.webp" alt="Bike Hire Luangwa">
       <div class="caption">Bike Hire Luangwa</div>
     </a>
-    <a href="istore.html" class="vehicle">
+
+    <a href="istore.html" class="vehicle" data-name="Assorted Items for sell-Luangwa">
       <img src="P6.jpg" alt="Assorted -Luangwa">
       <div class="caption">Assorted Items for sell-Luangwa</div>
     </a>
-    <a href="#" class="vehicle">
+
+    <a href="#" class="vehicle" data-name="Canter Hire Luangwa">
       <img src="P4.jpg" alt="Canter Hire Luangwa">
       <div class="caption">Canter Hire Luangwa</div>
     </a>
-    <a href="edit.html" class="vehicle">
-      <img src="V1.jpg" alt="Canter for Sale Ndola">
+
+    <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola">
+      <img src="V1.jpg" alt="Vitz Ndola">
       <div class="caption">Sell:ZMW 90,000 :Ndola</div>
     </a>
   </div>
@@ -186,18 +210,17 @@
   </div>
 
   <script>
-    function filterVehicles() {
-      const searchText = document.getElementById('searchInput').value.toLowerCase();
-      const selectedFilter = document.getElementById('dropdownFilter').value.toLowerCase();
-      const vehicles = document.querySelectorAll('.vehicle');
+    const searchInput = document.getElementById("searchInput");
+    const vehicleContainer = document.getElementById("vehicleContainer");
+    const vehicles = vehicleContainer.getElementsByClassName("vehicle");
 
-      vehicles.forEach(vehicle => {
-        const caption = vehicle.querySelector('.caption').textContent.toLowerCase();
-        const matchesText = caption.includes(searchText);
-        const matchesFilter = !selectedFilter || caption.includes(selectedFilter);
-        vehicle.style.display = matchesText && matchesFilter ? 'block' : 'none';
-      });
-    }
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+      for (let v of vehicles) {
+        const name = v.getAttribute("data-name").toLowerCase();
+        v.style.display = name.includes(query) ? "inline-block" : "none";
+      }
+    });
   </script>
 
 </body>
