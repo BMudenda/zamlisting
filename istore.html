@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grocery Cart</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+    }
+    h2 {
+      text-align: center;
+      padding: 10px;
+    }
+    .item-slider {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+    .item {
+      flex: 0 0 auto;
+      width: 140px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .item img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .cart {
+      padding: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #loader {
+      display: none;
+      color: green;
+      margin-top: 10px;
+    }
+    .cart-icon {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      background: #ff5722;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 30px;
+      font-weight: bold;
+      z-index: 999;
+    }
+
+    @media (max-width: 768px) {
+      .item {
+        width: 120px;
+        padding: 8px;
+      }
+      .item img {
+        width: 80px;
+        height: 80px;
+      }
+      h2 {
+        font-size: 1.2em;
+      }
+      table, th, td {
+        font-size: 14px;
+      }
+      button {
+        width: 100%;
+      }
+      .cart-icon {
+        font-size: 14px;
+        padding: 6px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .item {
+        width: 100px;
+      }
+      .item img {
+        width: 70px;
+        height: 70px;
+      }
+      th, td {
+        font-size: 12px;
+        padding: 6px;
+      }
+      .cart-icon {
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cart-icon" id="cartIcon">Cart: 0 | Qty: 0</div>
+
+<h2>Select Items</h2>
+<div class="item-slider" id="itemContainer"></div>
+
+<div class="cart">
+  <h3>Your Cart</h3>
+  <table id="cartTable">
+    <thead>
+      <tr><th>Item</th><th>Qty</th><th>Price</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <p><strong>Total: ZMW <span id="total">0.00</span></strong></p>
+  <button onclick="submitCart()">Submit</button>
+  <div id="loader">Submitting...</div>
+</div>
+
+<script>
+  const items = [
+    { name: "Mosi Beer", price: 25, image: "https://example.com/mosi.jpg" },
+    { name: "Castle Lager", price: 24, image: "https://example.com/castle.jpg" },
+    { name: "Dispenser Water", price: 50, image: "https://example.com/water.jpg" },
+    { name: "Black Label", price: 28, image: "https://example.com/blacklabel.jpg" },
+    { name: "Genset Hire", price: 300, image: "https://example.com/genset.jpg" },
+    { name: "wwww Hire", price: 100, image: "https://example.com/taxi.jpg" }
+  ];
+
+  const cart = {}; // name: { item, qty }
+  const itemContainer = document.getElementById("itemContainer");
+  const cartTable = document.querySelector("#cartTable tbody");
+  const totalDisplay = document.getElementById("total");
+  const loader = document.getElementById("loader");
+  const cartIcon = document.getElementById("cartIcon");
+
+  function updateCartDisplay() {
+    cartTable.innerHTML = "";
+    let total = 0, totalQty = 0, totalItems = 0;
+
+    Object.values(cart).forEach(({ item, qty }) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${item.name}</td><td>${qty}</td><td>ZMW ${(item.price * qty).toFixed(2)}</td>`;
+      cartTable.appendChild(row);
+      total += item.price * qty;
+      totalQty += qty;
+      totalItems++;
+    });
+
+    totalDisplay.textContent = total.toFixed(2);
+    cartIcon.textContent = `Cart: ${totalItems} | Qty: ${totalQty}`;
+  }
+
+  function addToCart(item) {
+    if (cart[item.name]) {
+      cart[item.name].qty++;
+    } else {
+      cart[item.name] = { item, qty: 1 };
+    }
+    updateCartDisplay();
+  }
+
+  function submitCart() {
+    if (Object.keys(cart).length === 0) return alert("Cart is empty.");
+
+    loader.style.display = "block";
+    loader.textContent = "Submitting...";
+
+    const itemsData = Object.values(cart).map(({ item, qty }) =>
+      `${item.name} (x${qty}) - ZMW ${(item.price * qty).toFixed(2)}`
+    ).join(", ");
+
+    const total = Object.values(cart).reduce((sum, entry) => sum + (entry.item.price * entry.qty), 0);
+
+    fetch("https://script.google.com/macros/s/AKfycbxy3eUjHDcOCr-cEpihTTrTnixw_6rE2B_w_25UxK2SnTXPYvT0f44jM3Ud1A2yEXKB_A/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: itemsData, total: total.toFixed(2) })
+    })
+    .then(res => res.json())
+    .then(() => {
+      loader.textContent = "Submitted successfully!";
+      for (const key in cart) delete cart[key];
+      updateCartDisplay();
+      setTimeout(() => loader.style.display = "none", 3000);
+    })
+    .catch(err => {
+      loader.textContent = "Failed to submit.";
+      console.error(err);
+      setTimeout(() => loader.style.display = "none", 3000);
+    });
+  }
+
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <p>${item.name}</p>
+      <p>ZMW ${item.price}</p>
+    `;
+    div.addEventListener("click", () => addToCart(item));
+    itemContainer.appendChild(div);
+  });
+</script>
+
+</body>
+</html>
