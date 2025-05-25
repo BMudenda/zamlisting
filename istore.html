@@ -10,9 +10,43 @@
       background: #f5f5f5;
       margin: 0;
     }
+    .top-bar {
+      background: #004d00;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    .top-bar h1 {
+      margin: 5px 0;
+      font-size: 22px;
+    }
+    .top-bar p {
+      margin: 3px 0;
+      font-size: 14px;
+    }
+    .top-bar a {
+      color: yellow;
+      text-decoration: none;
+      margin: 0 5px;
+      font-weight: bold;
+    }
+
     h2, h3 {
       text-align: center;
       padding: 10px;
+    }
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin: 10px;
+    }
+    #searchInput {
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
     }
     .item-slider {
       display: flex;
@@ -20,6 +54,7 @@
       gap: 10px;
       padding: 10px;
       background: #fff;
+      flex-wrap: nowrap;
     }
     .item {
       flex: 0 0 auto;
@@ -103,9 +138,23 @@
 </head>
 <body>
 
+<div class="top-bar">
+  <h1>Luanshya Grocery Hub</h1>
+  <p>Plot 15, Town Centre, Luanshya, Zambia</p>
+  <p>
+    <a href="tel:+260978000111">Call Us 📞</a> |
+    <a href="https://wa.me/260978000111" target="_blank">WhatsApp Us 💬</a>
+  </p>
+</div>
+
 <div class="cart-icon" id="cartIcon">Cart: 0 | Qty: 0</div>
 
 <h2>Select Items</h2>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search items...">
+</div>
+
 <div class="item-slider" id="itemContainer"></div>
 
 <div class="cart">
@@ -141,11 +190,31 @@
   const totalDisplay = document.getElementById("total");
   const loader = document.getElementById("loader");
   const cartIcon = document.getElementById("cartIcon");
+  const searchInput = document.getElementById("searchInput");
+
+  function renderItems(filter = "") {
+    itemContainer.innerHTML = "";
+    const filteredItems = items.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
+    filteredItems.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <p>${item.name}</p>
+        <p>ZMW ${item.price}</p>
+      `;
+      div.addEventListener("click", () => addToCart(item));
+      itemContainer.appendChild(div);
+    });
+  }
+
+  searchInput.addEventListener("input", () => {
+    renderItems(searchInput.value);
+  });
 
   function updateCartDisplay() {
     cartTable.innerHTML = "";
     let total = 0, totalQty = 0, totalItems = 0;
-
     Object.entries(cart).forEach(([key, { item, qty }]) => {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -159,7 +228,6 @@
       totalQty += qty;
       totalItems++;
     });
-
     totalDisplay.textContent = total.toFixed(2);
     cartIcon.textContent = `Cart: ${totalItems} | Qty: ${totalQty}`;
   }
@@ -182,16 +250,8 @@
 
   function submitCart() {
     const initials = document.getElementById("initialsInput").value.trim();
-
-    if (Object.keys(cart).length === 0) {
-      alert("Cart is empty.");
-      return;
-    }
-
-    if (!initials || initials.length < 2) {
-      alert("Please enter your initials to submit.");
-      return;
-    }
+    if (Object.keys(cart).length === 0) return alert("Cart is empty.");
+    if (!initials || initials.length < 2) return alert("Please enter your initials to submit.");
 
     loader.style.display = "block";
     loader.style.color = "blue";
@@ -206,10 +266,10 @@
     fetch("https://script.google.com/macros/s/AKfycbxy3eUjHDcOCr-cEpihTTrTnixw_6rE2B_w_25UxK2SnTXPYvT0f44jM3Ud1A2yEXKB_A/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        submitter: initials.toUpperCase(), 
-        items: itemsData, 
-        total: total.toFixed(2) 
+      body: JSON.stringify({
+        submitter: initials.toUpperCase(),
+        items: itemsData,
+        total: total.toFixed(2)
       })
     })
     .then(res => res.json())
@@ -223,23 +283,11 @@
     })
     .catch(err => {
       loader.style.color = "red";
-      loader.textContent = "Failed to submit.";
-      console.error(err);
-      setTimeout(() => loader.style.display = "none", 3000);
+      loader.textContent = "Submission failed. Try again.";
     });
   }
 
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `
-      <img src="${item.image}" alt="${item.name}">
-      <p>${item.name}</p>
-      <p>ZMW ${item.price}</p>
-    `;
-    div.addEventListener("click", () => addToCart(item));
-    itemContainer.appendChild(div);
-  });
+  renderItems(); // initial load
 </script>
 
 </body>
