@@ -10,7 +10,7 @@
       background: #f5f5f5;
       margin: 0;
     }
-    h2 {
+    h2, h3 {
       text-align: center;
       padding: 10px;
     }
@@ -61,10 +61,15 @@
       font-size: 16px;
       cursor: pointer;
     }
+    .delete-btn {
+      background: #dc3545;
+      margin-left: 10px;
+    }
     #loader {
-      display: none;
-      color: green;
       margin-top: 10px;
+      font-weight: bold;
+      color: green;
+      display: none;
     }
     .cart-icon {
       position: fixed;
@@ -77,47 +82,22 @@
       font-weight: bold;
       z-index: 999;
     }
-
-    @media (max-width: 768px) {
-      .item {
-        width: 120px;
-        padding: 8px;
-      }
-      .item img {
-        width: 80px;
-        height: 80px;
-      }
-      h2 {
-        font-size: 1.2em;
-      }
-      table, th, td {
-        font-size: 14px;
-      }
-      button {
-        width: 100%;
-      }
-      .cart-icon {
-        font-size: 14px;
-        padding: 6px 10px;
-      }
+    #initialsInput {
+      margin-top: 10px;
+      padding: 8px;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      display: block;
     }
-
-    @media (max-width: 480px) {
-      .item {
-        width: 100px;
-      }
-      .item img {
-        width: 70px;
-        height: 70px;
-      }
-      th, td {
-        font-size: 12px;
-        padding: 6px;
-      }
-      .cart-icon {
-        font-size: 12px;
-        padding: 5px 8px;
-      }
+    @media (max-width: 768px) {
+      .item { width: 120px; padding: 8px; }
+      .item img { width: 80px; height: 80px; }
+      h2 { font-size: 1.2em; }
+      table, th, td { font-size: 14px; }
+      button { width: 100%; }
+      .cart-icon { font-size: 14px; padding: 6px 10px; }
     }
   </style>
 </head>
@@ -132,23 +112,27 @@
   <h3>Your Cart</h3>
   <table id="cartTable">
     <thead>
-      <tr><th>Item</th><th>Qty</th><th>Price / Action</th></tr>
+      <tr><th>Item</th><th>Qty</th><th>Price</th><th>Action</th></tr>
     </thead>
     <tbody></tbody>
   </table>
   <p><strong>Total: ZMW <span id="total">0.00</span></strong></p>
+
+  <label for="initialsInput"><strong>Enter your initials to submit:</strong></label>
+  <input id="initialsInput" type="text" placeholder="e.g. BM" />
+
   <button onclick="submitCart()">Submit</button>
   <div id="loader">Submitting...</div>
 </div>
 
 <script>
   const items = [
-    { name: "Mosi Beer", price: 25, image: "M.jpeg" },
-    { name: "Castle Lager", price: 24, image: "CC.jpeg" },
+    { name: "Mosi Beer", price: 25, image: "M.jpg" },
+    { name: "Castle Lager", price: 24, image: "CC.jpg" },
     { name: "Dispenser Water", price: 50, image: "W.jpg" },
     { name: "Black Label", price: 28, image: "BL.webp" },
     { name: "Genset Hire", price: 300, image: "G.jpg" },
-    { name: "Coca-Cola", price: 15, image: "DC.jpg" }
+    { name: "Taxi Hire", price: 100, image: "T.jpg" }
   ];
 
   const cart = {};
@@ -162,15 +146,13 @@
     cartTable.innerHTML = "";
     let total = 0, totalQty = 0, totalItems = 0;
 
-    Object.values(cart).forEach(({ item, qty }) => {
+    Object.entries(cart).forEach(([key, { item, qty }]) => {
       const row = document.createElement("tr");
-
-      const deleteBtn = `<button onclick="removeFromCart('${item.name}')" style="background:#dc3545; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">Delete</button>`;
-
       row.innerHTML = `
         <td>${item.name}</td>
         <td>${qty}</td>
-        <td>ZMW ${(item.price * qty).toFixed(2)} ${deleteBtn}</td>
+        <td>ZMW ${(item.price * qty).toFixed(2)}</td>
+        <td><button class="delete-btn" onclick="removeFromCart('${key}')">Delete</button></td>
       `;
       cartTable.appendChild(row);
       total += item.price * qty;
@@ -191,15 +173,28 @@
     updateCartDisplay();
   }
 
-  function removeFromCart(itemName) {
-    delete cart[itemName];
-    updateCartDisplay();
+  function removeFromCart(name) {
+    if (cart[name]) {
+      delete cart[name];
+      updateCartDisplay();
+    }
   }
 
   function submitCart() {
-    if (Object.keys(cart).length === 0) return alert("Cart is empty.");
+    const initials = document.getElementById("initialsInput").value.trim();
+
+    if (Object.keys(cart).length === 0) {
+      alert("Cart is empty.");
+      return;
+    }
+
+    if (!initials || initials.length < 2) {
+      alert("Please enter your initials to submit.");
+      return;
+    }
 
     loader.style.display = "block";
+    loader.style.color = "blue";
     loader.textContent = "Submitting...";
 
     const itemsData = Object.values(cart).map(({ item, qty }) =>
@@ -211,16 +206,23 @@
     fetch("https://script.google.com/macros/s/AKfycbxy3eUjHDcOCr-cEpihTTrTnixw_6rE2B_w_25UxK2SnTXPYvT0f44jM3Ud1A2yEXKB_A/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: itemsData, total: total.toFixed(2) })
+      body: JSON.stringify({ 
+        submitter: initials.toUpperCase(), 
+        items: itemsData, 
+        total: total.toFixed(2) 
+      })
     })
     .then(res => res.json())
     .then(() => {
+      loader.style.color = "green";
       loader.textContent = "Submitted successfully!";
       for (const key in cart) delete cart[key];
       updateCartDisplay();
+      document.getElementById("initialsInput").value = "";
       setTimeout(() => loader.style.display = "none", 3000);
     })
     .catch(err => {
+      loader.style.color = "red";
       loader.textContent = "Failed to submit.";
       console.error(err);
       setTimeout(() => loader.style.display = "none", 3000);
