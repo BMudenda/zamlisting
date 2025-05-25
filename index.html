@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ZamListing</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-  <link rel="stylesheet" href="styles.css" />
-
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007" crossorigin="anonymous"></script>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 
   <style>
     body {
@@ -18,16 +15,47 @@
       padding: 20px;
       text-align: center;
     }
+
     h1 {
       color: #222;
     }
+
+    .search-bar {
+      margin: 20px 0;
+    }
+
+    .search-bar input, .search-bar select {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .search-bar button {
+      padding: 10px 16px;
+      background-color: #007bb5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .search-bar button:hover {
+      background-color: #005e90;
+    }
+
     .slider-container {
       display: flex;
       overflow-x: auto;
       gap: 20px;
       padding: 20px 0;
       scroll-behavior: smooth;
+      flex-wrap: nowrap;
     }
+
     .vehicle {
       flex: 0 0 auto;
       width: 250px;
@@ -38,9 +66,11 @@
       color: #000;
       transition: transform 0.2s;
     }
+
     .vehicle:hover {
       transform: scale(1.03);
     }
+
     .vehicle img {
       width: 100%;
       height: 160px;
@@ -48,6 +78,7 @@
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
     }
+
     .caption {
       padding: 10px;
       font-weight: bold;
@@ -56,6 +87,7 @@
     .slider-container::-webkit-scrollbar {
       height: 8px;
     }
+
     .slider-container::-webkit-scrollbar-thumb {
       background: #ccc;
       border-radius: 4px;
@@ -104,33 +136,49 @@
   <h1>Get your Service</h1>
   <p>Click on a service below to proceed</p>
 
-  <div class="slider-container">
-    <a href="taxi.html" class="vehicle">
+  <!-- Search + Filter -->
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search services..." />
+    <select id="categoryFilter">
+      <option value="">All</option>
+      <option value="taxi">Taxi</option>
+      <option value="bike">Bike</option>
+      <option value="canter">Canter</option>
+      <option value="sell">Sell</option>
+      <option value="assorted">Assorted</option>
+    </select>
+    <button onclick="applyFilter()">Search</button>
+  </div>
+
+  <div class="slider-container" id="vehicleList">
+    <a href="taxi.html" class="vehicle" data-category="taxi">
       <img src="P2.jpg" alt="Taxi Hire Luanshya">
       <div class="caption">Taxi Hire Luanshya</div>
     </a>
 
-    <a href="taxi.html" class="vehicle">
+    <a href="taxi.html" class="vehicle" data-category="taxi">
       <img src="P5.jpg" alt="Taxi Hire Luangwa">
       <div class="caption">Taxi Hire Luangwa</div>
     </a>
 
-    <a href="bike.html" class="vehicle">
+    <a href="bike.html" class="vehicle" data-category="bike">
       <img src="P3.webp" alt="Bike Hire Luangwa">
       <div class="caption">Bike Hire Luangwa</div>
     </a>
-    <a href="istore.html" class="vehicle">
-      <img src="P6.jpg" alt="Assorted -Luangwa">
+
+    <a href="istore.html" class="vehicle" data-category="assorted">
+      <img src="P6.jpg" alt="Assorted Items - Luangwa">
       <div class="caption">Assorted Items for sell-Luangwa</div>
     </a>
 
-    <a href="#" class="vehicle">
+    <a href="#" class="vehicle" data-category="canter">
       <img src="P4.jpg" alt="Canter Hire Luangwa">
       <div class="caption">Canter Hire Luangwa</div>
     </a>
-    <a href="edit.html" class="vehicle">
-      <img src="V1.jpg" alt="Canter Hire Luangwa">
-      <div class="caption">Sell:ZMW 90,000 :Ndola</div>
+
+    <a href="edit.html" class="vehicle" data-category="sell">
+      <img src="V1.jpg" alt="Vitz Ndola">
+      <div class="caption">Sell: ZMW 90,000 - Ndola</div>
     </a>
   </div>
 
@@ -151,5 +199,25 @@
     <a href="admin.html" title="Admin Access">*</a>
   </div>
 
+  <script>
+    function applyFilter() {
+      const searchValue = document.getElementById("searchInput").value.toLowerCase();
+      const category = document.getElementById("categoryFilter").value;
+
+      const vehicles = document.querySelectorAll(".vehicle");
+
+      vehicles.forEach(vehicle => {
+        const caption = vehicle.querySelector(".caption").innerText.toLowerCase();
+        const categoryMatch = category === "" || vehicle.dataset.category === category;
+        const textMatch = caption.includes(searchValue);
+
+        if (categoryMatch && textMatch) {
+          vehicle.style.display = "inline-block";
+        } else {
+          vehicle.style.display = "none";
+        }
+      });
+    }
+  </script>
 </body>
 </html>
