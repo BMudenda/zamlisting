@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ZamListing</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <link rel="stylesheet" href="styles.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007" crossorigin="anonymous"></script>
 
   <style>
     body {
@@ -15,36 +17,25 @@
       padding: 20px;
       text-align: center;
     }
-
     h1 {
       color: #222;
     }
 
-    .search-bar {
+    .filter-container {
       margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
     }
 
-    .search-bar input, .search-bar select {
+    .filter-container input,
+    .filter-container select {
       padding: 10px;
       font-size: 16px;
-      margin: 5px;
-      width: 200px;
+      width: 250px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .search-bar button {
-      padding: 10px 16px;
-      background-color: #007bb5;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .search-bar button:hover {
-      background-color: #005e90;
     }
 
     .slider-container {
@@ -53,7 +44,8 @@
       gap: 20px;
       padding: 20px 0;
       scroll-behavior: smooth;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .vehicle {
@@ -87,7 +79,6 @@
     .slider-container::-webkit-scrollbar {
       height: 8px;
     }
-
     .slider-container::-webkit-scrollbar-thumb {
       background: #ccc;
       border-radius: 4px;
@@ -136,49 +127,44 @@
   <h1>Get your Service</h1>
   <p>Click on a service below to proceed</p>
 
-  <!-- Search + Filter -->
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search services..." />
-    <select id="categoryFilter">
-      <option value="">All</option>
-      <option value="taxi">Taxi</option>
-      <option value="bike">Bike</option>
-      <option value="canter">Canter</option>
-      <option value="sell">Sell</option>
-      <option value="assorted">Assorted</option>
+  <!-- Filter Inputs -->
+  <div class="filter-container">
+    <input type="text" id="searchInput" placeholder="Search service or location..." oninput="filterVehicles()" />
+    <select id="dropdownFilter" onchange="filterVehicles()">
+      <option value="">-- Filter by Category --</option>
+      <option value="Taxi">Taxi</option>
+      <option value="Bike">Bike</option>
+      <option value="Canter">Canter</option>
+      <option value="Assorted">Assorted</option>
+      <option value="Ndola">Ndola</option>
+      <option value="Luangwa">Luangwa</option>
     </select>
-    <button onclick="applyFilter()">Search</button>
   </div>
 
   <div class="slider-container" id="vehicleList">
-    <a href="taxi.html" class="vehicle" data-category="taxi">
+    <a href="taxi.html" class="vehicle">
       <img src="P2.jpg" alt="Taxi Hire Luanshya">
       <div class="caption">Taxi Hire Luanshya</div>
     </a>
-
-    <a href="taxi.html" class="vehicle" data-category="taxi">
+    <a href="taxi.html" class="vehicle">
       <img src="P5.jpg" alt="Taxi Hire Luangwa">
       <div class="caption">Taxi Hire Luangwa</div>
     </a>
-
-    <a href="bike.html" class="vehicle" data-category="bike">
+    <a href="bike.html" class="vehicle">
       <img src="P3.webp" alt="Bike Hire Luangwa">
       <div class="caption">Bike Hire Luangwa</div>
     </a>
-
-    <a href="istore.html" class="vehicle" data-category="assorted">
-      <img src="P6.jpg" alt="Assorted Items - Luangwa">
+    <a href="istore.html" class="vehicle">
+      <img src="P6.jpg" alt="Assorted -Luangwa">
       <div class="caption">Assorted Items for sell-Luangwa</div>
     </a>
-
-    <a href="#" class="vehicle" data-category="canter">
+    <a href="#" class="vehicle">
       <img src="P4.jpg" alt="Canter Hire Luangwa">
       <div class="caption">Canter Hire Luangwa</div>
     </a>
-
-    <a href="edit.html" class="vehicle" data-category="sell">
-      <img src="V1.jpg" alt="Vitz Ndola">
-      <div class="caption">Sell: ZMW 90,000 - Ndola</div>
+    <a href="edit.html" class="vehicle">
+      <img src="V1.jpg" alt="Canter for Sale Ndola">
+      <div class="caption">Sell:ZMW 90,000 :Ndola</div>
     </a>
   </div>
 
@@ -200,24 +186,19 @@
   </div>
 
   <script>
-    function applyFilter() {
-      const searchValue = document.getElementById("searchInput").value.toLowerCase();
-      const category = document.getElementById("categoryFilter").value;
-
-      const vehicles = document.querySelectorAll(".vehicle");
+    function filterVehicles() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const selectedFilter = document.getElementById('dropdownFilter').value.toLowerCase();
+      const vehicles = document.querySelectorAll('.vehicle');
 
       vehicles.forEach(vehicle => {
-        const caption = vehicle.querySelector(".caption").innerText.toLowerCase();
-        const categoryMatch = category === "" || vehicle.dataset.category === category;
-        const textMatch = caption.includes(searchValue);
-
-        if (categoryMatch && textMatch) {
-          vehicle.style.display = "inline-block";
-        } else {
-          vehicle.style.display = "none";
-        }
+        const caption = vehicle.querySelector('.caption').textContent.toLowerCase();
+        const matchesText = caption.includes(searchText);
+        const matchesFilter = !selectedFilter || caption.includes(selectedFilter);
+        vehicle.style.display = matchesText && matchesFilter ? 'block' : 'none';
       });
     }
   </script>
+
 </body>
 </html>
