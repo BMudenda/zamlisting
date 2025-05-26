@@ -41,6 +41,11 @@
       padding: 8px 15px;
       border-radius: 5px;
       color: white;
+      margin-bottom: 5px;
+    }
+    .time-listed {
+      font-size: 0.85rem;
+      color: #ccc;
     }
 
     .product-container {
@@ -178,7 +183,7 @@
         <h2>Vitz 2SZ</h2>
         <ul>
           <li><strong>Seller:</strong> -</li>
-          <li><strong>Address:</strong> Ndola,Itowa</li>
+          <li><strong>Address:</strong> Ndola, Itowa</li>
           <li><strong>Delivery:</strong> Nationwide (fee applicable)</li>
         </ul>
         <div class="seller-contact">
@@ -186,7 +191,10 @@
           <a href="https://wa.me/260973442823"><i class="fa fa-whatsapp"></i>WhatsApp</a>
         </div>
       </div>
-      <div class="price-tag">ZMW 90,000</div>
+      <div>
+        <div class="price-tag">ZMW 90,000</div>
+        <div class="time-listed" id="timeListed">Listed just now</div>
+      </div>
     </div>
   </header>
 
@@ -279,26 +287,44 @@
 
       loader.style.display = "block";
 
+      // Replace with your actual Google Apps Script URL
       const scriptURL = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";
       const formData = new URLSearchParams();
       formData.append("phone", phone);
       formData.append("bid", bid);
-      formData.append("vehicle", "Vitz 2SZ");
 
-      fetch(scriptURL + "?" + formData.toString())
+      fetch(scriptURL, { method: 'POST', body: formData })
         .then(response => {
           loader.style.display = "none";
-          alert("Your offer has been submitted successfully.");
-          document.getElementById("phone").value = "";
-          document.getElementById("bid").value = "";
+          alert("Your offer has been submitted.");
         })
         .catch(error => {
           loader.style.display = "none";
-          alert("Error submitting offer. Try again.");
-          console.error("Error!", error.message);
+          alert("Submission failed. Try again.");
+          console.error("Error:", error);
         });
     }
-  </script>
 
+    // Time since listing counter
+    const listingTime = new Date(); // Set to page load for demo; replace with actual timestamp if available
+    function updateTimeListed() {
+      const now = new Date();
+      const seconds = Math.floor((now - listingTime) / 1000);
+      let display = "Listed just now";
+
+      if (seconds >= 60 && seconds < 3600) {
+        display = `Listed ${Math.floor(seconds / 60)} minutes ago`;
+      } else if (seconds >= 3600 && seconds < 86400) {
+        display = `Listed ${Math.floor(seconds / 3600)} hours ago`;
+      } else if (seconds >= 86400) {
+        display = `Listed ${Math.floor(seconds / 86400)} days ago`;
+      }
+
+      document.getElementById("timeListed").textContent = display;
+    }
+
+    setInterval(updateTimeListed, 60000); // Update every minute
+    updateTimeListed(); // Initial call
+  </script>
 </body>
 </html>
