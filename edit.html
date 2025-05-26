@@ -24,29 +24,16 @@
       align-items: center;
       gap: 15px;
     }
-    .seller-info {
-      flex: 1 1 60%;
-    }
-    .seller-info h2 {
-      font-size: 1.4rem;
-      color: #ff9900;
-    }
-    .seller-info ul {
-      list-style: none;
-      margin-top: 8px;
-    }
-    .seller-info li {
-      margin-bottom: 5px;
-      font-size: 0.95rem;
-    }
+    .seller-info { flex: 1 1 60%; }
+    .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
+    .seller-info ul { list-style: none; margin-top: 8px; }
+    .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
     .seller-contact a {
       text-decoration: none;
       color: white;
       margin-right: 10px;
     }
-    .seller-contact i {
-      margin-right: 5px;
-    }
+    .seller-contact i { margin-right: 5px; }
     .price-tag {
       font-size: 1.3rem;
       font-weight: bold;
@@ -121,17 +108,13 @@
       opacity: 0.9;
     }
 
-    .des {
-      padding: 10px;
-    }
+    .des { padding: 10px; }
     .card {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       padding: 20px;
       background: white;
     }
-    .action-buttons {
-      margin-top: 20px;
-    }
+    .action-buttons { margin-top: 20px; }
     .btn {
       padding: 10px 20px;
       font-weight: bold;
@@ -146,10 +129,16 @@
     .bid-input {
       width: 100%;
       padding: 10px;
-      margin: 15px 0;
+      margin: 10px 0;
       font-size: 1rem;
       border-radius: 5px;
       border: 1px solid #ccc;
+    }
+
+    #loader {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
     }
 
     footer {
@@ -179,7 +168,6 @@
     .fa-facebook { background: #3B5998; color: white; }
     .fa-twitter { background: #55ACEE; color: white; }
     .fa-whatsapp { background: #25d366; color: white; }
-
   </style>
 </head>
 <body>
@@ -217,10 +205,9 @@
     <section class="details-section">
       <div class="des">
         <div class="card">
-          
-        
-
-          <input class="bid-input" type="number" placeholder="Negotiable.Enter your offer in ZMW" />
+          <input id="phone" class="bid-input" type="tel" placeholder="Your phone number" required />
+          <input id="bid" class="bid-input" type="number" placeholder="Negotiable. Enter your offer in ZMW" required />
+          <div id="loader">Submitting...</div>
           <div class="action-buttons">
             <button class="btn btn-primary" onclick="submitBid()">Submit offer</button>
           </div>
@@ -281,10 +268,35 @@
     updateThumbnails();
 
     function submitBid() {
-      const bidValue = document.querySelector(".bid-input").value;
-      if (!bidValue) return alert("Please enter your bid amount.");
-      alert("Bid submitted: ZMW " + bidValue);
-      // Replace with actual submission to Google Sheets
+      const phone = document.getElementById("phone").value.trim();
+      const bid = document.getElementById("bid").value.trim();
+      const loader = document.getElementById("loader");
+
+      if (!phone || !bid) {
+        alert("Please enter both phone number and bid.");
+        return;
+      }
+
+      loader.style.display = "block";
+
+      const scriptURL = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";
+      const formData = new URLSearchParams();
+      formData.append("phone", phone);
+      formData.append("bid", bid);
+      formData.append("vehicle", "Vitz 2SZ");
+
+      fetch(scriptURL + "?" + formData.toString())
+        .then(response => {
+          loader.style.display = "none";
+          alert("Your offer has been submitted successfully.");
+          document.getElementById("phone").value = "";
+          document.getElementById("bid").value = "";
+        })
+        .catch(error => {
+          loader.style.display = "none";
+          alert("Error submitting offer. Try again.");
+          console.error("Error!", error.message);
+        });
     }
   </script>
 
