@@ -6,7 +6,7 @@
   <title>ZamListing</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007" crossorigin="anonymous"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,7 +21,6 @@
       font-weight: bold;
       color: #333;
       text-transform: uppercase;
-      letter-spacing: 1px;
     }
 
     .brand-title .highlight {
@@ -41,9 +40,8 @@
 
     .search-filter-row {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
       margin: 20px auto;
     }
@@ -53,12 +51,22 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     #searchInput {
-      flex: 1 1 250px;
-      max-width: 400px;
+      width: 60%;
+      max-width: 300px;
+    }
+
+    #typeFilter {
+      width: 160px;
+    }
+
+    #resultCount {
+      margin: 10px;
+      font-weight: bold;
+      color: #0077cc;
     }
 
     .slider-container {
@@ -75,7 +83,7 @@
       width: 250px;
       border-radius: 12px;
       background: #fff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       text-decoration: none;
       color: #000;
       transition: transform 0.2s;
@@ -96,8 +104,8 @@
     .caption {
       padding: 10px;
       font-weight: bold;
-      text-decoration: underline;
       color: #0077cc;
+      text-decoration: underline;
     }
 
     .slider-container::-webkit-scrollbar {
@@ -147,9 +155,22 @@
     }
 
     @media (max-width: 600px) {
-      .brand-title { font-size: 28px; }
-      .vehicle { width: 200px; }
-      #searchInput, #typeFilter { width: 90%; }
+      .brand-title {
+        font-size: 28px;
+      }
+
+      .vehicle {
+        width: 200px;
+      }
+
+      #searchInput {
+        width: 90%;
+      }
+
+      .search-filter-row {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
@@ -164,13 +185,16 @@
   <div class="search-filter-row">
     <input type="text" id="searchInput" placeholder="Search services...">
     <select id="typeFilter">
-      <option value="all">All Types</option>
+      <option value="all">All Categories</option>
       <option value="taxi">Taxi</option>
       <option value="bike">Bike</option>
-      <option value="items">Items</option>
+      <option value="item">Item</option>
       <option value="canter">Canter</option>
+      <option value="sale">Sale</option>
     </select>
   </div>
+
+  <div id="resultCount">Showing 6 results</div>
 
   <div class="slider-container" id="vehicleContainer">
     <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luanshya" data-type="taxi">
@@ -185,7 +209,7 @@
       <img src="P3.webp" alt="Bike Hire Luangwa">
       <div class="caption">Bike Hire Luangwa</div>
     </a>
-    <a href="istore.html" class="vehicle" data-name="Assorted Items for sell-Luangwa" data-type="items">
+    <a href="istore.html" class="vehicle" data-name="Assorted Items for sell-Luangwa" data-type="item">
       <img src="P6.jpg" alt="Assorted -Luangwa">
       <div class="caption">Assorted Items for sell-Luangwa</div>
     </a>
@@ -193,7 +217,7 @@
       <img src="P4.jpg" alt="Canter Hire Luangwa">
       <div class="caption">Canter Hire Luangwa</div>
     </a>
-    <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola" data-type="items">
+    <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola" data-type="sale">
       <img src="V1.jpg" alt="Vitz Ndola">
       <div class="caption">Sell:ZMW 90,000 :Ndola</div>
     </a>
@@ -221,23 +245,30 @@
     const typeFilter = document.getElementById("typeFilter");
     const vehicleContainer = document.getElementById("vehicleContainer");
     const vehicles = vehicleContainer.getElementsByClassName("vehicle");
+    const resultCount = document.getElementById("resultCount");
 
     function filterVehicles() {
       const searchValue = searchInput.value.toLowerCase();
       const selectedType = typeFilter.value;
+      let count = 0;
 
       for (let vehicle of vehicles) {
         const name = vehicle.getAttribute("data-name").toLowerCase();
         const type = vehicle.getAttribute("data-type");
         const matchesSearch = name.includes(searchValue);
         const matchesType = selectedType === "all" || type === selectedType;
-        vehicle.style.display = (matchesSearch && matchesType) ? "inline-block" : "none";
+        const show = matchesSearch && matchesType;
+        vehicle.style.display = show ? "inline-block" : "none";
+        if (show) count++;
       }
+
+      resultCount.textContent = `Showing ${count} result${count !== 1 ? 's' : ''}`;
     }
 
     searchInput.addEventListener("input", filterVehicles);
     typeFilter.addEventListener("change", filterVehicles);
+    filterVehicles(); // initialize on load
   </script>
 
 </body>
-      </html>
+</html>
