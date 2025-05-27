@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ZamListing</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007" crossorigin="anonymous"></script>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -41,15 +39,26 @@
       color: #777;
     }
 
-    #searchInput {
-      width: 80%;
-      max-width: 400px;
-      padding: 10px;
+    .search-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
       margin: 20px auto;
+    }
+
+    #searchInput, #typeFilter {
+      padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #searchInput {
+      flex: 1 1 250px;
+      max-width: 400px;
     }
 
     .slider-container {
@@ -66,7 +75,7 @@
       width: 250px;
       border-radius: 12px;
       background: #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       text-decoration: none;
       color: #000;
       transition: transform 0.2s;
@@ -87,6 +96,8 @@
     .caption {
       padding: 10px;
       font-weight: bold;
+      text-decoration: underline;
+      color: #0077cc;
     }
 
     .slider-container::-webkit-scrollbar {
@@ -136,17 +147,9 @@
     }
 
     @media (max-width: 600px) {
-      .brand-title {
-        font-size: 28px;
-      }
-
-      .vehicle {
-        width: 200px;
-      }
-
-      #searchInput {
-        width: 90%;
-      }
+      .brand-title { font-size: 28px; }
+      .vehicle { width: 200px; }
+      #searchInput, #typeFilter { width: 90%; }
     }
   </style>
 </head>
@@ -158,35 +161,39 @@
     <p class="subtitle">Click on a service below to proceed</p>
   </header>
 
-  <input type="text" id="searchInput" placeholder="Search services...">
+  <div class="search-filter-row">
+    <input type="text" id="searchInput" placeholder="Search services...">
+    <select id="typeFilter">
+      <option value="all">All Types</option>
+      <option value="taxi">Taxi</option>
+      <option value="bike">Bike</option>
+      <option value="items">Items</option>
+      <option value="canter">Canter</option>
+    </select>
+  </div>
 
   <div class="slider-container" id="vehicleContainer">
-    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luanshya">
+    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luanshya" data-type="taxi">
       <img src="P2.jpg" alt="Taxi Hire Luanshya">
       <div class="caption">Taxi Hire Luanshya</div>
     </a>
-
-    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luangwa">
+    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luangwa" data-type="taxi">
       <img src="P5.jpg" alt="Taxi Hire Luangwa">
       <div class="caption">Taxi Hire Luangwa</div>
     </a>
-
-    <a href="bike.html" class="vehicle" data-name="Bike Hire Luangwa">
+    <a href="bike.html" class="vehicle" data-name="Bike Hire Luangwa" data-type="bike">
       <img src="P3.webp" alt="Bike Hire Luangwa">
       <div class="caption">Bike Hire Luangwa</div>
     </a>
-
-    <a href="istore.html" class="vehicle" data-name="Assorted Items for sell-Luangwa">
+    <a href="istore.html" class="vehicle" data-name="Assorted Items for sell-Luangwa" data-type="items">
       <img src="P6.jpg" alt="Assorted -Luangwa">
       <div class="caption">Assorted Items for sell-Luangwa</div>
     </a>
-
-    <a href="#" class="vehicle" data-name="Canter Hire Luangwa">
+    <a href="#" class="vehicle" data-name="Canter Hire Luangwa" data-type="canter">
       <img src="P4.jpg" alt="Canter Hire Luangwa">
       <div class="caption">Canter Hire Luangwa</div>
     </a>
-
-    <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola">
+    <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola" data-type="items">
       <img src="V1.jpg" alt="Vitz Ndola">
       <div class="caption">Sell:ZMW 90,000 :Ndola</div>
     </a>
@@ -211,17 +218,26 @@
 
   <script>
     const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
     const vehicleContainer = document.getElementById("vehicleContainer");
     const vehicles = vehicleContainer.getElementsByClassName("vehicle");
 
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.toLowerCase();
-      for (let v of vehicles) {
-        const name = v.getAttribute("data-name").toLowerCase();
-        v.style.display = name.includes(query) ? "inline-block" : "none";
+    function filterVehicles() {
+      const searchValue = searchInput.value.toLowerCase();
+      const selectedType = typeFilter.value;
+
+      for (let vehicle of vehicles) {
+        const name = vehicle.getAttribute("data-name").toLowerCase();
+        const type = vehicle.getAttribute("data-type");
+        const matchesSearch = name.includes(searchValue);
+        const matchesType = selectedType === "all" || type === selectedType;
+        vehicle.style.display = (matchesSearch && matchesType) ? "inline-block" : "none";
       }
-    });
+    }
+
+    searchInput.addEventListener("input", filterVehicles);
+    typeFilter.addEventListener("change", filterVehicles);
   </script>
 
 </body>
-</html>
+      </html>
