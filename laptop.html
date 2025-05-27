@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZamListing | laptop</title>
+  <title>ZamListing | Laptop</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,9 +20,7 @@
     .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
     .seller-info ul { list-style: none; margin-top: 8px; }
     .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
-    .seller-contact a {
-      text-decoration: none; color: white; margin-right: 10px;
-    }
+    .seller-contact a { text-decoration: none; color: white; margin-right: 10px; }
     .seller-contact i { margin-right: 5px; }
     .price-tag {
       font-size: 1.3rem; font-weight: bold; background: #e67e22;
@@ -63,9 +61,7 @@
       cursor: pointer; border: 2px solid transparent;
       transition: 0.3s ease; height: 80px; object-fit: cover; border-radius: 4px;
     }
-    .thumbnail:hover, .thumbnail.active {
-      border-color: #ff9900; opacity: 0.9;
-    }
+    .thumbnail:hover, .thumbnail.active { border-color: #ff9900; opacity: 0.9; }
     .des { padding: 10px; }
     .card {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -83,7 +79,11 @@
     }
     .btn-primary { background-color: #27ae60; color: white; }
     .btn:hover { opacity: 0.9; }
-    #loader { display: none; text-align: center; margin-top: 10px; color: #27ae60; }
+    #loader {
+      display: none; text-align: center; margin-top: 10px;
+    }
+    #loader.success { color: green; }
+    #loader.error { color: red; }
 
     footer {
       background-color: #333; color: #fff;
@@ -110,7 +110,7 @@
   <header>
     <div class="header-content">
       <div class="seller-info">
-        <h2>Trekstor Laptop 11.6' </h2>
+        <h2>Trekstor Laptop 11.6'</h2>
         <ul>
           <li><strong>Seller:</strong> BM</li>
           <li><strong>Address:</strong> Lusaka, Makeni</li>
@@ -123,7 +123,7 @@
       </div>
       <div>
         <div class="price-tag">ZMW 1300</div>
-        <div class="time-listed" id="timeListed">Listed just now</div>
+        <div class="time-listed time-counter" data-list-date="2025-05-27T10:00:00Z">Listed just now</div>
       </div>
     </div>
   </header>
@@ -194,54 +194,66 @@
     }
 
     document.querySelector(".prev-slide").onclick = () => {
-      galleryConfig.currentSlide = (galleryConfig.currentSlide - 1 + galleryConfig.images.length) % galleryConfig.images.length;
-      updateMainImage(galleryConfig.currentSlide);
+      const newIndex = (galleryConfig.currentSlide - 1 + galleryConfig.images.length) % galleryConfig.images.length;
+      updateMainImage(newIndex);
     };
-
     document.querySelector(".next-slide").onclick = () => {
-      galleryConfig.currentSlide = (galleryConfig.currentSlide + 1) % galleryConfig.images.length;
-      updateMainImage(galleryConfig.currentSlide);
+      const newIndex = (galleryConfig.currentSlide + 1) % galleryConfig.images.length;
+      updateMainImage(newIndex);
     };
 
-    updateThumbnails();
+    updateMainImage(0);
 
     function submitBid() {
-      const itemName = document.getElementById("itemName").value.trim();
+      const name = document.getElementById("itemName").value.trim();
       const phone = document.getElementById("phone").value.trim();
-      const bid = document.getElementById("bid").value.trim();
+      const offer = document.getElementById("bid").value.trim();
       const loader = document.getElementById("loader");
 
-      if (!itemName || !phone || !bid) {
-        alert("Please fill in all fields.");
+      if (!name || !phone || !offer) {
+        loader.textContent = "Please fill in all fields.";
+        loader.className = "error";
+        loader.style.display = "block";
         return;
       }
 
+      loader.textContent = "Submitting...";
+      loader.className = "";
       loader.style.display = "block";
 
-      const url = "YOUR_WEB_APP_URL_HERE"; // Replace with your Google Apps Script Web App URL
+      const data = { item: name, phone: phone, bid: offer };
 
-      const params = new URLSearchParams({
-        itemName,
-        phone,
-        bid
-      });
-
-      fetch(url + "?" + params.toString(), {
-        method: "GET"
-      })
-      .then(res => res.text())
-      .then(response => {
-        alert("Offer submitted successfully!");
-        loader.style.display = "none";
+      fetch("YOUR_GOOGLE_SCRIPT_URL", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      }).then(() => {
+        loader.textContent = "Submitted successfully!";
+        loader.className = "success";
         document.getElementById("itemName").value = "";
         document.getElementById("phone").value = "";
         document.getElementById("bid").value = "";
-      })
-      .catch(err => {
-        alert("Failed to submit. Try again.");
-        loader.style.display = "none";
+      }).catch(err => {
+        loader.textContent = "Error submitting form.";
+        loader.className = "error";
       });
     }
+
+    (function() {
+      document.querySelectorAll('.time-counter').forEach(timeEl => {
+        const listDate = new Date(timeEl.dataset.listDate);
+        function updateTimer() {
+          const now = new Date();
+          const ms = now - listDate;
+          const days = Math.floor(ms / 86400000);
+          const hours = Math.floor((ms % 86400000) / 3600000);
+          timeEl.textContent = `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''} ago`;
+        }
+        updateTimer();
+        setInterval(updateTimer, 60000);
+      });
+    })();
   </script>
 </body>
 </html>
