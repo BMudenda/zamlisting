@@ -28,15 +28,13 @@
       font-size: 1.3rem; font-weight: bold; background: #e67e22;
       padding: 8px 15px; border-radius: 5px; color: white;
     }
-    .time-listed { font-size: 0.85rem; color: #ccc; }
-
+    .time-listed { font-size: 0.85rem; color: #ccc; margin-top: 5px; }
     .product-container {
       max-width: 1200px; margin: 30px auto; padding: 0 20px;
       display: flex; flex-wrap: wrap; gap: 30px;
     }
     .gallery-section { flex: 1 1 60%; min-width: 300px; }
     .details-section { flex: 1 1 35%; min-width: 300px; }
-
     .gallery-container {
       background: white; border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;
@@ -57,7 +55,6 @@
     }
     .prev-slide { left: 15px; }
     .next-slide { right: 15px; }
-
     .thumbnail-container {
       display: grid; grid-template-columns: repeat(6, 1fr);
       gap: 8px; padding: 15px;
@@ -69,7 +66,6 @@
     .thumbnail:hover, .thumbnail.active {
       border-color: #ff9900; opacity: 0.9;
     }
-
     .des { padding: 10px; }
     .card {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -87,7 +83,7 @@
     }
     .btn-primary { background-color: #27ae60; color: white; }
     .btn:hover { opacity: 0.9; }
-    #loader { display: none; text-align: center; margin-top: 10px; }
+    #loader { display: none; text-align: center; margin-top: 10px; color: #27ae60; }
 
     footer {
       background-color: #333; color: #fff;
@@ -111,7 +107,6 @@
   </style>
 </head>
 <body>
-
   <header>
     <div class="header-content">
       <div class="seller-info">
@@ -128,7 +123,7 @@
       </div>
       <div>
         <div class="price-tag">ZMW 90,000</div>
-        <div class="time-listed">Listed just now</div>
+        <div class="time-listed" id="timeListed">Listed just now</div>
       </div>
     </div>
   </header>
@@ -223,29 +218,28 @@
 
       loader.style.display = "block";
 
-      fetch("YOUR_SCRIPT_URL_HERE", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          item: itemName,
-          phone: phone,
-          offer: bid
-        })
+      const url = "YOUR_WEB_APP_URL_HERE"; // Replace with your Google Apps Script Web App URL
+
+      const params = new URLSearchParams({
+        itemName,
+        phone,
+        bid
+      });
+
+      fetch(url + "?" + params.toString(), {
+        method: "GET"
       })
+      .then(res => res.text())
       .then(response => {
+        alert("Offer submitted successfully!");
         loader.style.display = "none";
-        if (response.ok) {
-          alert("Offer submitted successfully!");
-          document.getElementById("itemName").value = "";
-          document.getElementById("phone").value = "";
-          document.getElementById("bid").value = "";
-        } else {
-          alert("Failed to submit. Please try again.");
-        }
+        document.getElementById("itemName").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("bid").value = "";
       })
-      .catch(() => {
+      .catch(err => {
+        alert("Failed to submit. Try again.");
         loader.style.display = "none";
-        alert("Error connecting to server.");
       });
     }
   </script>
