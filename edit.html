@@ -7,85 +7,45 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background-color: #f5f5f5; color: #333; }
-    header {
-      background: #333; color: white; padding: 20px; text-align: left;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .header-content {
-      max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap;
-      justify-content: space-between; align-items: center; gap: 15px;
-    }
+    header { background: #333; color: white; padding: 20px; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .header-content { max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; }
     .seller-info { flex: 1 1 60%; }
     .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
     .seller-info ul { list-style: none; margin-top: 8px; }
     .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
-    .seller-contact a {
-      text-decoration: none; color: white; margin-right: 10px;
-    }
-    .price-tag {
-      font-size: 1.3rem; font-weight: bold; background: #e67e22;
-      padding: 8px 15px; border-radius: 5px; color: white;
-    }
+    .seller-contact a { text-decoration: none; color: white; margin-right: 10px; }
+    .seller-contact i { margin-right: 5px; }
+    .price-tag { font-size: 1.3rem; font-weight: bold; background: #e67e22; padding: 8px 15px; border-radius: 5px; color: white; }
     .time-listed { font-size: 0.85rem; color: #ccc; margin-top: 5px; }
-    .product-container {
-      max-width: 1200px; margin: 30px auto; padding: 0 20px;
-      display: flex; flex-wrap: wrap; gap: 30px;
-    }
+    .product-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 30px; }
     .gallery-section { flex: 1 1 60%; min-width: 300px; }
     .details-section { flex: 1 1 35%; min-width: 300px; }
-    .gallery-container {
-      background: white; border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;
-    }
-    .main-slide {
-      position: relative; height: 500px;
-      display: flex; align-items: center; justify-content: center;
-      background: #f9f9f9;
-    }
-    .main-slide img {
-      max-width: 100%; max-height: 100%; object-fit: contain;
-    }
-    .slide-nav {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 40px; height: 40px; background: rgba(0,0,0,0.5);
-      color: white; border: none; border-radius: 50%; font-size: 20px;
-      cursor: pointer;
-    }
+    .gallery-container { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
+    .main-slide { position: relative; height: 500px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; }
+    .main-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .slide-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; font-size: 20px; cursor: pointer; }
     .prev-slide { left: 15px; }
     .next-slide { right: 15px; }
-    .thumbnail-container {
-      display: grid; grid-template-columns: repeat(6, 1fr);
-      gap: 8px; padding: 15px;
-    }
-    .thumbnail {
-      cursor: pointer; border: 2px solid transparent;
-      transition: 0.3s ease; height: 80px; object-fit: cover; border-radius: 4px;
-    }
-    .thumbnail:hover, .thumbnail.active {
-      border-color: #ff9900; opacity: 0.9;
-    }
-    .card {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px; background: white; border-radius: 8px;
-    }
-    .section-title {
-      font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 10px;
-    }
-    .bid-input {
-      width: 100%; padding: 10px; margin-bottom: 10px;
-      font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;
-    }
-    .toggle-btn {
-      background: #333; color: #fff; padding: 10px 15px;
-      border: none; border-radius: 5px; cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .action-buttons button {
-      width: 48%; padding: 10px; margin-right: 4%;
-      font-weight: bold; border: none; border-radius: 5px;
-      cursor: pointer; background-color: #25d366; color: white;
-    }
-    .action-buttons button:last-child { margin-right: 0; background-color: #3498db; }
+    .thumbnail-container { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 15px; }
+    .thumbnail { cursor: pointer; border: 2px solid transparent; transition: 0.3s ease; height: 80px; object-fit: cover; border-radius: 4px; }
+    .thumbnail:hover, .thumbnail.active { border-color: #ff9900; opacity: 0.9; }
+    .des { padding: 10px; }
+    .card { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); padding: 20px; background: white; border-radius: 10px; }
+    .toggle-offer-btn { background: #ff9900; color: white; padding: 10px; width: 100%; border: none; border-radius: 5px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
+    .offer-form { display: none; margin-top: 10px; }
+    .bid-input { width: 100%; padding: 10px; margin: 8px 0; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; }
+    .action-buttons { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { padding: 10px 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s ease; width: 48%; text-align: center; }
+    .btn-sms { background-color: #3498db; color: white; }
+    .btn-whatsapp { background-color: #25d366; color: white; }
+    footer { background-color: #333; color: #fff; padding: 10px; text-align: center; margin-top: 40px; }
+    .footer-links { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+    .footer-link { text-decoration: none; color: #fff; font-size: 0.9em; margin: 0 15px; }
+    .fa { padding: 10px; font-size: 20px; width: 30px; text-align: center; border-radius: 50%; }
+    .fa:hover { opacity: 0.7; }
+    .fa-facebook { background: #3B5998; color: white; }
+    .fa-twitter { background: #55ACEE; color: white; }
+    .fa-whatsapp { background: #25d366; color: white; }
   </style>
 </head>
 <body>
@@ -116,19 +76,21 @@
           <button class="slide-nav prev-slide">❮</button>
           <button class="slide-nav next-slide">❯</button>
         </div>
-        <div class="thumbnail-container"></div>
+        <div class="thumbnail-container" id="thumbnails"></div>
       </div>
     </section><section class="details-section">
-  <div class="card">
-    <button class="toggle-btn" onclick="toggleOfferSection()">Toggle Offer Section</button>
-    <div id="offerSection">
-      <div class="section-title">Your Offer</div>
-      <input id="itemName" class="bid-input" type="text" placeholder="Item name (e.g., Vitz 2SZ)" required />
-      <input id="phone" class="bid-input" type="tel" placeholder="Phone (e.g., 0973442823)" required />
-      <input id="bid" class="bid-input" type="number" placeholder="Offer in ZMW (e.g., 85000)" required />
-      <div class="action-buttons">
-        <button onclick="sendViaWhatsApp()">WhatsApp</button>
-        <button onclick="sendViaText()">Text</button>
+  <div class="des">
+    <div class="card">
+      <button class="toggle-offer-btn" onclick="toggleOfferForm()">Make an Offer</button>
+      <div class="offer-form" id="offerForm">
+        <h3 style="margin-bottom:10px">Your Offer</h3>
+        <input id="itemName" class="bid-input" type="text" placeholder="Item name (e.g., Vitz 2SZ)" required />
+        <input id="phone" class="bid-input" type="tel" placeholder="Phone (e.g., 0973442823)" required />
+        <input id="bid" class="bid-input" type="number" placeholder="Offer in ZMW (e.g., 85000)" required />
+        <div class="action-buttons">
+          <a id="smsBtn" class="btn btn-sms" href="#" target="_blank">Submit via Text</a>
+          <a id="waBtn" class="btn btn-whatsapp" href="#" target="_blank">Submit via WhatsApp</a>
+        </div>
       </div>
     </div>
   </div>
@@ -146,68 +108,68 @@
       <a href="https://wa.me/260770870706" class="fa fa-whatsapp"></a>
     </div>
   </footer>  <script>
-    const images = ["V1.jpg", "V2.jpg", "V3.jpg", "V4.jpg", "V5.jpg", "V6.jpg"];
-    let currentSlide = 0;
+    const images = ["V1.jpg", "V2.jpg", "V3.jpg","V4.jpg","V5.jpg","V6.jpg"];
+    const thumbnails = document.getElementById("thumbnails");
     const mainImage = document.getElementById("mainImage");
-    const thumbnailContainer = document.querySelector(".thumbnail-container");
+    let currentIndex = 0;
 
-    function loadThumbnails() {
-      images.forEach((img, index) => {
-        const thumb = document.createElement("img");
-        thumb.src = img;
-        thumb.className = "thumbnail";
-        if (index === 0) thumb.classList.add("active");
-        thumb.onclick = () => showSlide(index);
-        thumbnailContainer.appendChild(thumb);
+    function showImage(index) {
+      mainImage.src = images[index];
+      document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
       });
     }
 
-    function showSlide(index) {
-      currentSlide = index;
-      mainImage.src = images[index];
-      document.querySelectorAll(".thumbnail").forEach((el, i) => {
-        el.classList.toggle("active", i === index);
+    function populateThumbnails() {
+      images.forEach((img, i) => {
+        const thumb = document.createElement('img');
+        thumb.src = img;
+        thumb.className = 'thumbnail';
+        thumb.onclick = () => showImage(i);
+        thumbnails.appendChild(thumb);
       });
+      showImage(currentIndex);
     }
 
     document.querySelector(".prev-slide").onclick = () => {
-      currentSlide = (currentSlide - 1 + images.length) % images.length;
-      showSlide(currentSlide);
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      showImage(currentIndex);
     };
+
     document.querySelector(".next-slide").onclick = () => {
-      currentSlide = (currentSlide + 1) % images.length;
-      showSlide(currentSlide);
+      currentIndex = (currentIndex + 1) % images.length;
+      showImage(currentIndex);
     };
 
-    loadThumbnails();
+    populateThumbnails();
 
-    function toggleOfferSection() {
-      const section = document.getElementById("offerSection");
-      section.style.display = section.style.display === "none" ? "block" : "none";
+    function toggleOfferForm() {
+      const form = document.getElementById("offerForm");
+      form.style.display = form.style.display === "none" || form.style.display === "" ? "block" : "none";
     }
 
-    function sendViaWhatsApp() {
-      const item = document.getElementById("itemName").value;
-      const phone = document.getElementById("phone").value;
-      const bid = document.getElementById("bid").value;
-      const msg = `Offer for ${item}%0AMy Phone: ${phone}%0AMy Offer: ZMW ${bid}`;
-      window.open(`https://wa.me/260973442823?text=${msg}`, "_blank");
-    }
+    document.getElementById("itemName").value = "Vitz 2SZ";
 
-    function sendViaText() {
-      const item = document.getElementById("itemName").value;
-      const phone = document.getElementById("phone").value;
-      const bid = document.getElementById("bid").value;
-      const msg = `sms:+260973442823?body=Offer for ${item}, My Phone: ${phone}, My Offer: ZMW ${bid}`;
-      window.open(msg);
-    }
+    document.querySelectorAll("#itemName, #phone, #bid").forEach(input => {
+      input.addEventListener("input", () => {
+        const item = document.getElementById("itemName").value;
+        const phone = document.getElementById("phone").value;
+        const bid = document.getElementById("bid").value;
+        const msg = `Offer for ${item}: ZMW ${bid}. Contact: ${phone}`;
+        document.getElementById("smsBtn").href = `sms:+260973442823?body=${encodeURIComponent(msg)}`;
+        document.getElementById("waBtn").href = `https://wa.me/260973442823?text=${encodeURIComponent(msg)}`;
+      });
+    });
 
-    const listingTime = new Date();
+    const listedTime = new Date();
     function updateTimeListed() {
       const now = new Date();
-      const diffMinutes = Math.floor((now - listingTime) / 60000);
-      const display = diffMinutes < 1 ? "Listed just now" : `Listed ${diffMinutes} min ago`;
-      document.getElementById("timeListed").textContent = display;
+      const diffMs = now - listedTime;
+      const mins = Math.floor(diffMs / 60000);
+      const hours = Math.floor(mins / 60);
+      const days = Math.floor(hours / 24);
+      const timeStr = days > 0 ? `${days} day(s) ago` : hours > 0 ? `${hours} hour(s) ago` : `${mins} minute(s) ago`;
+      document.getElementById("timeListed").textContent = `Listed ${timeStr}`;
     }
     setInterval(updateTimeListed, 60000);
     updateTimeListed();
