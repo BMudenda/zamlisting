@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZamListing | Laptop</title>
+  <title>ZamListing | laptop</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,8 +20,6 @@
     .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
     .seller-info ul { list-style: none; margin-top: 8px; }
     .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
-    .seller-contact a { text-decoration: none; color: white; margin-right: 10px; }
-    .seller-contact i { margin-right: 5px; }
     .price-tag {
       font-size: 1.3rem; font-weight: bold; background: #e67e22;
       padding: 8px 15px; border-radius: 5px; color: white;
@@ -61,49 +59,43 @@
       cursor: pointer; border: 2px solid transparent;
       transition: 0.3s ease; height: 80px; object-fit: cover; border-radius: 4px;
     }
-    .thumbnail:hover, .thumbnail.active { border-color: #ff9900; opacity: 0.9; }
+    .thumbnail:hover, .thumbnail.active {
+      border-color: #ff9900; opacity: 0.9;
+    }
     .des { padding: 10px; }
     .card {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px; background: white;
+      padding: 20px; background: white; border-radius: 8px;
+    }
+    .toggle-offer-btn {
+      background: #2980b9; color: white; padding: 10px 20px;
+      border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+    }
+    .offer-section { display: none; margin-top: 15px; }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
     }
     .bid-input {
-      width: 100%; padding: 10px; margin: 10px 0;
+      width: 100%; padding: 10px;
       font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;
     }
-    .action-buttons { margin-top: 20px; }
-    .btn {
-      padding: 10px 20px; font-weight: bold;
-      border: none; border-radius: 5px; cursor: pointer;
-      transition: 0.3s ease;
+    .amount-input {
+      width: 60%; padding: 10px;
+      font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;
     }
-    .btn-primary { background-color: #27ae60; color: white; }
-    .btn:hover { opacity: 0.9; }
-    #loader {
-      display: none; text-align: center; margin-top: 10px;
+    .offer-actions button {
+      margin: 5px 10px 0 0; padding: 10px 15px;
+      border: none; border-radius: 5px; font-weight: bold;
+      cursor: pointer; font-size: 0.95rem;
     }
-    #loader.success { color: green; }
-    #loader.error { color: red; }
-
-    footer {
-      background-color: #333; color: #fff;
-      padding: 10px; text-align: center; margin-top: 40px;
-    }
-    .footer-links {
-      display: flex; justify-content: center;
-      flex-wrap: wrap; margin-top: 10px;
-    }
-    .footer-link {
-      text-decoration: none; color: #fff;
-      font-size: 0.9em; margin: 0 15px;
-    }
-    .fa { padding: 10px; font-size: 20px;
-      width: 30px; text-align: center; border-radius: 50%;
-    }
-    .fa:hover { opacity: 0.7; }
-    .fa-facebook { background: #3B5998; color: white; }
-    .fa-twitter { background: #55ACEE; color: white; }
-    .fa-whatsapp { background: #25d366; color: white; }
+    .whatsapp-btn { background-color: #25d366; color: white; }
+    .text-btn { background-color: #2980b9; color: white; }
+    .call-btn { background-color: #e74c3c; color: white; }
   </style>
 </head>
 <body>
@@ -114,16 +106,12 @@
         <ul>
           <li><strong>Seller:</strong> BM</li>
           <li><strong>Address:</strong> Lusaka, Makeni</li>
-          <li><strong>Delivery:</strong> Nationwide (fee applicable), good condition</li>
+          <li><strong>Delivery:</strong> Nationwide (fee applicable), Good condition</li>
         </ul>
-        <div class="seller-contact">
-          <a href="tel:+260978167546"><i class="fa fa-phone"></i>Call</a>
-          <a href="https://wa.me/260978167546"><i class="fa fa-whatsapp"></i>WhatsApp</a>
-        </div>
       </div>
       <div>
-        <div class="price-tag">ZMW 1300</div>
-        <div class="time-listed time-counter" data-list-date="2025-05-27T10:00:00Z">Listed just now</div>
+        <div class="price-tag">ZMW 1,300</div>
+        <div class="time-listed" id="timeListed">Listed just now</div>
       </div>
     </div>
   </header>
@@ -133,127 +121,112 @@
       <div class="gallery-container">
         <div class="main-slide">
           <img src="L1.jpeg" id="mainImage" alt="Item Image" />
-          <button class="slide-nav prev-slide">❮</button>
-          <button class="slide-nav next-slide">❯</button>
+          <button class="slide-nav prev-slide" onclick="navigateSlide(-1)">❮</button>
+          <button class="slide-nav next-slide" onclick="navigateSlide(1)">❯</button>
         </div>
-        <div class="thumbnail-container"></div>
+        <div class="thumbnail-container" id="thumbnailContainer"></div>
       </div>
     </section>
 
     <section class="details-section">
       <div class="des">
         <div class="card">
-          <input id="itemName" class="bid-input" type="text" placeholder="Item name (e.g., Treck laptop)" required />
-          <input id="phone" class="bid-input" type="tel" placeholder="Phone (e.g., 0973442823)" required />
-          <input id="bid" class="bid-input" type="number" placeholder="Offer in ZMW (e.g., 2000)" required />
-          <div id="loader">Submitting...</div>
-          <div class="action-buttons">
-            <button class="btn btn-primary" onclick="submitBid()">Submit offer</button>
+          <button class="toggle-offer-btn" onclick="toggleOfferSection()">Make an Offer</button>
+          <div class="offer-section" id="offerSection">
+            
+            <div class="form-group">
+              <label for="itemName">Item</label>
+              <input id="itemName" class="bid-input" type="text" placeholder="laptop" required />
+            </div>
+            <div class="form-group">
+              <label for="bid">Amount (ZMW)</label>
+              <input id="bid" class="amount-input" type="number" placeholder="1299" required />
+            </div>
+            <div class="offer-actions">
+              <button class="whatsapp-btn" onclick="submitOffer('whatsapp')">WhatsApp</button>
+              <button class="text-btn" onclick="submitOffer('sms')">Text</button>
+              <button class="call-btn" onclick="window.location.href='tel:+260978167546'">Call</button>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="footer-links">
-      <a href="https://zamlisting.com/about.html" class="footer-link">About</a>
-      <a href="https://zamlisting.com/" class="footer-link">Home</a>
-    </div>
-    <hr />
-    <div>
-      <a href="#" class="fa fa-facebook"></a>
-      <a href="#" class="fa fa-twitter"></a>
-      <a href="https://wa.me/0978167546" class="fa fa-whatsapp"></a>
-    </div>
-  </footer>
-
   <script>
-    const galleryConfig = {
-      images: ["L1.jpeg", "L2.jpeg", "L3.jpeg", "L4.jpeg", "L5.jpeg", "L6.jpg"],
-      currentSlide: 0
-    };
+    const thumbnails = ["L1.jpeg", "L2.jpeg", "L3.jpeg", "L4.jpeg", "L5.jpeg", "L6.jpg"];
+    let currentSlide = 0;
+
     const mainImage = document.getElementById("mainImage");
-    const thumbnails = document.querySelector(".thumbnail-container");
+    const thumbnailContainer = document.getElementById("thumbnailContainer");
 
-    function updateMainImage(index) {
-      mainImage.src = galleryConfig.images[index];
-      galleryConfig.currentSlide = index;
-      updateThumbnails();
-    }
-
-    function updateThumbnails() {
-      thumbnails.innerHTML = "";
-      galleryConfig.images.forEach((src, i) => {
-        const img = document.createElement("img");
-        img.src = src;
-        img.className = "thumbnail" + (i === galleryConfig.currentSlide ? " active" : "");
-        img.onclick = () => updateMainImage(i);
-        thumbnails.appendChild(img);
+    function renderThumbnails() {
+      thumbnails.forEach((src, index) => {
+        const thumb = document.createElement("img");
+        thumb.src = src;
+        thumb.className = "thumbnail";
+        if (index === currentSlide) thumb.classList.add("active");
+        thumb.onclick = () => {
+          currentSlide = index;
+          updateSlide();
+        };
+        thumbnailContainer.appendChild(thumb);
       });
     }
 
-    document.querySelector(".prev-slide").onclick = () => {
-      const newIndex = (galleryConfig.currentSlide - 1 + galleryConfig.images.length) % galleryConfig.images.length;
-      updateMainImage(newIndex);
-    };
-    document.querySelector(".next-slide").onclick = () => {
-      const newIndex = (galleryConfig.currentSlide + 1) % galleryConfig.images.length;
-      updateMainImage(newIndex);
-    };
+    function updateSlide() {
+      mainImage.src = thumbnails[currentSlide];
+      document.querySelectorAll(".thumbnail").forEach((thumb, i) => {
+        thumb.classList.toggle("active", i === currentSlide);
+      });
+    }
 
-    updateMainImage(0);
+    function navigateSlide(direction) {
+      currentSlide = (currentSlide + direction + thumbnails.length) % thumbnails.length;
+      updateSlide();
+    }
 
-    function submitBid() {
-      const name = document.getElementById("itemName").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const offer = document.getElementById("bid").value.trim();
-      const loader = document.getElementById("loader");
+    function toggleOfferSection() {
+      const section = document.getElementById("offerSection");
+      section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
+    }
 
-      if (!name || !phone || !offer) {
-        loader.textContent = "Please fill in all fields.";
-        loader.className = "error";
-        loader.style.display = "block";
-        return;
+    function submitOffer(type) {
+      const name = document.getElementById("itemName").value;
+      const bid = document.getElementById("bid").value;
+      const message = `Offer for ${name}:\nOffer: ZMW ${bid}`;
+      if (!name || !bid) return alert("Please enter both item name and offer amount.");
+
+      if (type === 'whatsapp') {
+        window.open(`https://wa.me/260978167546?text=${encodeURIComponent(message)}`);
+      } else if (type === 'sms') {
+        window.open(`sms:+260978167546?body=${encodeURIComponent(message)}`);
       }
-
-      loader.textContent = "Submitting...";
-      loader.className = "";
-      loader.style.display = "block";
-
-      const data = { item: name, phone: phone, bid: offer };
-
-      fetch("YOUR_GOOGLE_SCRIPT_URL", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      }).then(() => {
-        loader.textContent = "Submitted successfully!";
-        loader.className = "success";
-        document.getElementById("itemName").value = "";
-        document.getElementById("phone").value = "";
-        document.getElementById("bid").value = "";
-      }).catch(err => {
-        loader.textContent = "Error submitting form.";
-        loader.className = "error";
-      });
     }
 
-    (function() {
-      document.querySelectorAll('.time-counter').forEach(timeEl => {
-        const listDate = new Date(timeEl.dataset.listDate);
-        function updateTimer() {
-          const now = new Date();
-          const ms = now - listDate;
-          const days = Math.floor(ms / 86400000);
-          const hours = Math.floor((ms % 86400000) / 3600000);
-          timeEl.textContent = `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''} ago`;
-        }
-        updateTimer();
-        setInterval(updateTimer, 60000);
-      });
-    })();
+    function updateTimeListed() {
+      const listedTime = new Date("2025-05-27T12:00:00Z");
+      const now = new Date();
+      const diffMs = now - listedTime;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      let timeText;
+      if (diffMins < 1) timeText = "Listed just now";
+      else if (diffMins < 60) timeText = `Listed ${diffMins} minute(s) ago`;
+      else if (diffHours < 24) timeText = `Listed ${diffHours} hour(s) ago`;
+      else timeText = `Listed ${diffDays} day(s) ago`;
+
+      document.getElementById("timeListed").textContent = timeText;
+    }
+
+    // Initial load
+    renderThumbnails();
+    updateSlide();
+    updateTimeListed();
+    setInterval(updateTimeListed, 60000);
   </script>
 </body>
+  
 </html>
