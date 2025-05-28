@@ -20,10 +20,6 @@
     .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
     .seller-info ul { list-style: none; margin-top: 8px; }
     .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
-    .seller-contact a {
-      text-decoration: none; color: white; margin-right: 10px;
-    }
-    .seller-contact i { margin-right: 5px; }
     .price-tag {
       font-size: 1.3rem; font-weight: bold; background: #e67e22;
       padding: 8px 15px; border-radius: 5px; color: white;
@@ -113,8 +109,8 @@
       <div class="gallery-container">
         <div class="main-slide">
           <img src="V1.jpg" id="mainImage" alt="Item Image" />
-          <button class="slide-nav prev-slide">❮</button>
-          <button class="slide-nav next-slide">❯</button>
+          <button class="slide-nav prev-slide" onclick="navigateSlide(-1)">❮</button>
+          <button class="slide-nav next-slide" onclick="navigateSlide(1)">❯</button>
         </div>
         <div class="thumbnail-container" id="thumbnailContainer"></div>
       </div>
@@ -141,31 +137,47 @@
 
   <script>
     const thumbnails = ["V1.jpg", "V2.jpg", "V3.jpg", "V4.jpg", "V5.jpg", "V6.jpg"];
-    const thumbnailContainer = document.getElementById("thumbnailContainer");
-    const mainImage = document.getElementById("mainImage");
-    const offerSection = document.getElementById("offerSection");
+    let currentSlide = 0;
 
-    thumbnails.forEach((src, index) => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.className = "thumbnail";
-      img.onclick = () => {
-        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-        img.classList.add('active');
-        mainImage.src = src;
-      };
-      if (index === 0) img.classList.add("active");
-      thumbnailContainer.appendChild(img);
-    });
+    const mainImage = document.getElementById("mainImage");
+    const thumbnailContainer = document.getElementById("thumbnailContainer");
+
+    function renderThumbnails() {
+      thumbnails.forEach((src, index) => {
+        const thumb = document.createElement("img");
+        thumb.src = src;
+        thumb.className = "thumbnail";
+        if (index === currentSlide) thumb.classList.add("active");
+        thumb.onclick = () => {
+          currentSlide = index;
+          updateSlide();
+        };
+        thumbnailContainer.appendChild(thumb);
+      });
+    }
+
+    function updateSlide() {
+      mainImage.src = thumbnails[currentSlide];
+      document.querySelectorAll(".thumbnail").forEach((thumb, i) => {
+        thumb.classList.toggle("active", i === currentSlide);
+      });
+    }
+
+    function navigateSlide(direction) {
+      currentSlide = (currentSlide + direction + thumbnails.length) % thumbnails.length;
+      updateSlide();
+    }
 
     function toggleOfferSection() {
-      offerSection.style.display = offerSection.style.display === "none" ? "block" : "none";
+      const section = document.getElementById("offerSection");
+      section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
     }
 
     function submitOffer(type) {
       const name = document.getElementById("itemName").value;
       const bid = document.getElementById("bid").value;
       const message = `Offer for ${name}:\nOffer: ZMW ${bid}`;
+      if (!name || !bid) return alert("Please enter both item name and offer amount.");
 
       if (type === 'whatsapp') {
         window.open(`https://wa.me/260973442823?text=${encodeURIComponent(message)}`);
@@ -175,13 +187,25 @@
     }
 
     function updateTimeListed() {
-      const listedTime = new Date();
+      const listedTime = new Date("2025-05-28T12:00:00Z"); // Replace with actual listing time
       const now = new Date();
-      const diff = Math.floor((now - listedTime) / 60000);
-      document.getElementById("timeListed").textContent =
-        diff < 1 ? "Listed just now" : `Listed ${diff} minute(s) ago`;
+      const diffMs = now - listedTime;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      let timeText;
+      if (diffMins < 1) timeText = "Listed just now";
+      else if (diffMins < 60) timeText = `Listed ${diffMins} minute(s) ago`;
+      else if (diffHours < 24) timeText = `Listed ${diffHours} hour(s) ago`;
+      else timeText = `Listed ${diffDays} day(s) ago`;
+
+      document.getElementById("timeListed").textContent = timeText;
     }
 
+    // Initial load
+    renderThumbnails();
+    updateSlide();
     updateTimeListed();
     setInterval(updateTimeListed, 60000);
   </script>
