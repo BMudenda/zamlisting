@@ -30,11 +30,13 @@
       box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
       outline: none;
     }
-    /* Make coordinate inputs grey */
     #originCoords, #destinationCoords {
       background-color: #e0e0e0;
+      display: none;
     }
-
+    #fetchLocationBtn {
+      display: none;
+    }
     .button-group {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -82,10 +84,6 @@
     .success { background:#e3fcef; color:#0a6640; }
     .error   { background:#fde8e8; color:#9b2c2c; }
   </style>
-
-
-
-
 </head>
 <body>
   <div class="container">
@@ -122,7 +120,7 @@
       <label>Current Location</label>
       <div class="coords-group">
         <input id="origin" placeholder="Search your nearby place or fetch coordinates">
-        <button type="button" onclick="fetchCurrentLocation()">📍Fetch Current Location</button>
+        <button type="button" id="fetchLocationBtn" onclick="fetchCurrentLocation()">📍Fetch Current Location</button>
       </div>
       <input id="originCoords" placeholder="Latitude,Longitude">
     </div>
@@ -161,7 +159,6 @@
     let map, directionsService, directionsRenderer, autocompleteOrigin, autocompleteDest;
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbytUJ-taezbOxcxnZTWwWjeFBH-gqshju9_g295Cu9wSpwtvlHHHNajxHxii8SxsUpe/exec';
 
-    /* ---- MAP & AUTOCOMPLETE INITIALISATION ---- */
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 14,
@@ -185,19 +182,84 @@
           document.getElementById('destinationCoords').value =
             `${p.geometry.location.lat().toFixed(6)},${p.geometry.location.lng().toFixed(6)}`;
       });
+
+      autoFetchCurrentLocation();
     }
 
-    /* ---- IMPROVED CURRENT-LOCATION FETCH ---- */
-    function fetchCurrentLocation() {
+    function hideCoordsInputs() {
+      document.getElementById("originCoords").style.display = "none";
+      document.getElementById("destinationCoords").style.display = "none";
+      document.getElementById("originCoords").value = "";
+      document.getElementById("destinationCoords").value = "";
+      document.getElementById("fetchLocationBtn").style.display = "none";
+    }
+
+    function showCoordsInputs() {
+      document.getElementById("originCoords").style.display = "";
+      document.getElementById("destinationCoords").style.display = "";
+      document.getElementById("fetchLocationBtn").style.display = "none";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("fetchLocationBtn").style.display = "none";
+    });
+
+    function autoFetchCurrentLocation() {
       const originField  = document.getElementById("origin");
       const originCoords = document.getElementById("originCoords");
+      hideCoordsInputs();
+
+      let reminderTimeout = setTimeout(() => {
+        showMessage('Could not fetch your location. Please search for a nearby place.', "error");
+        showCoordsInputs();
+        originField.focus();
+      }, 10000);
 
       if (!navigator.geolocation) {
-        alert("Geolocation not supported by your browser");
+        showMessage("Geolocation is not supported by your browser. Please search for your location.", "error");
+        clearTimeout(reminderTimeout);
+        showCoordsInputs();
         return;
       }
 
-      /* show user we’re working */
+      showMessage("Attempting to fetch your current location...", "success");
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          clearTimeout(reminderTimeout);
+          const lat = pos.coords.latitude.toFixed(6);
+          const lng = pos.coords.longitude.toFixed(6);
+          const c   = `${lat},${lng}`;
+          originField.value  = c;
+          originCoords.value = c;
+          showCoordsInputs();
+          showMessage("Location fetched! Adjust if needed.", "success");
+        },
+        err => {
+          clearTimeout(reminderTimeout);
+          showMessage("Unable to fetch location. Please search for a nearby place.", "error");
+          showCoordsInputs();
+          originField.focus();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    function fetchCurrentLocation() {
+      const originField  = document.getElementById("origin");
+      const originCoords = document.getElementById("originCoords");
+      hideCoordsInputs();
+
+      if (!navigator.geolocation) {
+        showMessage("Geolocation not supported by your browser. Please search for your location.", "error");
+        showCoordsInputs();
+        return;
+      }
+
       originField.value  = "Fetching current location...";
 
       navigator.geolocation.getCurrentPosition(
@@ -207,10 +269,12 @@
           const c   = `${lat},${lng}`;
           originField.value  = c;
           originCoords.value = c;
+          showCoordsInputs();
+          showMessage("Location fetched! Adjust if needed.", "success");
         },
         err => {
-          console.error("Geolocation error:", err);
-          alert("Unable to fetch location. Please enable GPS and try again.");
+          showMessage("Unable to fetch location. Please enable GPS and try again or search for a nearby place.", "error");
+          showCoordsInputs();
           originField.value = "";
         },
         {
@@ -221,7 +285,6 @@
       );
     }
 
-    /* ---- UI HELPERS ---- */
     function toggleFields() {
       const isDriver = document.getElementById("submitterType").value === "Driver";
       document.getElementById("driverFields").classList.toggle("hidden", !isDriver);
@@ -244,12 +307,11 @@
       m.style.display = (m.style.display === "block" ? "none" : "block");
     }
 
-    /* ---- ROUTE & COST ---- */
     function calculateRoute() {
       const o = document.getElementById("originCoords").value.split(",").map(Number);
       const d = document.getElementById("destinationCoords").value.split(",").map(Number);
       if (o.length < 2 || d.length < 2 || Number.isNaN(o[0]) || Number.isNaN(d[0])) {
-        alert("Enter valid coordinates for origin and destination");
+        showMessage("Enter valid coordinates for origin and destination", "error");
         return;
       }
 
@@ -273,14 +335,14 @@
             document.getElementById("totalCost").innerText =
               `💲 Total: ZMW ${fare.toFixed(2)}`;
             document.getElementById("tripSummary").classList.remove("hidden");
+            showMessage("Route calculated.", "success");
           } else {
-            alert("Route error: " + st);
+            showMessage("Route error: " + st, "error");
           }
         }
       );
     }
 
-    /* ---- SUBMIT TO GOOGLE SHEETS ---- */
     function submitData() {
       const data = {
         submitterType  : document.getElementById("submitterType").value,
@@ -294,7 +356,7 @@
         distance       : document.getElementById("distance").innerText.replace("📏 Distance: ", ""),
         duration       : document.getElementById("duration").innerText.replace("⏱ Duration: ", ""),
         totalCost      : document.getElementById("totalCost").innerText.replace("💲 Total: ZMW ", ""),
-        Date           : ""   // handled by Apps Script
+        Date           : ""
       };
 
       document.getElementById("loader").style.display = "block";
@@ -328,16 +390,14 @@
       setTimeout(() => s.style.display = "none", 5000);
     }
 
-    /* expose init for callback */
     window.initMap = initMap;
   </script>
 
-  <!-- KEEPING YOUR ORIGINAL API KEY AND CALLBACK -->
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRdnvGw7epuDJjgBnpv0-FEuSQ6J-fyNY&libraries=places&callback=initMap">
   </script>
 </body>
-  <footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.2.0</strong> — Last updated May 27, 2025
+<footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
+  Version: <strong>1.2.1</strong> — Last updated May 29, 2025
 </footer>
- </html>
+</html>
