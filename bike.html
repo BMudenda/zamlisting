@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Luangwa-yangoL-RideTrack</title>
+  <title>Luangwa-yangoL-BikeTrack</title>
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
@@ -30,11 +30,13 @@
       box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
       outline: none;
     }
-    /* Make coordinate inputs grey */
     #originCoords, #destinationCoords {
       background-color: #e0e0e0;
+      display: none;
     }
-
+    #fetchLocationBtn {
+      display: none;
+    }
     .button-group {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -81,21 +83,66 @@
     }
     .success { background:#e3fcef; color:#0a6640; }
     .error   { background:#fde8e8; color:#9b2c2c; }
+    .instructions-toggle {
+      background: #fffbe6;
+      border: 1px solid #ffe07a;
+      color: #7c6700;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1em;
+      width: fit-content;
+    }
+    .instructions-box {
+      background: #f9f7f0;
+      border: 1px solid #ffe07a;
+      color: #5b5400;
+      border-radius: 10px;
+      padding: 18px 18px 18px 26px;
+      margin-bottom: 18px;
+      font-size: 1em;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      max-width: 100%;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .instructions-box ul {
+      margin: 0 0 0 1.2em;
+      padding: 0;
+    }
+    .instructions-box li {
+      margin-bottom: 0.7em;
+      line-height: 1.55em;
+    }
   </style>
-
-
-
-
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align:center; color:#2c3e50; margin-bottom:30px;">  🏍️ RideTrack</h1>
+    <h1 style="text-align:center; color:#2c3e50; margin-bottom:30px;">🏍 BikeTrack</h1>
+
+    <button type="button" class="instructions-toggle" onclick="toggleInstructions()" id="instructionsBtn">
+      <span id="instructionsBtnIcon">➕</span> Instructions & Tips
+    </button>
+    <div class="instructions-box" id="instructionsBox" style="display:none;">
+      <ul>
+        <li>🔍 <b>You can search for your current location and destination</b> by typing in the respective search boxes.</li>
+        <li>🌍 <b>You can select your destination on the map</b> by toggling the map and <b>double-clicking</b> (desktop) or <b>tapping once</b> (mobile) on the map.</li>
+        <li>🧳+👥 Tick the "Extras" checkbox if you have luggage or additional people (adds a 50% surcharge).</li>
+        <li>🗺 Click "Calculate Route" to see the fare, distance, and route on the map.</li>
+        <li>📤 Click "Submit Ride" to send your ride request.</li>
+        <li>💲 <b>Charges are K20 per 3km</b> (rounded up to the next 3km interval).</li>
+      </ul>
+    </div>
 
     <div class="form-section">
       <label for="submitterType">You are:</label>
       <select id="submitterType" onchange="toggleFields()">
         <option value="Customer">Customer</option>
-        <option value="Driver">Biker</option>
+        <option value="Driver">Driver</option>
       </select>
     </div>
 
@@ -109,11 +156,11 @@
         <label for="vehicle">Select Vehicle</label>
         <select id="vehicle" onchange="populateDriverPhone()">
           <option value="">Choose your vehicle</option>
-          <option value="BAH1996,Bike,Silver">BAH1996, ist, Silver</option>
-          <option value="BAH2345,Bike,Blue">BAH2345, Vitz, Blue</option>
-          <option value="BAH9876,Bike,White">BAH9876, Corolla, White</option>
-          <option value="BAH3456,Bike,Black">BAH3456, Harrier, Black</option>
-          <option value="BAH5678,Bike,Red">BAH5678, Mazda, Red</option>
+          <option value="BAH1996,ist,Silver">BAH1996, ist, Silver</option>
+          <option value="BAH2345,Vitz,Blue">BAH2345, Vitz, Blue</option>
+          <option value="BAH9876,Corolla,White">BAH9876, Corolla, White</option>
+          <option value="BAH3456,Harrier,Black">BAH3456, Harrier, Black</option>
+          <option value="BAH5678,Mazda,Red">BAH5678, Mazda, Red</option>
         </select>
       </div>
     </div>
@@ -122,7 +169,7 @@
       <label>Current Location</label>
       <div class="coords-group">
         <input id="origin" placeholder="Search your nearby place or fetch coordinates">
-        <button type="button" onclick="fetchCurrentLocation()">📍 Fetch Current Location</button>
+        <button type="button" id="fetchLocationBtn" onclick="fetchCurrentLocation()">📍Fetch Current Location</button>
       </div>
       <input id="originCoords" placeholder="Latitude,Longitude">
     </div>
@@ -158,14 +205,54 @@
   </div>
 
   <script>
+    // Instructions toggle logic
+    function toggleInstructions() {
+      var box = document.getElementById("instructionsBox");
+      var btn = document.getElementById("instructionsBtn");
+      var icon = document.getElementById("instructionsBtnIcon");
+      if (box.style.display === "none") {
+        box.style.display = "block";
+        icon.textContent = "➖";
+      } else {
+        box.style.display = "none";
+        icon.textContent = "➕";
+      }
+    }
+
     let map, directionsService, directionsRenderer, autocompleteOrigin, autocompleteDest;
+    let destinationMarker = null; // For map click to select destination
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbytUJ-taezbOxcxnZTWwWjeFBH-gqshju9_g295Cu9wSpwtvlHHHNajxHxii8SxsUpe/exec';
 
-    /* ---- MAP & AUTOCOMPLETE INITIALISATION ---- */
+    function setDestinationFromMap(latLng) {
+      const lat = latLng.lat().toFixed(6);
+      const lng = latLng.lng().toFixed(6);
+      document.getElementById("destinationCoords").value = `${lat},${lng}`;
+
+      // Place or move marker
+      if (destinationMarker) {
+        destinationMarker.setPosition(latLng);
+      } else {
+        destinationMarker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+          title: "Selected Destination"
+        });
+      }
+
+      // Optionally, reverse geocode to fill address
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          document.getElementById("destination").value = results[0].formatted_address;
+        }
+      });
+    }
+
     function initMap() {
+      // Center and zoom on Luangwa District, Zambia (approx -15.6052, 30.4167)
       map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
-        center: { lat: -13.1339, lng: 27.8493 }
+        zoom: 13,
+        center: { lat: -15.6052, lng: 30.4167 }
       });
       directionsService  = new google.maps.DirectionsService();
       directionsRenderer = new google.maps.DirectionsRenderer({ map });
@@ -185,19 +272,97 @@
           document.getElementById('destinationCoords').value =
             `${p.geometry.location.lat().toFixed(6)},${p.geometry.location.lng().toFixed(6)}`;
       });
+
+      // Double click for desktop
+      map.addListener('dblclick', function(e) {
+        setDestinationFromMap(e.latLng);
+      });
+
+      // Single tap/click for mobile and desktop
+      map.addListener('click', function(e) {
+        // Only set if map is visible
+        if (document.getElementById("map").style.display === "block") {
+          setDestinationFromMap(e.latLng);
+        }
+      });
+
+      autoFetchCurrentLocation();
     }
 
-    /* ---- IMPROVED CURRENT-LOCATION FETCH ---- */
-    function fetchCurrentLocation() {
+    function hideCoordsInputs() {
+      document.getElementById("originCoords").style.display = "none";
+      document.getElementById("destinationCoords").style.display = "none";
+      document.getElementById("originCoords").value = "";
+      document.getElementById("destinationCoords").value = "";
+      document.getElementById("fetchLocationBtn").style.display = "none";
+    }
+
+    function showCoordsInputs() {
+      document.getElementById("originCoords").style.display = "";
+      document.getElementById("destinationCoords").style.display = "";
+      document.getElementById("fetchLocationBtn").style.display = "none";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("fetchLocationBtn").style.display = "none";
+    });
+
+    function autoFetchCurrentLocation() {
       const originField  = document.getElementById("origin");
       const originCoords = document.getElementById("originCoords");
+      hideCoordsInputs();
+
+      let reminderTimeout = setTimeout(() => {
+        showMessage('Could not fetch your location. Please search for a nearby place.', "error");
+        showCoordsInputs();
+        originField.focus();
+      }, 10000);
 
       if (!navigator.geolocation) {
-        alert("Geolocation not supported by your browser");
+        showMessage("Geolocation is not supported by your browser. Please search for your location.", "error");
+        clearTimeout(reminderTimeout);
+        showCoordsInputs();
         return;
       }
 
-      /* show user we’re working */
+      showMessage("Attempting to fetch your current location...", "success");
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          clearTimeout(reminderTimeout);
+          const lat = pos.coords.latitude.toFixed(6);
+          const lng = pos.coords.longitude.toFixed(6);
+          const c   = `${lat},${lng}`;
+          originField.value  = c;
+          originCoords.value = c;
+          showCoordsInputs();
+          showMessage("Location fetched! Adjust if needed.", "success");
+        },
+        err => {
+          clearTimeout(reminderTimeout);
+          showMessage("Unable to fetch location. Please search for a nearby place.", "error");
+          showCoordsInputs();
+          originField.focus();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    function fetchCurrentLocation() {
+      const originField  = document.getElementById("origin");
+      const originCoords = document.getElementById("originCoords");
+      hideCoordsInputs();
+
+      if (!navigator.geolocation) {
+        showMessage("Geolocation not supported by your browser. Please search for your location.", "error");
+        showCoordsInputs();
+        return;
+      }
+
       originField.value  = "Fetching current location...";
 
       navigator.geolocation.getCurrentPosition(
@@ -207,10 +372,12 @@
           const c   = `${lat},${lng}`;
           originField.value  = c;
           originCoords.value = c;
+          showCoordsInputs();
+          showMessage("Location fetched! Adjust if needed.", "success");
         },
         err => {
-          console.error("Geolocation error:", err);
-          alert("Unable to fetch location. Please enable GPS and try again.");
+          showMessage("Unable to fetch location. Please enable GPS and try again or search for a nearby place.", "error");
+          showCoordsInputs();
           originField.value = "";
         },
         {
@@ -221,7 +388,6 @@
       );
     }
 
-    /* ---- UI HELPERS ---- */
     function toggleFields() {
       const isDriver = document.getElementById("submitterType").value === "Driver";
       document.getElementById("driverFields").classList.toggle("hidden", !isDriver);
@@ -229,11 +395,11 @@
 
     function populateDriverPhone() {
       const map = {
-        "BAH1996,Bike,Silver"  : "+260123456789",
-        "BAH2345,Bike,Blue"   : "+260987654321",
-        "BAH9876,Bike,White": "+260345678901",
-        "BAH3456,Bike,Black": "+260567890123",
-        "BAH5678,Bike,Red"   : "+260678901234"
+        "BAH1996,ist,Silver"  : "+260123456789",
+        "BAH2345,Vitz,Blue"   : "+260987654321",
+        "BAH9876,Corolla,White": "+260345678901",
+        "BAH3456,Harrier,Black": "+260567890123",
+        "BAH5678,Mazda,Red"   : "+260678901234"
       };
       const v = document.getElementById("vehicle").value;
       document.getElementById("phone").value = map[v] || "";
@@ -244,12 +410,11 @@
       m.style.display = (m.style.display === "block" ? "none" : "block");
     }
 
-    /* ---- ROUTE & COST ---- */
     function calculateRoute() {
       const o = document.getElementById("originCoords").value.split(",").map(Number);
       const d = document.getElementById("destinationCoords").value.split(",").map(Number);
       if (o.length < 2 || d.length < 2 || Number.isNaN(o[0]) || Number.isNaN(d[0])) {
-        alert("Enter valid coordinates for origin and destination");
+        showMessage("Enter valid coordinates for origin and destination", "error");
         return;
       }
 
@@ -268,19 +433,20 @@
               `📏 Distance: ${leg.distance.text}`;
             document.getElementById("duration").innerText =
               `⏱ Duration: ${leg.duration.text}`;
-            let fare = (leg.distance.value / 2000) * 10;
+            // K20 per 3km, round up
+            let fare = Math.ceil((leg.distance.value / 1000) / 3) * 20;
             if (document.getElementById("extras").checked) fare *= 1.5;
             document.getElementById("totalCost").innerText =
               `💲 Total: ZMW ${fare.toFixed(2)}`;
             document.getElementById("tripSummary").classList.remove("hidden");
+            showMessage("Route calculated.", "success");
           } else {
-            alert("Route error: " + st);
+            showMessage("Route error: " + st, "error");
           }
         }
       );
     }
 
-    /* ---- SUBMIT TO GOOGLE SHEETS ---- */
     function submitData() {
       const data = {
         submitterType  : document.getElementById("submitterType").value,
@@ -294,7 +460,7 @@
         distance       : document.getElementById("distance").innerText.replace("📏 Distance: ", ""),
         duration       : document.getElementById("duration").innerText.replace("⏱ Duration: ", ""),
         totalCost      : document.getElementById("totalCost").innerText.replace("💲 Total: ZMW ", ""),
-        Date           : ""   // handled by Apps Script
+        Date           : ""
       };
 
       document.getElementById("loader").style.display = "block";
@@ -328,18 +494,14 @@
       setTimeout(() => s.style.display = "none", 5000);
     }
 
-    /* expose init for callback */
     window.initMap = initMap;
   </script>
 
-  <!-- KEEPING YOUR ORIGINAL API KEY AND CALLBACK -->
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRdnvGw7epuDJjgBnpv0-FEuSQ6J-fyNY&libraries=places&callback=initMap">
   </script>
 </body>
-  <footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.2.0</strong> — Last updated May 27, 2025
-  </footer>
+<footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
+  Version: <strong>1.2.9</strong> — Last updated May 29, 2025
+</footer>
 </html>
-  
-
