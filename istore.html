@@ -429,9 +429,7 @@
         <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
       </div>
       <input id="end" class="address-input" type="text" placeholder="Enter delivery address" />
-      <button id="use-location-btn" class="btn btn-secondary" type="button">
-        <i class="fas fa-map-pin"></i> Use My Location
-      </button>
+      <div id="location-message" style="color: red; margin-top: 0.5rem;"></div>
       <input id="phone" type="tel" class="phone-input" placeholder="Enter phone number (e.g., +260 123 456 789)" />
       <button id="calc-time" class="btn btn-primary" disabled>
         <i class="fas fa-clock"></i> Estimate Delivery
@@ -476,7 +474,7 @@
     const nextBtn = document.getElementById('nextBtn');
     const toggleMapBtn = document.getElementById('toggle-map-btn');
     const mapEl = document.getElementById('map');
-    const useLocationBtn = document.getElementById('use-location-btn');
+    const locationMessageEl = document.getElementById('location-message');
 
     // Application State
     let map, geocoder, distanceService, directionsService, directionsRenderer;
@@ -496,9 +494,14 @@
         loadGoogleMaps();
       } catch (error) {
         console.error('Initialization error:', error);
-        alert('Failed to initialize the platform. Please try again.');
+        showMessage('Failed to initialize the platform. Please try again.');
       }
     });
+
+    // Show message below address input
+    function showMessage(message) {
+      locationMessageEl.textContent = message;
+    }
 
     // Render product list
     function renderProducts() {
@@ -520,6 +523,7 @@
         console.log('Products rendered:', PRODUCTS.length);
       } catch (error) {
         console.error('Render products error:', error);
+        showMessage('Error loading products.');
       }
     }
 
@@ -538,6 +542,7 @@
         }
       } catch (error) {
         console.error('Add to cart click error:', error);
+        showMessage('Error adding to cart.');
       }
     });
 
@@ -566,9 +571,11 @@
           }
         } else {
           console.warn('Product not found for ID:', id);
+          showMessage('Product not found.');
         }
       } catch (error) {
         console.error('Add to cart error:', error);
+        showMessage('Error adding to cart.');
       }
     }
 
@@ -623,6 +630,7 @@
         btnCalc.disabled = cart.length === 0 || (!endEl.value && !endLatLng) || !startLatLng;
       } catch (error) {
         console.error('Update cart error:', error);
+        showMessage('Error updating cart.');
       }
     }
 
@@ -644,6 +652,7 @@
         updateCart();
       } catch (error) {
         console.error('Cart interaction error:', error);
+        showMessage('Error updating cart items.');
       }
     });
 
@@ -663,50 +672,138 @@
         }
       } catch (error) {
         console.error('Map toggle error:', error);
+        showMessage('Error toggling map.');
       }
     });
 
-    // Use current location
-    useLocationBtn.addEventListener('click', () => {
+    // Geocode address
+    function geocodeAddress(address, isStart) {
       try {
-        if (!navigator.geolocation) {
-          alert('Geolocation is not supported by your browser. Please enter your address manually.');
-          return;
-        }
-
-        useLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
-        useLocationBtn.disabled = true;
-
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            reverseGeocode(latLng, endEl);
-            useLocationBtn.innerHTML = '<i class="fas fa-map-pin"></i> Use My Location';
-            useLocationBtn.disabled = false;
-          },
-          (error) => {
-            console.error('Geolocation error:', error);
-            let message = 'Unable to fetch your location.';
-            if (error.code === error.PERMISSION_DENIED) {
-              message = 'Location access denied. Please allow location access or enter your address manually.';
-            } else if (error.code === error.POSITION_UNAVAILABLE) {
-              message = 'Location information is unavailable. Please try again or enter your address manually.';
-            } else if (error.code === error.TIMEOUT) {
-              message = 'Location request timed out. Please try again or enter your address manually.';
+        if (!address) return;
+        geocoder.geocode({ 
+          address: address + ', Zambia',
+          componentRestrictions: { country: 'zm' }
+        }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            clearMarkers();
+            if (isStart) startLatLng = results[0].geometry.location;
+            else endLatLng = results[0].geometry.location;
+            updateCart();
+            
+            const marker = new google.maps.Marker({
+              position: results[0].geometry.location,
+              map: map,
+              title: results[0].formatted_address,
+              icon: {
+                url: isStart ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                              'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+              }
+            });
+            markers.push(marker);
+            map.setCenter(results[0].geometry.location);
+            if (isMapVisible) {
+              google.maps.event.trigger(map, 'resize');
+              map.setCenter(results[0].geometry.location);
             }
-            alert(message);
-            useLocationBtn.innerHTML = '<i class="fas fa-map-pin"></i> Use My Location';
-            useLocationBtn.disabled = false;
-          },
-          { timeout: 10000 }
-        );
+          } else {
+            showMessage('Could not find the location: ' + status);
+            if (!isStart) endEl.value = '';
+          }
+        });
       } catch (error) {
-        console.error('Use location error:', error);
-        alert('Error fetching location. Please try again or enter your address manually.');
-        useLocationBtn.innerHTML = '<i class="fas fa-map-pin"></i> Use My Location';
-        useLocationBtn.disabled = false;
+        console.error('Geocode address error:', error);
+        showMessage('Error geocoding address.');
       }
-    });
+    }
+
+    // Reverse geocode
+    function reverseGeocode(latLng, inputEl) {
+      try {
+        geocoder.geocode({ location: latLng }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const zambiaResult = results.find(r => 
+              r.address_components.some(c => c.types.includes('country') && c.short_name === 'ZM')
+            ) || results[0];
+            inputEl.value = zambiaResult.formatted_address;
+            endLatLng = latLng;
+            clearMarkers();
+            markers.forEach(marker => marker.setMap(map));
+            const marker = new google.maps.Marker({
+              position: latLng,
+              map: map,
+              title: zambiaResult.formatted_address,
+              icon: { url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }
+            });
+            markers.push(marker);
+            map.setCenter(latLng);
+            if (isMapVisible) {
+              google.maps.event.trigger(map, 'resize');
+              map.setCenter(latLng);
+            }
+            updateCart();
+            showMessage(''); // Clear message on success
+          } else {
+            inputEl.value = `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
+            endLatLng = latLng;
+            updateCart();
+            showMessage('Could not find address for this location.');
+          }
+        });
+      } catch (error) {
+        console.error('Reverse geocode error:', error);
+        showMessage('Error reverse geocoding location.');
+      }
+    }
+
+    // Clear markers
+    function clearMarkers() {
+      try {
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+        if (startLatLng) {
+          const marker = new google.maps.Marker({
+            position: startLatLng,
+            map: map,
+            title: 'Pickup Location',
+            icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
+          });
+          markers.push(marker);
+        }
+      } catch (error) {
+        console.error('Clear markers error:', error);
+        showMessage('Error clearing map markers.');
+      }
+    }
+
+    // Fetch default location
+    function fetchDefaultLocation() {
+      if (!navigator.geolocation) {
+        showMessage('Geolocation is not supported by your browser. Please enter your delivery address manually.');
+        return;
+      }
+
+      showMessage('Fetching your location...');
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          reverseGeocode(latLng, endEl);
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          let message = 'Unable to fetch your location. Please enter your delivery address manually.';
+          if (error.code === error.PERMISSION_DENIED) {
+            message = 'Location access denied. Please allow location access or enter your delivery address manually.';
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            message = 'Location information is unavailable. Please enter your delivery address manually.';
+          } else if (error.code === error.TIMEOUT) {
+            message = 'Location request timed out. Please enter your delivery address manually.';
+          }
+          showMessage(message);
+        },
+        { timeout: 10000 }
+      );
+    }
 
     // Initialize Google Maps
     function initMap() {
@@ -746,9 +843,10 @@
               map.setCenter(startLatLng);
             }
             updateCart();
+            fetchDefaultLocation(); // Fetch user's location after pickup is set
           } else {
             console.error('Geocode error:', status);
-            alert('Failed to locate pickup point. Please try again later.');
+            showMessage('Failed to locate pickup point. Please try again later.');
           }
         });
 
@@ -778,51 +876,15 @@
                 map.setCenter(endLatLng);
               }
               updateCart();
+              showMessage(''); // Clear message when user selects a place
             } else {
               geocodeAddress(place.name, false);
             }
           } catch (error) {
             console.error('Autocomplete error:', error);
+            showMessage('Error with address autocomplete.');
           }
         });
-
-        function geocodeAddress(address, isStart) {
-          try {
-            if (!address) return;
-            geocoder.geocode({ 
-              address: address + ', Zambia',
-              componentRestrictions: { country: 'zm' }
-            }, (results, status) => {
-              if (status === 'OK' && results[0]) {
-                clearMarkers();
-                if (isStart) startLatLng = results[0].geometry.location;
-                else endLatLng = results[0].geometry.location;
-                updateCart();
-                
-                const marker = new google.maps.Marker({
-                  position: results[0].geometry.location,
-                  map: map,
-                  title: results[0].formatted_address,
-                  icon: {
-                    url: isStart ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
-                                  'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-                  }
-                });
-                markers.push(marker);
-                map.setCenter(results[0].geometry.location);
-                if (isMapVisible) {
-                  google.maps.event.trigger(map, 'resize');
-                  map.setCenter(results[0].geometry.location);
-                }
-              } else {
-                alert('Could not find the location: ' + status);
-                if (!isStart) endEl.value = '';
-              }
-            });
-          } catch (error) {
-            console.error('Geocode address error:', error);
-          }
-        }
 
         map.addListener('dblclick', (e) => {
           try {
@@ -831,63 +893,12 @@
             updateCart();
           } catch (error) {
             console.error('Map dblclick error:', error);
+            showMessage('Error selecting location from map.');
           }
         });
-
-        function reverseGeocode(latLng, inputEl) {
-          try {
-            geocoder.geocode({ location: latLng }, (results, status) => {
-              if (status === 'OK' && results[0]) {
-                const zambiaResult = results.find(r => 
-                  r.address_components.some(c => c.types.includes('country') && c.short_name === 'ZM')
-                ) || results[0];
-                inputEl.value = zambiaResult.formatted_address;
-                endLatLng = latLng;
-                clearMarkers();
-                markers.forEach(marker => marker.setMap(map));
-                const marker = new google.maps.Marker({
-                  position: latLng,
-                  map: map,
-                  title: zambiaResult.formatted_address,
-                  icon: { url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }
-                });
-                markers.push(marker);
-                map.setCenter(latLng);
-                if (isMapVisible) {
-                  google.maps.event.trigger(map, 'resize');
-                  map.setCenter(latLng);
-                }
-                updateCart();
-              } else {
-                inputEl.value = `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
-                endLatLng = latLng;
-                updateCart();
-              }
-            });
-          } catch (error) {
-            console.error('Reverse geocode error:', error);
-          }
-        }
-
-        function clearMarkers() {
-          try {
-            markers.forEach(marker => marker.setMap(null));
-            markers = [];
-            if (startLatLng) {
-              const marker = new google.maps.Marker({
-                position: startLatLng,
-                map: map,
-                title: 'Pickup Location',
-                icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
-              });
-              markers.push(marker);
-            }
-          } catch (error) {
-            console.error('Clear markers error:', error);
-          }
-        }
       } catch (error) {
         console.error('Init map error:', error);
+        showMessage('Error initializing map.');
       }
     }
 
@@ -896,7 +907,10 @@
       try {
         const origin = startLatLng;
         const dest = endLatLng || endEl.value.trim();
-        if (!origin || !dest) return alert('Please enter a delivery location.');
+        if (!origin || !dest) {
+          showMessage('Please enter a delivery location.');
+          return;
+        }
 
         btnCalc.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
         btnCalc.disabled = true;
@@ -926,8 +940,10 @@
               <p><i class="fas fa-clock"></i> <strong>ETA:</strong> ${el.duration.text}</p>
               ${el.duration_in_traffic ? `<p><i class="fas fa-car"></i> <strong>With traffic:</strong> ${el.duration_in_traffic.text}</p>` : ''}
             `;
+            showMessage('');
           } else {
             etaEl.textContent = 'Could not compute distance/time. Please check your delivery location.';
+            showMessage('Could not compute distance/time.');
           }
         });
 
@@ -944,13 +960,14 @@
               map.setCenter(startLatLng || endLatLng);
             }
           } else {
-            alert('Route error: ' + status);
+            showMessage('Route error: ' + status);
           }
         });
       } catch (error) {
         console.error('Calculate delivery error:', error);
         btnCalc.innerHTML = '<i class="fas fa-clock"></i> Estimate Delivery';
         btnCalc.disabled = false;
+        showMessage('Error calculating delivery.');
       }
     };
 
@@ -958,23 +975,23 @@
     checkoutBtn.onclick = async () => {
       try {
         if (!endEl.value) {
-          alert('Please enter a delivery location before checkout.');
+          showMessage('Please enter a delivery location before checkout.');
           return;
         }
         
         if (cart.length === 0) {
-          alert('Your cart is empty. Please add items before checkout.');
+          showMessage('Your cart is empty. Please add items before checkout.');
           return;
         }
         
         if (transportationCost === 0) {
-          alert('Please estimate delivery before proceeding to checkout.');
+          showMessage('Please estimate delivery before proceeding to checkout.');
           return;
         }
         
         const phoneRegex = /^\+?260[0-9]{9}$|^0[0-9]{9}$/;
         if (!phoneEl.value || !phoneRegex.test(phoneEl.value.trim())) {
-          alert('Please enter a valid Zambian phone number (e.g., +260 123 456 789 or 09XX XXX XXX).');
+          showMessage('Please enter a valid Zambian phone number (e.g., +260 123 456 789 or 09XX XXX XXX).');
           return;
         }
         
@@ -1039,7 +1056,7 @@
           checkoutStatusEl.style.display = 'block';
           checkoutStatusEl.className = 'error';
           checkoutStatusEl.textContent = 'Error saving order: ' + result.message;
-          alert('Error saving order to Google Sheets: ' + result.message);
+          showMessage('Error saving order to Google Sheets: ' + result.message);
         }
       } catch (error) {
         console.error('Checkout error:', error);
@@ -1048,7 +1065,7 @@
         checkoutStatusEl.style.display = 'block';
         checkoutStatusEl.className = 'error';
         checkoutStatusEl.textContent = 'Error saving order: ' + error.message;
-        alert('Error saving order: ' + error.message);
+        showMessage('Error saving order: ' + error.message);
       }
     };
 
@@ -1062,6 +1079,7 @@
         document.head.appendChild(script);
       } catch (error) {
         console.error('Load Google Maps error:', error);
+        showMessage('Error loading Google Maps.');
       }
     }
   </script>
