@@ -1,1 +1,1 @@
-# favour
+google.com, pub-2307696013791007, DIRECT, f08c47fec0942fa0
