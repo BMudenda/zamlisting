@@ -2,295 +2,819 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007"
-     crossorigin="anonymous"></script>
-  <title>Grocery Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luanshya Delivery Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .top-bar {
-      background: #004d00;
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f4f6f9;
+      color: #333;
+      line-height: 1.6;
+    }
+    header {
+      background: #2e7d32;
       color: white;
-      padding: 10px;
+      padding: 1rem;
       text-align: center;
     }
-    .top-bar h1 {
-      margin: 5px 0;
-      font-size: 22px;
-    }
-    .top-bar p {
-      margin: 3px 0;
-      font-size: 14px;
-    }
-    .top-bar a {
-      color: yellow;
-      text-decoration: none;
-      margin: 0 5px;
-      font-weight: bold;
-    }
-
-    h2, h3 {
-      text-align: center;
-      padding: 10px;
-    }
-    .search-bar {
+    .container {
       display: flex;
-      justify-content: center;
-      margin: 10px;
+      flex-wrap: wrap;
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    #searchInput {
-      padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
+    .slider-wrapper {
+      flex: 2;
+      min-width: 300px;
+      position: relative;
     }
-    .item-slider {
+    .thumbnail-slider {
       display: flex;
       overflow-x: auto;
-      gap: 10px;
-      padding: 10px;
-      background: #fff;
-      flex-wrap: nowrap;
+      gap: 1rem;
+      padding: 1rem 0;
+      scroll-behavior: smooth;
     }
-    .item {
-      flex: 0 0 auto;
-      width: 140px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #fff;
-      text-align: center;
-      padding: 10px;
-      cursor: pointer;
+    .thumbnail-slider::-webkit-scrollbar {
+      height: 8px;
     }
-    .item img {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
+    .thumbnail-slider::-webkit-scrollbar-thumb {
+      background: #2e7d32;
       border-radius: 4px;
     }
+    .product {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      min-width: 150px;
+      flex-shrink: 0;
+    }
+    .product img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    .product h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .product p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .product button {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .product button:hover {
+      background: #1b5e20;
+    }
+    .slider-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(46, 125, 50, 0.8);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .prev {
+      left: 0;
+    }
+    .next {
+      right: 0;
+    }
     .cart {
-      padding: 15px;
+      flex: 1;
+      min-width: 300px;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    table {
+    .section-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #2e7d32;
+    }
+    .section-title i {
+      margin-right: 0.5rem;
+    }
+    .cart-items {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .cart-items li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .quantity-btn {
+      background: #e0e0e0;
+      color: #333;
+      border: none;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .quantity-btn:hover {
+      background: #d0d0d0;
+    }
+    .remove-btn {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .remove-btn:hover {
+      background: #b71c1c;
+    }
+    .empty-cart {
+      text-align: center;
+      color: #666;
+      padding: 2rem 0;
+    }
+    .empty-cart i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .cart-total {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    .cart-total p {
+      margin: 0.5rem 0;
+    }
+    .address-input, .phone-input {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background: #fff;
-    }
-    th, td {
-      padding: 8px;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
       border: 1px solid #ddd;
-      text-align: left;
+      border-radius: 4px;
+      font-size: 1rem;
     }
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background: #28a745;
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #2e7d32;
       color: white;
       border: none;
       border-radius: 4px;
-      font-size: 16px;
       cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
     }
-    .delete-btn {
-      background: #dc3545;
-      margin-left: 10px;
+    .btn:hover {
+      background: #1b5e20;
     }
-    #loader {
-      margin-top: 10px;
-      font-weight: bold;
-      color: green;
+    .btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+    .btn-accent {
+      background: #ff6f00;
+    }
+    .btn-accent:hover {
+      background: #e65100;
+    }
+    #eta {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    #eta p {
+      margin: 0.25rem 0;
+    }
+    #map {
       display: none;
-    }
-    .cart-icon {
-      position: fixed;
-      top: 10px;
-      right: 15px;
-      background: #ff5722;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 30px;
-      font-weight: bold;
-      z-index: 999;
-    }
-    #initialsInput {
-      margin-top: 10px;
-      padding: 8px;
+      height: 400px;
       width: 100%;
-      max-width: 300px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      display: block;
+      margin-top: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .map-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
     }
     @media (max-width: 768px) {
-      .item { width: 120px; padding: 8px; }
-      .item img { width: 80px; height: 80px; }
-      h2 { font-size: 1.2em; }
-      table, th, td { font-size: 14px; }
-      button { width: 100%; }
-      .cart-icon { font-size: 14px; padding: 6px 10px; }
+      .container {
+        flex-direction: column;
+        padding: 1rem;
+      }
+      .slider-button {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1><i class="fas fa-truck"></i> Luanshya Delivery Platform</h1>
+  </header>
 
-<div class="top-bar">
-  <h1>Luanshya Grocery Hub</h1>
-  <p>Plot 15, Town Centre, Luanshya, Zambia</p>
-  <p>
-    <a href="tel:+260978000111">Call Us 📞</a> |
-    <a href="https://wa.me/260978000111" target="_blank">WhatsApp Us 💬</a>
-  </p>
-</div>
+  <div class="container">
+    <!-- Product Slider -->
+    <div class="slider-wrapper">
+      <h2 class="section-title"><i class="fas fa-store"></i> Available Products & Services</h2>
+      <button class="slider-button prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+      <div id="product-list" class="thumbnail-slider"></div>
+      <button class="slider-button next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+    </div>
 
-<div class="cart-icon" id="cartIcon">Cart: 0 | Qty: 0</div>
+    <!-- Cart & ETA -->
+    <div class="cart">
+      <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Your Order</h2>
+      <ul id="cart-items" class="cart-items"></ul>
+      <div id="empty-cart" class="empty-cart">
+        <i class="fas fa-shopping-basket"></i>
+        <p>Your cart is empty</p>
+        <p>Add items to get started</p>
+      </div>
+      <div id="cart-total" class="cart-total" style="display: none;">
+        <p>Products Total: ZK <span id="products-total">0.00</span></p>
+        <p id="transportation-line" style="display: none;">Transportation: ZK <span id="transportation-cost">0.00</span></p>
+        <p><strong>Grand Total: ZK <span id="grand-total">0.00</span></strong></p>
+      </div>
+      <input id="start" class="address-input" placeholder="📍 Pickup location" />
+      <input id="end" class="address-input" placeholder="🏠 Delivery address" />
+      <input id="phone" class="phone-input" placeholder="📞 Phone number (e.g., +260 123 456 789)" />
+      <button id="calc-time" class="btn" disabled>
+        <i class="fas fa-clock"></i> Estimate Delivery
+      </button>
+      <div id="eta"></div>
+      <button id="checkout-btn" class="btn btn-accent" style="margin-top: 1rem; display: none;">
+        <i class="fas fa-credit-card"></i> Proceed to Checkout
+      </button>
+    </div>
+  </div>
 
-<h2>Select Items</h2>
+  <button id="toggle-map-btn" class="btn map-toggle-btn"><i class="fas fa-map"></i> Show Map</button>
+  <div id="map"></div>
 
-<div class="search-bar">
-  <input type="text" id="searchInput" placeholder="Search items...">
-</div>
+  <script>
+    const PRODUCTS = [
+      { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
+      { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages" },
+      { id: 3, name: "Castle Light Dumpy", price: 25, image: "CLD.jpeg", category: "beverages" },
+      { id: 4, name: "Black Label", price: 28, image: "BL.webp", category: "beverages" },
+      { id: 5, name: "Coca-Cola bottled", price: 12, image: "MC.jpg", category: "beverages" },
+      { id: 6, name: "Fanta", price: 12, image: "F.jpeg", category: "beverages" }
+    ];
 
-<div class="item-slider" id="itemContainer"></div>
+    // DOM Elements
+    const productListEl = document.getElementById('product-list');
+    const cartItemsEl = document.getElementById('cart-items');
+    const emptyCartEl = document.getElementById('empty-cart');
+    const cartTotalEl = document.getElementById('cart-total');
+    const productsTotalEl = document.getElementById('products-total');
+    const transportationCostEl = document.getElementById('transportation-cost');
+    const grandTotalEl = document.getElementById('grand-total');
+    const transportationLineEl = document.getElementById('transportation-line');
+    const startEl = document.getElementById('start');
+    const endEl = document.getElementById('end');
+    const phoneEl = document.getElementById('phone');
+    const btnCalc = document.getElementById('calc-time');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const etaEl = document.getElementById('eta');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const toggleMapBtn = document.getElementById('toggle-map-btn');
+    const mapEl = document.getElementById('map');
 
-<div class="cart">
-  <h3>Your Cart</h3>
-  <table id="cartTable">
-    <thead>
-      <tr><th>Item</th><th>Qty</th><th>Price</th><th>Action</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <p><strong>Total: ZMW <span id="total">0.00</span></strong></p>
+    // Application State
+    let map, geocoder, distanceService, directionsService, directionsRenderer;
+    let cart = [];
+    let transportationCost = 0;
+    let clickCount = 0;
+    let startLatLng = null, endLatLng = null;
+    let markers = [];
+    let isMapVisible = false;
+    const GOOGLE_SHEETS_URL = 'YOUR_WEB_APP_URL'; // Replace with your Google Apps Script Web App URL
+    const DEFAULT_PICKUP = 'JB THREE BORDERS SHOPPING MALL, Luanshya, Zambia';
 
-  <label for="initialsInput"><strong>Enter your initials to submit:</strong></label>
-  <input id="initialsInput" type="text" placeholder="e.g. BM" />
-
-  <button onclick="submitCart()">Submit</button>
-  <div id="loader">Submitting...</div>
-</div>
-
-<script>
-  const items = [
-    { name: "Mosi Beer", price: 25, image: "M.jpeg" },
-    { name: "Castle Lager", price: 24, image: "CC.jpeg" },
-    { name: "Castle Light Dumpy", price: 25, image: "CLD.jpeg" },
-    { name: "Black Label", price: 28, image: "BL.webp" },
-    { name: "Coca-Cola bottled", price: 12, image: "MC.jpg" },
-    { name: "Fanta", price: 12, image: "F.jpeg" }
-  ];
-
-  const cart = {};
-  const itemContainer = document.getElementById("itemContainer");
-  const cartTable = document.querySelector("#cartTable tbody");
-  const totalDisplay = document.getElementById("total");
-  const loader = document.getElementById("loader");
-  const cartIcon = document.getElementById("cartIcon");
-  const searchInput = document.getElementById("searchInput");
-
-  function renderItems(filter = "") {
-    itemContainer.innerHTML = "";
-    const filteredItems = items.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
-    filteredItems.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <img src="${item.image}" alt="${item.name}">
-        <p>${item.name}</p>
-        <p>ZMW ${item.price}</p>
-      `;
-      div.addEventListener("click", () => addToCart(item));
-      itemContainer.appendChild(div);
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+      startEl.value = DEFAULT_PICKUP; // Set default pickup location
+      updateCart();
+      loadGoogleMaps();
     });
-  }
 
-  searchInput.addEventListener("input", () => {
-    renderItems(searchInput.value);
-  });
-
-  function updateCartDisplay() {
-    cartTable.innerHTML = "";
-    let total = 0, totalQty = 0, totalItems = 0;
-    Object.entries(cart).forEach(([key, { item, qty }]) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.name}</td>
-        <td>${qty}</td>
-        <td>ZMW ${(item.price * qty).toFixed(2)}</td>
-        <td><button class="delete-btn" onclick="removeFromCart('${key}')">Delete</button></td>
-      `;
-      cartTable.appendChild(row);
-      total += item.price * qty;
-      totalQty += qty;
-      totalItems++;
-    });
-    totalDisplay.textContent = total.toFixed(2);
-    cartIcon.textContent = `Cart: ${totalItems} | Qty: ${totalQty}`;
-  }
-
-  function addToCart(item) {
-    if (cart[item.name]) {
-      cart[item.name].qty++;
-    } else {
-      cart[item.name] = { item, qty: 1 };
+    // Render product list
+    function renderProducts() {
+      productListEl.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/100/e3f2fd/2e7d32?text=${p.name}';">
+          <h4>${p.name}</h4>
+          <p>ZK ${p.price.toFixed(2)}</p>
+          <button data-id="${p.id}">
+            <i class="fas fa-plus"></i> Add
+          </button>
+        `;
+        productListEl.appendChild(div);
+      });
     }
-    updateCartDisplay();
-  }
 
-  function removeFromCart(name) {
-    if (cart[name]) {
-      delete cart[name];
-      updateCartDisplay();
-    }
-  }
+    // Slider navigation
+    prevBtn.onclick = () => productListEl.scrollBy({ left: -200, behavior: 'smooth' });
+    nextBtn.onclick = () => productListEl.scrollBy({ left: 200, behavior: 'smooth' });
 
-  function submitCart() {
-    const initials = document.getElementById("initialsInput").value.trim();
-    if (Object.keys(cart).length === 0) return alert("Cart is empty.");
-    if (!initials || initials.length < 2) return alert("Please enter your initials to submit.");
-
-    loader.style.display = "block";
-    loader.style.color = "blue";
-    loader.textContent = "Submitting...";
-
-    const itemsData = Object.values(cart).map(({ item, qty }) =>
-      `${item.name} (x${qty}) - ZMW ${(item.price * qty).toFixed(2)}`
-    ).join(", ");
-
-    const total = Object.values(cart).reduce((sum, entry) => sum + (entry.item.price * entry.qty), 0);
-
-    fetch("https://script.google.com/macros/s/AKfycbxy3eUjHDcOCr-cEpihTTrTnixw_6rE2B_w_25UxK2SnTXPYvT0f44jM3Ud1A2yEXKB_A/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        submitter: initials.toUpperCase(),
-        items: itemsData,
-        total: total.toFixed(2)
-      })
-    })
-    .then(res => res.json())
-    .then(() => {
-      loader.style.color = "green";
-      loader.textContent = "Submitted successfully!";
-      for (const key in cart) delete cart[key];
-      updateCartDisplay();
-      document.getElementById("initialsInput").value = "";
-      setTimeout(() => loader.style.display = "none", 3000);
-    })
-    .catch(err => {
-      loader.style.color = "red";
-      loader.textContent = "Submission failed. Try again.";
+    // Add to cart functionality
+    productListEl.addEventListener('click', e => {
+      const button = e.target.closest('button');
+      if (button && button.dataset.id) {
+        const id = +button.dataset.id;
+        addToCart(id);
+      }
     });
-  }
 
-  renderItems(); // initial load
-</script>
+    function addToCart(id) {
+      const product = PRODUCTS.find(x => x.id === id);
+      if (product) {
+        const cartItem = cart.find(item => item.product.id === id);
+        if (cartItem) {
+          cartItem.quantity += 1;
+        } else {
+          cart.push({ product, quantity: 1 });
+        }
+        updateCart();
+        
+        // Visual feedback
+        const btn = document.querySelector(`button[data-id="${id}"]`);
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-check"></i> Added';
+          btn.style.backgroundColor = 'var(--primary-dark)';
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-plus"></i> Add';
+            btn.style.backgroundColor = '';
+          }, 1000);
+        }
+      }
+    }
 
+    // Update cart display
+    function updateCart() {
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '';
+        emptyCartEl.style.display = 'block';
+        cartTotalEl.style.display = 'none';
+        checkoutBtn.style.display = 'none';
+      } else {
+        emptyCartEl.style.display = 'none';
+        cartTotalEl.style.display = 'block';
+        checkoutBtn.style.display = 'block';
+        
+        cartItemsEl.innerHTML = '';
+        cart.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>${item.product.name} (x${item.quantity})</span>
+            <div>
+              <span>ZK ${(item.product.price * item.quantity).toFixed(2)}</span>
+              <div class="quantity-controls">
+                <button class="quantity-btn decrease" data-index="${index}">-</button>
+                <button class="quantity-btn increase" data-index="${index}">+</button>
+                <button class="remove-btn" data-index="${index}">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          cartItemsEl.appendChild(li);
+        });
+        
+        // Calculate products total
+        const productsTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        productsTotalEl.textContent = productsTotal.toFixed(2);
+        
+        // Calculate grand total including transportation cost
+        const grandTotal = productsTotal + transportationCost;
+        grandTotalEl.textContent = grandTotal.toFixed(2);
+        
+        // Show transportation cost if calculated
+        if (transportationCost > 0) {
+          transportationCostEl.textContent = transportationCost.toFixed(2);
+          transportationLineEl.style.display = 'block';
+        } else {
+          transportationLineEl.style.display = 'none';
+        }
+      }
+      
+      btnCalc.disabled = cart.length === 0 || (!startEl.value && !startLatLng) || (!endEl.value && !endLatLng);
+    }
+
+    // Cart item quantity and removal handling
+    cartItemsEl.addEventListener('click', e => {
+      const button = e.target.closest('button');
+      if (!button) return;
+      
+      const index = +button.dataset.index;
+      if (button.classList.contains('remove-btn')) {
+        cart.splice(index, 1);
+      } else if (button.classList.contains('increase')) {
+        cart[index].quantity += 1;
+      } else if (button.classList.contains('decrease')) {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity === 0) cart.splice(index, 1);
+      }
+      updateCart();
+    });
+
+    // Map toggle functionality
+    toggleMapBtn.addEventListener('click', () => {
+      isMapVisible = !isMapVisible;
+      mapEl.style.display = isMapVisible ? 'block' : 'none';
+      toggleMapBtn.innerHTML = isMapVisible ? 
+        '<i class="fas fa-map"></i> Hide Map' : 
+        '<i class="fas fa-map"></i> Show Map';
+      if (isMapVisible && map) {
+        google.maps.event.trigger(map, 'resize');
+        if (startLatLng || endLatLng) {
+          map.setCenter(startLatLng || endLatLng);
+        }
+      }
+    });
+
+    // Initialize Google Maps
+    function initMap() {
+      map = new google.maps.Map(mapEl, {
+        center: { lat: -13.1367, lng: 28.3966 }, // Luanshya coordinates
+        zoom: 13,
+        styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }]
+      });
+
+      geocoder = new google.maps.Geocoder();
+      distanceService = new google.maps.DistanceMatrixService();
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: false,
+        preserveViewport: false
+      });
+      directionsRenderer.setMap(map);
+
+      // Geocode default pickup location
+      geocoder.geocode({ 
+        address: DEFAULT_PICKUP,
+        componentRestrictions: { country: 'zm' }
+      }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          startLatLng = results[0].geometry.location;
+          clearMarkers();
+          const marker = new google.maps.Marker({
+            position: startLatLng,
+            map: map,
+            title: DEFAULT_PICKUP,
+            icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
+          });
+          markers.push(marker);
+          if (isMapVisible) {
+            google.maps.event.trigger(map, 'resize');
+            map.setCenter(startLatLng);
+          }
+          updateCart();
+        } else {
+          console.error('Could not geocode default pickup location: ' + status);
+        }
+      });
+
+      const startAutocomplete = new google.maps.places.Autocomplete(startEl, {
+        types: ['geocode', 'establishment'],
+        componentRestrictions: { country: 'zm' },
+        fields: ['address_components', 'geometry', 'name', 'place_id']
+      });
+
+      const endAutocomplete = new google.maps.places.Autocomplete(endEl, {
+        types: ['geocode', 'establishment'],
+        componentRestrictions: { country: 'zm' },
+        fields: ['address_components', 'geometry', 'name', 'place_id']
+      });
+
+      const getPlaceDetails = (place, isStart) => {
+        if (!place.place_id) return;
+
+        const service = new google.maps.places.PlacesService(map);
+        service.getDetails({ placeId: place.place_id }, (placeResult, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            clearMarkers();
+            if (isStart) startLatLng = placeResult.geometry.location;
+            else endLatLng = placeResult.geometry.location;
+            updateCart();
+            
+            const marker = new google.maps.Marker({
+              position: placeResult.geometry.location,
+              map: map,
+              title: placeResult.name,
+              icon: {
+                url: isStart ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                              'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+              }
+            });
+            markers.push(marker);
+            map.setCenter(placeResult.geometry.location);
+            if (isMapVisible) {
+              google.maps.event.trigger(map, 'resize');
+              map.setCenter(placeResult.geometry.location);
+            }
+          }
+        });
+      };
+
+      startAutocomplete.addListener('place_changed', () => {
+        const place = startAutocomplete.getPlace();
+        if (place.geometry) getPlaceDetails(place, true);
+        else geocodeAddress(place.name, true);
+      });
+
+      endAutocomplete.addListener('place_changed', () => {
+        const place = endAutocomplete.getPlace();
+        if (place.geometry) getPlaceDetails(place, false);
+        else geocodeAddress(place.name, false);
+      });
+
+      const geocodeAddress = (address, isStart) => {
+        if (!address) return;
+        
+        geocoder.geocode({ 
+          address: address + ', Luanshya, Zambia',
+          componentRestrictions: { country: 'zm' }
+        }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            clearMarkers();
+            if (isStart) startLatLng = results[0].geometry.location;
+            else endLatLng = results[0].geometry.location;
+            updateCart();
+            
+            const marker = new google.maps.Marker({
+              position: results[0].geometry.location,
+              map: map,
+              title: results[0].formatted_address,
+              icon: {
+                url: isStart ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                              'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+              }
+            });
+            markers.push(marker);
+            map.setCenter(results[0].geometry.location);
+            if (isMapVisible) {
+              google.maps.event.trigger(map, 'resize');
+              map.setCenter(results[0].geometry.location);
+            }
+          } else {
+            alert('Could not find the location: ' + status);
+            if (isStart) startEl.value = DEFAULT_PICKUP;
+            else endEl.value = '';
+          }
+        });
+      };
+
+      map.addListener('dblclick', (e) => {
+        const latLng = e.latLng;
+        if (clickCount === 0) {
+          startLatLng = latLng;
+          reverseGeocode(latLng, startEl);
+          clickCount = 1;
+        } else {
+          endLatLng = latLng;
+          reverseGeocode(latLng, endEl);
+          clickCount = 0;
+        }
+        updateCart();
+      });
+
+      const reverseGeocode = (latLng, inputEl) => {
+        geocoder.geocode({ location: latLng }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const zambiaResult = results.find(r => 
+              r.address_components.some(c => c.types.includes('country') && c.short_name === 'ZM')
+            ) || results[0];
+            inputEl.value = zambiaResult.formatted_address;
+            clearMarkers();
+            const marker = new google.maps.Marker({
+              position: latLng,
+              map: map,
+              title: zambiaResult.formatted_address,
+              icon: {
+                url: inputEl === startEl ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                                          'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+              }
+            });
+            markers.push(marker);
+            if (isMapVisible) {
+              google.maps.event.trigger(map, 'resize');
+              map.setCenter(latLng);
+            }
+          } else {
+            inputEl.value = inputEl === startEl ? DEFAULT_PICKUP : `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
+          }
+        });
+      };
+
+      const clearMarkers = () => {
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+      };
+    }
+
+    // Calculate delivery time and distance
+    btnCalc.onclick = () => {
+      const origin = startLatLng || startEl.value.trim();
+      const dest = endLatLng || endEl.value.trim();
+      if (!origin || !dest) return alert('Please enter or select both pickup and delivery locations.');
+
+      btnCalc.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+      btnCalc.disabled = true;
+
+      distanceService.getDistanceMatrix({
+        origins: [origin],
+        destinations: [dest],
+        travelMode: 'DRIVING',
+        drivingOptions: {
+          departureTime: new Date(),
+          trafficModel: 'bestguess'
+        }
+      }, (resp, status) => {
+        btnCalc.innerHTML = '<i class="fas fa-clock"></i> Estimate Delivery';
+        btnCalc.disabled = false;
+        
+        const el = resp?.rows?.[0]?.elements?.[0];
+        if (status === 'OK' && el?.status === 'OK') {
+          const distanceInKm = el.distance.value / 1000;
+          const segments = Math.ceil(distanceInKm / 3);
+          transportationCost = segments * 20;
+          
+          updateCart();
+          
+          etaEl.innerHTML = `
+            <p><i class="fas fa-road"></i> <strong>Distance:</strong> ${el.distance.text} (${distanceInKm.toFixed(1)} km)</p>
+            <p><i class="fas fa-clock"></i> <strong>ETA:</strong> ${el.duration.text}</p>
+            ${el.duration_in_traffic ? `<p><i class="fas fa-car"></i> <strong>With traffic:</strong> ${el.duration_in_traffic.text}</p>` : ''}
+          `;
+        } else {
+          etaEl.textContent = 'Could not compute distance/time. Please check your locations.';
+        }
+      });
+
+      directionsService.route({
+        origin,
+        destination: dest,
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: true
+      }, (resp, status) => {
+        if (status === 'OK') {
+          directionsRenderer.setDirections(resp);
+          if (isMapVisible) {
+            google.maps.event.trigger(map, 'resize');
+            map.setCenter(startLatLng || endLatLng);
+          }
+        } else {
+          alert('Route error: ' + status);
+        }
+      });
+    };
+
+    // Checkout functionality
+    checkoutBtn.onclick = async () => {
+      if (!startEl.value || !endEl.value) {
+        alert('Please enter both pickup and delivery locations before checkout.');
+        return;
+      }
+      
+      if (cart.length === 0) {
+        alert('Your cart is empty. Please add items before checkout.');
+        return;
+      }
+      
+      if (transportationCost === 0) {
+        alert('Please estimate delivery before proceeding to checkout.');
+        return;
+      }
+      
+      const phoneRegex = /^\+?260[0-9]{9}$|^0[0-9]{9}$/;
+      if (!phoneEl.value || !phoneRegex.test(phoneEl.value.trim())) {
+        alert('Please enter a valid Zambian phone number (e.g., +260 123 456 789 or 09XX XXX XXX).');
+        return;
+      }
+      
+      // Prepare data for Google Sheets
+      const data = {
+        pickup: startEl.value,
+        delivery: endEl.value,
+        phoneNumber: phoneEl.value.trim(),
+        productsTotal: parseFloat(productsTotalEl.textContent),
+        transportationCost: transportationCost,
+        grandTotal: parseFloat(grandTotalEl.textContent),
+        items: cart.map(item => ({
+          name: item.product.name,
+          quantity: item.quantity
+        }))
+      };
+      
+      try {
+        const response = await fetch(GOOGLE_SHEETS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert(`Order confirmed! Your total is ZK ${grandTotalEl.textContent}. Delivery details will be sent to you.`);
+          
+          // Reset the cart and form
+          cart = [];
+          transportationCost = 0;
+          updateCart();
+          startEl.value = DEFAULT_PICKUP;
+          endEl.value = '';
+          phoneEl.value = '';
+          etaEl.textContent = '';
+          directionsRenderer.setDirections({routes: []});
+          clearMarkers();
+          
+          // Re-geocode default pickup
+          geocoder.geocode({ 
+            address: DEFAULT_PICKUP,
+            componentRestrictions: { country: 'zm' }
+          }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+              startLatLng = results[0].geometry.location;
+              const marker = new google.maps.Marker({
+                position: startLatLng,
+                map: map,
+                title: DEFAULT_PICKUP,
+                icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
+              });
+              markers.push(marker);
+              if (isMapVisible) {
+                google.maps.event.trigger(map, 'resize');
+                map.setCenter(startLatLng);
+              }
+            }
+          });
+        } else {
+          alert('Error saving order to Google Sheets: ' + result.message);
+        }
+      } catch (error) {
+        alert('Error saving order: ' + error.message);
+      }
+    };
+
+    // Load Google Maps API
+    function loadGoogleMaps() {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDRdnvGw7epuDJjgBnpv0-FEuSQ6J-fyNY&libraries=places&callback=initMap`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  </script>
 </body>
 </html>
