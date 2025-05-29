@@ -88,6 +88,15 @@
     }
     .status-message.success { background: var(--success); color: var(--primary-dark); }
     .status-message.error { background: var(--error); color: #c62828; }
+    #searchBox {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
     @media (max-width: 767px) {
       .container { flex-direction: column; }
       .slider-wrapper, .cart { width: 100%; }
@@ -102,6 +111,7 @@
   <div class="container">
     <div class="slider-wrapper">
       <h2 class="section-title"><i class="fas fa-store"></i> Available Products</h2>
+      <input type="text" id="searchBox" placeholder="Search products...">
       <button class="slider-button prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
       <div id="product-list" class="thumbnail-slider"></div>
       <button class="slider-button next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
@@ -166,6 +176,7 @@
     const toggleMapBtn = document.getElementById('toggle-map-btn');
     const mapEl = document.getElementById('map');
     const locationMessageEl = document.getElementById('location-message');
+    const searchBox = document.getElementById('searchBox');
     let map, geocoder, distanceService, directionsService, directionsRenderer;
     let cart = [];
     let transportationCost = 0;
@@ -174,6 +185,18 @@
     let isMapVisible = false;
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwUvA_InN9GzHNjuDTkV7A8VGSbLYEtkEkr-FwygSg0c6ZxxFnyIugasy8S_IM87Q/exec';
     const DEFAULT_PICKUP = '9CH5+J8J, Luangwa';
+
+    // For filtering
+    let filteredProducts = PRODUCTS.slice();
+
+    searchBox.addEventListener('input', function() {
+      const query = this.value.trim().toLowerCase();
+      filteredProducts = PRODUCTS.filter(p => 
+        p.name.toLowerCase().includes(query) ||
+        (p.category && p.category.toLowerCase().includes(query))
+      );
+      renderProducts();
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
       try { renderProducts(); updateCart(); loadGoogleMaps(); }
@@ -191,7 +214,7 @@
     function renderProducts() {
       try {
         productListEl.innerHTML = '';
-        PRODUCTS.forEach(p => {
+        filteredProducts.forEach(p => {
           const div = document.createElement('div');
           div.className = 'product';
           div.innerHTML = `
