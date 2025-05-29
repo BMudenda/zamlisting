@@ -97,6 +97,42 @@
       font-size: 1rem;
       box-sizing: border-box;
     }
+    /* Instructions toggle and box styles */
+    .instructions-toggle-btn {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 600;
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem;
+      margin: 1.2rem auto 0.5rem auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.15s;
+      font-size: 1.01em;
+      box-shadow: 0 2px 8px rgba(44,125,50,0.03);
+    }
+    .instructions-toggle-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    .instructions-box {
+      background: #f9fff7;
+      border: 1px solid var(--primary-light);
+      border-radius: 8px;
+      padding: 1.2em 1.4em 1.2em 2.2em;
+      max-width: 700px;
+      margin: 0 auto 1.5em auto;
+      font-size: 1em;
+      box-shadow: 0 1px 6px rgba(44,125,50,0.07);
+      color: var(--primary-dark);
+      display: none;
+      line-height: 1.66em;
+    }
+    .instructions-box ul { margin-left: 1.1em; }
+    .instructions-box li { margin-bottom: 0.6em; }
     @media (max-width: 767px) {
       .container { flex-direction: column; }
       .slider-wrapper, .cart { width: 100%; }
@@ -108,6 +144,24 @@
   <header>
     <h1><i class="fas fa-truck"></i> Luangwa Delivery Platform</h1>
   </header>
+
+  <!-- Instructions toggle button and box -->
+  <button id="instructions-toggle-btn" class="instructions-toggle-btn">
+    <span id="instructions-toggle-icon">➕</span> Instructions & Tips
+  </button>
+  <div id="instructions-box" class="instructions-box">
+    <ul>
+      <li>🔍 <b>You can search for products</b> using the search box above the products list.</li>
+      <li>🛒 <b>Add products</b> to your order using the <b>Add</b> buttons.</li>
+      <li>📦 <b>Set your delivery destination</b> by searching, or <b>double-clicking</b> (desktop) or <b>tapping once</b> (mobile) on the toggled map.</li>
+      <li>🗺 <b>Use the "Toggle Map" button</b> to show/hide the delivery map interface.</li>
+      <li>📍 <b>Pickup location</b> is set as the default Luangwa pickup point.</li>
+      <li>📱 <b>Enter your phone number</b> before checking out.</li>
+      <li>🚚 <b>Estimate delivery</b> to get ETA and cost before proceeding to checkout.</li>
+      <li>💳 <b>Proceed to checkout</b> to confirm your order and submit details.</li>
+    </ul>
+  </div>
+
   <div class="container">
     <div class="slider-wrapper">
       <h2 class="section-title"><i class="fas fa-store"></i> Available Products</h2>
@@ -149,6 +203,21 @@
   <button id="toggle-map-btn" class="btn map-toggle-btn">Toggle Map</button>
   <div id="map"></div>
   <script>
+    // --- INSTRUCTIONS TOGGLE LOGIC ---
+    const instructionsBtn = document.getElementById("instructions-toggle-btn");
+    const instructionsBox = document.getElementById("instructions-box");
+    const instructionsIcon = document.getElementById("instructions-toggle-icon");
+    instructionsBtn.addEventListener("click", function () {
+      if (instructionsBox.style.display === "block") {
+        instructionsBox.style.display = "none";
+        instructionsIcon.textContent = "➕";
+      } else {
+        instructionsBox.style.display = "block";
+        instructionsIcon.textContent = "➖";
+      }
+    });
+
+    // --- REST OF YOUR SCRIPT AS BEFORE ---
     const PRODUCTS = [
       { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
       { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages" },
@@ -509,8 +578,10 @@
             }
           } catch (error) { console.error('Autocomplete error:', error); showMessage('Error with address autocomplete.'); }
         });
+        // --- DOUBLE CLICK SETS DESTINATION ON MAP ---
         map.addListener('dblclick', (e) => {
           try {
+            if (!isMapVisible) return; // Only allow when map is visible
             const latLng = e.latLng;
             reverseGeocode(latLng, endEl);
             updateCart();
@@ -539,7 +610,8 @@
           const el = resp?.rows?.[0]?.elements?.[0];
           if (status === 'OK' && el?.status === 'OK') {
             const distanceInKm = el.distance.value / 1000;
-            const segments = Math.ceil(distanceInKm / 2);
+            // K20 per 3km, rounded up
+            const segments = Math.ceil(distanceInKm / 3);
             transportationCost = segments * 20;
             updateCart();
             etaEl.innerHTML = `
