@@ -18,6 +18,8 @@
       --card-bg: white;
       --border: #e0e0e0;
       --shadow: 0 0 8px rgba(0,0,0,0.5);
+      --success: #e8f5e9;
+      --error: #ffebee;
     }
     
     * {
@@ -253,7 +255,7 @@
       font-family: inherit;
       font-weight: 500;
       width: 100%;
-      transition: background 0.2s;
+      transition: background 0.2s, opacity 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -267,6 +269,7 @@
     .btn:disabled {
       background: #ccc;
       cursor: not-allowed;
+      opacity: 0.6;
     }
     
     .btn-accent {
@@ -286,6 +289,10 @@
       background: var(--primary);
     }
     
+    .btn-success {
+      background: var(--primary-dark);
+    }
+    
     .map-toggle-btn {
       background: var(--primary-light);
       margin: 1rem auto;
@@ -299,7 +306,7 @@
     #eta {
       margin-top: 1rem;
       padding: 0.75rem;
-      background: #e8f5e9;
+      background: var(--success);
       border-radius: 4px;
       color: var(--primary-dark);
       font-weight: 500;
@@ -359,6 +366,25 @@
       background: var(--primary);
     }
     
+    #checkout-status {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+    }
+    
+    #checkout-status.success {
+      background: var(--success);
+      color: var(--primary-dark);
+    }
+    
+    #checkout-status.error {
+      background: var(--error);
+      color: #c62828;
+    }
+    
     @media (max-width: 767px) {
       .container {
         flex-direction: column;
@@ -414,6 +440,7 @@
       <button id="checkout-btn" class="btn btn-accent" style="margin-top: 1rem; display:none;">
         <i class="fas fa-credit-card"></i> Proceed to Checkout
       </button>
+      <div id="checkout-status"></div>
     </div>
   </div>
 
@@ -424,7 +451,7 @@
     const PRODUCTS = [
       { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
       { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages" },
-      { id: 3, name: "Castle Light Dumpy", price: 25, image:"CLD.jpeg", category: "beverages" },
+      { id: 3, name: "Castle Light Dumpy", price: 25, image: "CLD.jpeg", category: "beverages" },
       { id: 4, name: "Black Label", price: 28, image: "BL.webp", category: "beverages" },
       { id: 5, name: "Coca-Cola bottled", price: 12, image: "MC.jpg", category: "beverages" },
       { id: 6, name: "Fanta", price: 12, image: "F.jpeg", category: "beverages" }
@@ -443,6 +470,7 @@
     const phoneEl = document.getElementById('phone');
     const btnCalc = document.getElementById('calc-time');
     const checkoutBtn = document.getElementById('checkout-btn');
+    const checkoutStatusEl = document.getElementById('checkout-status');
     const etaEl = document.getElementById('eta');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -457,7 +485,7 @@
     let startLatLng = null, endLatLng = null;
     let markers = [];
     let isMapVisible = false;
-    const GOOGLE_SHEETS_URL = 'YOUR_WEB_APP_URL'; // Replace with your Google Apps Script Web App URL
+    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyE-1RuFaW7C4nxp4heXKMYMcYZ4k1qeoE1Ct0KtBSJFgByr5LDYCTuykIkAt6EEoei/exec';
     const DEFAULT_PICKUP = '9CH5+J8J, Luangwa';
 
     // Initialize the application
@@ -552,6 +580,7 @@
           emptyCartEl.style.display = 'block';
           cartTotalEl.style.display = 'none';
           checkoutBtn.style.display = 'none';
+          checkoutStatusEl.style.display = 'none'; // Clear checkout status
         } else {
           emptyCartEl.style.display = 'none';
           cartTotalEl.style.display = 'block';
@@ -949,6 +978,11 @@
           return;
         }
         
+        // Show loader
+        checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        checkoutBtn.disabled = true;
+        checkoutStatusEl.style.display = 'none'; // Clear previous status
+        
         // Prepare data for Google Sheets
         const data = {
           pickup: DEFAULT_PICKUP,
@@ -973,6 +1007,13 @@
         
         const result = await response.json();
         if (result.status === 'success') {
+          // Show success state
+          checkoutBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+          checkoutBtn.classList.add('btn-success');
+          checkoutStatusEl.style.display = 'block';
+          checkoutStatusEl.className = 'success';
+          checkoutStatusEl.textContent = `Order confirmed! Total: ZK ${grandTotalEl.textContent}. Delivery details sent.`;
+          
           alert(`Order confirmed! Your total is ZK ${grandTotalEl.textContent}. Delivery details will be sent to you.`);
           
           // Reset the cart and form
@@ -984,11 +1025,29 @@
           etaEl.textContent = '';
           directionsRenderer.setDirections({routes: []});
           clearMarkers();
+          
+          // Revert button after 2 seconds
+          setTimeout(() => {
+            checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Checkout';
+            checkoutBtn.classList.remove('btn-success');
+            checkoutBtn.disabled = false;
+          }, 2000);
         } else {
+          // Show error state
+          checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Checkout';
+          checkoutBtn.disabled = false;
+          checkoutStatusEl.style.display = 'block';
+          checkoutStatusEl.className = 'error';
+          checkoutStatusEl.textContent = 'Error saving order: ' + result.message;
           alert('Error saving order to Google Sheets: ' + result.message);
         }
       } catch (error) {
         console.error('Checkout error:', error);
+        checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Checkout';
+        checkoutBtn.disabled = false;
+        checkoutStatusEl.style.display = 'block';
+        checkoutStatusEl.className = 'error';
+        checkoutStatusEl.textContent = 'Error saving order: ' + error.message;
         alert('Error saving order: ' + error.message);
       }
     };
