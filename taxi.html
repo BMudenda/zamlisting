@@ -83,21 +83,59 @@
     }
     .success { background:#e3fcef; color:#0a6640; }
     .error   { background:#fde8e8; color:#9b2c2c; }
-    .map-instruction {
-      margin-bottom:8px;
-      color:#336699;
-      font-size:0.95em;
+    .instructions-toggle {
+      background: #fffbe6;
+      border: 1px solid #ffe07a;
+      color: #7c6700;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1em;
+      width: fit-content;
     }
-    .search-tip {
-      margin-bottom:8px;
-      color:#228B22;
-      font-size:0.95em;
+    .instructions-box {
+      background: #f9f7f0;
+      border: 1px solid #ffe07a;
+      color: #5b5400;
+      border-radius: 10px;
+      padding: 18px 18px 18px 26px;
+      margin-bottom: 18px;
+      font-size: 1em;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      max-width: 100%;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .instructions-box ul {
+      margin: 0 0 0 1.2em;
+      padding: 0;
+    }
+    .instructions-box li {
+      margin-bottom: 0.7em;
+      line-height: 1.55em;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 style="text-align:center; color:#2c3e50; margin-bottom:30px;">🚖 RideTrack</h1>
+
+    <button type="button" class="instructions-toggle" onclick="toggleInstructions()" id="instructionsBtn">
+      <span id="instructionsBtnIcon">➕</span> Instructions & Tips
+    </button>
+    <div class="instructions-box" id="instructionsBox" style="display:none;">
+      <ul>
+        <li>🔍 <b>You can search for your current location and destination</b> by typing in the respective search boxes.</li>
+        <li>🌍 <b>You can select your destination on the map</b> by toggling the map and <b>double-clicking</b> (desktop) or <b>tapping once</b> (mobile) on the map.</li>
+        <li>🧳+👥 Tick the "Extras" checkbox if you have luggage or additional people (adds a 50% surcharge).</li>
+        <li>🗺 Click "Calculate Route" to see the fare, distance, and route on the map.</li>
+        <li>📤 Click "Submit Ride" to send your ride request.</li>
+      </ul>
+    </div>
 
     <div class="form-section">
       <label for="submitterType">You are:</label>
@@ -127,9 +165,6 @@
     </div>
 
     <div class="form-section">
-      <div class="search-tip">
-        🔍 <strong>Tip:</strong> You can search for your current location and destination in the search boxes below.
-      </div>
       <label>Current Location</label>
       <div class="coords-group">
         <input id="origin" placeholder="Search your nearby place or fetch coordinates">
@@ -139,9 +174,6 @@
     </div>
 
     <div class="form-section">
-      <div class="map-instruction">
-        💡 <strong>Tip:</strong> You can select your destination by toggling the map and <b>double-clicking</b> or <b>tapping once</b> on the map.
-      </div>
       <label>Destination</label>
       <div class="coords-group">
         <input id="destination" placeholder="Enter nearby destination or coordinates below">
@@ -172,6 +204,20 @@
   </div>
 
   <script>
+    // Instructions toggle logic
+    function toggleInstructions() {
+      var box = document.getElementById("instructionsBox");
+      var btn = document.getElementById("instructionsBtn");
+      var icon = document.getElementById("instructionsBtnIcon");
+      if (box.style.display === "none") {
+        box.style.display = "block";
+        icon.textContent = "➖";
+      } else {
+        box.style.display = "none";
+        icon.textContent = "➕";
+      }
+    }
+
     let map, directionsService, directionsRenderer, autocompleteOrigin, autocompleteDest;
     let destinationMarker = null; // For map click to select destination
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbytUJ-taezbOxcxnZTWwWjeFBH-gqshju9_g295Cu9wSpwtvlHHHNajxHxii8SxsUpe/exec';
@@ -454,6 +500,6 @@
   </script>
 </body>
 <footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.2.6</strong> — Last updated May 29, 2025
+  Version: <strong>1.2.8</strong> — Last updated May 29, 2025
 </footer>
 </html>
