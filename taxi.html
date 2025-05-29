@@ -83,6 +83,16 @@
     }
     .success { background:#e3fcef; color:#0a6640; }
     .error   { background:#fde8e8; color:#9b2c2c; }
+    .map-instruction {
+      margin-bottom:8px;
+      color:#336699;
+      font-size:0.95em;
+    }
+    .search-tip {
+      margin-bottom:8px;
+      color:#228B22;
+      font-size:0.95em;
+    }
   </style>
 </head>
 <body>
@@ -117,6 +127,9 @@
     </div>
 
     <div class="form-section">
+      <div class="search-tip">
+        🔍 <strong>Tip:</strong> You can search for your current location and destination in the search boxes below.
+      </div>
       <label>Current Location</label>
       <div class="coords-group">
         <input id="origin" placeholder="Search your nearby place or fetch coordinates">
@@ -126,6 +139,9 @@
     </div>
 
     <div class="form-section">
+      <div class="map-instruction">
+        💡 <strong>Tip:</strong> You can select your destination by toggling the map and <b>double-clicking</b> or <b>tapping once</b> on the map.
+      </div>
       <label>Destination</label>
       <div class="coords-group">
         <input id="destination" placeholder="Enter nearby destination or coordinates below">
@@ -157,12 +173,39 @@
 
   <script>
     let map, directionsService, directionsRenderer, autocompleteOrigin, autocompleteDest;
+    let destinationMarker = null; // For map click to select destination
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbytUJ-taezbOxcxnZTWwWjeFBH-gqshju9_g295Cu9wSpwtvlHHHNajxHxii8SxsUpe/exec';
 
+    function setDestinationFromMap(latLng) {
+      const lat = latLng.lat().toFixed(6);
+      const lng = latLng.lng().toFixed(6);
+      document.getElementById("destinationCoords").value = `${lat},${lng}`;
+
+      // Place or move marker
+      if (destinationMarker) {
+        destinationMarker.setPosition(latLng);
+      } else {
+        destinationMarker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+          title: "Selected Destination"
+        });
+      }
+
+      // Optionally, reverse geocode to fill address
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          document.getElementById("destination").value = results[0].formatted_address;
+        }
+      });
+    }
+
     function initMap() {
+      // Center and zoom on Luangwa District, Zambia (approx -15.6052, 30.4167)
       map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
-        center: { lat: -13.1339, lng: 27.8493 }
+        zoom: 13,
+        center: { lat: -15.6052, lng: 30.4167 }
       });
       directionsService  = new google.maps.DirectionsService();
       directionsRenderer = new google.maps.DirectionsRenderer({ map });
@@ -181,6 +224,19 @@
         if (p.geometry)
           document.getElementById('destinationCoords').value =
             `${p.geometry.location.lat().toFixed(6)},${p.geometry.location.lng().toFixed(6)}`;
+      });
+
+      // Double click for desktop
+      map.addListener('dblclick', function(e) {
+        setDestinationFromMap(e.latLng);
+      });
+
+      // Single tap/click for mobile and desktop
+      map.addListener('click', function(e) {
+        // Only set if map is visible
+        if (document.getElementById("map").style.display === "block") {
+          setDestinationFromMap(e.latLng);
+        }
       });
 
       autoFetchCurrentLocation();
@@ -398,6 +454,6 @@
   </script>
 </body>
 <footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.2.1</strong> — Last updated May 29, 2025
+  Version: <strong>1.2.6</strong> — Last updated May 29, 2025
 </footer>
 </html>
