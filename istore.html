@@ -96,6 +96,35 @@
       border: 1px solid #ccc;
       font-size: 1rem;
       box-sizing: border-box;
+      position: relative;
+      z-index: 2;
+    }
+    /* Autocomplete styles */
+    #autocomplete-list {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 100;
+      left: 0;
+      right: 0;
+      width: 100%;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      border-radius: 0 0 6px 6px;
+    }
+    .autocomplete-suggestion {
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-size: 1em;
+      color: #333;
+      background: #fff;
+      transition: background 0.15s;
+    }
+    .autocomplete-suggestion:hover, .autocomplete-active {
+      background: var(--primary-light);
+      color: #112;
     }
     /* Instructions toggle and box styles */
     .instructions-toggle-btn {
@@ -137,6 +166,7 @@
       .container { flex-direction: column; }
       .slider-wrapper, .cart { width: 100%; }
       .slider-button { display: none; }
+      #autocomplete-list { max-height: 120px; }
     }
   </style>
 </head>
@@ -165,7 +195,10 @@
   <div class="container">
     <div class="slider-wrapper">
       <h2 class="section-title"><i class="fas fa-store"></i> Available Products</h2>
-      <input type="text" id="searchBox" placeholder="Search products...">
+      <div style="position:relative;">
+        <input type="text" id="searchBox" placeholder="Search products...">
+        <div id="autocomplete-list"></div>
+      </div>
       <button class="slider-button prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
       <div id="product-list" class="thumbnail-slider"></div>
       <button class="slider-button next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
@@ -300,6 +333,7 @@
     const mapEl = document.getElementById('map');
     const locationMessageEl = document.getElementById('location-message');
     const searchBox = document.getElementById('searchBox');
+    const autocompleteList = document.getElementById('autocomplete-list');
     let map, geocoder, distanceService, directionsService, directionsRenderer;
     let cart = [];
     let transportationCost = 0;
@@ -312,6 +346,7 @@
     // For filtering
     let filteredProducts = PRODUCTS.slice();
 
+    // --- AUTOCOMPLETE LOGIC ---
     searchBox.addEventListener('input', function() {
       const query = this.value.trim().toLowerCase();
       filteredProducts = PRODUCTS.filter(p => 
@@ -319,6 +354,70 @@
         (p.category && p.category.toLowerCase().includes(query))
       );
       renderProducts();
+      // Autocomplete
+      autocompleteList.innerHTML = "";
+      if (query.length === 0) {
+        autocompleteList.style.display = "none";
+        return;
+      }
+      const matches = PRODUCTS.filter(p => p.name.toLowerCase().includes(query));
+      if (matches.length === 0) {
+        autocompleteList.style.display = "none";
+        return;
+      }
+      matches.slice(0, 10).forEach(product => {
+        const div = document.createElement('div');
+        div.className = "autocomplete-suggestion";
+        div.textContent = product.name;
+        div.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          searchBox.value = product.name;
+          autocompleteList.innerHTML = "";
+          autocompleteList.style.display = "none";
+          // Optionally: scroll to product in slider
+          const productDiv = Array.from(productListEl.children).find(
+            d => d.querySelector('h4') && d.querySelector('h4').textContent === product.name
+          );
+          if (productDiv) {
+            productDiv.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+            productDiv.classList.add("autocomplete-active");
+            setTimeout(()=>productDiv.classList.remove("autocomplete-active"), 1200);
+          }
+          // Filter for exact match
+          filteredProducts = PRODUCTS.filter(p => p.name === product.name);
+          renderProducts();
+        });
+        autocompleteList.appendChild(div);
+      });
+      autocompleteList.style.display = "block";
+    });
+
+    searchBox.addEventListener('blur', function() {
+      setTimeout(()=>{ autocompleteList.innerHTML = ""; autocompleteList.style.display = "none"; }, 120);
+    });
+
+    // allow arrow keys navigation for autocomplete
+    let autocompleteIndex = -1;
+    searchBox.addEventListener('keydown', function(e) {
+      const items = autocompleteList.querySelectorAll(".autocomplete-suggestion");
+      if (!items.length) return;
+      if (e.key === "ArrowDown") {
+        autocompleteIndex++; if (autocompleteIndex >= items.length) autocompleteIndex = 0;
+        items.forEach((el, idx)=>el.classList.toggle('autocomplete-active', idx===autocompleteIndex));
+        e.preventDefault();
+      } else if (e.key === "ArrowUp") {
+        autocompleteIndex--; if (autocompleteIndex < 0) autocompleteIndex = items.length-1;
+        items.forEach((el, idx)=>el.classList.toggle('autocomplete-active', idx===autocompleteIndex));
+        e.preventDefault();
+      } else if (e.key === "Enter") {
+        if (autocompleteIndex > -1 && items[autocompleteIndex]) {
+          items[autocompleteIndex].dispatchEvent(new MouseEvent('mousedown'));
+        }
+        autocompleteIndex = -1;
+        autocompleteList.innerHTML = "";
+        autocompleteList.style.display = "none";
+        e.preventDefault();
+      }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -454,9 +553,8 @@
         }
       } catch (error) { console.error('Map toggle error:', error); showMessage('Error toggling map.'); }
     });
-    // ... rest of your JS unchanged ...
-    // (initMap, geocoding, order submission, etc.)
 
+    // ... rest of your JS unchanged ...
     function loadGoogleMaps() {
       try {
         const script = document.createElement('script');
@@ -468,4 +566,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
