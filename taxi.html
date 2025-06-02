@@ -12,13 +12,11 @@
       justify-content: center;
       padding: 40px 10px;
     }
-
     .container {
       width: 100%;
       max-width: 540px;
       margin: 0 auto;
     }
-
     .card {
       background: #fff;
       padding: 25px 20px;
@@ -28,13 +26,11 @@
       width: 100%;
       margin: 0 auto;
     }
-
     label {
       font-weight: bold;
       margin: 10px 0 5px;
       display: block;
     }
-
     input[type="text"],
     select {
       width: 100%;
@@ -43,15 +39,12 @@
       border-radius: 8px;
       margin-bottom: 10px;
     }
-
     .checkbox-group {
       margin: 10px 0;
     }
-
     .checkbox-group input {
       margin-right: 10px;
     }
-
     .result {
       font-size: 18px;
       color: #007700;
@@ -59,7 +52,6 @@
       font-weight: bold;
       text-align: center;
     }
-
     .autocomplete-suggestions {
       border: 1px solid #ccc;
       position: absolute;
@@ -70,20 +62,16 @@
       z-index: 999;
       border-radius: 0 0 10px 10px;
     }
-
     .autocomplete-suggestion {
       padding: 8px;
       cursor: pointer;
     }
-
     .autocomplete-suggestion:hover {
       background-color: #eee;
     }
-
     .input-group {
       position: relative;
     }
-
     .driver-details {
       font-size: 14px;
       background: #f9f9f9;
@@ -92,7 +80,6 @@
       border-radius: 8px;
       margin-bottom: 10px;
     }
-
     .cancel-message {
       color: #b30000;
       font-weight: bold;
@@ -100,7 +87,6 @@
       margin-top: 15px;
       display: none;
     }
-
     .submit-message {
       color: #007700;
       font-weight: bold;
@@ -108,7 +94,6 @@
       margin-top: 15px;
       display: none;
     }
-
     .error-message {
       color: #b30000;
       font-weight: bold;
@@ -116,13 +101,19 @@
       margin-top: 15px;
       display: none;
     }
-
+    .field-reminder {
+      color: #b30000;
+      font-weight: bold;
+      font-size: 0.98rem;
+      margin-top: -7px;
+      margin-bottom: 5px;
+      display: none;
+    }
     .button-group {
       display: flex;
       justify-content: space-between;
       margin-top: 20px;
     }
-
     .cancel-btn {
       background: #b30000;
       color: #fff;
@@ -132,7 +123,6 @@
       cursor: pointer;
       font-size: 1rem;
     }
-
     .submit-btn {
       background: #007700;
       color: #fff;
@@ -142,13 +132,11 @@
       cursor: pointer;
       font-size: 1rem;
     }
-
     .loader {
       display: none;
       margin-top: 20px;
       text-align: center;
     }
-
     .loader div {
       display: inline-block;
       width: 24px;
@@ -158,7 +146,6 @@
       border-top-color: transparent;
       animation: spin 1s linear infinite;
     }
-
     .instructions-toggle {
       background: #e0e0e0;
       color: #333;
@@ -190,11 +177,9 @@
     .instructions-box li {
       margin-bottom: 8px;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
     @media(max-width: 600px) {
       .container { max-width: 100%; }
       .card { max-width: 100%; }
@@ -241,6 +226,7 @@
     <div id="customerPhoneGroup">
       <label for="customerPhone">Phone Number:</label>
       <input type="text" id="customerPhone" placeholder="Enter your phone number">
+      <div class="field-reminder" id="reminder-customerPhone"></div>
     </div>
 
     <div id="driverGroup" style="display:none;">
@@ -248,6 +234,7 @@
       <select id="driverSelect" onchange="displayDriverDetails()">
         <option value="">-- Select Driver --</option>
       </select>
+      <div class="field-reminder" id="reminder-driverName"></div>
       <div class="driver-details" id="driverDetails" style="display:none;"></div>
     </div>
 
@@ -255,12 +242,14 @@
       <label for="from">From:</label>
       <input type="text" id="from" placeholder="Start typing origin...">
       <div class="autocomplete-suggestions" id="fromSuggestions"></div>
+      <div class="field-reminder" id="reminder-from"></div>
     </div>
 
     <div class="input-group">
       <label for="to">To:</label>
       <input type="text" id="to" placeholder="Start typing destination...">
       <div class="autocomplete-suggestions" id="toSuggestions"></div>
+      <div class="field-reminder" id="reminder-to"></div>
     </div>
 
     <div class="checkbox-group">
@@ -284,10 +273,9 @@
 </div>
 
 <script>
-  // Use the provided Google Apps Script Web App URL
-  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbytUJ-taezbOxcxnZTWwWjeFBH-gqshju9_g295Cu9wSpwtvlHHHNajxHxii8SxsUpe/exec';
+  // Use the new provided Google Apps Script Web App URL
+  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec';
 
-  // Instructions toggle logic
   function toggleInstructions() {
     const box = document.getElementById("instructionsBox");
     const btnIcon = document.getElementById("instructionsBtnIcon");
@@ -324,8 +312,6 @@
     }
   ];
 
-  // INSTRUCTIONS: Add more places using the format shown below.
-  // { name: "Your Place Name", distance: X },
   const landmarks = [
     { name: "Luangwa Bus Station", distance: 0 },
     { name: "Luangwa Market", distance: 0.5 },
@@ -366,8 +352,6 @@
     { name: "Luangwa Bridge Bus Station", distance: 100 },
     { name: "Boma Clinic", distance: 2 },
     { name: "Luangwa High School", distance: 2.2 }
-    // Add your new landmark below this line, using the format:
-    // { name: "Your Place Name", distance: X },
   ];
 
   const baseFarePer3km = 20;
@@ -410,23 +394,20 @@
       document.getElementById("details").textContent = "";
       return;
     }
-
     const distance = Math.abs(to.distance - from.distance);
     let fare = Math.ceil(distance / 3) * baseFarePer3km;
-
-    // Surcharge: add 50% of ONE block for extras (change to fare *= 1.5; for 50% of total fare)
     if (document.getElementById("extra").checked) {
       fare += baseFarePer3km / 2;
     }
-
-    const time = (distance / avgSpeedKmh) * 60; // minutes
-
+    const time = (distance / avgSpeedKmh) * 60;
     document.getElementById("fareResult").innerText = `Estimated Fare: K${fare.toFixed(2)}`;
     document.getElementById("details").innerText = `Distance: ${distance.toFixed(1)} km | Estimated Time: ${time.toFixed(0)} mins`;
   }
 
   function updateUserType() {
     const userType = document.getElementById("userType").value;
+    hideFieldReminder("reminder-customerPhone");
+    hideFieldReminder("reminder-driverName");
     if (userType === "driver") {
       document.getElementById("driverGroup").style.display = "block";
       document.getElementById("customerPhoneGroup").style.display = "none";
@@ -440,7 +421,6 @@
   function displayDriverDetails() {
     const selectedIndex = document.getElementById("driverSelect").selectedIndex - 1;
     const detailsBox = document.getElementById("driverDetails");
-
     if (selectedIndex >= 0) {
       const d = drivers[selectedIndex];
       detailsBox.innerHTML = `
@@ -455,7 +435,27 @@
     }
   }
 
-  // Logic for ride cancellation before submission
+  function showFieldReminder(fieldId, message) {
+    const el = document.getElementById(fieldId);
+    if (el) {
+      el.textContent = message;
+      el.style.display = "block";
+    }
+  }
+  function hideFieldReminder(fieldId) {
+    const el = document.getElementById(fieldId);
+    if (el) {
+      el.textContent = "";
+      el.style.display = "none";
+    }
+  }
+  function hideAllFieldReminders() {
+    hideFieldReminder("reminder-customerPhone");
+    hideFieldReminder("reminder-driverName");
+    hideFieldReminder("reminder-from");
+    hideFieldReminder("reminder-to");
+  }
+
   function cancelRide() {
     document.getElementById("customerPhone").value = "";
     document.getElementById("userType").value = "customer";
@@ -468,16 +468,13 @@
     document.getElementById("details").textContent = "";
     document.getElementById("fromSuggestions").innerHTML = "";
     document.getElementById("toSuggestions").innerHTML = "";
-
     updateUserType();
-
     document.getElementById("submitMessage").style.display = "none";
     document.getElementById("errorMessage").style.display = "none";
-
+    hideAllFieldReminders();
     const cancelMsg = document.getElementById("cancelMessage");
     cancelMsg.textContent = "Ride cancelled. All entries have been cleared.";
     cancelMsg.style.display = "block";
-
     setTimeout(() => {
       cancelMsg.style.display = "none";
     }, 2500);
@@ -487,7 +484,9 @@
     document.getElementById("cancelMessage").style.display = "none";
     document.getElementById("errorMessage").style.display = "none";
     document.getElementById("submitMessage").style.display = "none";
+    hideAllFieldReminders();
 
+    let hasError = false;
     const userType = document.getElementById("userType").value;
     const customerPhone = document.getElementById("customerPhone").value.trim();
     const driverIdx = document.getElementById("driverSelect").selectedIndex - 1;
@@ -498,22 +497,34 @@
     const fare = document.getElementById("fareResult").innerText.replace("Estimated Fare: ","").replace("K","");
     const details = document.getElementById("details").innerText;
 
-    if (!from || !to) {
-      showError("Please enter both origin and destination.");
-      return;
+    if (!from) {
+      showFieldReminder("reminder-from", "Please select your origin.");
+      hasError = true;
+    }
+    if (!to) {
+      showFieldReminder("reminder-to", "Please select your destination.");
+      hasError = true;
     }
     if (userType === "customer" && !customerPhone) {
-      showError("Please enter your phone number.");
-      return;
+      showFieldReminder("reminder-customerPhone", "Please enter your phone number.");
+      hasError = true;
     }
     if (userType === "driver" && !driverName) {
-      showError("Please select a driver.");
-      return;
+      showFieldReminder("reminder-driverName", "Please select a driver.");
+      hasError = true;
     }
     const fromObj = landmarks.find(l => l.name === from);
     const toObj = landmarks.find(l => l.name === to);
-    if (!fromObj || !toObj) {
-      showError("Please choose valid locations from the list.");
+    if (from && !fromObj) {
+      showFieldReminder("reminder-from", "Origin not recognized. Choose from the list.");
+      hasError = true;
+    }
+    if (to && !toObj) {
+      showFieldReminder("reminder-to", "Destination not recognized. Choose from the list.");
+      hasError = true;
+    }
+    if (hasError) {
+      showError("Please complete all highlighted fields before submitting.");
       return;
     }
 
@@ -566,7 +577,6 @@
     setTimeout(() => { errorMsg.style.display = "none"; }, 4000);
   }
 
-  // Populate driver list
   const driverSelect = document.getElementById("driverSelect");
   drivers.forEach(driver => {
     const option = document.createElement("option");
@@ -574,7 +584,6 @@
     driverSelect.appendChild(option);
   });
 
-  // Init
   updateUserType();
 </script>
 
