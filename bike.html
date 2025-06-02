@@ -173,7 +173,7 @@
     <div id="driverFields" class="hidden">
       <div class="form-section">
         <label for="vehicle">Select Vehicle</label>
-        <select id="vehicle" onchange="populateDriverPhone()">
+        <select id="vehicle" onchange="populateDriverDetails()">
           <option value="">Choose your vehicle</option>
           <option value="BAH1996,ist,Silver">BAH1996, Bike, Silver</option>
           <option value="BAH2345,Vitz,Blue">BAH2345, Bike, Blue</option>
@@ -182,6 +182,7 @@
           <option value="BAH5678,Mazda,Red">BAH5678, Bike, Red</option>
         </select>
         <div id="reminder-vehicle" class="reminder"></div>
+        <div id="driverDetails" style="padding:10px 0 0 0; color:#333; font-size:1em;"></div>
       </div>
     </div>
 
@@ -232,6 +233,7 @@
       }
     }
 
+    // Corrected knownLandmarks object and distances
     const knownLandmarks = {
       "Luangwa Bus Station": 0,
       "Luangwa Market": 0.5,
@@ -242,9 +244,9 @@
       "Luangwa District Education Office": 0.6,
       "Luangwa Basic School": 1.3,
       "Luangwa Feira Day Secondary School": 3.7,
-      "Luangwa High  School": 48,
+      "Luangwa High School": 48,
       "Luangwa Filling Station": 1.5,
-      "Luangwa Council lodge": 0.,65
+      "Luangwa Council lodge": 0.65,
       "Chimutengo Primary School": 5,
       "Janeiro Basic School": 10,
       "Chiriwe Basic School": 15,
@@ -253,7 +255,7 @@
       "Mwalilia Basic School": 18,
       "Mpuka Village": 19,
       "Mwavi Primary School": 55,
-      "Mwavi Secondary School": ,60,
+      "Mwavi Secondary School": 60,
       "Kaunga Basic School": 25,
       "Kapoche Village": 23,
       "Redcliff Lodge": 27.7,
@@ -265,7 +267,7 @@
       "Nchinkwo Village": 49,
       "Chula Island Camp": 48.1,
       "Mburuma Village": 52,
-      "Mwavi Village": ,60,
+      "Mwavi Village": 60,
       "Lower Zambezi National Park": 53.7,
       "Kasinsa Village": 58,
       "Luangwa Bridge": 100,
@@ -275,23 +277,72 @@
       "Luangwa School": 2.2
     };
 
+    // Biker/vehicle data for auto-fill
+    const bikerDetails = {
+      "BAH1996,ist,Silver": {
+        phone: "0978123456",
+        name: "John Banda",
+        model: "ist",
+        color: "Silver",
+        reg: "BAH1996"
+      },
+      "BAH2345,Vitz,Blue": {
+        phone: "0978234567",
+        name: "Mary Zulu",
+        model: "Vitz",
+        color: "Blue",
+        reg: "BAH2345"
+      },
+      "BAH9876,Corolla,White": {
+        phone: "0978345678",
+        name: "James Phiri",
+        model: "Corolla",
+        color: "White",
+        reg: "BAH9876"
+      },
+      "BAH3456,Harrier,Black": {
+        phone: "0978456789",
+        name: "Chipo Mwale",
+        model: "Harrier",
+        color: "Black",
+        reg: "BAH3456"
+      },
+      "BAH5678,Mazda,Red": {
+        phone: "0978567890",
+        name: "Loveness Tembo",
+        model: "Mazda",
+        color: "Red",
+        reg: "BAH5678"
+      }
+    };
+
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec';
 
     function toggleFields() {
       const isDriver = document.getElementById("submitterType").value === "Driver";
       document.getElementById("driverFields").classList.toggle("hidden", !isDriver);
+      // Clear phone and details if switching to Customer
+      if (!isDriver) {
+        document.getElementById("phone").value = "";
+        document.getElementById("vehicle").value = "";
+        document.getElementById("driverDetails").innerHTML = "";
+      }
     }
 
-    function populateDriverPhone() {
-      const map = {
-        "BAH1996,Bike,Silver"  : "0978123456",
-        "BAH2345,Bike,Blue"   : "0978234567",
-        "BAH9876,Bike,White": "0978345678",
-        "BAH3456,Bike,Black": "0978456789",
-        "BAH5678,Bike,Red"   : "0978567890"
-      };
+    function populateDriverDetails() {
       const v = document.getElementById("vehicle").value;
-      document.getElementById("phone").value = map[v] || "";
+      const phoneInput = document.getElementById("phone");
+      const detailsDiv = document.getElementById("driverDetails");
+      if (bikerDetails[v]) {
+        phoneInput.value = bikerDetails[v].phone;
+        detailsDiv.innerHTML = "<b>Name:</b> " + bikerDetails[v].name +
+          "<br><b>Vehicle:</b> " + bikerDetails[v].model +
+          "<br><b>Color:</b> " + bikerDetails[v].color +
+          "<br><b>Registration:</b> " + bikerDetails[v].reg;
+      } else {
+        phoneInput.value = "";
+        detailsDiv.innerHTML = "";
+      }
     }
 
     // Autocomplete logic
@@ -474,6 +525,6 @@
 
 </body>
 <footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.3.1</strong> — Last updated June 2, 2025
+  Version: <strong>1.3.3</strong> — Last updated June 2, 2025
 </footer>
-</html>
+  </html>
