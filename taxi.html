@@ -284,8 +284,8 @@
 </div>
 
 <script>
-  // Replace this with your own Google Apps Script Web App URL
-  const scriptURL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec";
+  // Use the provided Google Apps Script Web App URL
+  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbytUJ-taezbOxcxnZTWwWjeFBH-gqshju9_g295Cu9wSpwtvlHHHNajxHxii8SxsUpe/exec';
 
   // Instructions toggle logic
   function toggleInstructions() {
@@ -457,7 +457,6 @@
 
   // Logic for ride cancellation before submission
   function cancelRide() {
-    // Clear all input fields
     document.getElementById("customerPhone").value = "";
     document.getElementById("userType").value = "customer";
     document.getElementById("from").value = "";
@@ -470,31 +469,25 @@
     document.getElementById("fromSuggestions").innerHTML = "";
     document.getElementById("toSuggestions").innerHTML = "";
 
-    // UI logic to reset to customer mode
     updateUserType();
 
-    // Hide submit and error messages
     document.getElementById("submitMessage").style.display = "none";
     document.getElementById("errorMessage").style.display = "none";
 
-    // Show cancellation message
     const cancelMsg = document.getElementById("cancelMessage");
     cancelMsg.textContent = "Ride cancelled. All entries have been cleared.";
     cancelMsg.style.display = "block";
 
-    // Hide the message after 2.5 seconds
     setTimeout(() => {
       cancelMsg.style.display = "none";
     }, 2500);
   }
 
   function submitRide() {
-    // Hide cancel and error messages
     document.getElementById("cancelMessage").style.display = "none";
     document.getElementById("errorMessage").style.display = "none";
     document.getElementById("submitMessage").style.display = "none";
 
-    // Gather form data
     const userType = document.getElementById("userType").value;
     const customerPhone = document.getElementById("customerPhone").value.trim();
     const driverIdx = document.getElementById("driverSelect").selectedIndex - 1;
@@ -505,7 +498,6 @@
     const fare = document.getElementById("fareResult").innerText.replace("Estimated Fare: ","").replace("K","");
     const details = document.getElementById("details").innerText;
 
-    // Validation
     if (!from || !to) {
       showError("Please enter both origin and destination.");
       return;
@@ -518,7 +510,6 @@
       showError("Please select a driver.");
       return;
     }
-    // If locations are not valid
     const fromObj = landmarks.find(l => l.name === from);
     const toObj = landmarks.find(l => l.name === to);
     if (!fromObj || !toObj) {
@@ -526,7 +517,6 @@
       return;
     }
 
-    // Prepare data
     const postData = {
       userType,
       customerPhone,
@@ -538,12 +528,11 @@
       details
     };
 
-    // Show loader and disable buttons
     document.getElementById("loader").style.display = "block";
     document.getElementById("submitBtn").disabled = true;
     document.getElementById("cancelBtn").disabled = true;
 
-    fetch(scriptURL, {
+    fetch(GOOGLE_SHEETS_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
