@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>RideTrack</title>
-  <link rel="icon" type="image/x-icon" href="/images/car.png">
+  <title>RideTrack & BikeTrack</title>
+  <link rel="icon" type="image/x-icon" href="/images/car.png" id="favicon">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
@@ -138,11 +138,14 @@
       margin-bottom: 0.7em;
       line-height: 1.55em;
     }
+    .mode-emoji { font-size: 35px; vertical-align: middle; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align:center; color:#2c3e50; margin-bottom:30px;">🚗 RideTrack</h1>
+    <h1 id="mainTitle" style="text-align:center; color:#2c3e50; margin-bottom:30px;">
+      <span id="modeIcon" class="mode-emoji">🚗</span> RideTrack & BikeTrack
+    </h1>
 
     <button type="button" class="instructions-toggle" onclick="toggleInstructions()" id="instructionsBtn">
       <span id="instructionsBtnIcon">➕</span> Instructions & Tips
@@ -157,10 +160,19 @@
     </div>
 
     <div class="form-section">
+      <label for="modeSelect">Preferred Mode of Transport:</label>
+      <select id="modeSelect" onchange="changeModeAndFavicon()">
+        <option value="car">Car</option>
+        <option value="bike">Bike</option>
+      </select>
+    </div>
+
+    <div class="form-section">
       <label for="submitterType">You are:</label>
-      <select id="submitterType" onchange="toggleFields()">
+      <select id="submitterType" onchange="toggleFields(); populateDriverDetails();">
         <option value="Customer">Customer</option>
-        <option value="Driver">Car Driver</option>
+        <option value="Car Driver">Car Driver</option>
+        <option value="Bike Rider">Bike Rider</option>
       </select>
     </div>
 
@@ -170,19 +182,35 @@
       <div id="reminder-phone" class="reminder"></div>
     </div>
 
-    <div id="driverFields" class="hidden">
+    <div id="driverFieldsCar" class="hidden">
       <div class="form-section">
-        <label for="vehicle">Select Vehicle</label>
-        <select id="vehicle" onchange="populateDriverDetails()">
-          <option value="">Choose your vehicle</option>
+        <label for="vehicleCar">Select Car</label>
+        <select id="vehicleCar" onchange="populateDriverDetails()">
+          <option value="">Choose your car</option>
           <option value="BAH1996,Car,Silver">BAH1996, Car, Silver</option>
           <option value="BAH2345,Car,Blue">BAH2345, Car, Blue</option>
           <option value="BAH9876,Car,White">BAH9876, Car, White</option>
           <option value="BAH3456,Car,Black">BAH3456, Car, Black</option>
           <option value="BAH5678,Car,Red">BAH5678, Car, Red</option>
         </select>
-        <div id="reminder-vehicle" class="reminder"></div>
-        <div id="driverDetails" style="padding:10px 0 0 0; color:#333; font-size:1em;"></div>
+        <div id="reminder-vehicleCar" class="reminder"></div>
+        <div id="driverDetailsCar" style="padding:10px 0 0 0; color:#333; font-size:1em;"></div>
+      </div>
+    </div>
+
+    <div id="driverFieldsBike" class="hidden">
+      <div class="form-section">
+        <label for="vehicleBike">Select Bike</label>
+        <select id="vehicleBike" onchange="populateDriverDetails()">
+          <option value="">Choose your bike</option>
+          <option value="BAH9001,Bike,Blue">BAH9001, Bike, Blue</option>
+          <option value="BAH9002,Bike,Red">BAH9002, Bike, Red</option>
+          <option value="BAH9003,Bike,Black">BAH9003, Bike, Black</option>
+          <option value="BAH9004,Bike,White">BAH9004, Bike, White</option>
+          <option value="BAH9005,Bike,Silver">BAH9005, Bike, Silver</option>
+        </select>
+        <div id="reminder-vehicleBike" class="reminder"></div>
+        <div id="driverDetailsBike" style="padding:10px 0 0 0; color:#333; font-size:1em;"></div>
       </div>
     </div>
 
@@ -221,6 +249,13 @@
   </div>
 
   <script>
+    // Change favicon and emoji based on mode
+    function changeModeAndFavicon() {
+      const mode = document.getElementById('modeSelect').value;
+      document.getElementById('modeIcon').textContent = mode === 'car' ? '🚗' : '🏍️';
+      document.getElementById('favicon').href = mode === 'car' ? '/images/car.png' : '/images/bike.png';
+    }
+
     function toggleInstructions() {
       var box = document.getElementById("instructionsBox");
       var icon = document.getElementById("instructionsBtnIcon");
@@ -290,8 +325,8 @@
       "Luangwa Town Council": 2.1
     };
 
-    // Car/vehicle data for auto-fill
-    const driverDetails = {
+    // Car details
+    const driverDetailsCar = {
       "BAH1996,Car,Silver": {
         phone: "0978123456",
         name: "John Banda",
@@ -329,31 +364,96 @@
       }
     };
 
+    // Bike details
+    const driverDetailsBike = {
+      "BAH9001,Bike,Blue": {
+        phone: "0967000001",
+        name: "Peter Mwansa",
+        model: "Bike",
+        color: "Blue",
+        reg: "BAH9001"
+      },
+      "BAH9002,Bike,Red": {
+        phone: "0967000002",
+        name: "Agnes Lungu",
+        model: "Bike",
+        color: "Red",
+        reg: "BAH9002"
+      },
+      "BAH9003,Bike,Black": {
+        phone: "0967000003",
+        name: "Kelvin Simfukwe",
+        model: "Bike",
+        color: "Black",
+        reg: "BAH9003"
+      },
+      "BAH9004,Bike,White": {
+        phone: "0967000004",
+        name: "Grace Zulu",
+        model: "Bike",
+        color: "White",
+        reg: "BAH9004"
+      },
+      "BAH9005,Bike,Silver": {
+        phone: "0967000005",
+        name: "Lazarus Phiri",
+        model: "Bike",
+        color: "Silver",
+        reg: "BAH9005"
+      }
+    };
+
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec';
 
     function toggleFields() {
-      const isDriver = document.getElementById("submitterType").value === "Car Driver";
-      document.getElementById("driverFields").classList.toggle("hidden", !isDriver);
-      if (!isDriver) {
+      const type = document.getElementById("submitterType").value;
+      document.getElementById("driverFieldsCar").classList.toggle("hidden", type !== "Car Driver");
+      document.getElementById("driverFieldsBike").classList.toggle("hidden", type !== "Bike Rider");
+      if (type !== "Car Driver") {
+        document.getElementById("vehicleCar").value = "";
+        document.getElementById("driverDetailsCar").innerHTML = "";
+      }
+      if (type !== "Bike Rider") {
+        document.getElementById("vehicleBike").value = "";
+        document.getElementById("driverDetailsBike").innerHTML = "";
+      }
+      // Only clear phone for customers
+      if (type === "Customer") {
         document.getElementById("phone").value = "";
-        document.getElementById("vehicle").value = "";
-        document.getElementById("driverDetails").innerHTML = "";
       }
     }
 
     function populateDriverDetails() {
-      const v = document.getElementById("vehicle").value;
+      const type = document.getElementById("submitterType").value;
       const phoneInput = document.getElementById("phone");
-      const detailsDiv = document.getElementById("driverDetails");
-      if (driverDetails[v]) {
-        phoneInput.value = driverDetails[v].phone;
-        detailsDiv.innerHTML = "<b>Name:</b> " + driverDetails[v].name +
-          "<br><b>Vehicle:</b> " + driverDetails[v].model +
-          "<br><b>Color:</b> " + driverDetails[v].color +
-          "<br><b>Registration:</b> " + driverDetails[v].reg;
-      } else {
+      if (type === "Car Driver") {
+        const v = document.getElementById("vehicleCar").value;
+        const detailsDiv = document.getElementById("driverDetailsCar");
+        if (driverDetailsCar[v]) {
+          phoneInput.value = driverDetailsCar[v].phone;
+          detailsDiv.innerHTML = "<b>Name:</b> " + driverDetailsCar[v].name +
+            "<br><b>Vehicle:</b> " + driverDetailsCar[v].model +
+            "<br><b>Color:</b> " + driverDetailsCar[v].color +
+            "<br><b>Registration:</b> " + driverDetailsCar[v].reg;
+        } else {
+          detailsDiv.innerHTML = "";
+        }
+      }
+      if (type === "Bike Rider") {
+        const v = document.getElementById("vehicleBike").value;
+        const detailsDiv = document.getElementById("driverDetailsBike");
+        if (driverDetailsBike[v]) {
+          phoneInput.value = driverDetailsBike[v].phone;
+          detailsDiv.innerHTML = "<b>Name:</b> " + driverDetailsBike[v].name +
+            "<br><b>Vehicle:</b> " + driverDetailsBike[v].model +
+            "<br><b>Color:</b> " + driverDetailsBike[v].color +
+            "<br><b>Registration:</b> " + driverDetailsBike[v].reg;
+        } else {
+          detailsDiv.innerHTML = "";
+        }
+      }
+      if (type === "Customer") {
         phoneInput.value = "";
-        detailsDiv.innerHTML = "";
       }
     }
 
@@ -414,7 +514,8 @@
     }
     function hideAllReminders() {
       hideReminder("reminder-phone");
-      hideReminder("reminder-vehicle");
+      hideReminder("reminder-vehicleCar");
+      hideReminder("reminder-vehicleBike");
       hideReminder("reminder-origin");
       hideReminder("reminder-destination");
     }
@@ -426,8 +527,12 @@
       const phonePattern = /^0[0-9]{9}$/;
       const origin = document.getElementById("origin").value.trim();
       const destination = document.getElementById("destination").value.trim();
-      const isDriver = document.getElementById("submitterType").value === "Car Driver";
-      const vehicle = document.getElementById("vehicle").value;
+      const type = document.getElementById("submitterType").value;
+
+      let vehicleCar = "";
+      let vehicleBike = "";
+      if (type === "Car Driver") vehicleCar = document.getElementById("vehicleCar").value;
+      if (type === "Bike Rider") vehicleBike = document.getElementById("vehicleBike").value;
 
       if (!phone) {
         showReminder("reminder-phone", "Please enter your phone number.");
@@ -453,8 +558,12 @@
         valid = false;
       }
 
-      if (isDriver && !vehicle) {
-        showReminder("reminder-vehicle", "Please select your vehicle.");
+      if (type === "Car Driver" && !vehicleCar) {
+        showReminder("reminder-vehicleCar", "Please select your car.");
+        valid = false;
+      }
+      if (type === "Bike Rider" && !vehicleBike) {
+        showReminder("reminder-vehicleBike", "Please select your bike.");
         valid = false;
       }
       return valid;
@@ -465,11 +574,18 @@
         document.getElementById("tripSummary").classList.add("hidden");
         return;
       }
+      const mode = document.getElementById("modeSelect").value;
+      const type = document.getElementById("submitterType").value;
       const origin = document.getElementById("origin").value.trim();
       const destination = document.getElementById("destination").value.trim();
       const dist = Math.abs(knownLandmarks[origin] - knownLandmarks[destination]);
-      const durationMins = Math.round((dist / 60) * 60); // 60km/h assumed speed
-      let fare = Math.ceil(dist / 3) * 20; // 20 kwacha per 3km
+      let speed = (mode === "car") ? 60 : 30;
+      let rate = (mode === "car") ? 20 : 10;
+      // If a car/bike driver, force matching mode
+      if (type === "Car Driver") { speed = 60; rate = 20; }
+      if (type === "Bike Rider") { speed = 30; rate = 10; }
+      const durationMins = Math.round((dist / speed) * 60);
+      let fare = Math.ceil(dist / 3) * rate;
       if (document.getElementById("extras").checked) fare += fare * 0.5;
       document.getElementById("distance").innerText = `📏 Distance: ${dist.toFixed(1)} km`;
       document.getElementById("duration").innerText = `⏱ Duration: ${durationMins} mins`;
@@ -484,10 +600,17 @@
         return;
       }
 
+      const type = document.getElementById("submitterType").value;
+      const mode = document.getElementById("modeSelect").value;
+      let vehicle = "";
+      if (type === "Car Driver") vehicle = document.getElementById("vehicleCar").value;
+      if (type === "Bike Rider") vehicle = document.getElementById("vehicleBike").value;
+
       const data = {
-        submitterType  : document.getElementById("submitterType").value,
+        submitterType  : type,
+        mode           : mode,
         phone          : document.getElementById("phone").value,
-        vehicle        : document.getElementById("vehicle")?.value || "",
+        vehicle        : vehicle,
         origin         : document.getElementById("origin").value,
         destination    : document.getElementById("destination").value,
         extras         : document.getElementById("extras").checked ? "Yes" : "No",
@@ -532,10 +655,22 @@
       s.style.display = "block";
       setTimeout(() => s.style.display = "none", 5000);
     }
+
+    // Ensure auto-populate works as soon as driver/rider & vehicle are selected, even if user switches back and forth
+    document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById("submitterType").addEventListener("change", populateDriverDetails);
+      document.getElementById("vehicleCar").addEventListener("change", populateDriverDetails);
+      document.getElementById("vehicleBike").addEventListener("change", populateDriverDetails);
+      document.getElementById('modeSelect').addEventListener("change", function() {
+        // Optionally reset driver selection when changing mode
+        populateDriverDetails();
+        toggleFields();
+      });
+    });
   </script>
 
 </body>
 <footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.3.4</strong> — Last updated June 3, 2025
+  Version: <strong>1.3.6</strong> — Last updated June 3, 2025
 </footer>
-  </html>
+</html>
