@@ -1,741 +1,839 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>RideTrack & BikeTrack</title>
-  <link rel="icon" type="image/x-icon" href="/images/car.png" id="favicon">
+  <title>Book a Ride</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts and Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-      background: #f5f5f5;
+    body { 
+      font-family: 'Roboto', Arial, sans-serif; 
+      max-width: 470px; 
+      margin: auto; 
+      padding: 0;
+      background: #eaf1fc;
     }
-    .container {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    .top-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      margin-bottom: 0;
     }
-    .form-section { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-    input, select, button {
-      width: 100%; padding: 12px; margin-bottom: 15px;
-      border: 1px solid #ddd; border-radius: 8px;
-      box-sizing: border-box; transition: all 0.3s ease;
+    .toggle-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 8px #2563eb19;
     }
-    input:focus, select:focus {
-      border-color: #4A90E2;
-      box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
-      outline: none;
+    .toggle-btn:hover, .toggle-btn:focus {
+      background: #174ea6;
     }
-    .autocomplete-suggestions {
-      border: 1px solid #ccc;
+    .instructions-box {
       background: #fff;
-      max-height: 160px;
-      overflow-y: auto;
-      position: absolute;
-      width: calc(100% - 2px);
-      z-index: 999;
-      border-radius: 0 0 10px 10px;
-      left: 0;
-      top: 100%;
-    }
-    .autocomplete-suggestion {
-      padding: 10px 14px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-    }
-    .autocomplete-suggestion:last-child { border-bottom: none; }
-    .autocomplete-suggestion:hover, .autocomplete-selected {
-      background: #e5efff;
-    }
-    .form-autocomplete-group {
-      position: relative;
-      margin-bottom: 18px;
-    }
-    .reminder {
-      color: #b30000;
-      font-weight: bold;
-      font-size: 0.98rem;
-      margin-top: -7px;
-      margin-bottom: 5px;
+      color: #1e293b;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px #2563eb13;
+      margin: 12px 0 18px 0;
+      padding: 18px 18px 14px 18px;
+      font-size: 15px;
+      line-height: 1.5;
       display: none;
+      animation: fadeIn .4s;
     }
-    .button-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px; margin-top: 20px;
+    @keyframes fadeIn {
+      from { opacity: 0;}
+      to { opacity: 1;}
     }
-    button {
-      background: #4A90E2; color: white; border: none;
-      font-weight: 600; cursor: pointer; padding: 12px 20px;
+    h2 {
+      text-align: center;
+      color: #2563eb; 
+      margin: 18px 0 12px 0;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
-    button:hover { background: #357ABD; }
-    .trip-summary {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      gap:15px; background:#f8f9fa; padding:15px;
-      border-radius:8px; margin:20px 0;
+    .icon-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 38px;
+      margin-bottom: 24px;
+      margin-top: 10px;
     }
-    .trip-summary div {
-      text-align:center; padding:10px; background:white;
-      border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.05);
+    .icon-box {
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 12px #2563eb19;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 66px;
+      height: 66px;
+      border: 3px solid #2563eb;
+      font-size: 2.5rem;
+      color: #2563eb;
     }
-    .hidden { display:none; }
-    .loader {
-      border:4px solid #f3f3f3; border-top:4px solid #4A90E2;
-      border-radius:50%; width:30px; height:30px;
-      animation:spin 1s linear infinite; margin:20px auto;
-      display:none;
+    .content-section, .summary-table-section {
+      background: #fff;
+      padding: 30px 20px 22px 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08);
+      margin: 22px 0 18px 0;
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .extra-options { margin:15px 0; }
-    .extra-options label {
-      display:flex; align-items:center; gap:8px;
-      background:#f8f9fa; padding:12px; border-radius:8px;
-      cursor:pointer;
-    }
-    input[type="checkbox"] { width:auto; margin:0; }
-    .status-message {
-      padding:12px; border-radius:8px; margin:15px 0;
-      display:none;
-    }
-    .success { background:#e3fcef; color:#0a6640; }
-    .error   { background:#fde8e8; color:#9b2c2c; }
-    .instructions-toggle {
-      background: #fffbe6;
-      border: 1px solid #ffe07a;
-      color: #7c6700;
-      font-weight: 600;
-      padding: 10px 16px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      cursor: pointer;
+    .section-title {
+      font-weight: 700;
+      color: #2563eb;
+      font-size: 17px;
+      margin-bottom: 10px;
+      letter-spacing: .05em;
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 1em;
-      width: fit-content;
     }
-    .instructions-box {
-      background: #f9f7f0;
-      border: 1px solid #ffe07a;
-      color: #5b5400;
-      border-radius: 10px;
-      padding: 18px 18px 18px 26px;
-      margin-bottom: 18px;
-      font-size: 1em;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      max-width: 100%;
-      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    .inputs-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      margin: 15px 0;
     }
-    .instructions-box ul {
-      margin: 0 0 0 1.2em;
-      padding: 0;
+    .input-group {
+      position: relative;
+      background: #f5f7fa;
+      border-radius: 7px;
+      padding: 16px 14px 8px 48px;
+      box-shadow: 0 1px 3px #2563eb11;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
-    .instructions-box li {
-      margin-bottom: 0.7em;
-      line-height: 1.55em;
+    .input-group label {
+      font-weight: 500;
+      color: #2563eb;
+      font-size: 13px;
+      margin-bottom: 2px;
+      letter-spacing: .1em;
     }
-    .mode-emoji { font-size: 35px; vertical-align: middle; }
-    #map {
+    .input-group .material-icons.input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #2563eb;
+      font-size: 25px;
+      opacity: 0.85;
+    }
+    .autocomplete-wrapper, .vehicle-autocomplete-wrapper, .biker-autocomplete-wrapper {
       width: 100%;
-      height: 300px;
-      border-radius: 10px;
-      margin: 16px 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      display: none; /* Hidden by default, toggled by button */
+      position: relative;
     }
-    .map-toggle-btn {
-      background: #fffbe6;
-      color: #7c6700;
-      border: 1px solid #ffe07a;
-      width: fit-content;
-      margin: 0 0 15px 0;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: bold;
+    input, select, button {
+      width: 100%;
+      padding: 13px 12px;
+      margin: 3px 0 0 0;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1.5px solid #e5e7eb;
+      transition: border 0.2s, box-shadow 0.2s;
+      font-family: 'Roboto', Arial, sans-serif;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus {
+      border: 1.5px solid #2563eb;
+      box-shadow: 0 0 0 2px #93c5fd55;
+      background: #fff;
+    }
+    button {
+      background: linear-gradient(90deg, #2563eb 60%, #60a5fa 100%);
+      color: white;
+      border: none;
       cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-top: 15px;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px #2563eb19;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    button:hover, button:focus {
+      background: linear-gradient(90deg, #174ea6 60%, #3b82f6 100%);
+      box-shadow: 0 4px 16px #2563eb22;
+    }
+    .autocomplete-list, .vehicle-autocomplete-list, .biker-autocomplete-list {
+      position: absolute;
+      background: white;
+      border: 1px solid #b6c1dd;
+      max-height: 140px;
+      overflow-y: auto;
+      z-index: 1000;
+      width: 100%;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      left: 0;
+      top: 100%;
+    }
+    .autocomplete-item, .vehicle-autocomplete-item, .biker-autocomplete-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 15px;
+      color: #1e293b;
+      transition: background 0.13s;
+    }
+    .autocomplete-item:last-child, .vehicle-autocomplete-item:last-child, .biker-autocomplete-item:last-child {
+      border-bottom: none;
+    }
+    .autocomplete-item:hover, .autocomplete-item.active,
+    .vehicle-autocomplete-item:hover, .vehicle-autocomplete-item.active,
+    .biker-autocomplete-item:hover, .biker-autocomplete-item.active {
+      background-color: #f0f6ff;
+      color: #2563eb;
+    }
+    .info-section {
+      padding: 12px 0 5px 0;
+      color: #475569;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    #google-map-frame {
+      width: 100%;
+      height: 390px;
+      border: none;
+      margin-top: 12px;
+      display: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(66,133,244,0.10);
+      background: #f1f5f9;
+      transition: box-shadow 0.2s;
+    }
+    .summary-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 0;
+      justify-content: flex-end;
+    }
+    .summary-actions button {
+      width: auto;
+      min-width: 120px;
+      margin: 0;
+      padding: 11px 18px;
+    }
+    table.summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 15px;
+      background: #f9fbfd;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    table.summary-table th, table.summary-table td {
+      border: 1px solid #dbeafe;
+      padding: 8px;
+      text-align: left;
+    }
+    table.summary-table th {
+      background-color: #e7f0fe;
+      color: #222;
+      font-weight: 700;
+    }
+    table.summary-table td {
+      color: #2d3a4a;
+      font-weight: 500;
+    }
+    .material-icons {
+      font-size: 23px;
+      vertical-align: middle;
+      color: #2563eb;
+      margin-right: 2px;
+    }
+    .summary-table-section .material-icons {
+      font-size: 18px;
+      margin-right: 3px;
+    }
+    .mode-group {
+      display: flex;
+      gap: 18px;
+      margin-top: 8px;
+    }
+    .mode-radio {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #f8fafc;
+      padding: 7px 13px 7px 7px;
+      border-radius: 6px;
+      border: 1.5px solid #e5e7eb;
+      cursor: pointer;
+      font-size: 15px;
+      color: #2563eb;
+      font-weight: 500;
+      transition: border 0.2s;
+    }
+    .mode-radio input[type="radio"] {
+      accent-color: #2563eb;
+      margin-right: 2px;
+      margin-left: 0;
+    }
+    .mode-radio.selected {
+      border: 2px solid #2563eb;
+      background: #f0f6ff;
+    }
+    .vehicle-biker-select-wrapper {
+      margin-bottom: 10px;
+    }
+    .loader {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      border: 3px solid #2563eb;
+      border-radius: 50%;
+      border-top: 3px solid #e5e7eb;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+      margin-right: 7px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    .submit-status {
       display: flex;
       align-items: center;
       gap: 7px;
-      font-size: 1em;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    .submit-status.success {
+      color: #1aaf5d;
+    }
+    .submit-status.failed {
+      color: #dc2626;
+    }
+    @media (max-width: 540px) {
+      body { padding: 0; }
+      .content-section, .summary-table-section { padding: 13px 5px 10px 5px; }
+      #google-map-frame { height: 220px; }
+      h2 { font-size: 1.25em; }
+      .icon-box { width: 48px; height: 48px; font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 id="mainTitle" style="text-align:center; color:#2c3e50; margin-bottom:30px;">
-      <span id="modeIcon" class="mode-emoji">🚗</span> RideTrack & BikeTrack
-    </h1>
-
-    <button type="button" class="instructions-toggle" onclick="toggleInstructions()" id="instructionsBtn">
-      <span id="instructionsBtnIcon">➕</span> Instructions & Tips
+  <div class="top-controls">
+    <button class="toggle-btn" id="toggle-instructions-btn" onclick="toggleInstructions()">
+      <span class="material-icons">info</span>
+      Instructions
     </button>
-    <div class="instructions-box" id="instructionsBox" style="display:none;">
-<ul>
-  <li>🚗🏍️ <b>Select your preferred mode of transport (Car or Bike)</b>.</li>
-  <li>🙋‍♂️ <b>Select who you are</b> (Car Driver, Bike Rider, or Customer).</li>
-  <li>🔍 <b>You can search for your current location and destination</b> by typing in the respective search boxes.</li>
-  <li>🧳+👥 Tick the "Extras" checkbox if you have luggage or additional people (adds a 50% surcharge).</li>
-  <li>🗺️ Enter your trip details and click <b>"Calculate Route"</b> to see the fare and trip summary.</li>
-  <li>📤 Click <b>"Submit Ride"</b> to send your ride request or information</li>
-</ul>
+  </div>
+  <div class="instructions-box" id="instructions-box">
+    <b>How to Use Book a Ride:</b>
+    <ol style="margin: 10px 0 0 18px; padding:0;">
+      <li><b>Select your user type:</b>
+        <ul>
+          <li><b>Customer:</b> Choose your preferred mode (Vehicle/Motorbike), enter your trip details, and get fare estimates. Enter your phone number (e.g. 0978167546).</li>
+          <li><b>Driver/Biker:</b> Select your registered vehicle or motorbike, then enter your trip details to see earnings and trip data.</li>
+        </ul>
+      </li>
+      <li><b>Start/End Location:</b> Use the "From" and "To" fields to type or pick your route. Suggestions will appear as you type.</li>
+      <li><b>Distance:</b> Enter the trip distance in kilometers in the "Distance" field.</li>
+      <li><b>Summarize:</b> Click <b>Summarize</b> to review your trip summary and fare calculation.</li>
+      <li><b>Submit:</b> Click <b>Submit</b> to send your trip record to the database (Google Sheet). You'll see a loader and a status message.</li>
+      <li><b>Show Route on Map:</b> Optionally, click <b>Show Route on Google Maps</b> to see your route visually.</li>
+    </ol>
+    <div style="margin-top: 13px; color: #666; font-size: 14px;">
+      <b>Note:</b> Prices are calculated as K20 per 3km for vehicles, and K10 per 3km for motorbikes.
     </div>
-
-    <button type="button" class="map-toggle-btn" onclick="toggleMap()" id="toggleMapBtn">
-      <span id="toggleMapBtnIcon">🗺️</span> Show Map
-    </button>
-    <div id="map" class="hidden"></div>
-
-    <div class="form-section">
-      <label for="modeSelect">Preferred Mode of Transport:</label>
-      <select id="modeSelect" onchange="changeModeAndFavicon()">
-        <option value="car">Car</option>
-        <option value="bike">Bike</option>
-      </select>
+  </div>
+  <h2>
+    Book a Ride
+  </h2>
+  <div class="icon-row">
+    <div class="icon-box" title="Book a motorbike ride">
+      <span class="material-icons" aria-label="Motorbike">two_wheeler</span>
     </div>
-
-    <div class="form-section">
-      <label for="submitterType">You are:</label>
-      <select id="submitterType" onchange="toggleFields(); populateDriverDetails();">
-        <option value="Customer">Customer</option>
-        <option value="Car Driver">Car Driver</option>
-        <option value="Bike Rider">Bike Rider</option>
-      </select>
+    <div class="icon-box" title="Book a vehicle ride">
+      <span class="material-icons" aria-label="Vehicle">directions_car</span>
     </div>
-
-    <div class="form-section">
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" placeholder="0978167546" maxlength="10" pattern="^0[0-9]{9}$" required>
-      <div id="reminder-phone" class="reminder"></div>
+  </div>
+  <div class="content-section">
+    <div class="section-title">
+      <span class="material-icons">public</span>
+      Get Route using Google Maps
     </div>
-
-    <div id="driverFieldsCar" class="hidden">
-      <div class="form-section">
-        <label for="vehicleCar">Select Car</label>
-        <select id="vehicleCar" onchange="populateDriverDetails()">
-          <option value="">Choose your car</option>
-          <option value="BAH1996,Car,Silver">BAH1996, Car, Silver</option>
-          <option value="BAH2345,Car,Blue">BAH2345, Car, Blue</option>
-          <option value="BAH9876,Car,White">BAH9876, Car, White</option>
-          <option value="BAH3456,Car,Black">BAH3456, Car, Black</option>
-          <option value="BAH5678,Car,Red">BAH5678, Car, Red</option>
+    <div class="inputs-wrapper">
+      <div class="input-group">
+        <span class="material-icons input-icon">person</span>
+        <label for="user-type">User Type</label>
+        <select id="user-type" aria-label="User type" onchange="handleUserTypeChange()">
+          <option value="" disabled selected>Select user type</option>
+          <option value="biker">Biker</option>
+          <option value="driver">Driver</option>
+          <option value="customer">Customer</option>
         </select>
-        <div id="reminder-vehicleCar" class="reminder"></div>
-        <div id="driverDetailsCar" style="padding:10px 0 0 0; color:#333; font-size:1em;"></div>
+      </div>
+      <!-- Vehicle/Biker select for driver/biker -->
+      <div class="vehicle-biker-select-wrapper" id="vehicle-biker-wrapper" style="display:none;">
+        <div class="input-group">
+          <span class="material-icons input-icon" id="vehicle-biker-icon">directions_car</span>
+          <label id="vehicle-biker-label">Select Vehicle</label>
+          <div class="vehicle-autocomplete-wrapper">
+            <input type="text" id="vehicle-biker-select" autocomplete="off" placeholder="Type to search..." oninput="showVehicleBikerSuggestions()">
+            <div id="vehicle-biker-list" class="vehicle-autocomplete-list"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Mode of transport for customer -->
+      <div class="input-group" id="mode-group-wrapper" style="display:none;">
+        <span class="material-icons input-icon">commute</span>
+        <label for="mode-of-transport">Preferred Mode</label>
+        <div class="mode-group" id="mode-group">
+          <label class="mode-radio" id="radio-vehicle">
+            <input type="radio" name="mode" value="vehicle" id="mode-vehicle" onchange="handleModeChange();handleCustomerPhoneInput();">
+            <span class="material-icons">directions_car</span>Vehicle
+          </label>
+          <label class="mode-radio" id="radio-motorbike">
+            <input type="radio" name="mode" value="motorbike" id="mode-motorbike" onchange="handleModeChange();handleCustomerPhoneInput();">
+            <span class="material-icons">two_wheeler</span>Motorbike
+          </label>
+        </div>
+      </div>
+      <div class="input-group" id="customer-phone-wrapper" style="display:none;">
+        <span class="material-icons input-icon">phone</span>
+        <label for="customer-phone">Phone Number</label>
+        <input
+          type="tel"
+          id="customer-phone"
+          maxlength="10"
+          pattern="^09[7-9][0-9]{7}$"
+          placeholder="e.g. 0978167546"
+          autocomplete="off"
+          inputmode="numeric"
+        >
+      </div>
+      <div class="input-group">
+        <span class="material-icons input-icon">place</span>
+        <label for="gm-origin">From</label>
+        <div class="autocomplete-wrapper">
+          <input type="text" id="gm-origin" autocomplete="off" placeholder="Enter starting point" oninput="showSuggestions(this, 'gm-origin')" aria-label="Origin">
+          <div id="gm-origin-list" class="autocomplete-list"></div>
+        </div>
+      </div>
+      <div class="input-group">
+        <span class="material-icons input-icon">flag</span>
+        <label for="gm-destination">To</label>
+        <div class="autocomplete-wrapper">
+          <input type="text" id="gm-destination" autocomplete="off" placeholder="Enter destination" oninput="showSuggestions(this, 'gm-destination')" aria-label="Destination">
+          <div id="gm-destination-list" class="autocomplete-list"></div>
+        </div>
       </div>
     </div>
+    <button onclick="openInGoogleMaps()"><span class="material-icons">map</span>Show Route on Google Maps</button>
+    <div class="info-section" style="font-size:14px; color:#666;">
+      <span class="material-icons" style="font-size:17px;vertical-align:middle; color:#666;margin-right:2px;">info</span>
+      This will show the route on this page and requires internet access.
+    </div>
+    <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
 
-    <div id="driverFieldsBike" class="hidden">
-      <div class="form-section">
-        <label for="vehicleBike">Select Bike</label>
-        <select id="vehicleBike" onchange="populateDriverDetails()">
-          <option value="">Choose your bike</option>
-          <option value="BAH9001,Bike,Blue">BAH9001, Bike, Blue</option>
-          <option value="BAH9002,Bike,Red">BAH9002, Bike, Red</option>
-          <option value="BAH9003,Bike,Black">BAH9003, Bike, Black</option>
-          <option value="BAH9004,Bike,White">BAH9004, Bike, White</option>
-          <option value="BAH9005,Bike,Silver">BAH9005, Bike, Silver</option>
-        </select>
-        <div id="reminder-vehicleBike" class="reminder"></div>
-        <div id="driverDetailsBike" style="padding:10px 0 0 0; color:#333; font-size:1em;"></div>
+  <div class="summary-table-section">
+    <div class="section-title">
+      <span class="material-icons">table_chart</span>
+      Trip Summary
+    </div>
+    <form id="summary-form" onsubmit="event.preventDefault(); updateSummaryTable();">
+      <div class="input-group" style="margin-bottom:10px;">
+        <span class="material-icons input-icon">straighten</span>
+        <label for="distance-input">Distance (km)</label>
+        <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance in km" required>
       </div>
-    </div>
-
-    <div class="form-section form-autocomplete-group">
-      <label>Current Location</label>
-      <input id="origin" autocomplete="off" placeholder="Enter your nearby place">
-      <div id="originSuggestions" class="autocomplete-suggestions"></div>
-      <div id="reminder-origin" class="reminder"></div>
-    </div>
-
-    <div class="form-section form-autocomplete-group">
-      <label>Destination</label>
-      <input id="destination" autocomplete="off" placeholder="Enter nearby destination">
-      <div id="destinationSuggestions" class="autocomplete-suggestions"></div>
-      <div id="reminder-destination" class="reminder"></div>
-    </div>
-
-    <div class="extra-options">
-      <label><input type="checkbox" id="extras" onclick="calculateRoute()"> 🧳+👥 Extras (50% Surcharge)</label>
-    </div>
-
-    <div id="tripSummary" class="trip-summary hidden">
-      <div id="distance">📏 Distance: -</div>
-      <div id="duration">⏱ Duration: -</div>
-      <div id="totalCost">💲 Total: -</div>
-    </div>
-
-    <div id="statusMessage" class="status-message"></div>
-
-    <div class="button-group">
-      <button type="button" onclick="calculateRoute()">🗺 Calculate Route</button>
-      <button type="button" onclick="submitData()">📤 Submit Ride</button>
-    </div>
-
-    <div id="loader" class="loader"></div>
+      <div class="summary-actions">
+        <button type="button" onclick="updateSummaryTable()"><span class="material-icons">summarize</span>Summarize</button>
+        <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled><span class="material-icons">send</span>Submit</button>
+      </div>
+    </form>
+    <div id="summary-table-container"></div>
+    <div id="submit-status"></div>
   </div>
 
   <script>
-    // --- MAP LOGIC ---
+    // List of notable places
+    const places = [
+      "Lusaka", "Ndola", "Kitwe", "Luanshya", "Livingstone",
+      "Chingola", "Kabwe", "Mufulira", "Chipata", "Solwezi",
+      "Kasama", "Mazabuka", "Mansa", "Mongu", "Kalulushi",
+      "Siavonga", "Choma", "Petauke", "Mpika", "Samfya"
+    ];
 
-    let map, markerOrigin, markerDestination, routePolyline;
-    let lastOrigin = "", lastDestination = "";
+    // Sample vehicle and biker data - in real world this would come from a database
+    const vehicles = [
+      { reg: "ALB123", name: "John Banda", phone: "0977000001" },
+      { reg: "BGR456", name: "Mary Mwansa", phone: "0977000002" },
+      { reg: "ZED789", name: "James Phiri", phone: "0977000003" }
+    ];
+    const bikers = [
+      { reg: "BK001", name: "Peter Zulu", phone: "0977001111" },
+      { reg: "BK002", name: "Chola Katongo", phone: "0977002222" },
+      { reg: "BK003", name: "Mwila Chanda", phone: "0977003333" }
+    ];
 
-    function toggleMap() {
-      const mapDiv = document.getElementById("map");
-      const btn = document.getElementById("toggleMapBtn");
-      const btnIcon = document.getElementById("toggleMapBtnIcon");
-      if (mapDiv.style.display === "none" || mapDiv.classList.contains("hidden")) {
-        mapDiv.style.display = "block";
-        mapDiv.classList.remove("hidden");
-        btn.innerHTML = '<span id="toggleMapBtnIcon">🙈</span> Hide Map';
-        showMapIfData();
-      } else {
-        mapDiv.style.display = "none";
-        mapDiv.classList.add("hidden");
-        btn.innerHTML = '<span id="toggleMapBtnIcon">🗺️</span> Show Map';
-      }
-    }
-
-    function showMapIfData() {
-      // Only update if both locations are filled
-      const originVal = document.getElementById("origin").value.trim();
-      const destVal = document.getElementById("destination").value.trim();
-      if (!originVal || !destVal) {
-        // Just center the map on Zambia if not filled
-        if (!map) map = new google.maps.Map(document.getElementById("map"), {center: {lat:-13.1339, lng:27.8493}, zoom:6});
-        return;
-      }
-      // Only refresh if changed
-      if (lastOrigin === originVal && lastDestination === destVal) return;
-      lastOrigin = originVal; lastDestination = destVal;
-
-      getLatLng(originVal).then(originLoc => {
-        getLatLng(destVal).then(destLoc => {
-          if (!map) map = new google.maps.Map(document.getElementById("map"), {center: originLoc, zoom: 13});
-          else map.setCenter(originLoc);
-
-          // Remove old markers and polylines
-          if (markerOrigin) markerOrigin.setMap(null);
-          if (markerDestination) markerDestination.setMap(null);
-          if (routePolyline) routePolyline.setMap(null);
-
-          markerOrigin = new google.maps.Marker({
-            position: originLoc,
-            map: map,
-            label: "A",
-            title: "Origin"
-          });
-          markerDestination = new google.maps.Marker({
-            position: destLoc,
-            map: map,
-            label: "B",
-            title: "Destination"
-          });
-
-          // Draw route using DirectionsService
-          const directionsService = new google.maps.DirectionsService();
-          const directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
-          directionsRenderer.setMap(map);
-
-          directionsService.route({
-            origin: originLoc,
-            destination: destLoc,
-            travelMode: (document.getElementById("modeSelect").value === "car" ? "DRIVING" : "BICYCLING")
-          }, function(result, status) {
-            if (status === "OK") {
-              directionsRenderer.setDirections(result);
-            }
-          });
-        });
-      });
-    }
-
-    // --- END MAP LOGIC ---
-
-    function changeModeAndFavicon() {
-      const mode = document.getElementById('modeSelect').value;
-      document.getElementById('modeIcon').textContent = mode === 'car' ? '🚗' : '🏍️';
-      document.getElementById('favicon').href = mode === 'car' ? '/images/car.png' : '/images/bike.png';
-      // If map is open, re-show with new mode (for route color)
-      const mapDiv = document.getElementById("map");
-      if (mapDiv && mapDiv.style.display !== "none") showMapIfData();
-    }
+    let summaryData = null; // To store the summarized data for submission
+    let selectedVehicleBiker = null;
 
     function toggleInstructions() {
-      var box = document.getElementById("instructionsBox");
-      var icon = document.getElementById("instructionsBtnIcon");
-      if (box.style.display === "none") {
-        box.style.display = "block";
-        icon.textContent = "➖";
-      } else {
+      const box = document.getElementById('instructions-box');
+      const btn = document.getElementById('toggle-instructions-btn');
+      if (box.style.display === "block") {
         box.style.display = "none";
-        icon.textContent = "➕";
+        btn.innerHTML = '<span class="material-icons">info</span>Instructions';
+      } else {
+        box.style.display = "block";
+        btn.innerHTML = '<span class="material-icons">close</span>Hide Instructions';
       }
     }
 
-    // Car details
-    const driverDetailsCar = {
-      "BAH1996,Car,Silver": {
-        phone: "0978123456",
-        name: "John Banda",
-        model: "Car",
-        color: "Silver",
-        reg: "BAH1996"
-      },
-      "BAH2345,Car,Blue": {
-        phone: "0978234567",
-        name: "Mary Zulu",
-        model: "Car",
-        color: "Blue",
-        reg: "BAH2345"
-      },
-      "BAH9876,Car,White": {
-        phone: "0978345678",
-        name: "James Phiri",
-        model: "Car",
-        color: "White",
-        reg: "BAH9876"
-      },
-      "BAH3456,Car,Black": {
-        phone: "0978456789",
-        name: "Chipo Mwale",
-        model: "Car",
-        color: "Black",
-        reg: "BAH3456"
-      },
-      "BAH5678,Car,Red": {
-        phone: "0978567890",
-        name: "Loveness Tembo",
-        model: "Car",
-        color: "Red",
-        reg: "BAH5678"
-      }
-    };
-
-    const driverDetailsBike = {
-      "BAH9001,Bike,Blue": {
-        phone: "0967000001",
-        name: "Peter Mwansa",
-        model: "Bike",
-        color: "Blue",
-        reg: "BAH9001"
-      },
-      "BAH9002,Bike,Red": {
-        phone: "0967000002",
-        name: "Agnes Lungu",
-        model: "Bike",
-        color: "Red",
-        reg: "BAH9002"
-      },
-      "BAH9003,Bike,Black": {
-        phone: "0967000003",
-        name: "Kelvin Simfukwe",
-        model: "Bike",
-        color: "Black",
-        reg: "BAH9003"
-      },
-      "BAH9004,Bike,White": {
-        phone: "0967000004",
-        name: "Grace Zulu",
-        model: "Bike",
-        color: "White",
-        reg: "BAH9004"
-      },
-      "BAH9005,Bike,Silver": {
-        phone: "0967000005",
-        name: "Lazarus Phiri",
-        model: "Bike",
-        color: "Silver",
-        reg: "BAH9005"
-      }
-    };
-
-    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec';
-
-    function toggleFields() {
-      const type = document.getElementById("submitterType").value;
-      document.getElementById("driverFieldsCar").classList.toggle("hidden", type !== "Car Driver");
-      document.getElementById("driverFieldsBike").classList.toggle("hidden", type !== "Bike Rider");
-      if (type !== "Car Driver") {
-        document.getElementById("vehicleCar").value = "";
-        document.getElementById("driverDetailsCar").innerHTML = "";
-      }
-      if (type !== "Bike Rider") {
-        document.getElementById("vehicleBike").value = "";
-        document.getElementById("driverDetailsBike").innerHTML = "";
-      }
-      // Only clear phone for customers
-      if (type === "Customer") {
-        document.getElementById("phone").value = "";
+    function handleUserTypeChange() {
+      const userType = document.getElementById('user-type').value;
+      const modeGroupWrapper = document.getElementById('mode-group-wrapper');
+      const vehicleBikerWrapper = document.getElementById('vehicle-biker-wrapper');
+      const customerPhoneWrapper = document.getElementById('customer-phone-wrapper');
+      const vehicleBikerLabel = document.getElementById('vehicle-biker-label');
+      const vehicleBikerIcon = document.getElementById('vehicle-biker-icon');
+      const vehicleBikerSelect = document.getElementById('vehicle-biker-select');
+      selectedVehicleBiker = null;
+      vehicleBikerSelect.value = "";
+      document.getElementById('vehicle-biker-list').innerHTML = "";
+      modeGroupWrapper.style.display = "none";
+      vehicleBikerWrapper.style.display = "none";
+      customerPhoneWrapper.style.display = "none";
+      if (userType === "customer") {
+        modeGroupWrapper.style.display = "";
+        setTimeout(handleCustomerPhoneInput, 0);
+      } else if (userType === "driver") {
+        vehicleBikerLabel.innerText = "Select Vehicle";
+        vehicleBikerIcon.innerText = "directions_car";
+        vehicleBikerSelect.setAttribute("placeholder", "Type vehicle reg or name...");
+        vehicleBikerWrapper.style.display = "";
+      } else if (userType === "biker") {
+        vehicleBikerLabel.innerText = "Select Biker";
+        vehicleBikerIcon.innerText = "two_wheeler";
+        vehicleBikerSelect.setAttribute("placeholder", "Type biker reg or name...");
+        vehicleBikerWrapper.style.display = "";
       }
     }
 
-    function populateDriverDetails() {
-      const type = document.getElementById("submitterType").value;
-      const phoneInput = document.getElementById("phone");
-      if (type === "Car Driver") {
-        const v = document.getElementById("vehicleCar").value;
-        const detailsDiv = document.getElementById("driverDetailsCar");
-        if (driverDetailsCar[v]) {
-          phoneInput.value = driverDetailsCar[v].phone;
-          detailsDiv.innerHTML = "<b>Name:</b> " + driverDetailsCar[v].name +
-            "<br><b>Vehicle:</b> " + driverDetailsCar[v].model +
-            "<br><b>Color:</b> " + driverDetailsCar[v].color +
-            "<br><b>Registration:</b> " + driverDetailsCar[v].reg;
-        } else {
-          detailsDiv.innerHTML = "";
-        }
+    function handleCustomerPhoneInput() {
+      const userType = document.getElementById('user-type').value;
+      const phoneWrapper = document.getElementById('customer-phone-wrapper');
+      if (userType !== "customer") {
+        phoneWrapper.style.display = "none";
+        return;
       }
-      if (type === "Bike Rider") {
-        const v = document.getElementById("vehicleBike").value;
-        const detailsDiv = document.getElementById("driverDetailsBike");
-        if (driverDetailsBike[v]) {
-          phoneInput.value = driverDetailsBike[v].phone;
-          detailsDiv.innerHTML = "<b>Name:</b> " + driverDetailsBike[v].name +
-            "<br><b>Vehicle:</b> " + driverDetailsBike[v].model +
-            "<br><b>Color:</b> " + driverDetailsBike[v].color +
-            "<br><b>Registration:</b> " + driverDetailsBike[v].reg;
-        } else {
-          detailsDiv.innerHTML = "";
-        }
-      }
-      if (type === "Customer") {
-        phoneInput.value = "";
+      const vehicle = document.getElementById('mode-vehicle').checked;
+      const motorbike = document.getElementById('mode-motorbike').checked;
+      if (vehicle || motorbike) {
+        phoneWrapper.style.display = "";
+      } else {
+        phoneWrapper.style.display = "none";
       }
     }
 
-    // Use Google Places Autocomplete for origin and destination
-    function setupGooglePlacesAutocomplete(inputId) {
-      const input = document.getElementById(inputId);
-      const autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['geocode'],
-        componentRestrictions: { country: "ZM" }
-      });
-      const suggestionsBox = document.getElementById(inputId + "Suggestions");
-      if (suggestionsBox) suggestionsBox.style.display = "none";
-
-      // If map is open, update map on change
-      input.addEventListener("change", function() {
-        const mapDiv = document.getElementById("map");
-        if (mapDiv && mapDiv.style.display !== "none") showMapIfData();
+    function showVehicleBikerSuggestions() {
+      const userType = document.getElementById('user-type').value;
+      const input = document.getElementById('vehicle-biker-select');
+      const value = input.value.trim().toLowerCase();
+      const list = document.getElementById('vehicle-biker-list');
+      list.innerHTML = '';
+      selectedVehicleBiker = null;
+      if (!value) return;
+      let data = [];
+      if (userType === "driver") {
+        data = vehicles;
+      } else if (userType === "biker") {
+        data = bikers;
+      }
+      const filtered = data.filter(
+        v => v.reg.toLowerCase().includes(value) ||
+        v.name.toLowerCase().includes(value) ||
+        v.phone.includes(value)
+      );
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add(userType === "driver" ? "vehicle-autocomplete-item" : "biker-autocomplete-item");
+        div.textContent = item.reg + " - " + item.name + " (" + item.phone + ")";
+        div.onclick = () => {
+          input.value = item.reg;
+          selectedVehicleBiker = item;
+          list.innerHTML = '';
+        };
+        list.appendChild(div);
       });
     }
 
-    function initMap() {
-      setupGooglePlacesAutocomplete("origin");
-      setupGooglePlacesAutocomplete("destination");
-      // Pre-load map hidden
-      map = new google.maps.Map(document.getElementById("map"), {center: {lat: -13.1339, lng: 27.8493}, zoom: 6});
-      document.getElementById("map").style.display = "none";
-      document.getElementById("map").classList.add("hidden");
+    function handleModeChange() {
+      const v = document.getElementById('mode-vehicle');
+      const m = document.getElementById('mode-motorbike');
+      document.getElementById('radio-vehicle').classList.toggle('selected', v.checked);
+      document.getElementById('radio-motorbike').classList.toggle('selected', m.checked);
     }
 
-    function showReminder(id, message) {
-      const el = document.getElementById(id);
-      el.innerText = message;
-      el.style.display = "block";
-    }
-    function hideReminder(id) {
-      const el = document.getElementById(id);
-      el.innerText = "";
-      el.style.display = "none";
-    }
-    function hideAllReminders() {
-      hideReminder("reminder-phone");
-      hideReminder("reminder-vehicleCar");
-      hideReminder("reminder-vehicleBike");
-      hideReminder("reminder-origin");
-      hideReminder("reminder-destination");
+    function showSuggestions(input, field) {
+      const listId = field + '-list';
+      const list = document.getElementById(listId);
+      const value = input.value.toLowerCase();
+      list.innerHTML = '';
+      if (!value) return;
+      const filtered = places.filter(place => place.toLowerCase().startsWith(value));
+      filtered.forEach(place => {
+        const item = document.createElement('div');
+        item.classList.add('autocomplete-item');
+        item.textContent = place;
+        item.onclick = () => {
+          input.value = place;
+          list.innerHTML = '';
+        };
+        list.appendChild(item);
+      });
     }
 
-    function validateInputs() {
-      hideAllReminders();
+    function openInGoogleMaps() {
+      const origin = document.getElementById('gm-origin').value.trim();
+      const destination = document.getElementById('gm-destination').value.trim();
+      const frame = document.getElementById('google-map-frame');
+      if (!origin || !destination) {
+        alert("Please enter both origin and destination.");
+        return;
+      }
+      const embedUrl = "https://www.google.com/maps?q=" +
+        encodeURIComponent(origin + " to " + destination) +
+        "&output=embed";
+      frame.src = embedUrl;
+      frame.style.display = "block";
+      frame.scrollIntoView({behavior:"smooth"});
+    }
+
+    function updateSummaryTable() {
+      const distance = parseFloat(document.getElementById('distance-input').value);
+      const origin = document.getElementById('gm-origin').value.trim();
+      const destination = document.getElementById('gm-destination').value.trim();
+      const userTypeSelect = document.getElementById('user-type');
+      const userType = userTypeSelect.value ? userTypeSelect.options[userTypeSelect.selectedIndex].text : '';
+      const container = document.getElementById('summary-table-container');
+      const submitBtn = document.getElementById('submit-btn');
       let valid = true;
-      const phone = document.getElementById("phone").value.trim();
-      const phonePattern = /^0[0-9]{9}$/;
-      const origin = document.getElementById("origin").value.trim();
-      const destination = document.getElementById("destination").value.trim();
-      const type = document.getElementById("submitterType").value;
 
-      let vehicleCar = "";
-      let vehicleBike = "";
-      if (type === "Car Driver") vehicleCar = document.getElementById("vehicleCar").value;
-      if (type === "Bike Rider") vehicleBike = document.getElementById("vehicleBike").value;
-
-      if (!phone) {
-        showReminder("reminder-phone", "Please enter your phone number.");
-        valid = false;
-      } else if (!phonePattern.test(phone)) {
-        showReminder("reminder-phone", "Format should be 0978167546 (10 digits, starts with 0).");
-        valid = false;
+      // For customers, get mode of transport and adjust price
+      let mode = "";
+      let pricePer3Km = 20;
+      let customerPhone = "";
+      if (userTypeSelect.value === "customer") {
+        const v = document.getElementById('mode-vehicle').checked;
+        const m = document.getElementById('mode-motorbike').checked;
+        if (!v && !m) {
+          container.innerHTML = '<div style="color:red;margin-top:10px;">Please select a mode of transport above.</div>';
+          submitBtn.disabled = true;
+          summaryData = null;
+          return;
+        }
+        if (v) {
+          mode = "Vehicle";
+          pricePer3Km = 20;
+        } else if (m) {
+          mode = "Motorbike";
+          pricePer3Km = 10;
+        }
+        // Validate phone number
+        customerPhone = document.getElementById('customer-phone').value.trim();
+        if (!customerPhone.match(/^09[7-9][0-9]{7}$/)) {
+          container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid phone number in the format 0978167546.</div>';
+          submitBtn.disabled = true;
+          summaryData = null;
+          return;
+        }
       }
 
-      if (!origin) {
-        showReminder("reminder-origin", "Please enter your current location.");
-        valid = false;
+      // For driver/biker, get selected vehicle or biker info
+      let vbReg = "", vbName = "", vbPhone = "";
+      if (userTypeSelect.value === "driver" || userTypeSelect.value === "biker") {
+        const vbInput = document.getElementById('vehicle-biker-select').value.trim();
+        let vbData = userTypeSelect.value === "driver" ? vehicles : bikers;
+        let found = vbData.find(x => x.reg.toLowerCase() === vbInput.toLowerCase());
+        if (!found) {
+          container.innerHTML = '<div style="color:red;margin-top:10px;">Please select your ' + (userTypeSelect.value === "driver" ? "vehicle" : "biker") + ' from the list.</div>';
+          submitBtn.disabled = true;
+          summaryData = null;
+          return;
+        }
+        vbReg = found.reg;
+        vbName = found.name;
+        vbPhone = found.phone;
+        selectedVehicleBiker = found;
       }
 
-      if (!destination) {
-        showReminder("reminder-destination", "Please enter your destination.");
-        valid = false;
-      }
-
-      if (type === "Car Driver" && !vehicleCar) {
-        showReminder("reminder-vehicleCar", "Please select your car.");
-        valid = false;
-      }
-      if (type === "Bike Rider" && !vehicleBike) {
-        showReminder("reminder-vehicleBike", "Please select your bike.");
-        valid = false;
-      }
-      return valid;
-    }
-
-    // Helper: get LatLng from Place name using Google Geocoding API
-    function getLatLng(place) {
-      return new Promise((resolve, reject) => {
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ address: place }, function(results, status) {
-          if (status === "OK" && results[0]) {
-            resolve(results[0].geometry.location);
-          } else {
-            reject("Could not geocode: " + place);
-          }
-        });
-      });
-    }
-
-    async function calculateRoute() {
-      if (!validateInputs()) {
-        document.getElementById("tripSummary").classList.add("hidden");
+      if (!origin || !destination) {
+        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter both origin and destination above.</div>';
+        submitBtn.disabled = true;
+        summaryData = null;
         return;
       }
-      const mode = document.getElementById("modeSelect").value;
-      const type = document.getElementById("submitterType").value;
-      const origin = document.getElementById("origin").value.trim();
-      const destination = document.getElementById("destination").value.trim();
-      let speed = (mode === "car") ? 60 : 30;
-      let rate = (mode === "car") ? 20 : 10;
-      if (type === "Car Driver") { speed = 60; rate = 20; }
-      if (type === "Bike Rider") { speed = 30; rate = 10; }
-
-      document.getElementById("loader").style.display = "block";
-      try {
-        const [originLatLng, destinationLatLng] = await Promise.all([
-          getLatLng(origin),
-          getLatLng(destination)
-        ]);
-        const directionsService = new google.maps.DirectionsService();
-        directionsService.route({
-          origin: originLatLng,
-          destination: destinationLatLng,
-          travelMode: (mode === "car" ? "DRIVING" : "BICYCLING")
-        }, function(result, status) {
-          document.getElementById("loader").style.display = "none";
-          if (status === "OK" && result.routes.length > 0) {
-            const leg = result.routes[0].legs[0];
-            const dist = leg.distance.value / 1000;
-            const durationMins = Math.round(leg.duration.value / 60);
-            let fare = Math.ceil(dist / 3) * rate;
-            if (document.getElementById("extras").checked) fare += fare * 0.5;
-            document.getElementById("distance").innerText = `📏 Distance: ${dist.toFixed(1)} km`;
-            document.getElementById("duration").innerText = `⏱ Duration: ${durationMins} mins`;
-            document.getElementById("totalCost").innerText = `💲 Total: ZMW ${fare.toFixed(2)}`;
-            document.getElementById("tripSummary").classList.remove("hidden");
-            showMessage("Trip calculated.", "success");
-            // If map is open, update route
-            if (document.getElementById("map").style.display !== "none") showMapIfData();
-          } else {
-            showMessage("Route not found. Please check your locations.", "error");
-            document.getElementById("tripSummary").classList.add("hidden");
-          }
-        });
-      } catch (err) {
-        document.getElementById("loader").style.display = "none";
-        showMessage("Location lookup failed: " + err, "error");
-        document.getElementById("tripSummary").classList.add("hidden");
+      if (!userType) {
+        container.innerHTML = '<div style="color:red;margin-top:10px;">Please select a user type above.</div>';
+        submitBtn.disabled = true;
+        summaryData = null;
+        return;
       }
-    }
-
-    function submitData() {
-      if (!validateInputs()) {
-        showMessage("Please complete all highlighted fields before submitting.", "error");
+      if (isNaN(distance) || distance <= 0) {
+        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid distance in km.</div>';
+        submitBtn.disabled = true;
+        summaryData = null;
         return;
       }
 
-      const type = document.getElementById("submitterType").value;
-      const mode = document.getElementById("modeSelect").value;
-      let vehicle = "";
-      if (type === "Car Driver") vehicle = document.getElementById("vehicleCar").value;
-      if (type === "Bike Rider") vehicle = document.getElementById("vehicleBike").value;
+      // Estimate travel time (assuming average speed 60km/h)
+      const avgSpeed = 60;
+      const timeHours = distance / avgSpeed;
+      const wholeHours = Math.floor(timeHours);
+      const minutes = Math.round((timeHours - wholeHours) * 60);
 
-      const data = {
-        submitterType  : type,
-        mode           : mode,
-        phone          : document.getElementById("phone").value,
-        vehicle        : vehicle,
-        origin         : document.getElementById("origin").value,
-        destination    : document.getElementById("destination").value,
-        extras         : document.getElementById("extras").checked ? "Yes" : "No",
-        distance       : document.getElementById("distance").innerText.replace("📏 Distance: ", ""),
-        duration       : document.getElementById("duration").innerText.replace("⏱ Duration: ", ""),
-        totalCost      : document.getElementById("totalCost").innerText.replace("💲 Total: ZMW ", ""),
-        Date           : ""
+      // Price calculation: K20 per 3km for vehicle, K10 per 3km for motorbike
+      let price = Math.ceil(distance / 3) * pricePer3Km;
+
+      let timeText = "";
+      if (wholeHours > 0) {
+        timeText += wholeHours + " hr";
+        if (minutes > 0) timeText += " " + minutes + " min";
+      } else {
+        timeText += minutes + " min";
+      }
+
+      let tableHeader = `
+        <tr>
+          <th>User Type</th>
+          ${userTypeSelect.value === "customer" ? '<th>Preferred Mode</th><th>Phone</th>' : ''}
+          ${userTypeSelect.value === "driver" || userTypeSelect.value === "biker" ? '<th>Reg No.</th><th>Name</th><th>Phone</th>' : ''}
+          <th>From</th>
+          <th>To</th>
+          <th>Distance (km)</th>
+          <th>Estimated Time</th>
+          <th>Price (K)</th>
+        </tr>`;
+      let tableRow = `
+        <tr>
+          <td>${userType}</td>
+          ${userTypeSelect.value === "customer" ? `<td>${mode}</td><td>${customerPhone}</td>` : ''}
+          ${(userTypeSelect.value === "driver" || userTypeSelect.value === "biker") ? `<td>${vbReg}</td><td>${vbName}</td><td>${vbPhone}</td>` : ''}
+          <td>${origin}</td>
+          <td>${destination}</td>
+          <td>${distance}</td>
+          <td>${timeText}</td>
+          <td><b>K${price}</b></td>
+        </tr>`;
+
+      container.innerHTML = `
+        <table class="summary-table">
+          ${tableHeader}
+          ${tableRow}
+        </table>
+      `;
+
+      // Prepare summaryData for submission
+      summaryData = {
+        userType: userType,
+        preferredMode: mode,
+        regNo: vbReg,
+        name: vbName,
+        phone: userTypeSelect.value === "customer" ? customerPhone : vbPhone,
+        from: origin,
+        to: destination,
+        distance: distance,
+        estimatedTime: timeText,
+        price: price
       };
+      submitBtn.disabled = false;
+      document.getElementById('submit-status').innerHTML = '';
+    }
 
-      if (data.distance === "-" || data.duration === "-" || data.totalCost === "-") {
-        showMessage("Please calculate the route before submitting.", "error");
+    // Replace with your actual Google Apps Script deployment URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+    function submitToGoogleSheet() {
+      const submitBtn = document.getElementById('submit-btn');
+      const statusDiv = document.getElementById('submit-status');
+      if (!summaryData) {
+        statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>No data to submit.</span>';
         return;
       }
 
-      document.getElementById("loader").style.display = "block";
+      // Ensure all required fields are present before submission
+      let requiredFields = ["userType", "from", "to", "distance", "estimatedTime", "price"];
+      if (summaryData.userType === "Customer") {
+        requiredFields.push("phone");
+        requiredFields.push("preferredMode");
+      }
+      if (summaryData.userType === "Driver" || summaryData.userType === "Biker") {
+        requiredFields.push("regNo");
+        requiredFields.push("name");
+        requiredFields.push("phone");
+      }
+      for (const key of requiredFields) {
+        if (!summaryData[key] || (typeof summaryData[key] === "string" && summaryData[key].trim() === "")) {
+          statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Please complete all required information before submitting.</span>';
+          return;
+        }
+      }
 
-      const formBody = Object.keys(data)
-        .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
-        .join("&");
+      submitBtn.disabled = true;
+      statusDiv.innerHTML = '<span class="loader"></span>Submitting...';
 
-      fetch(GOOGLE_SHEETS_URL, {
-        method : 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body   : formBody
-      })
-      .then(r => r.json())
-      .then(j => {
-        document.getElementById("loader").style.display = "none";
-        showMessage(j.result, "success");
-      })
-      .catch(e => {
-        document.getElementById("loader").style.display = "none";
-        showMessage("Submission failed", "error");
-        console.error(e);
+      // Prepare data for submission (as form data)
+      const formData = new FormData();
+      for (const key in summaryData) {
+        formData.append(key, summaryData[key]);
+      }
+
+      // POST to the Google Apps Script Web App
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+      }).then(() => {
+        statusDiv.innerHTML = '<span class="submit-status success"><span class="material-icons">check_circle</span>Submitted successfully!</span>';
+        submitBtn.disabled = false;
+      }).catch(() => {
+        statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Submission failed. Try again.</span>';
+        submitBtn.disabled = false;
       });
     }
 
-    function showMessage(msg, type) {
-      const s = document.getElementById("statusMessage");
-      s.textContent = msg;
-      s.className   = `status-message ${type}`;
-      s.style.display = "block";
-      setTimeout(() => s.style.display = "none", 5000);
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-      document.getElementById("submitterType").addEventListener("change", populateDriverDetails);
-      document.getElementById("vehicleCar").addEventListener("change", populateDriverDetails);
-      document.getElementById("vehicleBike").addEventListener("change", populateDriverDetails);
-      document.getElementById('modeSelect').addEventListener("change", function() {
-        populateDriverDetails();
-        toggleFields();
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('.autocomplete-list, .vehicle-autocomplete-list, .biker-autocomplete-list').forEach(list => {
+        if (!e.target.closest('.autocomplete-wrapper') && !e.target.closest('.vehicle-autocomplete-wrapper')) {
+          list.innerHTML = '';
+        }
       });
     });
   </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRdnvGw7epuDJjgBnpv0-FEuSQ6J-fyNY&libraries=places&callback=initMap" async defer></script>
 </body>
-<footer style="text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; padding: 10px;">
-  Version: <strong>1.3.6</strong> — Last updated June 3, 2025
-</footer>
 </html>
