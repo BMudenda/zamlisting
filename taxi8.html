@@ -327,6 +327,20 @@
     .submit-status.failed {
       color: #dc2626;
     }
+    .summary-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      margin-bottom: 0;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .summary-actions button {
+      width: auto;
+      min-width: 120px;
+      margin: 0;
+      padding: 11px 18px;
+    }
     @media (max-width: 540px) {
       body { padding: 0; }
       .content-section, .summary-table-section { padding: 13px 5px 10px 5px; }
@@ -335,6 +349,11 @@
       .icon-box { width: 48px; height: 48px; font-size: 1.5rem; }
       .summary-table-wrapper { overflow-x: auto; }
       table.summary-table { min-width: 710px; }
+      .summary-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 7px;
+      }
     }
   </style>
 </head>
@@ -447,7 +466,7 @@
         </div>
       </div>
     </div>
-    <button onclick="openInGoogleMaps()"><span class="material-icons">map</span>Show Route on Google Maps</button>
+    <!-- Remove the single Show Route button here, as it is now in the summary-actions row -->
     <div class="info-section" style="font-size:14px; color:#666;">
       <span class="material-icons" style="font-size:17px;vertical-align:middle; color:#666;margin-right:2px;">info</span>
       This will show the route on this page and requires internet access.
@@ -467,8 +486,15 @@
         <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance in km" required>
       </div>
       <div class="summary-actions">
-        <button type="button" onclick="updateSummaryTable()"><span class="material-icons">summarize</span>Summarize</button>
-        <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled><span class="material-icons">send</span>Submit</button>
+        <button type="button" onclick="openInGoogleMaps()" style="min-width:120px;">
+          <span class="material-icons">map</span>Show Route on Google Maps
+        </button>
+        <button type="button" onclick="updateSummaryTable()" style="min-width:120px;">
+          <span class="material-icons">summarize</span>Summarize
+        </button>
+        <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled style="min-width:120px;">
+          <span class="material-icons">send</span>Submit
+        </button>
       </div>
     </form>
     <div class="summary-table-wrapper">
@@ -479,19 +505,12 @@
 
   <script>
     // List of notable places
-    const places = [ "Lusaka", "Ndola", "Kitwe", "Luanshya", "Livingstone",
-"Chingola", "Kabwe", "Mufulira", "Chipata", "Solwezi",
-"Kasama", "Mazabuka", "Mansa", "Mongu", "Kalulushi",
-"Siavonga", "Choma", "Petauke", "Mpika", "Samfya",
-"Luangwa (Feira)", "Kavalamanja", "Katemo", "Chitope", "Kasinsa",
-"Chikwasha", "Mphuka", "Mphuka Central", "Chankungu", "Chilenga",
-"Chinzete", "Kapoche", "Chalwe", "Kalulu", "Kapiri (Luangwa)",
-"Kanyenye", "Mandombe", "Kawewa", "Chilimba", "Mwalimu (Luangwa)",
-"Kasisi (Luangwa)", "Kapuka", "Kasenga", "Chief Mphuka", "Chief Chitungulu",
-"Chief Mpuka", "Chief Zulu", "Chief Mburuma", "Chief Mwanya",
-"Luangwa Bridge", "Luangwa River", "Zambezi River (Luangwa)",
-"Luangwa Border Post", "Feira Confluence"
-       ];
+    const places = [
+      "Lusaka", "Ndola", "Kitwe", "Luanshya", "Livingstone",
+      "Chingola", "Kabwe", "Mufulira", "Chipata", "Solwezi",
+      "Kasama", "Mazabuka", "Mansa", "Mongu", "Kalulushi",
+      "Siavonga", "Choma", "Petauke", "Mpika", "Samfya"
+    ];
 
     // Sample vehicle and biker data - in real world this would come from a database
     const vehicles = [
