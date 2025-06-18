@@ -524,6 +524,7 @@
       <div id="summary-table-container"></div>
     </div>
     <div id="submit-status"></div>
+    <div id="loader" class="loader" style="display:none;"></div>
   </div>
 
   <script>
@@ -840,6 +841,7 @@
     function submitToGoogleSheet() {
       const submitBtn = document.getElementById('submit-btn');
       const statusDiv = document.getElementById('submit-status');
+      const loader = document.getElementById('loader');
       if (!summaryData) {
         statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>No data to submit.</span>';
         return;
@@ -864,23 +866,32 @@
       }
 
       submitBtn.disabled = true;
-      statusDiv.innerHTML = '<span class="loader"></span>Submitting...';
+      loader.style.display = "block";
+      statusDiv.innerHTML = 'Submitting...';
 
-      // Prepare data for submission (as form data)
-      const formData = new FormData();
-      for (const key in summaryData) {
-        formData.append(key, summaryData[key]);
-      }
+      // Use the form submission method requested: url-encoded form body
+      const data = summaryData;
+      const formBody = Object.keys(data)
+        .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
+        .join("&");
 
-      // POST to the Google Apps Script Web App
       fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData
-      }).then(() => {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formBody
+      })
+      .then(r => {
+        // If the script returns JSON (if not, you may want to comment this out and just mark as success)
+        if (r.ok) return r.json();
+        else throw new Error("Network response was not ok");
+      })
+      .then(j => {
+        loader.style.display = "none";
         statusDiv.innerHTML = '<span class="submit-status success"><span class="material-icons">check_circle</span>Submitted successfully!</span>';
         submitBtn.disabled = false;
-      }).catch(() => {
+      })
+      .catch(() => {
+        loader.style.display = "none";
         statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Submission failed. Try again.</span>';
         submitBtn.disabled = false;
       });
