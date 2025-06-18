@@ -509,8 +509,8 @@
         <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance in km" required>
       </div>
       <div class="summary-actions">
-        <button type="button" onclick="openInGoogleMaps()" style="min-width:120px;">
-          <span class="material-icons">map</span>Map
+        <button type="button" id="map-btn" onclick="toggleMap()" style="min-width:120px;">
+          <span class="material-icons">map</span><span id="map-btn-text">Map</span>
         </button>
         <button type="button" onclick="updateSummaryTable()" style="min-width:120px;">
           <span class="material-icons">summarize</span>Summarize
@@ -666,20 +666,31 @@
       });
     }
 
-    function openInGoogleMaps() {
+    function toggleMap() {
       const origin = document.getElementById('gm-origin').value.trim();
       const destination = document.getElementById('gm-destination').value.trim();
       const frame = document.getElementById('google-map-frame');
-      if (!origin || !destination) {
-        alert("Please enter both origin and destination.");
-        return;
+      const mapBtn = document.getElementById('map-btn');
+      const mapBtnText = document.getElementById('map-btn-text');
+
+      if (frame.style.display === "none" || frame.style.display === "") {
+        if (!origin || !destination) {
+          alert("Please enter both origin and destination.");
+          return;
+        }
+        const embedUrl = "https://www.google.com/maps?q=" +
+          encodeURIComponent(origin + " to " + destination) +
+          "&output=embed";
+        frame.src = embedUrl;
+        frame.style.display = "block";
+        mapBtnText.textContent = "Hide Map";
+        mapBtn.setAttribute('aria-pressed', 'true');
+        frame.scrollIntoView({behavior:"smooth"});
+      } else {
+        frame.style.display = "none";
+        mapBtnText.textContent = "Map";
+        mapBtn.setAttribute('aria-pressed', 'false');
       }
-      const embedUrl = "https://www.google.com/maps?q=" +
-        encodeURIComponent(origin + " to " + destination) +
-        "&output=embed";
-      frame.src = embedUrl;
-      frame.style.display = "block";
-      frame.scrollIntoView({behavior:"smooth"});
     }
 
     function updateSummaryTable() {
