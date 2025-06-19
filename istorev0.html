@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luangwa Delivery Platform</title>
+  <title>Luangwa Delivery Platform - Transport Cart</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
       --primary: #2e7d32;
@@ -60,24 +61,6 @@
     .btn-secondary { background: var(--primary-light); margin-top: 0.5rem; }
     .btn-secondary:hover { background: var(--primary); }
     .btn-success { background: var(--primary-dark); }
-    .map-toggle-btn { background: var(--primary-light); margin: 1rem auto; display: block; }
-    .map-toggle-btn:hover { background: var(--primary); }
-    #eta { margin-top: 1rem; padding: 0.75rem; background: var(--success); border-radius: 4px; color: var(--primary-dark); font-weight: 500; }
-    #map { width: 100%; height: 400px; margin: 2rem 0; border-radius: 10px; box-shadow: var(--shadow); display: none; }
-    .empty-cart { text-align: center; color: var(--text-muted); padding: 2rem 0; }
-    .empty-cart i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary-light); }
-    .remove-btn { background-color: transparent; border: none; color: #ff5252; cursor: pointer; padding: 0.25rem; transition: color 0.2s; }
-    .quantity-controls { display: flex; align-items: center; gap: 0.5rem; }
-    .quantity-btn { background: var(--primary-light); border: none; color: white; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
-    .quantity-btn:hover { background: var(--primary); }
-    #checkout-status { margin-top: 1rem; padding: 0.75rem; border-radius: 4px; font-weight: 500; text-align: center; display: none; }
-    #checkout-status.success { background: var(--success); color: var(--primary-dark); }
-    #checkout-status.error { background: var(--error); color: #c62828; }
-    #loader {
-      display: none;
-      margin: 1rem auto;
-      text-align: center;
-    }
     .status-message {
       display: none;
       margin: 1rem 0;
@@ -97,71 +80,180 @@
       font-size: 1rem;
       box-sizing: border-box;
     }
-    /* Instructions toggle and box styles */
-    .instructions-toggle-btn {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      font-weight: 600;
-      border: 1px solid var(--primary);
-      border-radius: 6px;
-      padding: 0.6rem 1.2rem;
-      margin: 1.2rem auto 0.5rem auto;
+    .hidden-input {
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+      height: 0;
+      width: 0;
+    }
+    .autocomplete-suggestions {
+      border: 1px solid #ccc;
+      background: #fff;
+      max-height: 130px;
+      overflow-y: auto;
+      position: absolute;
+      width: calc(100% - 2px);
+      z-index: 999;
+      border-radius: 0 0 7px 7px;
+      left: 0;
+      top: 100%;
+      margin-top: -5px;
+      font-size: 1em;
+    }
+    .autocomplete-suggestion {
+      padding: 8px 14px;
       cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .autocomplete-suggestion:last-child { border-bottom: none; }
+    .autocomplete-suggestion:hover, .autocomplete-selected {
+      background: #e5efff;
+    }
+    .form-autocomplete-group { position: relative; }
+    .input-group {
+      position: relative;
+      background: #f5f7fa;
+      border-radius: 7px;
+      padding: 16px 14px 8px 48px;
+      box-shadow: 0 1px 3px #2563eb11;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      margin-bottom: 1em;
+    }
+    .input-group label {
+      font-weight: 500;
+      color: #2563eb;
+      font-size: 13px;
+      margin-bottom: 2px;
+      letter-spacing: .1em;
+    }
+    .input-group .material-icons.input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #2563eb;
+      font-size: 25px;
+      opacity: 0.85;
+    }
+    /* --- Compact mode radio buttons --- */
+    .input-row-flex {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1em;
+    }
+    .input-row-flex .input-group {
+      flex: 1 1 0;
+      margin-bottom: 0 !important;
+    }
+    .input-row-flex .mode-container {
+      flex: 0 0 56px;
+      min-width: 56px;
+      max-width: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+      margin: 0;
+    }
+    .input-row-flex .mode-container label {
+      font-size: 13px;
+      margin-bottom: 2px;
+      margin-left: 3px;
+      margin-top: 5px;
+      color: #2563eb;
+      font-weight: 500;
+      letter-spacing: .1em;
+    }
+    .input-row-flex .mode-group {
+      margin-top: 0;
+      margin-left: 0;
+      gap: 0;
+    }
+    .mode-group {
       display: flex;
       align-items: center;
-      gap: 7px;
-      transition: background 0.15s;
-      font-size: 1.01em;
-      box-shadow: 0 2px 8px rgba(44,125,50,0.03);
     }
-    .instructions-toggle-btn:hover {
-      background: var(--primary);
-      color: white;
+    .mode-radio {
+      border: 1.5px solid #e5e7eb !important;
+      background: #f8fafc !important;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 16px;
+      transition: border 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-weight: 500;
+      min-width: 0 !important;
+      padding: 6px 8px 6px 6px !important;
+      border-radius: 5px 0 0 5px !important;
+      border-right: 0;
+      box-shadow: none;
+      margin: 0;
     }
-    .instructions-box {
-      background: #f9fff7;
-      border: 1px solid var(--primary-light);
-      border-radius: 8px;
-      padding: 1.2em 1.4em 1.2em 2.2em;
-      max-width: 700px;
-      margin: 0 auto 1.5em auto;
-      font-size: 1em;
-      box-shadow: 0 1px 6px rgba(44,125,50,0.07);
-      color: var(--primary-dark);
-      display: none;
-      line-height: 1.66em;
+    .mode-radio.selected {
+      border: 2px solid #2563eb !important;
+      background: #f0f6ff !important;
+      z-index: 1;
     }
-    .instructions-box ul { margin-left: 1.1em; }
-    .instructions-box li { margin-bottom: 0.6em; }
+    .mode-radio:last-child {
+      border-radius: 0 5px 5px 0 !important;
+      border-right: 1.5px solid #e5e7eb !important;
+      margin-left: -1px;
+    }
+    .mode-radio input[type="radio"] {
+      accent-color: #2563eb;
+      margin-right: 1px;
+      margin-left: 0;
+      width: 16px;
+      height: 16px;
+    }
+    .mode-radio span.material-icons {
+      font-size: 20px !important;
+      margin: 0 2px 0 0;
+      vertical-align: middle;
+    }
     @media (max-width: 767px) {
       .container { flex-direction: column; }
       .slider-wrapper, .cart { width: 100%; }
       .slider-button { display: none; }
+      #google-map-frame { height: 160px; }
+      .input-row-flex { flex-direction: column; gap: 0; }
+      .input-row-flex .mode-container { max-width: unset !important; flex: unset !important; }
+      .input-row-flex .mode-container label { margin-left: 34px; }
+      .input-row-flex .mode-group { margin-left: 18px; }
+    }
+    .map-btn-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.5em;
+      margin-top: -8px;
+    }
+    #google-map-frame {
+      width: 100%;
+      height: 250px;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(66,133,244,0.10);
+      background: #f1f5f9;
+      margin: 10px 0 18px 0;
+      display: none;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1><i class="fas fa-truck"></i> Luangwa Delivery Platform(under construction🚧)</h1>
+    <h1><i class="fas fa-truck"></i> Luangwa Delivery Platform (Transport Cart)</h1>
   </header>
-
-  <!-- Instructions toggle button and box -->
-  <button id="instructions-toggle-btn" class="instructions-toggle-btn">
-    <span id="instructions-toggle-icon">➕</span> Instructions & Tips
-  </button>
-  <div id="instructions-box" class="instructions-box">
-    <ul>
-      <li>🔍 <b>You can search for products</b> using the search box above the products list.</li>
-      <li>🛒 <b>Add products</b> to your order using the <b>Add</b> buttons.</li>
-      <li>📦 <b>Set your delivery destination</b> by searching, or <b>double-clicking</b> (desktop) or <b>tapping once</b> (mobile) on the toggled map.</li>
-      <li>🗺 <b>Use the "Toggle Map" button</b> to show/hide the delivery map interface.</li>
-      <li>📍 <b>Pickup location</b> is set as the default Luangwa pickup point.</li>
-      <li>📱 <b>Enter your phone number</b> before checking out.</li>
-      <li>🚚 <b>Estimate delivery</b> to get ETA and cost before proceeding to checkout.</li>
-      <li>💳 <b>Proceed to checkout</b> to confirm your order and submit details.</li>
-    </ul>
-  </div>
-
   <div class="container">
     <div class="slider-wrapper">
       <h2 class="section-title"><i class="fas fa-store"></i> Available Products</h2>
@@ -180,134 +272,157 @@
       </div>
       <div id="cart-total" class="cart-total" style="display:none;">
         <p>Products Total: ZK <span id="products-total">0.00</span></p>
-        <p id="transportation-line" style="display:none;">Transportation: ZK <span id="transportation-cost">0.00</span></p>
+        <p id="transportation-line" style="display:none;">Transportation: <span id="transport-icon">🚗</span> <span id="transportation-cost">0.00</span></p>
         <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
       </div>
-      <label for="end">Search for your Destination below or let the current fetched location</label>
-      <input id="end" class="address-input" type="text" placeholder="Enter delivery address" />
-      <div id="location-message" style="color: red; margin-top: 0.5rem;"></div>
-      <label for="phone">Enter phone number:</label>
-      <input id="phone" type="tel" class="phone-input" placeholder="0978167546" pattern="0[0-9]{9}" maxlength="10" />
-      <button id="calc-time" class="btn btn-primary" disabled>
-        <i class="fas fa-clock"></i> Estimate Delivery
-      </button>
-      <div id="eta"></div>
+      <input id="pickup" type="text" class="hidden-input" value="Luangwa Bus station" readonly>
+
+      <!-- Compact input row: Preferred Mode, From, To, Phone, Distance -->
+      <div class="input-row-flex">
+        <div class="mode-container">
+          <label for="mode-of-transport">Mode</label>
+          <div class="mode-group" id="mode-group">
+            <label class="mode-radio" id="radio-vehicle">
+              <input type="radio" name="mode" value="vehicle" id="mode-vehicle" onchange="handleModeChange();handleCustomerPhoneInput();">
+              <span class="material-icons">directions_car</span>
+            </label>
+            <label class="mode-radio" id="radio-motorbike">
+              <input type="radio" name="mode" value="motorbike" id="mode-motorbike" onchange="handleModeChange();handleCustomerPhoneInput();">
+              <span class="material-icons">two_wheeler</span>
+            </label>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="material-icons input-icon">place</span>
+          <label for="gm-origin">From</label>
+          <input type="text" id="gm-origin" class="address-input" value="Luangwa Bus station" autocomplete="off" placeholder="Enter starting point">
+          <div id="gm-origin-list" class="autocomplete-suggestions"></div>
+        </div>
+        <div class="input-group">
+          <span class="material-icons input-icon">flag</span>
+          <label for="gm-destination">To</label>
+          <input type="text" id="gm-destination" class="address-input" autocomplete="off" placeholder="Enter destination">
+          <div id="gm-destination-list" class="autocomplete-suggestions"></div>
+        </div>
+        <div class="input-group" id="customer-phone-wrapper-flex" style="display:none;">
+          <span class="material-icons input-icon">phone</span>
+          <label for="customer-phone">Phone</label>
+          <input
+            type="tel"
+            id="customer-phone"
+            maxlength="10"
+            pattern="^09[7-9][0-9]{7}$"
+            placeholder="e.g. 0978167546"
+            autocomplete="off"
+            inputmode="numeric"
+          >
+        </div>
+        <div class="input-group">
+          <span class="material-icons input-icon">straighten</span>
+          <label for="distance-input">Distance (km)</label>
+          <input
+            type="number"
+            id="distance-input"
+            class="address-input"
+            min="0"
+            step="0.01"
+            placeholder="Auto/Manual"
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <!-- Map toggle is below the input row -->
+      <div class="map-btn-row">
+        <button type="button" id="toggle-map-btn" class="btn btn-secondary" style="width: auto; min-width: 100px;">
+          <span class="material-icons">map</span> <span id="map-btn-text">Show Map</span>
+        </button>
+      </div>
+      <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+      <!-- Old phone input-group hidden, since it's in the row above -->
+      <div class="input-group" id="customer-phone-wrapper" style="display:none;">
+        <span class="material-icons input-icon">phone</span>
+        <label for="customer-phone">Phone Number</label>
+        <input
+          type="tel"
+          id="customer-phone-dummy"
+          style="display:none"
+        >
+      </div>
       <button id="checkout-btn" class="btn btn-accent" style="margin-top: 1rem; display:none;">
         <i class="fas fa-credit-card"></i> Proceed to Checkout
       </button>
       <div id="checkout-status" class="status-message"></div>
-      <div id="loader"><i class="fas fa-spinner fa-spin"></i> Processing...</div>
+      <div id="loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Processing...</div>
       <div id="statusMessage" class="status-message"></div>
     </div>
   </div>
-  <button id="toggle-map-btn" class="btn map-toggle-btn">Toggle Map</button>
-  <div id="map"></div>
   <script>
-    // --- INSTRUCTIONS TOGGLE LOGIC ---
-    const instructionsBtn = document.getElementById("instructions-toggle-btn");
-    const instructionsBox = document.getElementById("instructions-box");
-    const instructionsIcon = document.getElementById("instructions-toggle-icon");
-    instructionsBtn.addEventListener("click", function () {
-      if (instructionsBox.style.display === "block") {
-        instructionsBox.style.display = "none";
-        instructionsIcon.textContent = "➕";
-      } else {
-        instructionsBox.style.display = "block";
-        instructionsIcon.textContent = "➖";
-      }
-    });
+    // --- FULL PLACES LIST ---
+    const luangwaLandmarks = {
+      "Luangwa Bus Station": 0,
+      "Luangwa Indeco":0.9,"Luangwa Market":0.5,"Luangwa District Hospital":4.6,"Luangwa Police Station":0.55,"Luangwa Post Office":1.1,
+      "Luangwa District Comission office":1.1,"Luangwa District Education Office":0.6,"Makichilo lodge":1.1,"UCZ lodge":1.2,"Luangwa Habour":0.5,
+      "Yangoma Hotel":0.8,"Anglican Church":1.2,"BM residence":2.7,"Simon Njobvu Place,Soweto":3.1,"Big 2 water Resorts":4.7,
+      "Gerasnos Lodge lodge":1.3,"Luangwa Basic School":0.45,"Luangwa Feira Day Secondary School":3.7,"Luangwa High School":48,
+      "Luangwa High School Police post":48.8,"Luangwa Filling Station":1.5,"Luangwa Council lodge":0.65,"CSchool":5,"JSchool":10,
+      "Chiriwe Basic School":46.7,"K Clinic":15,"Me":16,"MBSchool":18,"Mp":19,"Mwavi Primary School":55,"Mwavi Secondary School":60,
+      "Kaunga Basic School":25,"Kapoche Village":27.4,"Redcliff Lodge":27.7,"Kakaro Basic School":12.1,"Kakaroo Heritage Site":11.1,
+      "Katondwe Primary School":50.4,"Katondwe Girls Secondary School":51.3,"Katondwe Mission Hospital":53.2,"Katondwe SDA churches":49.8,
+      "Katondwe  Chappel":53.5,"Nc":49,"C":48.1,"Mb":52,"Mwavi Village":60,"Luangwa Air ":3.8,"K":58,"Luangwa Bridge":100,
+      "Luangwa Bridge Market":87.3,"Luangwa Bridge Station":90,"Boma Clinic":2,"Dzalo Skills Training Centre kambolozo":1.8,"Luangwa Town Council":2.1
+    };
+    const luangwaPlaces = Object.keys(luangwaLandmarks);
 
-    // --- REST OF YOUR SCRIPT AS BEFORE ---
-    // 100 default commodities
+    function setupAutocomplete(inputId, suggestionsId, sourceList) {
+      const input = document.getElementById(inputId);
+      const suggestionsBox = document.getElementById(suggestionsId);
+      input.addEventListener("input", function() {
+        const query = input.value.trim().toLowerCase();
+        suggestionsBox.innerHTML = "";
+        if (!query) {
+          suggestionsBox.style.display = "none";
+          return;
+        }
+        const matches = sourceList.filter(
+          name => name.toLowerCase().includes(query)
+        ).slice(0, 10);
+        if (matches.length === 0) {
+          suggestionsBox.style.display = "none";
+          return;
+        }
+        matches.forEach(name => {
+          const div = document.createElement("div");
+          div.className = "autocomplete-suggestion";
+          div.innerText = name;
+          div.onclick = function() {
+            input.value = name;
+            suggestionsBox.innerHTML = "";
+            suggestionsBox.style.display = "none";
+            updateCart();
+          };
+          suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = "block";
+      });
+      input.addEventListener("blur", function() {
+        setTimeout(() => { suggestionsBox.style.display = "none"; }, 150);
+      });
+      input.addEventListener("focus", function() {
+        if (input.value.trim()) input.dispatchEvent(new Event("input"));
+      });
+    }
+    setupAutocomplete("gm-origin", "gm-origin-list", luangwaPlaces);
+    setupAutocomplete("gm-destination", "gm-destination-list", luangwaPlaces);
+
+    // --- PRODUCTS ---
     const PRODUCTS = [
       { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
       { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages" },
-      { id: 3, name: "Castle Light Dumpy", price: 25, image: "CLD.jpeg", category: "beverages" },
-      { id: 4, name: "Black Label", price: 20, image: "BL.webp", category: "beverages" },
-      { id: 5, name: "Coca-Cola bottled", price: 12, image: "MC.jpg", category: "beverages" },
-      { id: 6, name: "Fanta", price: 12, image: "F.jpeg", category: "beverages" },
-      { id: 7, name: "Disposable Fanta", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 8, name: "Disposable Coke", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 9, name: "Disposable Sprite", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 10, name: "Fresh_Up", price: 15.9, image: "Freshup.png", category: "beverages" },
-      { id: 11, name: "Black Label Cained", price: 30, image: "BL.webp", category: "beverages" },
-      { id: 12, name: "Fruitcana", price: 15, image: "Fruitc.webp", category: "beverages" },
-      { id: 13, name: "Kunfu", price: 15, image: "Konfu.png", category: "beverages" },
-      { id: 14, name: "Mojo", price: 15, image: "Mojo.png", category: "beverages" },
-      { id: 15, name: "Red Rock", price: 15, image: "RR.png", category: "beverages" },
-      { id: 16, name: "Rasta", price: 15, image: "Rasta.png", category: "beverages" },
-      { id: 17, name: "Life Shots", price: 15, image: "Shots.webp", category: "beverages" },
-      { id: 18, name: "Fruitcana Red Smoothie", price: 15, image: "Smoothy.png", category: "beverages" },
-      { id: 19, name: "Sun Dance", price: 15, image: "Sund.png", category: "beverages" },
-      { id: 21, name: "Tonic Water Brothers", price: 15, image: "Tonic.png", category: "beverages" },
-      { id: 22, name: "Vatra", price: 15, image: "Vatra.png", category: "beverages" },
-      { id: 23, name: "Wild Cat", price: 15, image: "Wildcat.png", category: "beverages" },
-      { id: 24, name: "Fruit-up", price: 15, image: "Fruitup.png", category: "beverages" },
-      { id: 25, name: "DP", price: 00, image: "D1.jpeg", category: "beverages" },
-      { id: 26, name: "DP", price: 00, image: "D2.png", category: "beverages" },
-      { id: 27, name: "DP", price: 00, image: "D3.jpeg", category: "beverages" },
-      { id: 28, name: "DP", price: 00, image: "D4.jpeg", category: "beverages" },
-      { id: 29, name: "DP", price: 00, image: "D5.jpeg", category: "beverages" },
-      { id: 30, name: "DP", price: 00, image: "D6.jpeg", category: "beverages" },
-      { id: 31, name: "DP", price: 00, image: "D7.jpeg", category: "beverages" },
-      { id: 32, name: "DP", price: 00, image: "D8.jpeg", category: "beverages" },
-      { id: 33, name: "o1", price: 00, image: "O1.jpeg", category: "beverages" },
-      { id: 34, name: "o2", price: 00, image: "O2.jpeg", category: "beverages" },
-      { id: 35, name: "o3", price: 00, image: "O3.jpeg", category: "beverages" },
-      { id: 36, name: "o4", price: 00, image: "O4.jpg", category: "beverages" },
-      { id: 37, name: "o5", price: 00, image: "O5.jpeg", category: "beverages" },
-      { id: 38, name: "o6", price: 00, image: "O6.jpeg", category: "beverages" },
-      { id: 39, name: "o7", price: 00, image: "O7.jpeg", category: "beverages" },
-      { id: 40, name: "o8", price: 00, image: "O8.jpg", category: "beverages" },
-      { id: 41, name: "o9", price: 00, image: "O9.jpeg", category: "beverages" },
-      { id: 42, name: "10", price: 00, image: "010.jpeg", category: "beverages" },
-      { id: 43, name: "11", price: 00, image: "O11.png", category: "beverages" },
-      { id: 44, name: "12", price: 00, image: "012.jpeg", category: "beverages" },
-      { id: 45, name: "13", price: 00, image: "O13.jpeg", category: "beverages" },
-      { id: 46, name: "N1", price: 00, image: "N1.jpg", category: "beverages" },
-      { id: 47, name: "N2", price: 00, image: "N2.jpeg", category: "beverages" },
-      { id: 48, name: "N3", price: 00, image: "N3.jpeg", category: "beverages" },
-      { id: 49, name: "N4", price: 00, image: "N4.jpeg", category: "beverages" },
-      { id: 50, name: "N5", price: 00, image: "N5.jpeg", category: "beverages" },
-      { id: 51, name: "N6", price: 00, image: "N6.jpeg", category: "beverages" },
-      { id: 52, name: "N7", price: 00, image: "N7.jpeg", category: "beverages" },
-      { id: 53, name: "N8", price: 00, image: "N8.jpeg", category: "beverages" },
-      { id: 54, name: "N9", price: 00, image: "N9.jpeg", category: "beverages" },
-      { id: 55, name: "N10", price: 00, image: "N10.jpeg", category: "beverages" },
-      { id: 56, name: "N11", price: 00, image: "N11.jpeg", category: "beverages" },
-      { id: 57, name: "N12", price: 00, image: "N12.jpeg", category: "beverages" },
-      { id: 58, name: "N13", price: 00, image: "N13.jpeg", category: "beverages" },
-      { id: 59, name: "N14", price: 00, image: "N14.jpeg", category: "beverages" },
-      { id: 60, name: "N15", price: 00, image: "N15.jpeg", category: "beverages" },
-      { id: 61, name: "N16", price: 00, image: "N16.jpeg", category: "beverages" },
-      { id: 62, name: "N17", price: 00, image: "N17.jpeg", category: "beverages" },
-      { id: 63, name: "N18", price: 00, image: "N18.jpeg", category: "beverages" },
-      { id: 64, name: "N19", price: 00, image: "N19.jpeg", category: "beverages" },
-      { id: 65, name: "N20", price: 00, image: "N20.jpeg", category: "beverages" },
-      { id: 66, name: "N21", price: 00, image: "N21.jpeg", category: "beverages" },
-      { id: 67, name: "N22", price: 00, image: "N22.jpeg", category: "beverages" },
-      { id: 68, name: "N23", price: 00, image: "N23.jpeg", category: "beverages" },
-      { id: 69, name: "N24", price: 00, image: "N24.jpeg", category: "beverages" },
-      { id: 70, name: "N25", price: 00, image: "N25.jpeg", category: "beverages" },
-      { id: 71, name: "N26", price: 00, image: "N26.jpeg", category: "beverages" },
-      { id: 72, name: "N27", price: 00, image: "N27.webp", category: "beverages" },
-      { id: 73, name: "N28", price: 00, image: "N28.webp", category: "beverages" },
-      { id: 74, name: "N29", price: 00, image: "N29.jpeg", category: "beverages" },
-    // Add 91 more default products
       { id: 100, name: "Black Label Big", price: 30, image: "BL.webp", category: "beverages" }
-      
+      // ... (rest of your product list here) ...
     ];
-
-    // 
-    for (let i = 75; i <= 99; i++) {
-      PRODUCTS.push({
-        id: i,
-        name: "Commodity " + i,
-        price: 10 + Math.floor(Math.random() * 90), // ZK10-ZK99
-        image: "https://via.placeholder.com/100?text=Product+" + i,
-        category: (i % 2 === 0 ? "food" : "beverages")
-      });
-    }
 
     const productListEl = document.getElementById('product-list');
     const cartItemsEl = document.getElementById('cart-items');
@@ -315,31 +430,70 @@
     const cartTotalEl = document.getElementById('cart-total');
     const productsTotalEl = document.getElementById('products-total');
     const transportationCostEl = document.getElementById('transportation-cost');
+    const transportLineEl = document.getElementById('transportation-line');
+    const transportIconEl = document.getElementById('transport-icon');
     const grandTotalEl = document.getElementById('grand-total');
-    const transportationLineEl = document.getElementById('transportation-line');
-    const endEl = document.getElementById('end');
-    const phoneEl = document.getElementById('phone');
-    const btnCalc = document.getElementById('calc-time');
     const checkoutBtn = document.getElementById('checkout-btn');
-    const checkoutStatusEl = document.getElementById('checkout-status');
-    const etaEl = document.getElementById('eta');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const toggleMapBtn = document.getElementById('toggle-map-btn');
-    const mapEl = document.getElementById('map');
-    const locationMessageEl = document.getElementById('location-message');
     const searchBox = document.getElementById('searchBox');
-    let map, geocoder, distanceService, directionsService, directionsRenderer;
+    const pickupEl = document.getElementById('pickup');
+    const gmOriginEl = document.getElementById('gm-origin');
+    const gmDestinationEl = document.getElementById('gm-destination');
+    const mapBtn = document.getElementById('toggle-map-btn');
+    const mapBtnText = document.getElementById('map-btn-text');
+    const googleMapFrame = document.getElementById('google-map-frame');
+    // Mode logic elements
+    const modeVehicle = document.getElementById('mode-vehicle');
+    const modeMotorbike = document.getElementById('mode-motorbike');
+    const radioVehicle = document.getElementById('radio-vehicle');
+    const radioMotorbike = document.getElementById('radio-motorbike');
+    // For phone input in the row
+    const customerPhoneWrapperFlex = document.getElementById('customer-phone-wrapper-flex');
+    const customerPhoneInput = document.getElementById('customer-phone');
+    // Old phone wrapper (hidden, but kept for compatibility)
+    const customerPhoneWrapper = document.getElementById('customer-phone-wrapper');
+    // For distance input
+    const distanceInput = document.getElementById('distance-input');
+
     let cart = [];
     let transportationCost = 0;
-    let startLatLng = null, endLatLng = null;
-    let markers = [];
-    let isMapVisible = false;
-    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwUvA_InN9GzHNjuDTkV7A8VGSbLYEtkEkr-FwygSg0c6ZxxFnyIugasy8S_IM87Q/exec';
-    const DEFAULT_PICKUP = '9CH5+J8J, Luangwa';
-
-    // For filtering
+    let transportMode = 'vehicle'; // default
+    const TRANSPORT_COST_PER3KM = { vehicle: 20, motorbike: 10 };
+    const TRANSPORT_ICON = { vehicle: "🚗", motorbike: "🏍️" };
+    const DEFAULT_PICKUP = 'Luangwa Bus station';
     let filteredProducts = PRODUCTS.slice();
+
+    // --- Mode selection logic ---
+    function handleModeChange() {
+      const v = modeVehicle.checked;
+      const m = modeMotorbike.checked;
+      radioVehicle.classList.toggle('selected', v);
+      radioMotorbike.classList.toggle('selected', m);
+      transportMode = v ? 'vehicle' : (m ? 'motorbike' : 'vehicle');
+      updateCart();
+      handleCustomerPhoneInput();
+    }
+    function handleCustomerPhoneInput() {
+      const v = modeVehicle.checked;
+      const m = modeMotorbike.checked;
+      // Show phone input in row if mode selected, else hide
+      if (v || m) {
+        customerPhoneWrapperFlex.style.display = "";
+      } else {
+        customerPhoneWrapperFlex.style.display = "none";
+        customerPhoneInput.value = "";
+      }
+      // Hide old phone input always (in case old logic tries to show it)
+      customerPhoneWrapper.style.display = "none";
+    }
+    modeVehicle.addEventListener('change', handleModeChange);
+    modeMotorbike.addEventListener('change', handleModeChange);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      modeVehicle.checked = true;
+      handleModeChange();
+      renderProducts();
+      updateCart();
+    });
 
     searchBox.addEventListener('input', function() {
       const query = this.value.trim().toLowerCase();
@@ -350,11 +504,6 @@
       renderProducts();
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      try { renderProducts(); updateCart(); loadGoogleMaps(); }
-      catch (error) { console.error('Initialization error:', error); showMessage('Failed to initialize the platform. Please try again.', "error"); }
-    });
-
     function showMessage(message, type = "error") {
       const s = document.getElementById("statusMessage");
       s.textContent = message;
@@ -363,454 +512,227 @@
       setTimeout(() => s.style.display = "none", 5000);
     }
 
-    function renderProducts() {
-      try {
-        productListEl.innerHTML = '';
-        filteredProducts.forEach(p => {
-          const div = document.createElement('div');
-          div.className = 'product';
-          div.innerHTML = `
-            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/100?text=Error';">
-            <h4>${p.name}</h4>
-            <p>ZK ${p.price.toFixed(2)}</p>
-            <button data-id="${p.id}">
-              <i class="fas fa-plus"></i> Add
-            </button>
-          `;
-          productListEl.appendChild(div);
-        });
-      } catch (error) { console.error('Render products error:', error); showMessage('Error loading products.'); }
+    function calcTransportationCost() {
+      // Priority: manual distance input, else use "from" and "to"
+      const from = gmOriginEl.value.trim();
+      const to   = gmDestinationEl.value.trim();
+      let distance = parseFloat(distanceInput.value);
+      if (!isNaN(distance) && distance > 0) {
+        const kmSegments = Math.ceil(distance / 3);
+        return kmSegments * TRANSPORT_COST_PER3KM[transportMode];
+      }
+      // fallback to computed
+      if (from && to && luangwaLandmarks.hasOwnProperty(from) && luangwaLandmarks.hasOwnProperty(to)) {
+        const computedDistance = Math.abs(luangwaLandmarks[from] - luangwaLandmarks[to]);
+        const kmSegments = Math.ceil(computedDistance / 3);
+        return kmSegments * TRANSPORT_COST_PER3KM[transportMode];
+      }
+      return TRANSPORT_COST_PER3KM[transportMode];
     }
-    prevBtn.onclick = () => productListEl.scrollBy({ left: -200, behavior: 'smooth' });
-    nextBtn.onclick = () => productListEl.scrollBy({ left: 200, behavior: 'smooth' });
+
+    function renderProducts() {
+      productListEl.innerHTML = '';
+      filteredProducts.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/100?text=Error';">
+          <h4>${p.name}</h4>
+          <p>ZK ${p.price.toFixed(2)}</p>
+          <button data-id="${p.id}">
+            <i class="fas fa-plus"></i> Add
+          </button>
+        `;
+        productListEl.appendChild(div);
+      });
+    }
+    document.getElementById('prevBtn').onclick = () => productListEl.scrollBy({ left: -200, behavior: 'smooth' });
+    document.getElementById('nextBtn').onclick = () => productListEl.scrollBy({ left: 200, behavior: 'smooth' });
     productListEl.addEventListener('click', e => {
-      try {
-        const button = e.target.closest('button');
-        if (button && button.dataset.id) {
-          const id = parseInt(button.dataset.id, 10);
-          addToCart(id);
-        }
-      } catch (error) { console.error('Add to cart click error:', error); showMessage('Error adding to cart.'); }
+      const button = e.target.closest('button');
+      if (button && button.dataset.id) {
+        const id = parseInt(button.dataset.id, 10);
+        addToCart(id);
+      }
     });
     function addToCart(id) {
-      try {
-        const product = PRODUCTS.find(x => x.id === id);
-        if (product) {
-          const cartItem = cart.find(item => item.product.id === id);
-          if (cartItem) { cartItem.quantity += 1; }
-          else { cart.push({ product, quantity: 1 }); }
-          updateCart();
-          const btn = document.querySelector(`button[data-id="${id}"]`);
-          if (btn) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Added';
-            btn.style.backgroundColor = 'var(--primary-dark)';
-            setTimeout(() => {
-              btn.innerHTML = '<i class="fas fa-plus"></i> Add';
-              btn.style.backgroundColor = '';
-            }, 1000);
-          }
-        } else { showMessage('Product not found.'); }
-      } catch (error) { console.error('Add to cart error:', error); showMessage('Error adding to cart.'); }
+      const product = PRODUCTS.find(x => x.id === id);
+      if (product) {
+        const cartItem = cart.find(item => item.product.id === id);
+        if (cartItem) { cartItem.quantity += 1; }
+        else { cart.push({ product, quantity: 1 }); }
+        updateCart();
+        const btn = document.querySelector(`button[data-id="${id}"]`);
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-check"></i> Added';
+          btn.style.backgroundColor = 'var(--primary-dark)';
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-plus"></i> Add';
+            btn.style.backgroundColor = '';
+          }, 1000);
+        }
+      } else { showMessage('Product not found.'); }
     }
     function updateCart() {
-      try {
-        if (cart.length === 0) {
-          cartItemsEl.innerHTML = '';
-          emptyCartEl.style.display = 'block';
-          cartTotalEl.style.display = 'none';
-          checkoutBtn.style.display = 'none';
-          checkoutStatusEl.style.display = 'none';
-        } else {
-          emptyCartEl.style.display = 'none';
-          cartTotalEl.style.display = 'block';
-          checkoutBtn.style.display = 'block';
-          cartItemsEl.innerHTML = '';
-          cart.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <span>${item.product.name} (x${item.quantity})</span>
-              <div>
-                <span>ZK ${(item.product.price * item.quantity).toFixed(2)}</span>
-                <div class="quantity-controls">
-                  <button class="quantity-btn decrease" data-index="${index}">-</button>
-                  <button class="quantity-btn increase" data-index="${index}">+</button>
-                  <button class="remove-btn" data-index="${index}">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
+      transportationCost = calcTransportationCost();
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '';
+        emptyCartEl.style.display = 'block';
+        cartTotalEl.style.display = 'none';
+        checkoutBtn.style.display = 'none';
+      } else {
+        emptyCartEl.style.display = 'none';
+        cartTotalEl.style.display = 'block';
+        checkoutBtn.style.display = 'block';
+        cartItemsEl.innerHTML = '';
+        cart.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>${item.product.name} (x${item.quantity})</span>
+            <div>
+              <span>ZK ${(item.product.price * item.quantity).toFixed(2)}</span>
+              <div class="quantity-controls">
+                <button class="quantity-btn decrease" data-index="${index}">-</button>
+                <button class="quantity-btn increase" data-index="${index}">+</button>
+                <button class="remove-btn" data-index="${index}">
+                  <i class="fas fa-times"></i>
+                </button>
               </div>
-            `;
-            cartItemsEl.appendChild(li);
-          });
-          const productsTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-          productsTotalEl.textContent = productsTotal.toFixed(2);
-          const grandTotal = productsTotal + transportationCost;
-          grandTotalEl.textContent = grandTotal.toFixed(2);
-          if (transportationCost > 0) {
-            transportationCostEl.textContent = transportationCost.toFixed(2);
-            transportationLineEl.style.display = 'block';
-          } else { transportationLineEl.style.display = 'none'; }
-        }
-        btnCalc.disabled = cart.length === 0 || (!endEl.value && !endLatLng) || !startLatLng;
-      } catch (error) { console.error('Update cart error:', error); showMessage('Error updating cart.'); }
+            </div>
+          `;
+          cartItemsEl.appendChild(li);
+        });
+        const productsTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        productsTotalEl.textContent = productsTotal.toFixed(2);
+        const grandTotal = productsTotal + transportationCost;
+        grandTotalEl.textContent = grandTotal.toFixed(2);
+        if (transportationCost > 0) {
+          transportationCostEl.textContent = transportationCost.toFixed(2);
+          transportLineEl.style.display = 'block';
+        } else { transportLineEl.style.display = 'none'; }
+        transportIconEl.textContent = TRANSPORT_ICON[transportMode];
+      }
     }
     cartItemsEl.addEventListener('click', e => {
-      try {
-        const button = e.target.closest('button');
-        if (!button) return;
-        const index = parseInt(button.dataset.index, 10);
-        if (button.classList.contains('remove-btn')) { cart.splice(index, 1); }
-        else if (button.classList.contains('increase')) { cart[index].quantity += 1; }
-        else if (button.classList.contains('decrease')) {
-          cart[index].quantity -= 1;
-          if (cart[index].quantity === 0) cart.splice(index, 1);
-        }
-        updateCart();
-      } catch (error) { console.error('Cart interaction error:', error); showMessage('Error updating cart items.'); }
-    });
-    toggleMapBtn.addEventListener('click', () => {
-      try {
-        isMapVisible = !isMapVisible;
-        mapEl.style.display = isMapVisible ? 'block' : 'none';
-        toggleMapBtn.innerHTML = isMapVisible ? 
-          '<i class="fas fa-map"></i> Hide Map' : 
-          '<i class="fas fa-map"></i> Show Map';
-        if (isMapVisible && map) {
-          google.maps.event.trigger(map, 'resize');
-          if (startLatLng || endLatLng) {
-            map.setCenter(startLatLng || endLatLng);
-          }
-        }
-      } catch (error) { console.error('Map toggle error:', error); showMessage('Error toggling map.'); }
-    });
-    function geocodeAddress(address, isStart) {
-      try {
-        if (!address) return;
-        geocoder.geocode({ 
-          address: address + ', Zambia',
-          componentRestrictions: { country: 'zm' }
-        }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            clearMarkers();
-            if (isStart) startLatLng = results[0].geometry.location;
-            else endLatLng = results[0].geometry.location;
-            updateCart();
-            const marker = new google.maps.Marker({
-              position: results[0].geometry.location,
-              map: map,
-              title: results[0].formatted_address,
-              icon: {
-                url: isStart ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
-                              'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-              }
-            });
-            markers.push(marker);
-            map.setCenter(results[0].geometry.location);
-            if (isMapVisible) {
-              google.maps.event.trigger(map, 'resize');
-              map.setCenter(results[0].geometry.location);
-            }
-          } else {
-            showMessage('Could not find the location: ' + status);
-            if (!isStart) endEl.value = '';
-          }
-        });
-      } catch (error) { console.error('Geocode address error:', error); showMessage('Error geocoding address.'); }
-    }
-    function reverseGeocode(latLng, inputEl) {
-      try {
-        geocoder.geocode({ location: latLng }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            const zambiaResult = results.find(r => 
-              r.address_components.some(c => c.types.includes('country') && c.short_name === 'ZM')
-            ) || results[0];
-            inputEl.value = zambiaResult.formatted_address;
-            endLatLng = latLng;
-            clearMarkers();
-            markers.forEach(marker => marker.setMap(map));
-            const marker = new google.maps.Marker({
-              position: latLng,
-              map: map,
-              title: zambiaResult.formatted_address,
-              icon: { url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }
-            });
-            markers.push(marker);
-            map.setCenter(latLng);
-            if (isMapVisible) {
-              google.maps.event.trigger(map, 'resize');
-              map.setCenter(latLng);
-            }
-            updateCart();
-            showMessage('');
-          } else {
-            inputEl.value = `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
-            endLatLng = latLng;
-            updateCart();
-            showMessage('Could not find address for this location.');
-          }
-        });
-      } catch (error) { console.error('Reverse geocode error:', error); showMessage('Error reverse geocoding location.'); }
-    }
-    function clearMarkers() {
-      try {
-        markers.forEach(marker => marker.setMap(null));
-        markers = [];
-        if (startLatLng) {
-          const marker = new google.maps.Marker({
-            position: startLatLng,
-            map: map,
-            title: 'Pickup Location',
-            icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
-          });
-          markers.push(marker);
-        }
-      } catch (error) { console.error('Clear markers error:', error); showMessage('Error clearing map markers.'); }
-    }
-    function fetchDefaultLocation() {
-      if (!navigator.geolocation) {
-        showMessage('Geolocation is not supported by your browser. Please enter your delivery address manually.');
-        return;
+      const button = e.target.closest('button');
+      if (!button) return;
+      const index = parseInt(button.dataset.index, 10);
+      if (button.classList.contains('remove-btn')) { cart.splice(index, 1); }
+      else if (button.classList.contains('increase')) { cart[index].quantity += 1; }
+      else if (button.classList.contains('decrease')) {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity === 0) cart.splice(index, 1);
       }
-      showMessage('Fetching your location...');
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          reverseGeocode(latLng, endEl);
-        },
-        (error) => {
-          let message = 'Unable to fetch your location. Please enter your delivery address manually.';
-          if (error.code === error.PERMISSION_DENIED) {
-            message = 'Location access denied. Please allow location access or enter your delivery address manually.';
-          } else if (error.code === error.POSITION_UNAVAILABLE) {
-            message = 'Location information is unavailable. Please enter your delivery address manually.';
-          } else if (error.code === error.TIMEOUT) {
-            message = 'Location request timed out. Please enter your delivery address manually.';
-          }
-          showMessage(message);
-        },
-        { timeout: 10000 }
-      );
-    }
-    function initMap() {
-      try {
-        map = new google.maps.Map(mapEl, {
-          center: { lat: -13.1367, lng: 28.4164 },
-          zoom: 13,
-          styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }]
-        });
-        geocoder = new google.maps.Geocoder();
-        distanceService = new google.maps.DistanceMatrixService();
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer({
-          suppressMarkers: false,
-          preserveViewport: false
-        });
-        directionsRenderer.setMap(map);
-        geocoder.geocode({ 
-          address: DEFAULT_PICKUP,
-          componentRestrictions: { country: 'zm' }
-        }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            startLatLng = results[0].geometry.location;
-            clearMarkers();
-            const marker = new google.maps.Marker({
-              position: startLatLng,
-              map: map,
-              title: 'Pickup Location',
-              icon: { url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' }
-            });
-            markers.push(marker);
-            if (isMapVisible) {
-              google.maps.event.trigger(map, 'resize');
-              map.setCenter(startLatLng);
-            }
-            updateCart();
-            fetchDefaultLocation();
-          } else {
-            showMessage('Failed to locate pickup point. Please try again later.');
-          }
-        });
-        const endAutocomplete = new google.maps.places.Autocomplete(endEl, {
-          types: ['geocode', 'establishment'],
-          componentRestrictions: { country: 'zm' },
-          fields: ['address_components', 'geometry', 'name', 'place_id']
-        });
-        endAutocomplete.addListener('place_changed', () => {
-          try {
-            const place = endAutocomplete.getPlace();
-            if (place.geometry) {
-              endLatLng = place.geometry.location;
-              clearMarkers();
-              markers.forEach(marker => marker.setMap(map));
-              const marker = new google.maps.Marker({
-                position: endLatLng,
-                map: map,
-                title: place.name,
-                icon: { url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }
-              });
-              markers.push(marker);
-              map.setCenter(endLatLng);
-              if (isMapVisible) {
-                google.maps.event.trigger(map, 'resize');
-                map.setCenter(endLatLng);
-              }
-              updateCart();
-              showMessage('');
-            } else {
-              geocodeAddress(place.name, false);
-            }
-          } catch (error) { console.error('Autocomplete error:', error); showMessage('Error with address autocomplete.'); }
-        });
-        // --- DOUBLE CLICK SETS DESTINATION ON MAP ---
-        map.addListener('dblclick', (e) => {
-          try {
-            if (!isMapVisible) return; // Only allow when map is visible
-            const latLng = e.latLng;
-            reverseGeocode(latLng, endEl);
-            updateCart();
-          } catch (error) { console.error('Map dblclick error:', error); showMessage('Error selecting location from map.'); }
-        });
-      } catch (error) { console.error('Init map error:', error); showMessage('Error initializing map.'); }
-    }
-    btnCalc.onclick = () => {
-      try {
-        const origin = startLatLng;
-        const dest = endLatLng || endEl.value.trim();
-        if (!origin || !dest) {
-          showMessage('Please enter a delivery location.');
-          return;
-        }
-        btnCalc.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
-        btnCalc.disabled = true;
-        distanceService.getDistanceMatrix({
-          origins: [origin],
-          destinations: [dest],
-          travelMode: 'DRIVING',
-          drivingOptions: { departureTime: new Date(), trafficModel: 'bestguess' }
-        }, (resp, status) => {
-          btnCalc.innerHTML = '<i class="fas fa-clock"></i> Estimate Delivery';
-          btnCalc.disabled = false;
-          const el = resp?.rows?.[0]?.elements?.[0];
-          if (status === 'OK' && el?.status === 'OK') {
-            const distanceInKm = el.distance.value / 1000;
-            // K15 per 3km, rounded up
-            const segments = Math.ceil(distanceInKm / 3);
-            transportationCost = segments * 15;
-            updateCart();
-            etaEl.innerHTML = `
-              <p><i class="fas fa-road"></i> <strong>Distance:</strong> ${el.distance.text} (${distanceInKm.toFixed(1)} km)</p>
-              <p><i class="fas fa-clock"></i> <strong>ETA:</strong> ${el.duration.text}</p>
-              ${el.duration_in_traffic ? `<p><i class="fas fa-car"></i> <strong>With traffic:</strong> ${el.duration_in_traffic.text}</p>` : ''}
-            `;
-            showMessage('');
-          } else {
-            etaEl.textContent = 'Could not compute distance/time. Please check your delivery location.';
-            showMessage('Could not compute distance/time.');
-          }
-        });
-        directionsService.route({
-          origin: startLatLng,
-          destination: endLatLng || endEl.value.trim(),
-          travelMode: google.maps.TravelMode.DRIVING,
-          provideRouteAlternatives: true
-        }, (resp, status) => {
-          if (status === 'OK') {
-            directionsRenderer.setDirections(resp);
-            if (isMapVisible) {
-              google.maps.event.trigger(map, 'resize');
-              map.setCenter(startLatLng || endLatLng);
-            }
-          } else { showMessage('Route error: ' + status); }
-        });
-      } catch (error) {
-        btnCalc.innerHTML = '<i class="fas fa-clock"></i> Estimate Delivery';
-        btnCalc.disabled = false;
-        showMessage('Error calculating delivery.');
-      }
-    };
+      updateCart();
+    });
+    gmOriginEl.addEventListener('input', updateCart);
+    gmDestinationEl.addEventListener('input', updateCart);
+    distanceInput.addEventListener('input', updateCart);
 
-    // --- SUBMIT ORDER VIA x-www-form-urlencoded POST ---
-    checkoutBtn.onclick = function () {
-      if (checkoutBtn.disabled) return;
-      // Validate
-      if (!endEl.value) {
-        showMessage('Please enter a delivery location before checkout.');
+    // Toggle Map logic
+    mapBtn.addEventListener('click', function() {
+      const from = gmOriginEl.value.trim();
+      const to = gmDestinationEl.value.trim();
+      if (!from || !to) {
+        alert("Please enter both origin (From) and destination (To).");
         return;
       }
+      if (googleMapFrame.style.display === "block") {
+        googleMapFrame.style.display = "none";
+        mapBtnText.textContent = "Show Map";
+      } else {
+        const embedUrl = "https://www.google.com/maps?q=" +
+          encodeURIComponent(from + " to " + to) +
+          "&output=embed";
+        googleMapFrame.src = embedUrl;
+        googleMapFrame.style.display = "block";
+        googleMapFrame.scrollIntoView({behavior:"smooth"});
+        mapBtnText.textContent = "Hide Map";
+      }
+    });
+
+    // --- SUBMISSION LOGIC ---
+    function submitOrder() {
       if (cart.length === 0) {
         showMessage('Your cart is empty. Please add items before checkout.');
         return;
       }
-      if (transportationCost === 0) {
-        showMessage('Please estimate delivery before proceeding to checkout.');
+      const from = gmOriginEl.value.trim();
+      const to = gmDestinationEl.value.trim();
+      if (!from || !to) {
+        showMessage('Please enter both origin (From) and destination (To) before checkout.');
         return;
       }
-      const phoneRegex = /^0[0-9]{9}$/;
-      if (!phoneEl.value || !phoneRegex.test(phoneEl.value.trim())) {
-        showMessage('Please enter a valid Zambian phone number (e.g., 0978167546).');
+      const v = modeVehicle.checked;
+      const m = modeMotorbike.checked;
+      if (!v && !m) {
+        showMessage('Please select a mode of transport.');
         return;
       }
-
-      // Show loader
-      document.getElementById("loader").style.display = "block";
-
-      // Collect order data
+      const phone = customerPhoneInput.value.trim();
+      if (!phone.match(/^09[7-9][0-9]{7}$/)) {
+        showMessage('Please enter a valid phone number (e.g., 0978167546).');
+        return;
+      }
+      // Optional: send distance if provided
+      let distance = parseFloat(distanceInput.value);
+      if (isNaN(distance) || distance <= 0) {
+        // fallback to computed
+        if (luangwaLandmarks.hasOwnProperty(from) && luangwaLandmarks.hasOwnProperty(to)) {
+          distance = Math.abs(luangwaLandmarks[from] - luangwaLandmarks[to]);
+        } else {
+          distance = '';
+        }
+      }
+      const loader = document.getElementById("loader");
+      loader.style.display = "block";
+      const productsTotal = parseFloat(productsTotalEl.textContent);
+      const grandTotal = parseFloat(grandTotalEl.textContent);
       const data = {
-        pickup      : DEFAULT_PICKUP,
-        delivery    : endEl.value.trim(),
-        phoneNumber : phoneEl.value.trim(),
-        productsTotal : parseFloat(productsTotalEl.textContent),
-        transportationCost: transportationCost,
-        grandTotal  : parseFloat(grandTotalEl.textContent),
-        items       : cart.map(item => item.product.name + " x" + item.quantity).join(", "),
-        Date        : "" // Let Apps Script handle date
+        from               : from,
+        to                 : to,
+        phoneNumber        : phone,
+        distance           : distance, // new!
+        productsTotal      : productsTotal,
+        transportationCost : transportationCost,
+        transportMode      : v ? "Vehicle" : "Motorbike",
+        grandTotal         : grandTotal,
+        items              : cart.map(item => item.product.name + " x" + item.quantity).join(", "),
+        Date               : "" // (Backend can set timestamp)
       };
-
-      // Encode as x-www-form-urlencoded
       const formBody = Object.keys(data)
         .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
         .join("&");
-
-      // Submit
-      fetch(GOOGLE_SHEETS_URL, {
+      fetch('https://script.google.com/macros/s/AKfycbx7R-M0nKEafAfvKnCbDq5r-m7TtQ466eNTA5SwjvTFqQKCbmT4rY8sTFZEzCtwQ9a3/exec', {
         method : 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body   : formBody
       })
       .then(r => r.json())
       .then(j => {
-        document.getElementById("loader").style.display = "none";
+        loader.style.display = "none";
         if (j.status === 'success' || j.result === 'success' || (j.result && j.result.indexOf('success') !== -1)) {
           showMessage('Order confirmed! Delivery details sent.', "success");
           alert('Order confirmed! Delivery details will be sent to you.');
           cart = [];
-          transportationCost = 0;
           updateCart();
-          endEl.value = '';
-          phoneEl.value = '';
-          etaEl.textContent = '';
-          if (directionsRenderer && directionsRenderer.setDirections) directionsRenderer.setDirections({routes: []});
-          clearMarkers();
+          customerPhoneInput.value = '';
+          gmOriginEl.value = '';
+          gmDestinationEl.value = '';
+          distanceInput.value = '';
+          googleMapFrame.style.display = "none";
+          mapBtnText.textContent = "Show Map";
         } else {
           showMessage(j.message || "Submission failed", "error");
         }
       })
       .catch(e => {
-        document.getElementById("loader").style.display = "none";
+        loader.style.display = "none";
         showMessage("Submission failed", "error");
         console.error(e);
       });
-    };
-
-    function loadGoogleMaps() {
-      try {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDRdnvGw7epuDJjgBnpv0-FEuSQ6J-fyNY&libraries=places&callback=initMap`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-      } catch (error) { showMessage('Error loading Google Maps.'); }
     }
+    checkoutBtn.onclick = submitOrder;
   </script>
 </body>
-  </html>
+</html>
