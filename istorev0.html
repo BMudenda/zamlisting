@@ -45,7 +45,7 @@
     .slider-button:hover { background: rgba(0,0,0,0.8); }
     .slider-button.prev { left: 0; }
     .slider-button.next { right: 0; }
-    .cart { border: 1px solid var(--border); padding: 1.5rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow); }
+    .cart { border: 1px solid var(--border); padding: 1.5rem 1.3rem 1.7rem 1.3rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow); margin-bottom: 2em;}
     .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 300px; overflow-y: auto; }
     .cart-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .cart-items li:last-child { border-bottom: none; }
@@ -124,6 +124,7 @@
       min-width: 0;
       box-sizing: border-box;
       margin-bottom: 1em;
+      align-self: flex-end;
     }
     .input-group label {
       font-weight: 500;
@@ -141,48 +142,49 @@
       font-size: 25px;
       opacity: 0.85;
     }
-    /* --- Compact mode radio buttons --- */
-    .input-row-flex {
+
+    /* Cart inputs flexbox alignment */
+    .cart-inputs-flex {
       display: flex;
-      gap: 10px;
-      margin-bottom: 1em;
+      gap: 12px;
+      align-items: flex-end;
+      margin-bottom: 1.2em;
+      flex-wrap: wrap;
     }
-    .input-row-flex .input-group {
-      flex: 1 1 0;
+    .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container {
+      min-width: 160px;
+      flex: 1 1 160px;
       margin-bottom: 0 !important;
     }
-    .input-row-flex .mode-container {
-      flex: 0 0 56px;
+    .cart-inputs-flex .mode-container {
+      flex: 0 0 62px;
       min-width: 56px;
-      max-width: 60px;
+      max-width: 70px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: flex-start;
+      justify-content: flex-end;
       padding: 0;
       background: none;
       box-shadow: none;
       margin: 0;
     }
-    .input-row-flex .mode-container label {
+    .cart-inputs-flex .mode-container label {
       font-size: 13px;
       margin-bottom: 2px;
-      margin-left: 3px;
       margin-top: 5px;
       color: #2563eb;
       font-weight: 500;
       letter-spacing: .1em;
+      margin-left: 3px;
     }
-    .input-row-flex .mode-group {
-      margin-top: 0;
-      margin-left: 0;
-      gap: 0;
-    }
-    .mode-group {
+    .cart-inputs-flex .mode-group {
       display: flex;
       align-items: center;
+      gap: 0;
+      margin: 0;
     }
-    .mode-radio {
+    .cart-inputs-flex .mode-radio {
       border: 1.5px solid #e5e7eb !important;
       background: #f8fafc !important;
       color: #2563eb;
@@ -200,38 +202,55 @@
       box-shadow: none;
       margin: 0;
     }
-    .mode-radio.selected {
+    .cart-inputs-flex .mode-radio.selected {
       border: 2px solid #2563eb !important;
       background: #f0f6ff !important;
       z-index: 1;
     }
-    .mode-radio:last-child {
+    .cart-inputs-flex .mode-radio:last-child {
       border-radius: 0 5px 5px 0 !important;
       border-right: 1.5px solid #e5e7eb !important;
       margin-left: -1px;
     }
-    .mode-radio input[type="radio"] {
+    .cart-inputs-flex .mode-radio input[type="radio"] {
       accent-color: #2563eb;
       margin-right: 1px;
       margin-left: 0;
       width: 16px;
       height: 16px;
     }
-    .mode-radio span.material-icons {
+    .cart-inputs-flex .mode-radio span.material-icons {
       font-size: 20px !important;
       margin: 0 2px 0 0;
       vertical-align: middle;
     }
-    @media (max-width: 767px) {
-      .container { flex-direction: column; }
-      .slider-wrapper, .cart { width: 100%; }
-      .slider-button { display: none; }
-      #google-map-frame { height: 160px; }
-      .input-row-flex { flex-direction: column; gap: 0; }
-      .input-row-flex .mode-container { max-width: unset !important; flex: unset !important; }
-      .input-row-flex .mode-container label { margin-left: 34px; }
-      .input-row-flex .mode-group { margin-left: 18px; }
+
+    @media (max-width: 900px) {
+      .cart-inputs-flex {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .cart-inputs-flex .input-group,
+      .cart-inputs-flex .mode-container {
+        min-width: 130px;
+        flex: 1 1 130px;
+      }
     }
+
+    @media (max-width: 650px) {
+      .cart-inputs-flex {
+        flex-direction: column;
+        gap: 0.2em;
+        align-items: stretch;
+      }
+      .cart-inputs-flex .input-group,
+      .cart-inputs-flex .mode-container {
+        max-width: unset;
+        min-width: 0;
+        flex: unset;
+      }
+    }
+
     .map-btn-row {
       display: flex;
       justify-content: flex-end;
@@ -277,8 +296,8 @@
       </div>
       <input id="pickup" type="text" class="hidden-input" value="Luangwa Bus station" readonly>
 
-      <!-- Compact input row: Preferred Mode, From, To, Phone, Distance -->
-      <div class="input-row-flex">
+      <!-- Neatly aligned input row -->
+      <div class="cart-inputs-flex">
         <div class="mode-container">
           <label for="mode-of-transport">Mode</label>
           <div class="mode-group" id="mode-group">
@@ -512,22 +531,28 @@
       setTimeout(() => s.style.display = "none", 5000);
     }
 
+    // Always use the distance input for cost calculation if present.
+    // Otherwise, auto-calculate from From/To.
+    // Motorbike: K10 per 3km, Vehicle: K20 per 3km (rounded up)
     function calcTransportationCost() {
-      // Priority: manual distance input, else use "from" and "to"
       const from = gmOriginEl.value.trim();
       const to   = gmDestinationEl.value.trim();
       let distance = parseFloat(distanceInput.value);
+
       if (!isNaN(distance) && distance > 0) {
-        const kmSegments = Math.ceil(distance / 3);
-        return kmSegments * TRANSPORT_COST_PER3KM[transportMode];
+        const rate = TRANSPORT_COST_PER3KM[transportMode];
+        return Math.ceil(distance / 3) * rate;
       }
-      // fallback to computed
+
+      // fallback: auto-calc from landmarks
       if (from && to && luangwaLandmarks.hasOwnProperty(from) && luangwaLandmarks.hasOwnProperty(to)) {
-        const computedDistance = Math.abs(luangwaLandmarks[from] - luangwaLandmarks[to]);
-        const kmSegments = Math.ceil(computedDistance / 3);
-        return kmSegments * TRANSPORT_COST_PER3KM[transportMode];
+        distance = Math.abs(luangwaLandmarks[from] - luangwaLandmarks[to]);
+        if (!isNaN(distance) && distance > 0) {
+          const rate = TRANSPORT_COST_PER3KM[transportMode];
+          return Math.ceil(distance / 3) * rate;
+        }
       }
-      return TRANSPORT_COST_PER3KM[transportMode];
+      return 0;
     }
 
     function renderProducts() {
@@ -674,7 +699,6 @@
         showMessage('Please enter a valid phone number (e.g., 0978167546).');
         return;
       }
-      // Optional: send distance if provided
       let distance = parseFloat(distanceInput.value);
       if (isNaN(distance) || distance <= 0) {
         // fallback to computed
@@ -692,13 +716,13 @@
         from               : from,
         to                 : to,
         phoneNumber        : phone,
-        distance           : distance, // new!
+        distance           : distance,
         productsTotal      : productsTotal,
         transportationCost : transportationCost,
         transportMode      : v ? "Vehicle" : "Motorbike",
         grandTotal         : grandTotal,
         items              : cart.map(item => item.product.name + " x" + item.quantity).join(", "),
-        Date               : "" // (Backend can set timestamp)
+        Date               : ""
       };
       const formBody = Object.keys(data)
         .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
