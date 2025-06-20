@@ -265,36 +265,95 @@
       font-size: 18px;
       margin-right: 3px;
     }
-    .mode-group {
+    .single-action-row {
       display: flex;
-      gap: 18px;
-      margin-top: 8px;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 14px;
+      margin-top: 0;
+      gap: 0;
     }
-    .mode-radio {
+    .single-action-row .map-btn-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+    }
+    .single-action-row button {
+      min-width: 120px;
+      max-width: 220px;
+      padding: 11px 0;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px #2563eb19;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s;
       display: flex;
       align-items: center;
-      gap: 5px;
-      background: #f8fafc;
-      padding: 7px 13px 7px 7px;
+      justify-content: center;
+      gap: 7px;
+    }
+    .single-action-row button:hover, .single-action-row button:focus {
+      background: #174ea6;
+      box-shadow: 0 4px 16px #2563eb22;
+    }
+    .distance-input-row {
+      margin-bottom: 14px;
+    }
+    .summary-actions-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+      margin-top: 0;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      width: 100%;
+    }
+    .summary-actions-row button {
+      flex: 1 1 0;
+      min-width: 100px;
+      max-width: 180px;
+      padding: 11px 0;
+      margin: 0;
+      background: #2563eb;
+      color: #fff;
+      border: none;
       border-radius: 6px;
-      border: 1.5px solid #e5e7eb;
+      box-shadow: 0 2px 8px #2563eb19;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
       cursor: pointer;
-      font-size: 15px;
-      color: #2563eb;
-      font-weight: 500;
-      transition: border 0.2s;
+      transition: background 0.18s, box-shadow 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
     }
-    .mode-radio input[type="radio"] {
-      accent-color: #2563eb;
-      margin-right: 2px;
-      margin-left: 0;
+    .summary-actions-row button:hover, .summary-actions-row button:focus {
+      background: #174ea6;
+      box-shadow: 0 4px 16px #2563eb22;
     }
-    .mode-radio.selected {
-      border: 2px solid #2563eb;
-      background: #f0f6ff;
-    }
-    .vehicle-biker-select-wrapper {
-      margin-bottom: 10px;
+    @media (max-width: 540px) {
+      .single-action-row {
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+      .distance-input-row {
+        margin-bottom: 10px;
+      }
+      .summary-actions-row {
+        flex-direction: column;
+        gap: 7px;
+      }
+      .summary-actions-row button {
+        font-size: 14px;
+        min-width: 90px;
+      }
     }
     .loader {
       display: inline-block;
@@ -324,61 +383,6 @@
     .submit-status.failed {
       color: #dc2626;
     }
-    .summary-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-      margin-bottom: 0;
-      justify-content: space-between;
-      flex-wrap: nowrap;
-      width: 100%;
-    }
-    .summary-actions button {
-      width: 33.33%;
-      min-width: 100px;
-      max-width: 180px;
-      margin: 0;
-      padding: 11px 0;
-      flex: 1 1 0;
-      white-space: nowrap;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px #2563eb19;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.18s, box-shadow 0.18s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-    }
-    .summary-actions button:hover, .summary-actions button:focus {
-      background: #174ea6;
-      box-shadow: 0 4px 16px #2563eb22;
-    }
-    @media (max-width: 540px) {
-      body { padding: 0; }
-      .content-section, .summary-table-section { padding: 13px 5px 10px 5px; }
-      #google-map-frame { height: 220px; }
-      h2 { font-size: 1.25em; }
-      .icon-box { width: 48px; height: 48px; font-size: 1.5rem; }
-      .summary-table-wrapper { overflow-x: auto; }
-      table.summary-table { min-width: 710px; }
-      .summary-actions {
-        flex-direction: row;
-        align-items: stretch;
-        gap: 6px;
-      }
-      .summary-actions button {
-        padding: 11px 0;
-        min-width: 90px;
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -398,9 +402,9 @@
         </ul>
       </li>
       <li><b>Start/End Location:</b> Use the "From" and "To" fields to type or pick your route. Suggestions will appear as you type.</li>
-      <li><b>Distance:</b> Enter the trip distance in kilometers in the "Distance" field and convert to KM if its in M.</li>
+      <li><b>Distance:</b> Enter the trip distance in kilometers in the "Distance" field.</li>
       <li><b>Summarize:</b> Click <b>Summarize</b> to review your trip summary and fare calculation.</li>
-      <li><b>Submit:</b> Click <b>Submit</b> to send your trip record to the database . You'll see a loader and a status message.</li>
+      <li><b>Submit:</b> Click <b>Submit</b> to send your trip record to the database (Google Sheet). You'll see a loader and a status message.</li>
       <li><b>Show Route on Map:</b> Optionally, click <b>Show Route on Google Maps</b> to see your route visually.</li>
     </ol>
     <div style="margin-top: 13px; color: #666; font-size: 14px;">
@@ -431,7 +435,6 @@
           <option value="customer">Customer</option>
         </select>
       </div>
-      <!-- Vehicle/Biker select for driver/biker -->
       <div class="vehicle-biker-select-wrapper" id="vehicle-biker-wrapper" style="display:none;">
         <div class="input-group">
           <span class="material-icons input-icon" id="vehicle-biker-icon">directions_car</span>
@@ -442,7 +445,6 @@
           </div>
         </div>
       </div>
-      <!-- Mode of transport for customer -->
       <div class="input-group" id="mode-group-wrapper" style="display:none;">
         <span class="material-icons input-icon">commute</span>
         <label for="mode-of-transport">Preferred Mode</label>
@@ -489,7 +491,7 @@
     </div>
     <div class="info-section" style="font-size:14px; color:#666;">
       <span class="material-icons" style="font-size:17px;vertical-align:middle; color:#666;margin-right:2px;">info</span>
-      This will show the route on this page and requires internet access.toggle map and get the distance between your places
+      This will show the route on this page and requires internet access.
     </div>
     <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
@@ -499,21 +501,30 @@
       Trip Summary
     </div>
     <form id="summary-form" onsubmit="event.preventDefault(); updateSummaryTable();">
-      <div class="summary-actions">
-        <button type="button" id="map-btn" onclick="toggleMap()" style="min-width:120px;">
-          <span class="material-icons">map</span><span id="map-btn-text">Map</span>
-        </button>
-        <button type="button" onclick="updateSummaryTable()" style="min-width:120px;">
+      <!-- Map toggle in its own row -->
+      <div class="single-action-row">
+        <div class="map-btn-wrapper">
+          <button type="button" id="map-btn" onclick="toggleMap()">
+            <span class="material-icons">map</span><span id="map-btn-text">Map</span>
+          </button>
+        </div>
+      </div>
+      <!-- Distance input in its own row -->
+      <div class="distance-input-row">
+        <div class="input-group" style="margin-bottom:0;">
+          <span class="material-icons input-icon">straighten</span>
+          <label for="distance-input">Distance (km)</label>
+          <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance - get from the map e.g. 2 or 0.7" required>
+        </div>
+      </div>
+      <!-- Summarize + Submit buttons in a different row -->
+      <div class="summary-actions-row">
+        <button type="button" onclick="updateSummaryTable()">
           <span class="material-icons">summarize</span>Summarize
         </button>
-        <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled style="min-width:120px;">
+        <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled>
           <span class="material-icons">send</span>Submit
         </button>
-      </div>
-      <div class="input-group" style="margin:18px 0 10px 0;">
-        <span class="material-icons input-icon">straighten</span>
-        <label for="distance-input">Distance (km)</label>
-        <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance -Get from the map " required>
       </div>
     </form>
     <div class="summary-table-wrapper">
@@ -529,6 +540,7 @@
       "Chingola", "Kabwe", "Mufulira", "Chipata", "Solwezi",
       "Kasama", "Mazabuka", "Mansa", "Mongu", "Kalulushi",
       "Siavonga", "Choma", "Petauke", "Mpika", "Samfya",
+      // Luangwa District – towns, villages, chiefdoms, landmarks
       "Luangwa (Feira)", "Kavalamanja", "Katemo", "Chitope", "Kasinsa",
       "Chikwasha", "Mphuka", "Mphuka Central", "Chankungu", "Chilenga",
       "Chinzete", "Kapoche", "Chalwe", "Kalulu", "Kapiri (Luangwa)",
@@ -546,10 +558,11 @@
       "Kavalamanja Market", "Kasinsa Market", "Mpuka Market", "Chimutengo Market", "Mwavi Market",
       "Kavalamanja Bus Station", "Feira Bus Station", "Kasinsa Bus Stop", "Mwavi Bus Stop",
       "Luangwa Clinic", "Kapoche Clinic", "Feira Lodge", "INDECO BUILDING", "Justifeli Lodge,Luangwa",
-      "Simon Njobvu's palace", "Dzalo Training Centre", "Luangwa SDA main",
+      "Simon Njobvu's palace", "Dzalo Training Centre Kambolozo", "Luangwa SDA main",
       "Makichilo Lodge Luangwa", "yellow shop Luangwa", "JB THREE BOARDERS MALL", "River spot Luangwa",
       "Gerasmos Safari Lodge", "Nyabota Lodge", "UCZ Luangwa", "Pentocostal Assembly Joshua Assembly Luangwa",
       "Feira Kingdom Hall Luangwa", "Aglican Church",
+      // Luanshya – landmarks, institutions, facilities
       "Roan General Hospital", "Thomson Hospital", "Luanshya Hospital",
       "Roan Antelope Copper Mine", "Baluba Mine", "Roan Antelope Mine Hospital",
       "Kasims Medical Center", "Masaiti Health Center", "Garden Luangwa Compound",
@@ -566,6 +579,7 @@
       "Luanshya Airport", "Luanshya Shops", "Luanshya Bars",
       "Luanshya Town Bus Station", "Mpatamatu Bus Station", "Kamirenda Bus Station",
       "Roan Bus Station", "Luanshya Intercity Bus Station",
+      // Banks in Luanshya
       "Absa Bank Luanshya", "Zanaco Luanshya", "Standard Chartered Bank Luanshya",
       "National Savings & Credit Bank Luanshya", "Finance Bank Luanshya",
       "First National Bank Luanshya"
@@ -836,7 +850,7 @@
         return;
       }
       if (isNaN(distance) || distance <= 0) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid distance in km from the map.</div>';
+        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid distance in km.</div>';
         submitBtn.disabled = true;
         summaryData = null;
         return;
