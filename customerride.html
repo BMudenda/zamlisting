@@ -316,9 +316,6 @@
       box-shadow: 0 8px 32px #2563eb33;
       transform: translateY(-2px) scale(1.03);
     }
-    .distance-input-row {
-      margin-bottom: 14px;
-    }
     .summary-actions-row {
       display: flex;
       gap: 12px;
@@ -359,9 +356,6 @@
         flex-direction: column;
         margin-bottom: 10px;
       }
-      .distance-input-row {
-        margin-bottom: 10px;
-      }
       .summary-actions-row {
         flex-direction: column;
         gap: 7px;
@@ -399,7 +393,6 @@
     .submit-status.failed {
       color: #dc2626;
     }
-    /* Mode radio selected style */
     .mode-radio.selected {
       background: #e3eafe;
       border-radius: 10px;
@@ -442,7 +435,6 @@
         <b>Mode selection:</b> Choose your preferred mode (Vehicle/Motorbike), enter your trip details, and get fare estimates. Enter your phone number (e.g. 0978167546).
       </li>
       <li><b>Start/End Location:</b> Use the "From" and "To" fields to type or pick your route. Suggestions will appear as you type.</li>
-      <li><b>Distance:</b> Enter the trip distance in kilometers in the "Distance" field.</li>
       <li><b>Summarize:</b> Click <b>Summarize</b> to review your trip summary and fare calculation.</li>
       <li><b>Submit:</b> Click <b>Submit</b> to send your trip record to. You'll see a loader and a status message.</li>
       <li><b>Show Route on Map:</b> Optionally, click <b>Show Route on Google Maps</b> to see your route visually.</li>
@@ -464,9 +456,7 @@
   <div class="content-section">
     <div class="section-title"></div>
     <div class="inputs-wrapper">
-      <!-- Hidden User Type Input -->
       <input type="hidden" id="user-type" value="customer">
-      <!-- Mode Selection -->
       <div class="input-group" id="mode-group-wrapper">
         <span class="material-icons input-icon">commute</span>
         <label for="mode-of-transport">Preferred Mode</label>
@@ -498,7 +488,7 @@
         <span class="material-icons input-icon">place</span>
         <label for="gm-origin">From</label>
         <div class="autocomplete-wrapper">
-          <input type="text" id="gm-origin" autocomplete="off" placeholder="Enter starting point" oninput="showSuggestions(this, 'gm-origin')" aria-label="Origin">
+          <input type="text" id="gm-origin" autocomplete="off" placeholder="Enter starting point" aria-label="Origin">
           <div id="gm-origin-list" class="autocomplete-list"></div>
         </div>
       </div>
@@ -506,7 +496,7 @@
         <span class="material-icons input-icon">flag</span>
         <label for="gm-destination">To</label>
         <div class="autocomplete-wrapper">
-          <input type="text" id="gm-destination" autocomplete="off" placeholder="Enter destination" oninput="showSuggestions(this, 'gm-destination')" aria-label="Destination">
+          <input type="text" id="gm-destination" autocomplete="off" placeholder="Enter destination" aria-label="Destination">
           <div id="gm-destination-list" class="autocomplete-list"></div>
         </div>
       </div>
@@ -523,7 +513,6 @@
       Trip Summary
     </div>
     <form id="summary-form" onsubmit="event.preventDefault(); updateSummaryTable();">
-      <!-- Map toggle in its own row -->
       <div class="single-action-row">
         <div class="map-btn-wrapper">
           <button type="button" id="map-btn" onclick="toggleMap()">
@@ -531,15 +520,6 @@
           </button>
         </div>
       </div>
-      <!-- Distance input in its own row -->
-      <div class="distance-input-row">
-        <div class="input-group" style="margin-bottom:0;">
-          <span class="material-icons input-icon">straighten</span>
-          <label for="distance-input">Distance (km)</label>
-          <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance - Get from the map" required>
-        </div>
-      </div>
-      <!-- Summarize + Submit buttons in a different row -->
       <div class="summary-actions-row">
         <button type="button" onclick="updateSummaryTable()">
           <span class="material-icons">summarize</span>Calculate
@@ -556,14 +536,36 @@
     <div id="loader" class="loader" style="display:none;"></div>
   </div>
   <script>
-    // List of notable places
+    // Place list and distance map for Luangwa district
     const places = [
-      "Lusaka", "Ndola", "Kitwe", "Luanshya", "Livingstone",
-      "Chingola", "Kabwe", "Mufulira", "Chipata", "Solwezi",
-      "Kasama", "Mazabuka", "Mansa", "Mongu", "Kalulushi",
-      "Siavonga", "Choma", "Petauke", "Mpika", "Samfya",
-      "RTSA Office Luanshya", "Luanshya Magistrate Court", "Luanshya Council Guesthouse"
+      "Luangwa Boma", "Katondwe", "Feira", "Kasinsa", "Kavalamanja",
+      "Chitope", "Luangwa Bridge", "Mphuka", "Kapoche", "Kanyense",
+      "Munyense", "Chipuka", "Mpuka Mission", "Kaunga"
     ];
+
+    const roadDistances = {
+      "Katondwe-Feira": 28, "Feira-Kasinsa": 12,
+      "Luangwa Boma-Katondwe": 42, "Luangwa Boma-Kavalamanja": 65,
+      "Luangwa Boma-Feira": 15, "Katondwe-Kavalamanja": 33,
+      "Luangwa Boma-Chitope": 36, "Chitope-Luangwa Bridge": 25,
+      "Luangwa Bridge-Kavalamanja": 40, "Feira-Kapoche": 30,
+      "Feira-Kanyense": 22, "Feira-Munyense": 35,
+      "Munyense-Kavalamanja": 20, "Katondwe-Mphuka": 18,
+      "Mphuka-Chitope": 15, "Chipuka-Kasinsa": 10,
+      "Kasinsa-Kanyense": 14, "Kanyense-Kaunga": 26,
+      "Mpuka Mission-Chipuka": 12
+    };
+
+    function getDistance(from, to) {
+      const key1 = `${from}-${to}`;
+      const key2 = `${to}-${from}`;
+      return roadDistances[key1] || roadDistances[key2] || null;
+    }
+
+    function calculateFare(distance, type) {
+      return type === "motorbike" ? Math.ceil(distance / 3) * 10 :
+             type === "vehicle" ? Math.ceil(distance / 3) * 20 : 0;
+    }
 
     let summaryData = null;
 
@@ -597,6 +599,7 @@
       document.getElementById('radio-motorbike').classList.toggle('selected', m.checked);
     }
 
+    // Autocomplete helpers
     function searchPlaces(value, list, maxResults = 12) {
       if (!value) return [];
       value = value.trim().toLowerCase();
@@ -650,6 +653,20 @@
         list.appendChild(item);
       });
     }
+    document.getElementById('gm-origin').addEventListener("input", function() {
+      showSuggestions(this, 'gm-origin');
+    });
+    document.getElementById('gm-destination').addEventListener("input", function() {
+      showSuggestions(this, 'gm-destination');
+    });
+
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('.autocomplete-list').forEach(list => {
+        if (!e.target.closest('.autocomplete-wrapper')) {
+          list.innerHTML = '';
+        }
+      });
+    });
 
     function toggleMap() {
       const origin = document.getElementById('gm-origin').value.trim();
@@ -678,13 +695,9 @@
       }
     }
 
-    function updateSummaryTable() {
-      const distance = parseFloat(document.getElementById('distance-input').value);
-      const origin = document.getElementById('gm-origin').value.trim();
-      const destination = document.getElementById('gm-destination').value.trim();
+    async function updateSummaryTable() {
       const container = document.getElementById('summary-table-container');
       const submitBtn = document.getElementById('submit-btn');
-      // User type is always customer
       let mode = "";
       let pricePer3Km = 20;
       let customerPhone = "";
@@ -710,18 +723,25 @@
         summaryData = null;
         return;
       }
+      const origin = document.getElementById('gm-origin').value.trim();
+      const destination = document.getElementById('gm-destination').value.trim();
       if (!origin || !destination) {
         container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter both origin and destination above.</div>';
         submitBtn.disabled = true;
         summaryData = null;
         return;
       }
-      if (isNaN(distance) || distance <= 0) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid distance in km convert to km if its in m.</div>';
+
+      // Get distance from the predefined roadDistances table
+      const distance = getDistance(origin, destination);
+
+      if (!distance) {
+        container.innerHTML = `<div style="color:red;margin-top:10px;">Distance not found for selected route.</div>`;
         submitBtn.disabled = true;
         summaryData = null;
         return;
       }
+
       // Estimate travel time (assuming average speed 60km/h)
       const avgSpeed = 60;
       const timeHours = distance / avgSpeed;
@@ -827,13 +847,6 @@
         submitBtn.disabled = false;
       });
     }
-    document.addEventListener('click', function (e) {
-      document.querySelectorAll('.autocomplete-list').forEach(list => {
-        if (!e.target.closest('.autocomplete-wrapper')) {
-          list.innerHTML = '';
-        }
-      });
-    });
   </script>
 </body>
-</html>
+                                                                                    </html>
