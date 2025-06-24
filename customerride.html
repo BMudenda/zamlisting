@@ -7,307 +7,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
-    body { 
-      font-family: 'Roboto', Arial, sans-serif; 
-      max-width: 470px; 
-      margin: auto; 
-      padding: 0;
-      background: #eaf1fc;
-    }
-    .top-controls {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-      margin-top: 14px;
-      margin-bottom: 0;
-    }
-    .toggle-btn {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 7px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 2px 8px #2563eb19;
-    }
-    .toggle-btn:hover, .toggle-btn:focus {
-      background: #174ea6;
-    }
-    .instructions-box {
-      background: #fff;
-      color: #1e293b;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px #2563eb13;
-      margin: 12px 0 18px 0;
-      padding: 18px 18px 14px 18px;
-      font-size: 15px;
-      line-height: 1.5;
-      display: none;
-      animation: fadeIn .4s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0;}
-      to { opacity: 1;}
-    }
-    h2 {
-      text-align: center;
-      color: #2563eb; 
-      margin: 18px 0 12px 0;
-      font-weight: 700;
-      letter-spacing: 1px;
-      font-size: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .icon-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 38px;
-      margin-bottom: 24px;
-      margin-top: 10px;
-    }
-    .icon-box {
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 2px 12px #2563eb19;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 66px;
-      height: 66px;
-      border: 3px solid #2563eb;
-      font-size: 2.5rem;
-      color: #2563eb;
-    }
-    .content-section, .summary-table-section {
-      background: #fff;
-      padding: 30px 20px 22px 20px;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08);
-      margin: 22px 0 18px 0;
-      position: relative;
-      overflow: hidden;
-    }
-    .section-title {
-      font-weight: 700;
-      color: #2563eb;
-      font-size: 17px;
-      margin-bottom: 10px;
-      letter-spacing: .05em;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .inputs-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      margin: 15px 0;
-    }
-    .input-group {
-      position: relative;
-      background: #f5f7fa;
-      border-radius: 7px;
-      padding: 16px 14px 8px 48px;
-      box-shadow: 0 1px 3px #2563eb11;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-    }
-    .input-group label {
-      font-weight: 500;
-      color: #2563eb;
-      font-size: 13px;
-      margin-bottom: 2px;
-      letter-spacing: .1em;
-    }
-    .input-group .material-icons.input-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #2563eb;
-      font-size: 25px;
-      opacity: 0.85;
-    }
-    .autocomplete-wrapper, .vehicle-autocomplete-wrapper, .biker-autocomplete-wrapper {
-      width: 100%;
-      position: relative;
-    }
-    input, select {
-      width: 100%;
-      padding: 13px 12px;
-      margin: 3px 0 0 0;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1.5px solid #e5e7eb;
-      transition: border 0.2s, box-shadow 0.2s;
-      font-family: 'Roboto', Arial, sans-serif;
-      outline: none;
-      background: #fff;
-      min-width: 0;
-      box-sizing: border-box;
-      display: block;
-    }
-    input:focus, select:focus {
-      border: 1.5px solid #2563eb;
-      box-shadow: 0 0 0 2px #93c5fd55;
-      background: #fff;
-    }
-    .autocomplete-list, .vehicle-autocomplete-list, .biker-autocomplete-list {
-      position: absolute;
-      background: white;
-      border: 1px solid #b6c1dd;
-      max-height: 140px;
-      overflow-y: auto;
-      z-index: 1000;
-      width: 100%;
-      border-radius: 0 0 5px 5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-      left: 0;
-      top: 100%;
-    }
-    .autocomplete-item, .vehicle-autocomplete-item, .biker-autocomplete-item {
-      padding: 10px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 15px;
-      color: #1e293b;
-      transition: background 0.13s;
-    }
-    .autocomplete-item:last-child, .vehicle-autocomplete-item:last-child, .biker-autocomplete-item:last-child {
-      border-bottom: none;
-    }
-    .autocomplete-item:hover, .autocomplete-item.active,
-    .vehicle-autocomplete-item:hover, .vehicle-autocomplete-item.active,
-    .biker-autocomplete-item:hover, .biker-autocomplete-item.active {
-      background-color: #f0f6ff;
-      color: #2563eb;
-    }
-    .info-section {
-      padding: 12px 0 5px 0;
-      color: #475569;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    #google-map-frame {
-      width: 100%;
-      height: 390px;
-      border: none;
-      margin-top: 12px;
-      display: none;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(66,133,244,0.10);
-      background: #f1f5f9;
-      transition: box-shadow 0.2s;
-    }
-    .summary-table-section {
-      overflow-x: auto;
-      padding-bottom: 18px;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08);
-      margin: 22px 0 18px 0;
-    }
-    .section-title {
-      font-weight: 700;
-      color: #2563eb;
-      font-size: 17px;
-      margin-bottom: 10px;
-      letter-spacing: .05em;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    /* Improved arrangement for action and summary */
-    .summary-actions-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-    .summary-actions-row.single {
-      margin-bottom: 0;
-    }
-    .summary-actions-row.submit-row {
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-    @media (max-width: 540px) {
-      .summary-actions-row {
-        flex-direction: column;
-        gap: 7px;
-      }
-    }
-    .summary-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      display: flex;
-      justify-content: center;
-      margin: 15px 0;
-    }
-    table.summary-table {
-      min-width: 710px;
-      width: auto;
-      border-collapse: collapse;
-      font-size: 15px;
-      background: #f9fbfd;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 1px 6px #2563eb11;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    table.summary-table th, table.summary-table td {
-      border: 1px solid #dbeafe;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    table.summary-table th {
-      background-color: #e7f0fe;
-      color: #222;
-      font-weight: 700;
-    }
-    table.summary-table td {
-      color: #2d3a4a;
-      font-weight: 500;
-    }
-    .material-icons {
-      font-size: 23px;
-      vertical-align: middle;
-      color: #2563eb;
-      margin-right: 2px;
-    }
-    .summary-table-section .material-icons {
-      font-size: 18px;
-      margin-right: 3px;
-    }
-    .single-action-row {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      margin-bottom: 14px;
-      margin-top: 0;
-      gap: 0;
-    }
-    .single-action-row .map-btn-wrapper {
-      width: 100%;
-      display: flex;
-      justify-content: flex-start;
-    }
+    body { font-family: 'Roboto', Arial, sans-serif; max-width: 470px; margin: auto; padding: 0; background: #eaf1fc; }
+    .top-controls { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 14px; margin-bottom: 0; }
+    .toggle-btn { background: #2563eb; color: #fff; border: none; font-weight: 500; padding: 8px 16px; border-radius: 7px; font-size: 15px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 8px #2563eb19; }
+    .toggle-btn:hover, .toggle-btn:focus { background: #174ea6; }
+    .instructions-box { background: #fff; color: #1e293b; border-radius: 10px; box-shadow: 0 2px 10px #2563eb13; margin: 12px 0 18px 0; padding: 18px 18px 14px 18px; font-size: 15px; line-height: 1.5; display: none; animation: fadeIn .4s;}
+    @keyframes fadeIn { from { opacity: 0;} to { opacity: 1;} }
+    h2 { text-align: center; color: #2563eb; margin: 18px 0 12px 0; font-weight: 700; letter-spacing: 1px; font-size: 2rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .icon-row { display: flex; justify-content: center; align-items: center; gap: 38px; margin-bottom: 24px; margin-top: 10px; }
+    .icon-box { background: #fff; border-radius: 50%; box-shadow: 0 2px 12px #2563eb19; display: flex; align-items: center; justify-content: center; width: 66px; height: 66px; border: 3px solid #2563eb; font-size: 2.5rem; color: #2563eb; }
+    .content-section, .summary-table-section { background: #fff; padding: 30px 20px 22px 20px; border-radius: 14px; box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08); margin: 22px 0 18px 0; position: relative; overflow: hidden; }
+    .section-title { font-weight: 700; color: #2563eb; font-size: 17px; margin-bottom: 10px; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; }
+    .inputs-wrapper { display: flex; flex-direction: column; gap: 25px; margin: 15px 0; }
+    .input-group { position: relative; background: #f5f7fa; border-radius: 7px; padding: 16px 14px 8px 48px; box-shadow: 0 1px 3px #2563eb11; display: flex; flex-direction: column; justify-content: center; width: 100%; min-width: 0; box-sizing: border-box;}
+    .input-group label { font-weight: 500; color: #2563eb; font-size: 13px; margin-bottom: 2px; letter-spacing: .1em; }
+    .input-group .material-icons.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #2563eb; font-size: 25px; opacity: 0.85; }
+    .autocomplete-wrapper { width: 100%; position: relative; }
+    input, select { width: 100%; padding: 13px 12px; margin: 3px 0 0 0; font-size: 16px; border-radius: 5px; border: 1.5px solid #e5e7eb; transition: border 0.2s, box-shadow 0.2s; font-family: 'Roboto', Arial, sans-serif; outline: none; background: #fff; min-width: 0; box-sizing: border-box; display: block; }
+    input:focus, select:focus { border: 1.5px solid #2563eb; box-shadow: 0 0 0 2px #93c5fd55; background: #fff; }
+    .autocomplete-list { position: absolute; background: white; border: 1px solid #b6c1dd; max-height: 140px; overflow-y: auto; z-index: 1000; width: 100%; border-radius: 0 0 5px 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.13); left: 0; top: 100%; }
+    .autocomplete-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #1e293b; transition: background 0.13s; }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover, .autocomplete-item.active { background-color: #f0f6ff; color: #2563eb; }
+    .info-section { padding: 12px 0 5px 0; color: #475569; font-size: 16px; line-height: 1.5; }
+    #google-map-frame { width: 100%; height: 390px; border: none; margin-top: 12px; display: none; border-radius: 10px; box-shadow: 0 2px 12px rgba(66,133,244,0.10); background: #f1f5f9; transition: box-shadow 0.2s; }
+    .summary-table-section { overflow-x: auto; padding-bottom: 18px; background: #fff; border-radius: 14px; box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08); margin: 22px 0 18px 0; }
+    .section-title { font-weight: 700; color: #2563eb; font-size: 17px; margin-bottom: 10px; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; }
+    .summary-actions-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; }
+    .summary-actions-row.single { margin-bottom: 0; }
+    .summary-actions-row.submit-row { margin-top: 0; margin-bottom: 8px; }
+    @media (max-width: 540px) { .summary-actions-row { flex-direction: column; gap: 7px; } }
+    .summary-table-wrapper { width: 100%; overflow-x: auto; display: flex; justify-content: center; margin: 15px 0; }
+    table.summary-table { min-width: 710px; width: auto; border-collapse: collapse; font-size: 15px; background: #f9fbfd; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 6px #2563eb11; margin-left: auto; margin-right: auto; }
+    table.summary-table th, table.summary-table td { border: 1px solid #dbeafe; padding: 8px 12px; text-align: left; }
+    table.summary-table th { background-color: #e7f0fe; color: #222; font-weight: 700; }
+    table.summary-table td { color: #2d3a4a; font-weight: 500; }
+    .material-icons { font-size: 23px; vertical-align: middle; color: #2563eb; margin-right: 2px; }
+    .summary-table-section .material-icons { font-size: 18px; margin-right: 3px; }
+    .single-action-row { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 14px; margin-top: 0; gap: 0; }
+    .single-action-row .map-btn-wrapper { width: 100%; display: flex; justify-content: flex-start; }
     .single-action-row button,
     .summary-actions-row button {
       width: 100%;
@@ -335,44 +73,14 @@
       background: #174ea6;
       box-shadow: 0 4px 16px #2563eb22;
     }
-    .loader {
-      display: inline-block;
-      width: 26px;
-      height: 26px;
-      border: 3px solid #2563eb;
-      border-radius: 50%;
-      border-top: 3px solid #e5e7eb;
-      animation: spin 1s linear infinite;
-      vertical-align: middle;
-      margin-right: 7px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-    .submit-status {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-top: 10px;
-      font-weight: 500;
-    }
-    .submit-status.success {
-      color: #1aaf5d;
-    }
-    .submit-status.failed {
-      color: #dc2626;
-    }
-    /* Hide the user type select */
-    #user-type {
-      display: none !important;
-    }
-    .input-group label[for="user-type"] {
-      display: none !important;
-    }
-    .distance-input-row {
-      display: none !important;
-    }
+    .loader { display: inline-block; width: 26px; height: 26px; border: 3px solid #2563eb; border-radius: 50%; border-top: 3px solid #e5e7eb; animation: spin 1s linear infinite; vertical-align: middle; margin-right: 7px;}
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .submit-status { display: flex; align-items: center; gap: 7px; margin-top: 10px; font-weight: 500; }
+    .submit-status.success { color: #1aaf5d; }
+    .submit-status.failed { color: #dc2626; }
+    #user-type { display: none !important; }
+    .input-group label[for="user-type"] { display: none !important; }
+    .distance-input-row { display: none !important; }
   </style>
 </head>
 <body>
@@ -421,16 +129,6 @@
           <option value="biker">Biker</option>
           <option value="driver">Driver</option>
         </select>
-      </div>
-      <div class="vehicle-biker-select-wrapper" id="vehicle-biker-wrapper" style="display:none;">
-        <div class="input-group">
-          <span class="material-icons input-icon" id="vehicle-biker-icon">directions_car</span>
-          <label id="vehicle-biker-label">Select Vehicle</label>
-          <div class="vehicle-autocomplete-wrapper">
-            <input type="text" id="vehicle-biker-select" autocomplete="off" placeholder="Type to search..." oninput="showVehicleBikerSuggestions()">
-            <div id="vehicle-biker-list" class="vehicle-autocomplete-list"></div>
-          </div>
-        </div>
       </div>
       <div class="input-group" id="mode-group-wrapper">
         <span class="material-icons input-icon">commute</span>
@@ -495,175 +193,111 @@
           </button>
         </div>
       </div>
-
-      <!-- Calculate Action -->
       <div class="summary-actions-row single">
         <button type="button" onclick="updateSummaryTable()">
           <span class="material-icons">summarize</span>Calculate
         </button>
       </div>
-
-      <!-- Summary Table -->
       <div class="summary-table-wrapper">
         <div id="summary-table-container"></div>
       </div>
-
-      <!-- Submit Action -->
       <div class="summary-actions-row submit-row">
         <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled>
           <span class="material-icons">send</span>Submit
         </button>
       </div>
-
-      <!-- Status and Loader -->
       <div id="submit-status"></div>
       <div id="loader" class="loader" style="display:none;"></div>
     </form>
   </div>
   <script>
-    // PRESET PLACES AND SEGMENT DISTANCES FOR AUTO DISTANCE CALCULATION
+    // Consolidated places and segments
     const places = [
-      "Lusaka","Luangwa Bridge Market","Chitope","Mwavi Secondary School","Mburuma local court","Katondwe Hospital Administration",
-      "Luangwa Secondary School","Luangwa (Feira)","Luangwa District Hospital","Simon Njobvu's palace","Luangwa Market",
-      "Luangwa Bus Station","Luangwa Police Station","Luangwa Post Office","Luangwa District Council","Feira Day Secondary School",
-      "Boma Clinic","Kavalamanja","Kasinsa"
+      "Luangwa Bus Station",
+      "Katondwe administration",
+      "Luangwa Market",
+      "Kasinsa",
+      "Luangwa (Feira)",
+      "Luangwa District Hospital",
+      "Kavalamanja"
+      // ...add all other key places here
     ];
-    // Distances between consecutive places above
-    const distancesBetween = [
-      233,      // Lusaka → Luangwa Bridge Market
-      29,       // Luangwa Bridge Market→ Luangwa Chitope
-      1.1,      // Chitope → Mwavi Secondary School
-      0.65,     // Mwavi Secondary School → Mburuma Local Court
-      7.8,       // Mburuma Local court→ Katondwe Hospital Administration
-      5.2,       // Katondwe Hospital Admin→ Luangwa Secondary School
-      1.8,      // Chitope → Kansisa
-      321,      // Lusaka → Luangwa (Feira)
-      5.1,      // Luangwa (Feira) → Hospital
-      2.1,      // Hospital → Simon Njobvu's Palace
-      3.1,      // Hospital → Market
-      0.1,      // Market → Bus Station
-      0.55,     // Bus Station → Police
-      1.1,      // Police → Post Office
-      0.7,      // Post Office → Council
-      1.8,      // Council → Feira Day Secondary School
-      4.2,      // Secondary School → Boma
-      22,       // Boma → Kavalamanja
-      74        // Kavalamanja → Kasinsa
+    // List every direct road segment between places
+    const segments = [
+      { from: "Luangwa Bus Station", to: "Katondwe administration", distance: 52 },
+      { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.1 },
+      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 2.5 },
+      { from: "Luangwa (Feira)", to: "Luangwa District Hospital", distance: 4.6 },
+      { from: "Luangwa District Hospital", to: "Kavalamanja", distance: 65 },
+      { from: "Katondwe administration", to: "Kasinsa", distance: 45 },
+      { from: "Kavalamanja", to: "Kasinsa", distance: 56 }
+      // ...add all other direct segments for your area
     ];
 
-    // Vehicles and bikers (sample)
-    const vehicles = [
-      { reg: "ALB123", name: "John Banda", phone: "0977000001" },
-      { reg: "BGR456", name: "Mary Mwansa", phone: "0977000002" },
-      { reg: "ZED789", name: "James Phiri", phone: "0977000003" }
-    ];
-    const bikers = [
-      { reg: "BK001", name: "Peter Zulu", phone: "0977001111" },
-      { reg: "BK002", name: "Chola Katongo", phone: "0977002222" },
-      { reg: "BK003", name: "Mwila Chanda", phone: "0977003333" }
-    ];
-
-    let summaryData = null;
-    let selectedVehicleBiker = null;
-
-    function toggleInstructions() {
-      const box = document.getElementById('instructions-box');
-      const btn = document.getElementById('toggle-instructions-btn');
-      if (box.style.display === "block") {
-        box.style.display = "none";
-        btn.innerHTML = '<span class="material-icons">info</span>Instructions';
-      } else {
-        box.style.display = "block";
-        btn.innerHTML = '<span class="material-icons">close</span>Hide Instructions';
-      }
+    function buildGraph(segments) {
+      const graph = {};
+      segments.forEach(seg => {
+        if (!graph[seg.from]) graph[seg.from] = [];
+        if (!graph[seg.to]) graph[seg.to] = [];
+        graph[seg.from].push({ place: seg.to, distance: seg.distance });
+        graph[seg.to].push({ place: seg.from, distance: seg.distance }); // undirected
+      });
+      return graph;
     }
 
-    // Always default to customer and hide user section logic
+    function findShortestDistance(from, to, segments) {
+      const graph = buildGraph(segments);
+      if (!graph[from] || !graph[to]) return null;
+      const distances = {};
+      const visited = new Set();
+      places.forEach(place => distances[place] = Infinity);
+      distances[from] = 0;
+      let queue = [{ place: from, dist: 0 }];
+      while (queue.length > 0) {
+        queue.sort((a, b) => a.dist - b.dist);
+        const { place, dist } = queue.shift();
+        if (place === to) return dist;
+        if (visited.has(place)) continue;
+        visited.add(place);
+        for (let neighbor of (graph[place] || [])) {
+          if (dist + neighbor.distance < distances[neighbor.place]) {
+            distances[neighbor.place] = dist + neighbor.distance;
+            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
+          }
+        }
+      }
+      return null;
+    }
+
     window.onload = function() {
       document.getElementById('user-type').value = 'customer';
       document.getElementById('mode-group-wrapper').style.display = '';
       document.getElementById('customer-phone-wrapper').style.display = '';
     };
 
-    function handleUserTypeChange() {
-      // No-op: user cannot change user type
-    }
-
-    function handleCustomerPhoneInput() {
-      // Always show phone input for customer default
-      document.getElementById('customer-phone-wrapper').style.display = '';
-    }
-
-    function showVehicleBikerSuggestions() { /* No-op for customer */ }
-
-    function handleModeChange() {
-      const v = document.getElementById('mode-vehicle');
-      const m = document.getElementById('mode-motorbike');
-      document.getElementById('radio-vehicle').classList.toggle('selected', v.checked);
-      document.getElementById('radio-motorbike').classList.toggle('selected', m.checked);
-    }
-
-    function searchPlaces(value, list, maxResults = 12) {
-      if (!value) return [];
-      value = value.trim().toLowerCase();
-
-      const startsWith = [], wordMatch = [], contains = [], fuzzy = [];
-      for (let place of list) {
-        const p = place.toLowerCase();
-        if (p.startsWith(value)) {
-          startsWith.push(place);
-        } else if (p.split(/[\s,()-]+/).some(w => w.startsWith(value) && w.length > value.length)) {
-          wordMatch.push(place);
-        } else if (p.includes(value)) {
-          contains.push(place);
-        } else if (value.length >= 3 && getEditDistance(p, value) === 1) {
-          fuzzy.push(place);
-        }
-        if (startsWith.length + wordMatch.length + contains.length + fuzzy.length >= maxResults * 2) break;
-      }
-      const all = startsWith.concat(wordMatch, contains, fuzzy);
-      return Array.from(new Set(all)).slice(0, maxResults);
-    }
-    function getEditDistance(a, b) {
-      if (Math.abs(a.length - b.length) > 2) return 99;
-      const m = a.length, n = b.length;
-      const dp = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));
-      for (let i = 0; i <= m; i++) dp[i][0] = i;
-      for (let j = 0; j <= n; j++) dp[0][j] = j;
-      for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-          if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
-          else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
-        }
-      }
-      return dp[m][n];
-    }
+    function handleUserTypeChange() {}
+    function handleCustomerPhoneInput() { document.getElementById('customer-phone-wrapper').style.display = ''; }
     function showSuggestions(input, field) {
       const listId = field + '-list';
       const list = document.getElementById(listId);
       const value = input.value;
       list.innerHTML = '';
       if (!value) return;
-      const filtered = searchPlaces(value, places, 12);
+      const filtered = places.filter(place => place.toLowerCase().includes(value.trim().toLowerCase()));
       filtered.forEach(place => {
         const item = document.createElement('div');
         item.classList.add('autocomplete-item');
         item.textContent = place;
-        item.onclick = () => {
-          input.value = place;
-          list.innerHTML = '';
-        };
+        item.onclick = () => { input.value = place; list.innerHTML = ''; };
         list.appendChild(item);
       });
     }
-
     function toggleMap() {
       const origin = document.getElementById('gm-origin').value.trim();
       const destination = document.getElementById('gm-destination').value.trim();
       const frame = document.getElementById('google-map-frame');
       const mapBtn = document.getElementById('map-btn');
       const mapBtnText = document.getElementById('map-btn-text');
-
       if (frame.style.display === "none" || frame.style.display === "") {
         if (!origin || !destination) {
           alert("Please enter both origin and destination.");
@@ -683,42 +317,23 @@
         mapBtn.setAttribute('aria-pressed', 'false');
       }
     }
-
-    function getPresetDistance(from, to) {
-      const start = places.indexOf(from);
-      const end = places.indexOf(to);
-      if (start === -1 || end === -1 || start === end) return null;
-      let distance = 0;
-      if (start < end) {
-        for (let i = start; i < end; i++) distance += distancesBetween[i];
-      } else {
-        for (let i = end; i < start; i++) distance += distancesBetween[i];
-      }
-      return distance;
-    }
-
     function updateSummaryTable() {
       const origin = document.getElementById('gm-origin').value.trim();
       const destination = document.getElementById('gm-destination').value.trim();
       const userType = "Customer";
       const container = document.getElementById('summary-table-container');
       const submitBtn = document.getElementById('submit-btn');
-
       let mode = "";
       let pricePer3Km = 20;
       let customerPhone = "";
       let distance = null;
-
-      // Use preset distance only
-      distance = getPresetDistance(origin, destination);
-
-      if (distance === null) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter both origin and destination from the supported list.</div>';
+      distance = findShortestDistance(origin, destination, segments);
+      if (distance === null || isNaN(distance)) {
+        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter both origin and destination from the supported list, and ensure a route exists between them.</div>';
         submitBtn.disabled = true;
         summaryData = null;
         return;
       }
-
       const v = document.getElementById('mode-vehicle').checked;
       const m = document.getElementById('mode-motorbike').checked;
       if (!v && !m) {
@@ -727,13 +342,8 @@
         summaryData = null;
         return;
       }
-      if (v) {
-        mode = "Vehicle";
-        pricePer3Km = 20;
-      } else if (m) {
-        mode = "Motorbike";
-        pricePer3Km = 10;
-      }
+      if (v) { mode = "Vehicle"; pricePer3Km = 20; }
+      else if (m) { mode = "Motorbike"; pricePer3Km = 10; }
       customerPhone = document.getElementById('customer-phone').value.trim();
       if (!customerPhone.match(/^0[0-9]{9}$/)) {
         container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid phone number in the format 0978167546.</div>';
@@ -741,24 +351,14 @@
         summaryData = null;
         return;
       }
-
-      // Estimate travel time (assuming average speed 60km/h)
       const avgSpeed = 60;
       const timeHours = distance / avgSpeed;
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
-
-      // Price calculation: K20 per 3km for vehicle, K10 per 3km for motorbike or biker
       let price = Math.ceil(distance / 3) * pricePer3Km;
-
       let timeText = "";
-      if (wholeHours > 0) {
-        timeText += wholeHours + " hr";
-        if (minutes > 0) timeText += " " + minutes + " min";
-      } else {
-        timeText += minutes + " min";
-      }
-
+      if (wholeHours > 0) { timeText += wholeHours + " hr"; if (minutes > 0) timeText += " " + minutes + " min"; }
+      else { timeText += minutes + " min"; }
       let tableHeader = `
         <tr>
           <th>User Type</th>
@@ -775,18 +375,16 @@
           <td>${mode}</td><td>${customerPhone}</td>
           <td>${origin}</td>
           <td>${destination}</td>
-          <td>${distance}</td>
+          <td>${distance.toFixed(2)}</td>
           <td>${timeText}</td>
           <td><b>K${price}</b></td>
         </tr>`;
-
       container.innerHTML = `
         <table class="summary-table">
           ${tableHeader}
           ${tableRow}
         </table>
       `;
-
       summaryData = {
         userType: userType,
         preferredMode: mode,
@@ -795,15 +393,13 @@
         phone: customerPhone,
         from: origin,
         to: destination,
-        distance: distance,
+        distance: distance.toFixed(2),
         estimatedTime: timeText,
         price: price
       };
       submitBtn.disabled = false;
       document.getElementById('submit-status').innerHTML = '';
     }
-
-    // Substitute with your Google Script URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
     function submitToGoogleSheet() {
       const submitBtn = document.getElementById('submit-btn');
@@ -820,7 +416,6 @@
           return;
         }
       }
-
       submitBtn.disabled = true;
       loader.style.display = "inline-block";
       statusDiv.innerHTML = "";
