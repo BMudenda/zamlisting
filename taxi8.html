@@ -7,327 +7,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
-    body { 
-      font-family: 'Roboto', Arial, sans-serif; 
-      max-width: 470px; 
-      margin: auto; 
-      padding: 0;
-      background: #eaf1fc;
-    }
-    .top-controls {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-      margin-top: 14px;
-      margin-bottom: 0;
-    }
-    .toggle-btn {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 7px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 2px 8px #2563eb19;
-    }
-    .toggle-btn:hover, .toggle-btn:focus {
-      background: #174ea6;
-    }
-    .instructions-box {
-      background: #fff;
-      color: #1e293b;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px #2563eb13;
-      margin: 12px 0 18px 0;
-      padding: 18px 18px 14px 18px;
-      font-size: 15px;
-      line-height: 1.5;
-      display: none;
-      animation: fadeIn .4s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0;}
-      to { opacity: 1;}
-    }
-
-        /* Tooltips */
-    
-
-
-
-
-
-    
-    h2 {
-      text-align: center;
-      color: #2563eb; 
-      margin: 18px 0 12px 0;
-      font-weight: 700;
-      letter-spacing: 1px;
-      font-size: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .icon-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 38px;
-      margin-bottom: 24px;
-      margin-top: 10px;
-    }
-    .icon-box {
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 2px 12px #2563eb19;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 66px;
-      height: 66px;
-      border: 3px solid #2563eb;
-      font-size: 2.5rem;
-      color: #2563eb;
-    }
-    .content-section, .summary-table-section {
-      background: #fff;
-      padding: 30px 20px 22px 20px;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08);
-      margin: 22px 0 18px 0;
-      position: relative;
-      overflow: hidden;
-    }
-    .section-title {
-      font-weight: 700;
-      color: #2563eb;
-      font-size: 17px;
-      margin-bottom: 10px;
-      letter-spacing: .05em;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .inputs-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      margin: 15px 0;
-    }
-    .input-group {
-      position: relative;
-      background: #f5f7fa;
-      border-radius: 7px;
-      padding: 16px 14px 8px 48px;
-      box-shadow: 0 1px 3px #2563eb11;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-    }
-    .input-group label {
-      font-weight: 500;
-      color: #2563eb;
-      font-size: 13px;
-      margin-bottom: 2px;
-      letter-spacing: .1em;
-    }
-    .input-group .material-icons.input-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #2563eb;
-      font-size: 25px;
-      opacity: 0.85;
-    }
-    .autocomplete-wrapper, .vehicle-autocomplete-wrapper, .biker-autocomplete-wrapper {
-      width: 100%;
-      position: relative;
-    }
-    input, select {
-      width: 100%;
-      padding: 13px 12px;
-      margin: 3px 0 0 0;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1.5px solid #e5e7eb;
-      transition: border 0.2s, box-shadow 0.2s;
-      font-family: 'Roboto', Arial, sans-serif;
-      outline: none;
-      background: #fff;
-      min-width: 0;
-      box-sizing: border-box;
-      display: block;
-    }
-    input:focus, select:focus {
-      border: 1.5px solid #2563eb;
-      box-shadow: 0 0 0 2px #93c5fd55;
-      background: #fff;
-    }
-    .autocomplete-list, .vehicle-autocomplete-list, .biker-autocomplete-list {
-      position: absolute;
-      background: white;
-      border: 1px solid #b6c1dd;
-      max-height: 140px;
-      overflow-y: auto;
-      z-index: 1000;
-      width: 100%;
-      border-radius: 0 0 5px 5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-      left: 0;
-      top: 100%;
-    }
-    .autocomplete-item, .vehicle-autocomplete-item, .biker-autocomplete-item {
-      padding: 10px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 15px;
-      color: #1e293b;
-      transition: background 0.13s;
-    }
-    .autocomplete-item:last-child, .vehicle-autocomplete-item:last-child, .biker-autocomplete-item:last-child {
-      border-bottom: none;
-    }
-    .autocomplete-item:hover, .autocomplete-item.active,
-    .vehicle-autocomplete-item:hover, .vehicle-autocomplete-item.active,
-    .biker-autocomplete-item:hover, .biker-autocomplete-item.active {
-      background-color: #f0f6ff;
-      color: #2563eb;
-    }
-    .info-section {
-      padding: 12px 0 5px 0;
-      color: #475569;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    #google-map-frame {
-      width: 100%;
-      height: 390px;
-      border: none;
-      margin-top: 12px;
-      display: none;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(66,133,244,0.10);
-      background: #f1f5f9;
-      transition: box-shadow 0.2s;
-    }
-    .summary-table-section {
-      overflow-x: auto;
-      padding-bottom: 18px;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08);
-      margin: 22px 0 18px 0;
-    }
-    .summary-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      margin-top: 8px;
-      display: flex;
-      justify-content: center;
-    }
-    table.summary-table {
-      min-width: 710px;
-      width: auto;
-      border-collapse: collapse;
-      font-size: 15px;
-      background: #f9fbfd;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 1px 6px #2563eb11;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    table.summary-table th, table.summary-table td {
-      border: 1px solid #dbeafe;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    table.summary-table th {
-      background-color: #e7f0fe;
-      color: #222;
-      font-weight: 700;
-    }
-    table.summary-table td {
-      color: #2d3a4a;
-      font-weight: 500;
-    }
-    .material-icons {
-      font-size: 23px;
-      vertical-align: middle;
-      color: #2563eb;
-      margin-right: 2px;
-    }
-    .summary-table-section .material-icons {
-      font-size: 18px;
-      margin-right: 3px;
-    }
-    .single-action-row {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      margin-bottom: 14px;
-      margin-top: 0;
-      gap: 0;
-    }
-    .single-action-row .map-btn-wrapper {
-      width: 100%;
-      display: flex;
-      justify-content: flex-start;
-    }
-    .single-action-row button {
-      min-width: 120px;
-      max-width: 220px;
-      padding: 11px 0;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px #2563eb19;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.18s, box-shadow 0.18s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-    }
-    .single-action-row button:hover, .single-action-row button:focus {
-      background: #174ea6;
-      box-shadow: 0 4px 16px #2563eb22;
-    }
-    .distance-input-row {
-      margin-bottom: 14px;
-    }
-    .summary-actions-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 8px;
-      margin-top: 0;
-      justify-content: space-between;
-      flex-wrap: nowrap;
-      width: 100%;
-    }
+    body { font-family: 'Roboto', Arial, sans-serif; max-width: 470px; margin: auto; padding: 0; background: #eaf1fc; }
+    .top-controls { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 14px; margin-bottom: 0; }
+    .toggle-btn { background: #2563eb; color: #fff; border: none; font-weight: 500; padding: 8px 16px; border-radius: 7px; font-size: 15px; cursor: pointer; transition: background 0.2s; display: flex; }
+    .toggle-btn:hover, .toggle-btn:focus { background: #174ea6; }
+    .instructions-box { background: #fff; color: #1e293b; border-radius: 10px; box-shadow: 0 2px 10px #2563eb13; margin: 12px 0 18px 0; padding: 18px 18px 14px 18px; font-size: 15px; line-height: 1.5; }
+    h2 { text-align: center; color: #2563eb; margin: 18px 0 12px 0; font-weight: 700; letter-spacing: 1px; font-size: 2rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .icon-row { display: flex; justify-content: center; align-items: center; gap: 38px; margin-bottom: 24px; margin-top: 10px; }
+    .icon-box { background: #fff; border-radius: 50%; box-shadow: 0 2px 12px #2563eb19; display: flex; align-items: center; justify-content: center; width: 66px; height: 66px; border: 3px solid #2563eb; }
+    .content-section, .summary-table-section { background: #fff; padding: 30px 20px 22px 20px; border-radius: 14px; box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08); margin: 22px 0 18px 0; position: relative; }
+    .section-title { font-weight: 700; color: #2563eb; font-size: 17px; margin-bottom: 10px; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; }
+    .inputs-wrapper { display: flex; flex-direction: column; gap: 25px; margin: 15px 0; }
+    .input-group { position: relative; background: #f5f7fa; border-radius: 7px; padding: 16px 14px 8px 48px; box-shadow: 0 1px 3px #2563eb11; display: flex; flex-direction: column; justify-content: center; }
+    .input-group label { font-weight: 500; color: #2563eb; font-size: 13px; margin-bottom: 2px; letter-spacing: .1em; }
+    .input-group .material-icons.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #2563eb; font-size: 25px; opacity: 0.85; }
+    .autocomplete-wrapper, .vehicle-autocomplete-wrapper { width: 100%; position: relative; }
+    input, select { width: 100%; padding: 13px 12px; margin: 3px 0 0 0; font-size: 16px; border-radius: 5px; border: 1.5px solid #e5e7eb; transition: border 0.2s, box-shadow 0.2s; font-family: 'Roboto', Arial, sans-serif; }
+    input:focus, select:focus { border: 1.5px solid #2563eb; box-shadow: 0 0 0 2px #93c5fd55; background: #fff; }
+    .autocomplete-list, .vehicle-autocomplete-list { position: absolute; background: white; border: 1px solid #b6c1dd; max-height: 140px; overflow-y: auto; z-index: 1000; width: 100%; border-radius: 0 0 5px 5px; box-shadow: 0 2px 8px #2563eb18; }
+    .autocomplete-item, .vehicle-autocomplete-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #1e293b; transition: background 0.13s; }
+    .autocomplete-item:last-child, .vehicle-autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover, .autocomplete-item.active, .vehicle-autocomplete-item:hover, .vehicle-autocomplete-item.active { background-color: #f0f6ff; color: #2563eb; }
+    .info-section { padding: 12px 0 5px 0; color: #475569; font-size: 16px; line-height: 1.5; }
+    #google-map-frame { width: 100%; height: 390px; border: none; margin-top: 12px; display: none; border-radius: 10px; box-shadow: 0 2px 12px rgba(66,133,244,0.10); background: #f1f5f9; transition: box-shadow 0.2s; }
+    .summary-table-section { overflow-x: auto; padding-bottom: 18px; background: #fff; border-radius: 14px; box-shadow: 0 4px 16px 0 rgba(66,133,244,0.08); margin: 22px 0 18px 0; }
+    .summary-actions-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; }
+    .summary-actions-row.single { margin-bottom: 0; }
+    .summary-actions-row.submit-row { margin-top: 0; margin-bottom: 8px; }
+    @media (max-width: 540px) { .summary-actions-row { flex-direction: column; gap: 7px; } }
+    .summary-table-wrapper { width: 100%; overflow-x: auto; display: flex; justify-content: center; margin: 15px 0; }
+    table.summary-table { min-width: 710px; width: auto; border-collapse: collapse; font-size: 15px; background: #f9fbfd; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 6px #2563eb11; margin: 0 auto; }
+    table.summary-table th, table.summary-table td { border: 1px solid #dbeafe; padding: 8px 12px; text-align: left; }
+    table.summary-table th { background-color: #e7f0fe; color: #222; font-weight: 700; }
+    table.summary-table td { color: #2d3a4a; font-weight: 500; }
+    .material-icons { font-size: 23px; vertical-align: middle; color: #2563eb; margin-right: 2px; }
+    .summary-table-section .material-icons { font-size: 18px; margin-right: 3px; }
+    .single-action-row { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 14px; margin-top: 0; gap: 0; }
+    .single-action-row .map-btn-wrapper { width: 100%; display: flex; justify-content: flex-start; }
+    .single-action-row button,
     .summary-actions-row button {
-      flex: 1 1 0;
-      min-width: 100px;
-      max-width: 180px;
-      padding: 11px 0;
-      margin: 0;
+      width: 100%;
+      min-width: 180px;
+      max-width: 350px;
+      padding: 13px 0;
       background: #2563eb;
       color: #fff;
       border: none;
@@ -342,56 +64,21 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
+      margin: 0 auto;
     }
+    .single-action-row button:hover, .single-action-row button:focus,
     .summary-actions-row button:hover, .summary-actions-row button:focus {
       background: #174ea6;
       box-shadow: 0 4px 16px #2563eb22;
     }
-    @media (max-width: 540px) {
-      .single-action-row {
-        flex-direction: column;
-        margin-bottom: 10px;
-      }
-      .distance-input-row {
-        margin-bottom: 10px;
-      }
-      .summary-actions-row {
-        flex-direction: column;
-        gap: 7px;
-      }
-      .summary-actions-row button {
-        font-size: 14px;
-        min-width: 90px;
-      }
-    }
-    .loader {
-      display: inline-block;
-      width: 26px;
-      height: 26px;
-      border: 3px solid #2563eb;
-      border-radius: 50%;
-      border-top: 3px solid #e5e7eb;
-      animation: spin 1s linear infinite;
-      vertical-align: middle;
-      margin-right: 7px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-    .submit-status {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-top: 10px;
-      font-weight: 500;
-    }
-    .submit-status.success {
-      color: #1aaf5d;
-    }
-    .submit-status.failed {
-      color: #dc2626;
-    }
+    .loader { display: inline-block; width: 26px; height: 26px; border: 3px solid #2563eb; border-radius: 50%; border-top: 3px solid #e5e7eb; animation: spin 1s linear infinite; vertical-align: middle; }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .submit-status { display: flex; align-items: center; gap: 7px; margin-top: 10px; font-weight: 500; }
+    .submit-status.success { color: #1aaf5d; }
+    .submit-status.failed { color: #dc2626; }
+    #user-type { display: block !important; }
+    .input-group label[for="user-type"] { display: block !important; }
+    .distance-input-row { display: none !important; }
   </style>
 </head>
 <body>
@@ -401,27 +88,23 @@
       Instructions
     </button>
   </div>
-  <div class="instructions-box" id="instructions-box">
+  <div class="instructions-box" id="instructions-box" style="display:none;">
     <b>How to Use Book a Ride:</b>
     <ol style="margin: 10px 0 0 18px; padding:0;">
       <li><b>Select your user type:</b>
         <ul>
-          <li><b>Customer:</b> Choose your preferred mode (Vehicle/Motorbike), enter your trip details, and get fare estimates. Enter your phone number (e.g. 0978167546).</li>
-          <li><b>Driver/Biker:</b> Select your registered vehicle or motorbike, then enter your trip details to see earnings and trip data.</li>
+          <li><b>Driver/Biker:</b> Search and select your registered vehicle or motorbike, then enter your trip details to see earnings and trip data.</li>
         </ul>
       </li>
       <li><b>Start/End Location:</b> Use the "From" and "To" fields to type or pick your route. Suggestions will appear as you type.</li>
-      <li><b>Distance:</b> Enter the trip distance in kilometers in the "Distance" field.</li>
+      <li><b>Distance:</b> Distance is calculated automatically for preset locations.</li>
       <li><b>Summarize:</b> Click <b>Summarize</b> to review your trip summary and fare calculation.</li>
       <li><b>Submit:</b> Click <b>Submit</b> to send your trip record to. You'll see a loader and a status message.</li>
       <li><b>Show Route on Map:</b> Optionally, click <b>Show Route on Google Maps</b> to see your route visually.</li>
     </ol>
-    <div style="margin-top: 13px; color: #666; font-size: 14px;">
-    
-    </div>
   </div>
   <h2>
-    Search and Submit Your Ride
+    Book Your Ride
   </h2>
   <div class="icon-row">
     <div class="icon-box" title="Book a motorbike ride">
@@ -438,48 +121,37 @@
         <span class="material-icons input-icon">person</span>
         <label for="user-type">User Type</label>
         <select id="user-type" aria-label="User type" onchange="handleUserTypeChange()">
-          <option value="" disabled selected>Select user type</option>
           <option value="biker">Biker</option>
           <option value="driver">Driver</option>
-      
         </select>
       </div>
-      <div class="vehicle-biker-select-wrapper" id="vehicle-biker-wrapper" style="display:none;">
+      <div class="vehicle-biker-select-wrapper" id="vehicle-biker-wrapper">
         <div class="input-group">
           <span class="material-icons input-icon" id="vehicle-biker-icon">directions_car</span>
-          <label id="vehicle-biker-label">Select Vehicle</label>
+          <label id="vehicle-biker-label">Select Driver or Biker</label>
           <div class="vehicle-autocomplete-wrapper">
-            <input type="text" id="vehicle-biker-select" autocomplete="off" placeholder="Type to search..." oninput="showVehicleBikerSuggestions()">
+            <input type="text" id="vehicle-biker-select" autocomplete="off" placeholder="Type registration or name..." oninput="showVehicleBikerSuggestions()">
             <div id="vehicle-biker-list" class="vehicle-autocomplete-list"></div>
           </div>
         </div>
       </div>
-      <div class="input-group" id="mode-group-wrapper" style="display:none;">
-        <span class="material-icons input-icon">commute</span>
-        <label for="mode-of-transport">Preferred Mode</label>
-        <div class="mode-group" id="mode-group">
-          <label class="mode-radio" id="radio-vehicle">
-            <input type="radio" name="mode" value="vehicle" id="mode-vehicle" onchange="handleModeChange();handleCustomerPhoneInput();">
-            <span class="material-icons">directions_car</span>Vehicle
-          </label>
-          <label class="mode-radio" id="radio-motorbike">
-            <input type="radio" name="mode" value="motorbike" id="mode-motorbike" onchange="handleModeChange();handleCustomerPhoneInput();">
-            <span class="material-icons">two_wheeler</span>Motorbike
-          </label>
-        </div>
+      <div class="input-group" id="driver-fields">
+        <span class="material-icons input-icon">badge</span>
+        <label for="driver-reg">Vehicle Registration Number</label>
+        <input type="text" id="driver-reg" placeholder="e.g. ALB123" autocomplete="off" readonly>
+        <label for="driver-name" style="margin-top:8px;">Driver Name</label>
+        <input type="text" id="driver-name" placeholder="e.g. John Banda" autocomplete="off" readonly>
+        <label for="driver-phone" style="margin-top:8px;">Phone Number</label>
+        <input type="tel" id="driver-phone" maxlength="10" pattern="^0[0-9]{9}$" placeholder="e.g. 0977000001" autocomplete="off" readonly>
       </div>
-      <div class="input-group" id="customer-phone-wrapper" style="display:none;">
-        <span class="material-icons input-icon">phone</span>
-        <label for="customer-phone">Phone Number</label>
-        <input
-          type="tel"
-          id="customer-phone"
-          maxlength="10"
-          pattern="^0[0-9]{9}$"
-          placeholder="e.g. 0978167546"
-          autocomplete="off"
-          inputmode="numeric"
-        >
+      <div class="input-group" id="biker-fields">
+        <span class="material-icons input-icon">two_wheeler</span>
+        <label for="biker-reg">Biker Registration Number</label>
+        <input type="text" id="biker-reg" placeholder="e.g. BK001" autocomplete="off" readonly>
+        <label for="biker-name" style="margin-top:8px;">Biker Name</label>
+        <input type="text" id="biker-name" placeholder="e.g. Peter Zulu" autocomplete="off" readonly>
+        <label for="biker-phone" style="margin-top:8px;">Phone Number</label>
+        <input type="tel" id="biker-phone" maxlength="10" pattern="^0[0-9]{9}$" placeholder="e.g. 0977001111" autocomplete="off" readonly>
       </div>
       <div class="input-group">
         <span class="material-icons input-icon">place</span>
@@ -498,11 +170,6 @@
         </div>
       </div>
     </div>
-    <div class="info-section" style="font-size:14px; color:#666;">
-      <span class="material-icons" style="font-size:17px;vertical-align:middle; color:#666;margin-right:2px;">info</span>
-      This will show the route on this page and requires internet access.Toggle the map to check distance
-    </div>
-    <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
   <div class="summary-table-section">
     <div class="section-title">
@@ -510,155 +177,49 @@
       Trip Summary
     </div>
     <form id="summary-form" onsubmit="event.preventDefault(); updateSummaryTable();">
-      <!-- Map toggle in its own row -->
-      <div class="single-action-row">
-        <div class="map-btn-wrapper">
-          <button type="button" id="map-btn" onclick="toggleMap()">
-            <span class="material-icons">map</span><span id="map-btn-text">Tap To Show Map</span>
-          </button>
-        </div>
-      </div>
-      <!-- Distance input in its own row -->
-      <div class="distance-input-row">
-        <div class="input-group" style="margin-bottom:0;">
-          <span class="material-icons input-icon">straighten</span>
-          <label for="distance-input">Distance (km)</label>
-          
-          <input type="number" min="1" step="any" id="distance-input" placeholder="Enter distance - Get from the map" required>
-        </div>
-      </div>
-      <!-- Summarize + Submit buttons in a different row -->
-      <div class="summary-actions-row">
+      <div class="summary-actions-row single">
         <button type="button" onclick="updateSummaryTable()">
           <span class="material-icons">summarize</span>Calculate
         </button>
+      </div>
+      <div class="summary-table-wrapper">
+        <div id="summary-table-container"></div>
+      </div>
+      <div class="summary-actions-row submit-row">
         <button type="button" id="submit-btn" onclick="submitToGoogleSheet()" disabled>
           <span class="material-icons">send</span>Submit
         </button>
       </div>
+      <div id="submit-status"></div>
+      <div id="loader" class="loader" style="display:none;"></div>
+      <div class="summary-actions-row" style="margin-top:12px;">
+        <button type="button" id="map-btn" onclick="toggleMap()">
+          <span class="material-icons">map</span><span id="map-btn-text">Tap To Show Map</span>
+        </button>
+      </div>
+      <div class="info-section" id="map-info-section" style="font-size:14px; color:#666; margin-bottom:0;">
+        <span class="material-icons" style="font-size:17px;vertical-align:middle; color:#666;margin-right:2px;">info</span>
+        This will show the route on this page and requires internet access. Toggle the map to check distance.Note,distance are subject to adjustment 
+      </div>
+      <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </form>
-    <div class="summary-table-wrapper">
-      <div id="summary-table-container"></div>
-    </div>
-    <div id="submit-status"></div>
-    <div id="loader" class="loader" style="display:none;"></div>
   </div>
   <script>
-    // List of notable places
-    const places = [
-      "Lusaka", "Ndola", "Kitwe", "Luanshya", "Livingstone",
-      "Chingola", "Kabwe", "Mufulira", "Chipata", "Solwezi",
-      "Kasama", "Mazabuka", "Mansa", "Mongu", "Kalulushi",
-      "Siavonga", "Choma", "Petauke", "Mpika", "Samfya",
-      // Luangwa District – towns, villages, chiefdoms, landmarks
-      "Luangwa (Feira)", "Kavalamanja", "Katemo", "Chitope", "Kasinsa",
-      "Chikwasha", "Mphuka", "Mphuka Central", "Chankungu", "Chilenga",
-      "Chinzete", "Kapoche", "Chalwe", "Kalulu", "Kapiri (Luangwa)",
-      "Kanyenye", "Mandombe", "Kawewa", "Chilimba", "Mwalimu (Luangwa)",
-      "Kasisi (Luangwa)", "Kapuka", "Kasenga",
-      "Chief Mphuka", "Chief Chitungulu", "Chief Mpuka",
-      "Chief Zulu", "Chief Mburuma", "Chief Mwanya",
-      "Luangwa Bridge", "Geramos Lodge Luangwa", "BM Residence Luangwa",
-      "Luangwa Border Post", "Feira Confluence", "Feira Day Secondary",
-      "Yangoma Lodge", "Luangwa District Hospital", "Luangwa Police Station",
-      "Luangwa Post Office", "Luangwa District Council", "Luangwa District Education Office",
-      "Luangwa Basic School", "Luangwa Secondary School", "Luangwa Filling Station",
-      "Luangwa Guest House", "Boma Clinic", "Luangwa High School",
-      "Luangwa Market", "Luangwa Bus Station", "Luangwa Bridge Market", "Luangwa Bridge Bus Station",
-      "Kavalamanja Market", "Kasinsa Market", "Mpuka Market", "Chimutengo Market", "Mwavi Market",
-      "Kavalamanja Bus Station", "Feira Bus Station", "Kasinsa Bus Stop", "Mwavi Bus Stop",
-      "Luangwa Clinic", "Kapoche Clinic", "Feira Lodge", "INDECO BUILDING", "Justifeli Lodge,Luangwa",
-      "Simon Njobvu's palace", "Dzalo Training Centre Kambolozo", "Luangwa SDA main",
-      "Makichilo Lodge Luangwa", "yellow shop Luangwa", "JB THREE BOARDERS MALL", "River spot Luangwa",
-      "Gerasmos Safari Lodge", "Nyabota Lodge", "UCZ Luangwa", "Pentocostal Assembly Joshua Assembly Luangwa",
-      "Feira Kingdom Hall Luangwa", "Aglican Church",
-      // Luanshya – landmarks, institutions, facilities
-  
-"Roan General Hospital", "Thomson Hospital", "Luanshya Hospital",
-"Roan Antelope Copper Mine", "Baluba Mine", "Roan Antelope Mine Hospital",
-"Kasims Medical Center", "Masaiti Health Center", "Garden Luangwa Compound",
-"Luanshya Police Station", "Luanshya Post Office", "ZESCO Office Luanshya",
-"Luanshya District Education Office", "Luanshya District Commissioner's Office",
-"Kamirenda Market", "Roan Township Market", "Masangano Market",
-"Luanshya Central Market", "Mpatamatu Market", "Mine Market", "Chamboli Market",
-"Luanshya Boys High School", "Luanshya Girls High School", "Luanshya High School",
-"Copperstone University", "Luanshya Technical & Vocational Teachers College",
-"Luanshya Technical & Business College", "Da Gama School", "Rivercross Primary School",
-"Central Primary School", "Mikwanda Primary School", "Mpatamatu Secondary School",
-"Roan Antelope Rugby Club", "Town Recreation Ground (Luanshya)", "Garden Luangwa Compound",
-"Roan Compound", "Mpatamatu Compound", "Kamirenda Compound",
-"Luanshya Airport", "Luanshya Shops", "Luanshya Bars",
-"Luanshya Town Bus Station", "Mpatamatu Bus Station", "Kamirenda Bus Station",
-"Roan Bus Station", "Luanshya Intercity Bus Station", "Luanshya Town Roundabout",
-"Luanshya Civic Centre", "Ndeke Luanshya", "Roan Mall", "Baluba", "Luanshya Main Market",
-"Second Bus Station Luanshya", "KAMBILO MBILO",
-
-// Additional Health Facilities
-"Kamirenda Clinic", "Baluba Clinic", "Mpatamatu Clinic", "Mine Hospital",
-"Riverside Clinic", "Mikomfwa Clinic", "Luanshya Urban Clinic", "Chamboli Clinic",
-
-// Additional Education Institutions
-"Mpatamatu Primary School", "Kamirenda Primary School", "St. Joseph’s School",
-"Forest View School", "Chimwemwe Primary School",
-
-// Additional Compounds/Residential Areas
-"Mikomfwa", "Kawama Luanshya", "Mikomfwa Extension", "Kambilombilo",
-
-// Additional Markets
-"Baluba Market", "Kambilombilo Market",
-
-// Lodges & Guest Houses
-"New Town Lodge", "Roan Park Lodge", "Buntungwa Lodge", "Kamirenda Guest House",
-"Baluba Lodge", "Goldfield Lodge", "Gloria Lodge", "Jewel Guest House Luanshya",
-"Kawama Guest House", "Blue Nile Lodge", "Zambia Motor Industry Guest House",
-
-// Additional Bus/Transport Points
-"Baluba Junction","Luanshya Town Roundabout",
-
-// Shops, Malls & Commercial
-"Luanshya Spar", "Shoprite Luanshya", "Pick n Pay Luanshya",
-"Budget Store Luanshya", "Quick Save Luanshya", "Baluba Market Center",
-
-// Banks in Luanshya
-"Absa Bank Luanshya", "Zanaco Luanshya", "Standard Chartered Bank Luanshya",
-"National Savings & Credit Bank Luanshya", "Finance Bank Luanshya",
-"First National Bank Luanshya", "Indo Zambia Bank Luanshya",
-
-// Churches
-"St. Peter’s Catholic Church Luanshya", "United Church of Zambia (UCZ) Luanshya",
-"Bread of Life Church Luanshya", "Pentecostal Holiness Church Luanshya",
-"New Apostolic Church Luanshya", "Seventh-Day Adventist Church Mpatamatu",
-"Jehovah’s Witness Kingdom Hall", "Anglican Church Luanshya",
-"Miracle Life Church Luanshya", "Revival Fire Church", "Catholic Cathedral Luanshya",
-
-// Bars & Nightlife
-"Club Roan", "Beer Garden Luanshya", "Baluba Bar", "Mpatamatu Tavern",
-"Hunters Pub", "Roan Pub", "Zed Lounge Luanshya", "Stadium Bar", "Chillers Luanshya",
-
-// Recreation & Sports
-"Luanshya Golf Club", "Mpatamatu Stadium", "Roan Sports Complex", 
-"Luanshya Tennis Club", "Luanshya Bowling Club",
-
-// Other Government Facilities
-"Luanshya Fire Brigade", "National Registration Office Luanshya",
-"RTSA Office Luanshya", "Luanshya Magistrate Court", "Luanshya Council Guesthouse"
-    ];
-
-    // Sample vehicle and biker data
+    // DATA
     const vehicles = [
-      { reg: "ALB123", name: "John Banda", phone: "0977000001" },
-      { reg: "BGR456", name: "Mary Mwansa", phone: "0977000002" },
-      { reg: "ZED789", name: "James Phiri", phone: "0977000003" }
+      { reg: "ALB123", name: "John Banda", phone: "0977000001", type: "driver" },
+      { reg: "BGR456", name: "Mary Mwansa", phone: "0977000002", type: "driver" },
+      { reg: "ZED789", name: "James Phiri", phone: "0977000003", type: "driver" },
+      { reg: "GRZ987", name: "Joseph Tembo", phone: "0977000004", type: "driver" },
+      { reg: "MLG555", name: "Loveness Mulenga", phone: "0977000005", type: "driver" },
+      { reg: "LUS452", name: "Hastings Kapila", phone: "0977000006", type: "driver" }
     ];
     const bikers = [
-      { reg: "BK001", name: "Peter Zulu", phone: "0977001111" },
-      { reg: "BK002", name: "Chola Katongo", phone: "0977002222" },
-      { reg: "BK003", name: "Mwila Chanda", phone: "0977003333" }
+      { reg: "BK001", name: "Peter Zulu", phone: "0977001111", type: "biker" },
+      { reg: "BK002", name: "Chola Katongo", phone: "0977002222", type: "biker" },
+      { reg: "BK003", name: "Mwila Chanda", phone: "0977003333", type: "biker" }
     ];
-
     let summaryData = null;
-    let selectedVehicleBiker = null;
-
     function toggleInstructions() {
       const box = document.getElementById('instructions-box');
       const btn = document.getElementById('toggle-instructions-btn');
@@ -670,126 +231,173 @@
         btn.innerHTML = '<span class="material-icons">close</span>Hide Instructions';
       }
     }
-
+    window.onload = function() {
+      document.getElementById('user-type').value = 'driver';
+      document.getElementById('vehicle-biker-wrapper').style.display = '';
+      document.getElementById('driver-fields').style.display = '';
+      document.getElementById('biker-fields').style.display = 'none';
+      document.getElementById('instructions-box').style.display = "none";
+      clearDriverFields();
+    };
     function handleUserTypeChange() {
       const userType = document.getElementById('user-type').value;
-      const modeGroupWrapper = document.getElementById('mode-group-wrapper');
-      const vehicleBikerWrapper = document.getElementById('vehicle-biker-wrapper');
-      const customerPhoneWrapper = document.getElementById('customer-phone-wrapper');
-      const vehicleBikerLabel = document.getElementById('vehicle-biker-label');
-      const vehicleBikerIcon = document.getElementById('vehicle-biker-icon');
-      const vehicleBikerSelect = document.getElementById('vehicle-biker-select');
-      selectedVehicleBiker = null;
-      vehicleBikerSelect.value = "";
-      document.getElementById('vehicle-biker-list').innerHTML = "";
-      modeGroupWrapper.style.display = "none";
-      vehicleBikerWrapper.style.display = "none";
-      customerPhoneWrapper.style.display = "none";
-      if (userType === "customer") {
-        modeGroupWrapper.style.display = "";
-        setTimeout(handleCustomerPhoneInput, 0);
-      } else if (userType === "driver") {
-        vehicleBikerLabel.innerText = "Select Vehicle";
-        vehicleBikerIcon.innerText = "directions_car";
-        vehicleBikerSelect.setAttribute("placeholder", "Type vehicle reg or name...");
-        vehicleBikerWrapper.style.display = "";
+      document.getElementById('vehicle-biker-wrapper').style.display = "";
+      document.getElementById('driver-fields').style.display = "none";
+      document.getElementById('biker-fields').style.display = "none";
+      clearDriverFields();
+      clearBikerFields();
+      if (userType === "driver") {
+        document.getElementById('vehicle-biker-label').innerText = "Select Driver";
+        document.getElementById('vehicle-biker-icon').innerText = "directions_car";
+        document.getElementById('vehicle-biker-select').placeholder = "Type driver reg or name...";
+        document.getElementById('driver-fields').style.display = "";
       } else if (userType === "biker") {
-        vehicleBikerLabel.innerText = "Select Biker";
-        vehicleBikerIcon.innerText = "two_wheeler";
-        vehicleBikerSelect.setAttribute("placeholder", "Type biker reg or name...");
-        vehicleBikerWrapper.style.display = "";
+        document.getElementById('vehicle-biker-label').innerText = "Select Biker";
+        document.getElementById('vehicle-biker-icon').innerText = "two_wheeler";
+        document.getElementById('vehicle-biker-select').placeholder = "Type biker reg or name...";
+        document.getElementById('biker-fields').style.display = "";
       }
     }
-
-    function handleCustomerPhoneInput() {
-      const userType = document.getElementById('user-type').value;
-      const phoneWrapper = document.getElementById('customer-phone-wrapper');
-      if (userType !== "customer") {
-        phoneWrapper.style.display = "none";
-        return;
-      }
-      const vehicle = document.getElementById('mode-vehicle').checked;
-      const motorbike = document.getElementById('mode-motorbike').checked;
-      if (vehicle || motorbike) {
-        phoneWrapper.style.display = "";
-      } else {
-        phoneWrapper.style.display = "none";
-      }
+    function clearDriverFields() {
+      document.getElementById('vehicle-biker-select').value = "";
+      document.getElementById('driver-reg').value = "";
+      document.getElementById('driver-name').value = "";
+      document.getElementById('driver-phone').value = "";
     }
-
+    function clearBikerFields() {
+      document.getElementById('vehicle-biker-select').value = "";
+      document.getElementById('biker-reg').value = "";
+      document.getElementById('biker-name').value = "";
+      document.getElementById('biker-phone').value = "";
+    }
     function showVehicleBikerSuggestions() {
       const userType = document.getElementById('user-type').value;
       const input = document.getElementById('vehicle-biker-select');
       const value = input.value.trim().toLowerCase();
       const list = document.getElementById('vehicle-biker-list');
-      list.innerHTML = '';
-      selectedVehicleBiker = null;
-      if (!value) return;
+      list.innerHTML = "";
       let data = [];
-      if (userType === "driver") {
-        data = vehicles;
-      } else if (userType === "biker") {
-        data = bikers;
-      }
-      const filtered = data.filter(
-        v => v.reg.toLowerCase().includes(value) ||
-        v.name.toLowerCase().includes(value) ||
-        v.phone.includes(value)
+      if (userType === 'driver') data = vehicles;
+      else if (userType === 'biker') data = bikers;
+      else return;
+      if (value.length === 0) return;
+      const filtered = data.filter(x =>
+        x.reg.toLowerCase().includes(value) ||
+        x.name.toLowerCase().includes(value) ||
+        x.phone.includes(value)
       );
       filtered.forEach(item => {
-        const div = document.createElement('div');
-        div.classList.add(userType === "driver" ? "vehicle-autocomplete-item" : "biker-autocomplete-item");
-        div.textContent = item.reg + " - " + item.name + " (" + item.phone + ")";
-        div.onclick = () => {
+        const div = document.createElement("div");
+        div.className = "vehicle-autocomplete-item";
+        div.textContent = `${item.reg} (${item.name}, ${item.phone})`;
+        div.onclick = function() {
           input.value = item.reg;
-          selectedVehicleBiker = item;
-          list.innerHTML = '';
+          list.innerHTML = "";
+          if (userType === 'driver') {
+            document.getElementById('driver-reg').value = item.reg;
+            document.getElementById('driver-name').value = item.name;
+            document.getElementById('driver-phone').value = item.phone;
+          } else {
+            document.getElementById('biker-reg').value = item.reg;
+            document.getElementById('biker-name').value = item.name;
+            document.getElementById('biker-phone').value = item.phone;
+          }
         };
         list.appendChild(div);
       });
     }
+    document.getElementById('vehicle-biker-select').addEventListener('focus', showVehicleBikerSuggestions);
+    document.getElementById('vehicle-biker-select').addEventListener('input', showVehicleBikerSuggestions);
+    document.getElementById('vehicle-biker-select').addEventListener('blur', function() {
+      setTimeout(() => document.getElementById('vehicle-biker-list').innerHTML = '', 150);
+    });
 
-    function handleModeChange() {
-      const v = document.getElementById('mode-vehicle');
-      const m = document.getElementById('mode-motorbike');
-      document.getElementById('radio-vehicle').classList.toggle('selected', v.checked);
-      document.getElementById('radio-motorbike').classList.toggle('selected', m.checked);
+    // PLACES AND SEGMENTS (for distance calculation)
+    const places = [
+      "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche", "Kakaro Primary School", "Makichilo Lodge", "Gerasmos Safari Lodge", "Justifeli Lodge", "Kantuleni executive Lodge", "Feira Kindom Hall", "Luangwa main sda churh", "Pentocostal Assembly of God Joshua Assembly", "UCZ", "JB THREE BOARDERS MALL", "yellow shop", "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "Luangwa Secondary School", "Luangwa District Hospital", "Kavalamanja", "Luangwa Police Station", "Zambia Electricity Supply Corporation", "Luangwa Post Office", "Luangwa Basic School", "Luangwa Habour", "Luangwa Indeco", "Luangwa District Comission office", "Luangwa District Education Board Offices", "Luangwa Council lodge", "Yangoma Hotel", "Luangwa Filling Station", "Dzalo Skills Training Centre kambolozo", "Boma Clinic", "BM residence", "Luangwa Feira Day Secondary School", "Katondwe Mission Hospital", "Mwavi Secondary School", "Luangwa Bridge", "Luangwa Bridge Market"
+    ];
+    const segments = [
+      { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
+      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
+      { from: "Luangwa (Feira)",  to: "Luangwa Market", distance: 0.1 },
+      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 2.5 },
+      { from: "Luangwa (Feira)", to: "Luangwa District Hospital", distance: 4.6 },
+      { from: "Luangwa (Feira)", to: "Kakaro Primary School", distance: 12},
+      { from: "Luangwa District Hospital", to: "Kavalamanja", distance: 23 },
+      { from: "Katondwe Mission Hospital", to: "Kasinsa", distance: 45 },
+      { from: "Chitope", to: "Kasinsa", distance: 10 },
+      { from: "Luangwa (Feira)", to: "Luangwa Police Station", distance: 0.55 },
+      { from: "Luangwa (Feira)", to: "Makichilo Lodge", distance: 0.40 },
+      { from: "Luangwa (Feira)", to: "Anglican Church", distance: 0.75},
+      { from: "Luangwa (Feira)", to: "Feira Kingdom Hall", distance: 0.7 },
+      { from: "Luangwa (Feira)", to: "UCZ", distance: 0.5 },
+      { from: "Luangwa (Feira)", to: "Pentocostal Assembly of God Joshua Assembly", distance: 0.6 },
+      { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
+      { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0 },
+      { from: "Luangwa Market", to: "Luangwa Basic School", distance: 0.45 },
+      { from: "Luangwa Market", to: "Luangwa Habour", distance: 0.5 },
+      { from: "Luangwa (Feira)", to: "Luangwa Indeco", distance: 0.9 },
+      { from: "Luangwa Indeco", to: "Luangwa Council lodge", distance: 0.25 },
+      { from: "Luangwa Council lodge", to: "Yangoma Hotel", distance: 0.15 },
+      { from: "Luangwa Council lodge", to: "Zambia Electricity Supply Corporation", distance: 2.4 },
+      { from: "Yangoma Hotel", to: "Luangwa Filling Station", distance: 0.7 },
+      { from: "Kantuleni executive Lodge", to: "Luangwa Filling Station", distance: 0.190 },
+      { from: "Luangwa Filling Station", to: "Dzalo Skills Training Centre kambolozo", distance: 0.3 },
+      { from: "Dzalo Skills Training Centre kambolozo", to: "Boma Clinic", distance: 0.2 },
+      { from: "Boma Clinic", to: "BM residence", distance: 0.6 },
+      { from: "BM residence", to: "Luangwa Feira Day Secondary School", distance: 1.1 },
+      { from: "Gerasmos Safari Lodge", to: "Luangwa Feira Day Secondary School", distance: 3.1 },
+      { from: "Luangwa Feira Day Secondary School", to: "Justifeli Lodge", distance: 2.2 },
+      { from: "Luangwa main sda church", to: "Justifeli Lodge", distance: 0.9 },
+      { from: "Luangwa District Education Board Offices", to: "Justifeli Lodge", distance: 2.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "yellow shop", distance: 3.3 },
+      { from: "Luangwa Feira Day Secondary School", to: "Zambia Electricity Supply Corporation", distance: 2.0 },
+      { from: "yellow shop", to: "JB THREE BOARDERS MALL", distance: 0.45 },
+      { from: "yellow shop", to: "Luangwa Indeco", distance: 0.45 },
+      { from: "yellow shop", to: "Luangwa main sda churh", distance: 0.70 },
+      { from: "Luangwa main sda churh", to: "Zambia Electricity Supply Corporation", distance: 0.65 },
+      { from: "Luangwa District Hospital", to: "Zambia Electricity Supply Corporation", distance: 2.8 },
+      { from: "Luangwa Feira Day Secondary School", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 4.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "Katondwe Mission Hospital", distance: 48 },
+      { from: "Katondwe Mission Hospital", to: "Mwavi Secondary School", distance: 7.2 },
+      { from: "Mwavi Secondary School", to: "Luangwa Bridge Market", distance: 27.3 },
+      { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
+      { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
+      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
+    ];
+
+    function buildGraph(segments) {
+      const graph = {};
+      segments.forEach(seg => {
+        if (!graph[seg.from]) graph[seg.from] = [];
+        if (!graph[seg.to]) graph[seg.to] = [];
+        graph[seg.from].push({ place: seg.to, distance: seg.distance });
+        graph[seg.to].push({ place: seg.from, distance: seg.distance }); // undirected
+      });
+      return graph;
     }
-
-    function searchPlaces(value, list, maxResults = 12) {
-      if (!value) return [];
-      value = value.trim().toLowerCase();
-
-      const startsWith = [], wordMatch = [], contains = [], fuzzy = [];
-      for (let place of list) {
-        const p = place.toLowerCase();
-        if (p.startsWith(value)) {
-          startsWith.push(place);
-        } else if (p.split(/[\s,()-]+/).some(w => w.startsWith(value) && w.length > value.length)) {
-          wordMatch.push(place);
-        } else if (p.includes(value)) {
-          contains.push(place);
-        } else if (value.length >= 3 && getEditDistance(p, value) === 1) {
-          fuzzy.push(place);
-        }
-        if (startsWith.length + wordMatch.length + contains.length + fuzzy.length >= maxResults * 2) break;
-      }
-      const all = startsWith.concat(wordMatch, contains, fuzzy);
-      return Array.from(new Set(all)).slice(0, maxResults);
-    }
-    function getEditDistance(a, b) {
-      if (Math.abs(a.length - b.length) > 2) return 99;
-      const m = a.length, n = b.length;
-      const dp = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));
-      for (let i = 0; i <= m; i++) dp[i][0] = i;
-      for (let j = 0; j <= n; j++) dp[0][j] = j;
-      for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-          if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
-          else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    function findShortestDistance(from, to, segments) {
+      const graph = buildGraph(segments);
+      if (!graph[from] || !graph[to]) return null;
+      const distances = {};
+      const visited = new Set();
+      places.forEach(place => distances[place] = Infinity);
+      distances[from] = 0;
+      let queue = [{ place: from, dist: 0 }];
+      while (queue.length > 0) {
+        queue.sort((a, b) => a.dist - b.dist);
+        const { place, dist } = queue.shift();
+        if (place === to) return dist;
+        if (visited.has(place)) continue;
+        visited.add(place);
+        for (let neighbor of (graph[place] || [])) {
+          if (dist + neighbor.distance < distances[neighbor.place]) {
+            distances[neighbor.place] = dist + neighbor.distance;
+            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
+          }
         }
       }
-      return dp[m][n];
+      return null;
     }
     function showSuggestions(input, field) {
       const listId = field + '-list';
@@ -797,26 +405,21 @@
       const value = input.value;
       list.innerHTML = '';
       if (!value) return;
-      const filtered = searchPlaces(value, places, 12);
+      const filtered = places.filter(place => place.toLowerCase().includes(value.trim().toLowerCase()));
       filtered.forEach(place => {
         const item = document.createElement('div');
         item.classList.add('autocomplete-item');
         item.textContent = place;
-        item.onclick = () => {
-          input.value = place;
-          list.innerHTML = '';
-        };
+        item.onclick = () => { input.value = place; list.innerHTML = ''; };
         list.appendChild(item);
       });
     }
-
     function toggleMap() {
       const origin = document.getElementById('gm-origin').value.trim();
       const destination = document.getElementById('gm-destination').value.trim();
       const frame = document.getElementById('google-map-frame');
       const mapBtn = document.getElementById('map-btn');
       const mapBtnText = document.getElementById('map-btn-text');
-
       if (frame.style.display === "none" || frame.style.display === "") {
         if (!origin || !destination) {
           alert("Please enter both origin and destination.");
@@ -832,111 +435,66 @@
         frame.scrollIntoView({behavior:"smooth"});
       } else {
         frame.style.display = "none";
-        mapBtnText.textContent = "Map";
+        mapBtnText.textContent = "Tap To Show Map";
         mapBtn.setAttribute('aria-pressed', 'false');
       }
     }
-
     function updateSummaryTable() {
-      const distance = parseFloat(document.getElementById('distance-input').value);
+      const userType = document.getElementById('user-type').value;
+      let regNo = "", name = "", phone = "";
+      let preferredMode = userType === "driver" ? "Vehicle" : (userType === "biker" ? "Motorbike" : "");
+      if (userType === "driver") {
+        regNo = document.getElementById('driver-reg').value;
+        name = document.getElementById('driver-name').value;
+        phone = document.getElementById('driver-phone').value;
+      } else if (userType === "biker") {
+        regNo = document.getElementById('biker-reg').value;
+        name = document.getElementById('biker-name').value;
+        phone = document.getElementById('biker-phone').value;
+      }
       const origin = document.getElementById('gm-origin').value.trim();
       const destination = document.getElementById('gm-destination').value.trim();
-      const userTypeSelect = document.getElementById('user-type');
-      const userType = userTypeSelect.value ? userTypeSelect.options[userTypeSelect.selectedIndex].text : '';
+      let pricePer3Km = userType === "driver" ? 20 : 10;
+      let distance = findShortestDistance(origin, destination, segments);
+      let timeText = "", price = "";
+      if (distance !== null && distance !== undefined && distance !== "") {
+        const avgSpeed = 60;
+        const timeHours = distance / avgSpeed;
+        const wholeHours = Math.floor(timeHours);
+        const minutes = Math.round((timeHours - wholeHours) * 60);
+        price = Math.ceil(distance / 3) * pricePer3Km;
+        if (wholeHours > 0) { timeText += wholeHours + " hr"; if (minutes > 0) timeText += " " + minutes + " min"; }
+        else { timeText += minutes + " min"; }
+      }
+      // Build summaryData with all columns in order for the Google Sheet
+      summaryData = {
+        userType: userType || "",
+        preferredMode: preferredMode || "",
+        regNo: regNo || "",
+        name: name || "",
+        phone: phone || "",
+        from: origin || "",
+        to: destination || "",
+        distance: distance !== null && distance !== undefined ? distance.toString() : "",
+        estimated: timeText || "",
+        price: price !== null && price !== undefined ? price.toString() : "",
+        timestamp: "" // Let Google Sheets fill this
+      };
+      // Show summary
       const container = document.getElementById('summary-table-container');
       const submitBtn = document.getElementById('submit-btn');
-
-      let mode = "";
-      let pricePer3Km = 20;
-      let customerPhone = "";
-      if (userTypeSelect.value === "customer") {
-        const v = document.getElementById('mode-vehicle').checked;
-        const m = document.getElementById('mode-motorbike').checked;
-        if (!v && !m) {
-          container.innerHTML = '<div style="color:red;margin-top:10px;">Please select a mode of transport above.</div>';
-          submitBtn.disabled = true;
-          summaryData = null;
-          return;
-        }
-        if (v) {
-          mode = "Vehicle";
-          pricePer3Km = 20;
-        } else if (m) {
-          mode = "Motorbike";
-          pricePer3Km = 10;
-        }
-        customerPhone = document.getElementById('customer-phone').value.trim();
-        if (!customerPhone.match(/^0[0-9]{9}$/)) {
-          container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid phone number in the format 0978167546.</div>';
-          submitBtn.disabled = true;
-          summaryData = null;
-          return;
-        }
-      }
-
-      let vbReg = "", vbName = "", vbPhone = "";
-      if (userTypeSelect.value === "driver" || userTypeSelect.value === "biker") {
-        const vbInput = document.getElementById('vehicle-biker-select').value.trim();
-        let vbData = userTypeSelect.value === "driver" ? vehicles : bikers;
-        let found = vbData.find(x => x.reg.toLowerCase() === vbInput.toLowerCase());
-        if (!found) {
-          container.innerHTML = '<div style="color:red;margin-top:10px;">Please select your ' + (userTypeSelect.value === "driver" ? "vehicle" : "biker") + ' from the list.</div>';
-          submitBtn.disabled = true;
-          summaryData = null;
-          return;
-        }
-        vbReg = found.reg;
-        vbName = found.name;
-        vbPhone = found.phone;
-        selectedVehicleBiker = found;
-
-        // KEY: biker is always K10 per 3km
-        if (userTypeSelect.value === "biker") {
-          pricePer3Km = 10;
-        }
-      }
-
-      if (!origin || !destination) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter both origin and destination above.</div>';
+      if (!regNo || !name || !phone || !origin || !destination || !distance) {
+        container.innerHTML = '<div style="color:red;margin-top:10px;">Please fill all required fields and select from the list.</div>';
         submitBtn.disabled = true;
-        summaryData = null;
         return;
       }
-      if (!userType) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please select a user type above.</div>';
-        submitBtn.disabled = true;
-        summaryData = null;
-        return;
-      }
-      if (isNaN(distance) || distance <= 0) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid distance in km convert to km if its in m.</div>';
-        submitBtn.disabled = true;
-        summaryData = null;
-        return;
-      }
-
-      // Estimate travel time (assuming average speed 60km/h)
-      const avgSpeed = 60;
-      const timeHours = distance / avgSpeed;
-      const wholeHours = Math.floor(timeHours);
-      const minutes = Math.round((timeHours - wholeHours) * 60);
-
-      // Price calculation: K20 per 3km for vehicle, K10 per 3km for motorbike or biker
-      let price = Math.ceil(distance / 3) * pricePer3Km;
-
-      let timeText = "";
-      if (wholeHours > 0) {
-        timeText += wholeHours + " hr";
-        if (minutes > 0) timeText += " " + minutes + " min";
-      } else {
-        timeText += minutes + " min";
-      }
-
       let tableHeader = `
         <tr>
           <th>User Type</th>
-          ${userTypeSelect.value === "customer" ? '<th>Preferred Mode</th><th>Phone</th>' : ''}
-          ${userTypeSelect.value === "driver" || userTypeSelect.value === "biker" ? '<th>Reg No.</th><th>Name</th><th>Phone</th>' : ''}
+          <th>Mode</th>
+          <th>Registration</th>
+          <th>Name</th>
+          <th>Phone</th>
           <th>From</th>
           <th>To</th>
           <th>Distance (km)</th>
@@ -945,39 +503,22 @@
         </tr>`;
       let tableRow = `
         <tr>
-          <td>${userType}</td>
-          ${userTypeSelect.value === "customer" ? `<td>${mode}</td><td>${customerPhone}</td>` : ''}
-          ${(userTypeSelect.value === "driver" || userTypeSelect.value === "biker") ? `<td>${vbReg}</td><td>${vbName}</td><td>${vbPhone}</td>` : ''}
-          <td>${origin}</td>
-          <td>${destination}</td>
-          <td>${distance}</td>
-          <td>${timeText}</td>
-          <td><b>K${price}</b></td>
+          <td>${summaryData.userType}</td>
+          <td>${summaryData.preferredMode}</td>
+          <td>${summaryData.regNo}</td>
+          <td>${summaryData.name}</td>
+          <td>${summaryData.phone}</td>
+          <td>${summaryData.from}</td>
+          <td>${summaryData.to}</td>
+          <td>${summaryData.distance}</td>
+          <td>${summaryData.estimated}</td>
+          <td><b>K${summaryData.price}</b></td>
         </tr>`;
-
-      container.innerHTML = `
-        <table class="summary-table">
-          ${tableHeader}
-          ${tableRow}
-        </table>
-      `;
-
-      summaryData = {
-        userType: userType,
-        preferredMode: mode,
-        regNo: vbReg,
-        name: vbName,
-        phone: userTypeSelect.value === "customer" ? customerPhone : vbPhone,
-        from: origin,
-        to: destination,
-        distance: distance,
-        estimatedTime: timeText,
-        price: price
-      };
+      container.innerHTML = `<table class="summary-table">${tableHeader}${tableRow}</table>`;
       submitBtn.disabled = false;
       document.getElementById('submit-status').innerHTML = '';
     }
-
+    // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
     function submitToGoogleSheet() {
       const submitBtn = document.getElementById('submit-btn');
@@ -987,57 +528,28 @@
         statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>No data to submit.</span>';
         return;
       }
-      let requiredFields = ["userType", "from", "to", "distance", "estimatedTime", "price"];
-      if (summaryData.userType === "Customer") {
-        requiredFields.push("phone");
-        requiredFields.push("preferredMode");
-      }
-      if (summaryData.userType === "Driver" || summaryData.userType === "Biker") {
-        requiredFields.push("regNo");
-        requiredFields.push("name");
-        requiredFields.push("phone");
-      }
-      for (const key of requiredFields) {
-        if (!summaryData[key] || (typeof summaryData[key] === "string" && summaryData[key].trim() === "")) {
-          statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Please complete all required information before submitting.</span>';
-          return;
-        }
-      }
-      summaryData.timestamp = new Date().toISOString();
       submitBtn.disabled = true;
-      loader.style.display = "block";
-      statusDiv.innerHTML = 'Submitting...';
-      const data = summaryData;
-      const formBody = Object.keys(data)
-        .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
-        .join("&");
+      loader.style.display = "inline-block";
+      statusDiv.innerHTML = "";
       fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formBody
+        method: "POST",
+        body: new URLSearchParams(summaryData)
       })
-      .then(r => {
-        if (r.ok) return r.json();
-        else throw new Error("Network response was not ok");
-      })
-      .then(j => {
-        loader.style.display = "none";
+      .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
+      .then(txt => {
         statusDiv.innerHTML = '<span class="submit-status success"><span class="material-icons">check_circle</span>Submitted successfully!</span>';
-        submitBtn.disabled = false;
-      })
-      .catch(() => {
         loader.style.display = "none";
-        statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Submission failed. Try again.</span>';
+        submitBtn.disabled = true;
+        setTimeout(() => {
+          statusDiv.innerHTML = "";
+        }, 3000);
+      })
+      .catch(err => {
+        statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Submission failed: ' + err + '</span>';
+        loader.style.display = "none";
         submitBtn.disabled = false;
       });
     }
-    document.addEventListener('click', function (e) {
-      document.querySelectorAll('.autocomplete-list, .vehicle-autocomplete-list, .biker-autocomplete-list').forEach(list => {
-        if (!e.target.closest('.autocomplete-wrapper') && !e.target.closest('.vehicle-autocomplete-wrapper')) {
-          list.innerHTML = '';
-        }
-      });
-    });
   </script>
 </body>
 </html>
