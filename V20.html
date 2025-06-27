@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZamListing | laptop</title>
+  <title>ZamListing | V20</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007"
      crossorigin="anonymous"></script>
@@ -72,6 +72,11 @@
     .toggle-offer-btn {
       background: #2980b9; color: white; padding: 10px 20px;
       border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+    .toggle-offer-btn:hover {
+      background: #176099;
     }
     .offer-section { display: none; margin-top: 15px; }
     .form-group {
@@ -98,21 +103,43 @@
     .whatsapp-btn { background-color: #25d366; color: white; }
     .text-btn { background-color: #2980b9; color: white; }
     .call-btn { background-color: #e74c3c; color: white; }
+    /* More Details section */
+    .more-details-section {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f8f8;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      animation: fadeIn 0.4s;
+    }
+    .more-details-section ul {
+      list-style: disc inside;
+      color: #444;
+      margin-left: 10px;
+    }
+    .more-details-section li {
+      margin-bottom: 8px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0;}
+      to { opacity: 1;}
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
       <div class="seller-info">
-        <h2>Trekstor Laptop 11.6'</h2>
+        <h2>Sumsung S24 Brand New Boxed </h2>
         <ul>
-          <li><strong>Seller:</strong> BM</li>
+          <li><strong>Seller:</strong> BM -</li>
           <li><strong>Address:</strong> Lusaka, Makeni</li>
-          <li><strong>Delivery:</strong> Nationwide (fee applicable), Good condition</li>
+          <li><strong>Delivery:</strong> Nationwide (fee applicable)</li>
         </ul>
       </div>
       <div>
-        <div class="price-tag">ZMW 1,300</div>
+        <div class="price-tag">ZMW 600</div>
         <div class="time-listed" id="timeListed">Listed just now</div>
       </div>
     </div>
@@ -122,7 +149,7 @@
     <section class="gallery-section">
       <div class="gallery-container">
         <div class="main-slide">
-          <img src="L1.jpeg" id="mainImage" alt="Item Image" />
+          <img src="V1.jpg" id="mainImage" alt="Item Image" />
           <button class="slide-nav prev-slide" onclick="navigateSlide(-1)">❮</button>
           <button class="slide-nav next-slide" onclick="navigateSlide(1)">❯</button>
         </div>
@@ -135,14 +162,13 @@
         <div class="card">
           <button class="toggle-offer-btn" onclick="toggleOfferSection()">Make an Offer</button>
           <div class="offer-section" id="offerSection">
-            
             <div class="form-group">
               <label for="itemName">Item</label>
-              <input id="itemName" class="bid-input" type="text" placeholder="laptop" required />
+              <input id="itemName" class="bid-input" type="text" placeholder="Sumsung s24 required" />
             </div>
             <div class="form-group">
               <label for="bid">Amount (ZMW)</label>
-              <input id="bid" class="amount-input" type="number" placeholder="1299" required />
+              <input id="bid" class="amount-input" type="number" placeholder="9000" required />
             </div>
             <div class="offer-actions">
               <button class="whatsapp-btn" onclick="submitOffer('whatsapp')">WhatsApp</button>
@@ -150,13 +176,33 @@
               <button class="call-btn" onclick="window.location.href='tel:+260978167546'">Call</button>
             </div>
           </div>
+          <!-- More Details Toggle Button and Section -->
+          <button id="toggleDetailsBtn" class="toggle-offer-btn" style="margin-top:15px;" onclick="toggleDetails()">Show More Details</button>
+          <div id="moreDetails" class="more-details-section">
+            <h3 style="margin-bottom:10px;">Product Specifications</h3>
+            <ul>
+              
+  <li><strong>Model</strong>: Villaon V20 SE - Budget Smartphone</li>
+  <li><strong>Price</strong>: ZMW 600 (Negotiable)</li>
+  <li><strong>Location</strong>: Lusaka, Zambia</li>
+  <li><strong>Display</strong>: 6.3-inch PLS LCD (480x854)</li>
+  <li><strong>Processor</strong>: Octa-Core Unisoc SC9863A</li>
+  <li><strong>Memory</strong>: 2 GB RAM</li>
+  <li><strong>Storage</strong>: 32 GB (Expandable to 256 GB)</li>
+  <li><strong>Cameras</strong>: 8 MP Rear, 5 MP Front</li>
+  <li><strong>Battery</strong>: 3000 mAh with Fast Charging</li>
+  <li><strong>Features</strong>: Fingerprint Sensor, USB-C, Android 11 Go</li>
+
+            </ul>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <script>
-    const thumbnails = ["L1.jpeg", "L2.jpeg", "L3.jpeg", "L4.jpeg", "L5.jpeg", "L6.jpg"];
+    // Gallery logic
+    const thumbnails = ["S241.webp", "S242.webp", "S243.webp", "S244.webp", "S245.webp", "S246.webp"];
     let currentSlide = 0;
 
     const mainImage = document.getElementById("mainImage");
@@ -188,11 +234,13 @@
       updateSlide();
     }
 
+    // Offer section toggle
     function toggleOfferSection() {
       const section = document.getElementById("offerSection");
       section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
     }
 
+    // Offer submission
     function submitOffer(type) {
       const name = document.getElementById("itemName").value;
       const bid = document.getElementById("bid").value;
@@ -206,8 +254,9 @@
       }
     }
 
+    // Time since listing
     function updateTimeListed() {
-      const listedTime = new Date("2025-05-27T12:00:00Z");
+      const listedTime = new Date("2025-06-27T12:00:00Z");
       const now = new Date();
       const diffMs = now - listedTime;
       const diffMins = Math.floor(diffMs / 60000);
@@ -223,12 +272,26 @@
       document.getElementById("timeListed").textContent = timeText;
     }
 
+    // More Details toggle
+    function toggleDetails() {
+      const detailsDiv = document.getElementById("moreDetails");
+      const btn = document.getElementById("toggleDetailsBtn");
+      if (detailsDiv.style.display === "none" || detailsDiv.style.display === "") {
+        detailsDiv.style.display = "block";
+        btn.textContent = "Hide Details";
+      } else {
+        detailsDiv.style.display = "none";
+        btn.textContent = "Show More Details";
+      }
+    }
+
     // Initial load
     renderThumbnails();
     updateSlide();
     updateTimeListed();
     setInterval(updateTimeListed, 60000);
+    // Ensure more details is hidden on load
+    document.getElementById("moreDetails").style.display = "none";
   </script>
 </body>
-  
 </html>
