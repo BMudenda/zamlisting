@@ -72,6 +72,11 @@
     .toggle-offer-btn {
       background: #2980b9; color: white; padding: 10px 20px;
       border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+    .toggle-offer-btn:hover {
+      background: #176099;
     }
     .offer-section { display: none; margin-top: 15px; }
     .form-group {
@@ -98,6 +103,28 @@
     .whatsapp-btn { background-color: #25d366; color: white; }
     .text-btn { background-color: #2980b9; color: white; }
     .call-btn { background-color: #e74c3c; color: white; }
+    /* More Details section */
+    .more-details-section {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f8f8;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      animation: fadeIn 0.4s;
+    }
+    .more-details-section ul {
+      list-style: disc inside;
+      color: #444;
+      margin-left: 10px;
+    }
+    .more-details-section li {
+      margin-bottom: 8px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0;}
+      to { opacity: 1;}
+    }
   </style>
 </head>
 <body>
@@ -135,10 +162,9 @@
         <div class="card">
           <button class="toggle-offer-btn" onclick="toggleOfferSection()">Make an Offer</button>
           <div class="offer-section" id="offerSection">
-            
             <div class="form-group">
               <label for="itemName">Item</label>
-              <input id="itemName" class="bid-input" type="text" placeholder="Sumsung s24 required />
+              <input id="itemName" class="bid-input" type="text" placeholder="Sumsung s24 required" />
             </div>
             <div class="form-group">
               <label for="bid">Amount (ZMW)</label>
@@ -150,12 +176,31 @@
               <button class="call-btn" onclick="window.location.href='tel:+260979359159'">Call</button>
             </div>
           </div>
+          <!-- More Details Toggle Button and Section -->
+          <button id="toggleDetailsBtn" class="toggle-offer-btn" style="margin-top:15px;" onclick="toggleDetails()">Show More Details</button>
+          <div id="moreDetails" class="more-details-section">
+            <h3 style="margin-bottom:10px;">Product Specifications</h3>
+            <ul>
+              <li><strong>Model:</strong> Samsung Galaxy S24 (Boxed, Unopened)</li>
+              <li><strong>Storage:</strong> 256GB</li>
+              <li><strong>RAM:</strong> 8GB</li>
+              <li><strong>Color:</strong> Black</li>
+              <li><strong>Warranty:</strong> 12 Months (Manufacturer)</li>
+              <li><strong>Battery:</strong> 4000 mAh, Fast Charging</li>
+              <li><strong>Camera:</strong> Triple Rear 50MP + 12MP + 10MP, Front 12MP</li>
+              <li><strong>Display:</strong> 6.2" Dynamic AMOLED, 120Hz</li>
+              <li><strong>OS:</strong> Android 14, One UI 6</li>
+              <li><strong>Delivery:</strong> Available Nationwide (fee applicable)</li>
+              <li><strong>Contact:</strong> +260979359159</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <script>
+    // Gallery logic
     const thumbnails = ["V1.jpg", "V2.jpg", "V3.jpg", "V4.jpg", "V5.jpg", "V6.jpg"];
     let currentSlide = 0;
 
@@ -188,11 +233,13 @@
       updateSlide();
     }
 
+    // Offer section toggle
     function toggleOfferSection() {
       const section = document.getElementById("offerSection");
       section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
     }
 
+    // Offer submission
     function submitOffer(type) {
       const name = document.getElementById("itemName").value;
       const bid = document.getElementById("bid").value;
@@ -206,6 +253,7 @@
       }
     }
 
+    // Time since listing
     function updateTimeListed() {
       const listedTime = new Date("2025-05-27T12:00:00Z");
       const now = new Date();
@@ -223,12 +271,26 @@
       document.getElementById("timeListed").textContent = timeText;
     }
 
+    // More Details toggle
+    function toggleDetails() {
+      const detailsDiv = document.getElementById("moreDetails");
+      const btn = document.getElementById("toggleDetailsBtn");
+      if (detailsDiv.style.display === "none" || detailsDiv.style.display === "") {
+        detailsDiv.style.display = "block";
+        btn.textContent = "Hide Details";
+      } else {
+        detailsDiv.style.display = "none";
+        btn.textContent = "Show More Details";
+      }
+    }
+
     // Initial load
     renderThumbnails();
     updateSlide();
     updateTimeListed();
     setInterval(updateTimeListed, 60000);
+    // Ensure more details is hidden on load
+    document.getElementById("moreDetails").style.display = "none";
   </script>
 </body>
-  
 </html>
