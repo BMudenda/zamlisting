@@ -69,17 +69,17 @@
     }
 
     .slider-container {
-      display: flex;
-      overflow-x: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* Exactly three cards per row */
       gap: 20px;
       padding: 20px 0;
-      scroll-behavior: smooth;
-      flex-wrap: nowrap;
+      max-width: 810px; /* 3 * (250px width + 20px gap) - 20px */
+      margin: 0 auto; /* Center the grid */
+      justify-items: center; /* Center cards within columns */
     }
 
     .vehicle {
-      flex: 0 0 auto;
-      width: 250px;
+      width: 250px; /* Fixed card width */
       border-radius: 12px;
       background: #fff;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -98,17 +98,17 @@
 
     .vehicle img {
       margin-top: 16px;
-      width: 90%; /* Increased to fill most of the card width */
-      max-width: 220px; /* Ensures image doesn't exceed card width (250px - padding) */
-      height: 120px; /* Adjusted height for better proportion */
-      object-fit: contain; /* Ensures full image is visible without cropping */
-      border-radius: 8px; /* Subtle rounded corners for icon aesthetic */
+      width: 90%; /* Fill most of the card width */
+      max-width: 220px; /* Prevent overflow */
+      height: 120px; /* Proportionate height */
+      object-fit: contain; /* Full image visible */
+      border-radius: 8px;
       display: block;
       margin-left: auto;
       margin-right: auto;
-      background: #f5f5f5; /* Consistent background */
-      padding: 8px; /* Slightly reduced padding to allow wider image */
-      border: 1px solid #ddd; /* Subtle border for definition */
+      background: #f5f5f5;
+      padding: 8px;
+      border: 1px solid #ddd;
       flex-shrink: 0;
     }
 
@@ -119,6 +119,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      min-height: 120px; /* Ensure consistent card height */
     }
 
     .card-title {
@@ -151,15 +152,6 @@
 
     .card-action:hover {
       background: #005fa3;
-    }
-
-    .slider-container::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    .slider-container::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 4px;
     }
 
     .footer-links {
@@ -212,16 +204,21 @@
       font-size: 80px;
       margin-top: 30px;
       animation: emojiBounce 1.5s infinite ease-in-out;
-      height: 160px; /* Match original image height for consistency */
+      height: 160px; /* Match image height */
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f5f5f5; /* Match image background */
+      background: #f5f5f5;
     }
 
     @media (max-width: 600px) {
       .brand-title {
         font-size: 28px;
+      }
+
+      .slider-container {
+        grid-template-columns: 1fr; /* One card per row on mobile */
+        max-width: 250px;
       }
 
       .vehicle {
@@ -230,15 +227,15 @@
       }
 
       .vehicle img {
-        width: 90%; /* Maintain wide appearance on mobile */
-        max-width: 170px; /* Adjust for smaller card width (200px - padding) */
-        height: 100px; /* Reduced height for mobile */
-        padding: 6px; /* Slightly reduced padding */
+        width: 90%;
+        max-width: 170px;
+        height: 100px;
+        padding: 6px;
       }
 
       .emoji-animated {
-        font-size: 60px; /* Adjust emoji size for mobile */
-        height: 120px; /* Match mobile image height */
+        font-size: 60px;
+        height: 120px;
       }
 
       #searchInput {
@@ -258,10 +255,16 @@
         font-size: 12px;
       }
     }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      .slider-container {
+        grid-template-columns: repeat(2, 1fr); /* Two cards per row */
+        max-width: 540px; /* 2 * (250px + 20px) - 20px */
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- HTML remains unchanged -->
   <header>
     <div class="brand-title">Zam<span class="highlight">Listing</span></div>
     <h2 class="tagline">Get your Service</h2>
@@ -294,8 +297,8 @@
       </div>
     </a>
 
-    <a href="laptop.html" class="vehicle" data-name="Sell laptop Lusaka" data-type="laptop">
-      <img src="L1.jpeg" alt="laptop">
+    <a href="laptop.html" class="vehicle" data-name="Sell Laptop Lusaka" data-type="laptop">
+      <img src="L1.jpeg" alt="Laptop">
       <div class="card-body">
         <div class="card-title">Laptop - For Sale</div>
         <div class="card-detail">Price: ZMW 1,300</div>
@@ -303,10 +306,10 @@
       </div>
     </a>
 
-    <a href="sumsungs24.html" class="vehicle" data-name="Sell laptop Lusaka" data-type="phone">
-      <img src="S243.webp" alt="laptop">
+    <a href="sumsungs24.html" class="vehicle" data-name="Sell Samsung S24 Lusaka" data-type="phone">
+      <img src="S243.webp" alt="Samsung S24">
       <div class="card-body">
-        <div class="card-title">Sumsung S24 - For Sale -Negotiable</div>
+        <div class="card-title">Samsung S24 - For Sale - Negotiable</div>
         <div class="card-detail">Price: ZMW 9,000</div>
         <div class="card-detail">Location: Lusaka</div>
       </div>
@@ -359,22 +362,23 @@
       const selectedType = typeFilter.value;
       let count = 0;
 
-      for (let vehicle of vehicles) {
+      // Iterate in DOM order to preserve HTML sequence
+      Array.from(vehicles).forEach(vehicle => {
         const name = vehicle.getAttribute("data-name").toLowerCase();
         const type = vehicle.getAttribute("data-type");
         const matchesSearch = name.includes(searchValue);
         const matchesType = selectedType === "all" || type === selectedType;
         const show = matchesSearch && matchesType;
-        vehicle.style.display = show ? "inline-block" : "none";
+        vehicle.style.display = show ? "flex" : "none";
         if (show) count++;
-      }
+      });
 
       resultCount.textContent = `Showing ${count} result${count !== 1 ? 's' : ''}`;
     }
 
     searchInput.addEventListener("input", filterVehicles);
     typeFilter.addEventListener("change", filterVehicles);
-    filterVehicles(); // initialize on load
+    filterVehicles(); // Initialize on load
   </script>
 </body>
 </html>
