@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZamListing | vehicle</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background-color: #f5f5f5; color: #333; }
+    header {
+      background: #333;
+      color: white;
+      padding: 20px;
+      text-align: left;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+    .seller-info { flex: 1 1 60%; }
+    .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
+    .seller-info ul { list-style: none; margin-top: 8px; }
+    .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
+    .seller-contact a {
+      text-decoration: none;
+      color: white;
+      margin-right: 10px;
+    }
+    .seller-contact i { margin-right: 5px; }
+    .price-tag {
+      font-size: 1.3rem;
+      font-weight: bold;
+      background: #e67e22;
+      padding: 8px 15px;
+      border-radius: 5px;
+      color: white;
+      margin-bottom: 5px;
+    }
+    .time-listed {
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+
+    .product-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+    .gallery-section { flex: 1 1 60%; min-width: 300px; }
+    .details-section { flex: 1 1 35%; min-width: 300px; }
+
+    .gallery-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .main-slide {
+      position: relative;
+      height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9f9f9;
+    }
+    .main-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .slide-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .prev-slide { left: 15px; }
+    .next-slide { right: 15px; }
+
+    .thumbnail-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: 15px;
+    }
+    .thumbnail {
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.3s ease;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .thumbnail:hover, .thumbnail.active {
+      border-color: #ff9900;
+      opacity: 0.9;
+    }
+
+    .des { padding: 10px; }
+    .card {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      background: white;
+    }
+    .action-buttons { margin-top: 20px; }
+    .btn {
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .btn-primary { background-color: #27ae60; color: white; }
+    .btn:hover { opacity: 0.9; }
+
+    .bid-input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #loader {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .footer-link {
+      text-decoration: none;
+      color: #fff;
+      font-size: 0.9em;
+      margin: 0 15px;
+    }
+
+    .fa { padding: 10px; font-size: 20px; width: 30px; text-align: center; border-radius: 50%; }
+    .fa:hover { opacity: 0.7; }
+    .fa-facebook { background: #3B5998; color: white; }
+    .fa-twitter { background: #55ACEE; color: white; }
+    .fa-whatsapp { background: #25d366; color: white; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <div class="seller-info">
+        <h2>Vitz 2SZ</h2>
+        <ul>
+          <li><strong>Seller:</strong> -</li>
+          <li><strong>Address:</strong> Ndola, Itowa</li>
+          <li><strong>Delivery:</strong> Nationwide (fee applicable)</li>
+        </ul>
+        <div class="seller-contact">
+          <a href="tel:+260973442823"><i class="fa fa-phone"></i>Call</a>
+          <a href="https://wa.me/260973442823"><i class="fa fa-whatsapp"></i>WhatsApp</a>
+        </div>
+      </div>
+      <div>
+        <div class="price-tag">ZMW 90,000</div>
+        <div class="time-listed" id="timeListed">Listed just now</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="product-container">
+    <section class="gallery-section">
+      <div class="gallery-container">
+        <div class="main-slide">
+          <img src="V1.jpg" id="mainImage" alt="Item Image" />
+          <button class="slide-nav prev-slide">❮</button>
+          <button class="slide-nav next-slide">❯</button>
+        </div>
+        <div class="thumbnail-container"></div>
+      </div>
+    </section>
+
+    <section class="details-section">
+      <div class="des">
+        <div class="card">
+          <input id="phone" class="bid-input" type="tel" placeholder="Your phone number" required />
+          <input id="bid" class="bid-input" type="number" placeholder="Negotiable. Enter your offer in ZMW" required />
+          <div id="loader">Submitting...</div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="submitBid()">Submit offer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <a href="https://zamlisting.com/about.html" class="footer-link">About</a>
+      <a href="https://zamlisting.com/" class="footer-link">Home</a>
+    </div>
+    <hr />
+    <div>
+      <a href="#" class="fa fa-facebook"></a>
+      <a href="#" class="fa fa-twitter"></a>
+      <a href="https://wa.me/260770870706" class="fa fa-whatsapp"></a>
+    </div>
+  </footer>
+
+  <script>
+    const galleryConfig = {
+      images: ["V1.jpg", "V2.jpg", "V3.jpg", "V4.jpg", "V5.jpg", "V6.jpg"],
+      currentSlide: 0
+    };
+
+    const mainImage = document.getElementById("mainImage");
+    const thumbnails = document.querySelector(".thumbnail-container");
+
+    function updateMainImage(index) {
+      mainImage.src = galleryConfig.images[index];
+      galleryConfig.currentSlide = index;
+      updateThumbnails();
+    }
+
+    function updateThumbnails() {
+      thumbnails.innerHTML = "";
+      galleryConfig.images.forEach((src, i) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "thumbnail" + (i === galleryConfig.currentSlide ? " active" : "");
+        img.onclick = () => updateMainImage(i);
+        thumbnails.appendChild(img);
+      });
+    }
+
+    document.querySelector(".prev-slide").onclick = () => {
+      galleryConfig.currentSlide = (galleryConfig.currentSlide - 1 + galleryConfig.images.length) % galleryConfig.images.length;
+      updateMainImage(galleryConfig.currentSlide);
+    };
+
+    document.querySelector(".next-slide").onclick = () => {
+      galleryConfig.currentSlide = (galleryConfig.currentSlide + 1) % galleryConfig.images.length;
+      updateMainImage(galleryConfig.currentSlide);
+    };
+
+    updateThumbnails();
+
+    function submitBid() {
+      const phone = document.getElementById("phone").value.trim();
+      const bid = document.getElementById("bid").value.trim();
+      const loader = document.getElementById("loader");
+
+      if (!phone || !bid) {
+        alert("Please enter both phone number and bid.");
+        return;
+      }
+
+      loader.style.display = "block";
+
+      // Replace with your actual Google Apps Script URL
+      const scriptURL = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";
+      const formData = new URLSearchParams();
+      formData.append("phone", phone);
+      formData.append("bid", bid);
+
+      fetch(scriptURL, { method: 'POST', body: formData })
+        .then(response => {
+          loader.style.display = "none";
+          alert("Your offer has been submitted.");
+        })
+        .catch(error => {
+          loader.style.display = "none";
+          alert("Submission failed. Try again.");
+          console.error("Error:", error);
+        });
+    }
+
+    // Time since listing counter
+    const listingTime = new Date(); // Set to page load for demo; replace with actual timestamp if available
+    function updateTimeListed() {
+      const now = new Date();
+      const seconds = Math.floor((now - listingTime) / 1000);
+      let display = "Listed just now";
+
+      if (seconds >= 60 && seconds < 3600) {
+        display = `Listed ${Math.floor(seconds / 60)} minutes ago`;
+      } else if (seconds >= 3600 && seconds < 86400) {
+        display = `Listed ${Math.floor(seconds / 3600)} hours ago`;
+      } else if (seconds >= 86400) {
+        display = `Listed ${Math.floor(seconds / 86400)} days ago`;
+      }
+
+      document.getElementById("timeListed").textContent = display;
+    }
+
+    setInterval(updateTimeListed, 60000); // Update every minute
+    updateTimeListed(); // Initial call
+  </script>
+</body>
+</html>
