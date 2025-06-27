@@ -6,8 +6,6 @@
   <title>ZamListing</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007"
-     crossorigin="anonymous"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -88,6 +86,10 @@
       text-decoration: none;
       color: #000;
       transition: transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 320px;
     }
 
     .vehicle:hover {
@@ -95,18 +97,59 @@
     }
 
     .vehicle img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
+      margin-top: 16px;
+      width: 80px; /* Reduced size for icon-like appearance */
+      height: 80px; /* Fixed height for consistency */
+      object-fit: contain; /* Ensures full image is visible without cropping */
+      border-radius: 8px; /* Slightly rounded corners for icon aesthetic */
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      background: #f5f5f5; /* Consistent background for uniformity */
+      padding: 10px; /* Padding to give icon-like spacing */
+      border: 1px solid #ddd; /* Subtle border for definition */
+      flex-shrink: 0;
     }
 
-    .caption {
-      padding: 10px;
+    .card-body {
+      padding: 10px 12px 18px 12px;
+      text-align: left;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .card-title {
+      font-size: 18px;
       font-weight: bold;
       color: #0077cc;
-      text-decoration: underline;
+      margin-bottom: 3px;
+    }
+
+    .card-detail {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 2px;
+    }
+
+    .card-action {
+      margin-top: 8px;
+      color: #fff;
+      background: #0077cc;
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+      align-self: flex-start;
+      text-decoration: none;
+    }
+
+    .card-action:hover {
+      background: #005fa3;
     }
 
     .slider-container::-webkit-scrollbar {
@@ -155,6 +198,26 @@
       margin: 20px 0;
     }
 
+    @keyframes emojiBounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .emoji-animated {
+      font-size: 80px;
+      margin-top: 30px;
+      animation: emojiBounce 1.5s infinite ease-in-out;
+      height: 160px; /* Match original image height for consistency */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f5f5f5; /* Match image background */
+    }
+
     @media (max-width: 600px) {
       .brand-title {
         font-size: 28px;
@@ -162,6 +225,18 @@
 
       .vehicle {
         width: 200px;
+        min-height: 230px;
+      }
+
+      .vehicle img {
+        width: 60px; /* Smaller icon size for mobile */
+        height: 60px;
+        padding: 8px;
+      }
+
+      .emoji-animated {
+        font-size: 60px; /* Adjust emoji size for mobile */
+        height: 120px; /* Match mobile image height */
       }
 
       #searchInput {
@@ -172,11 +247,19 @@
         flex-direction: column;
         align-items: center;
       }
+
+      .card-title {
+        font-size: 15px;
+      }
+
+      .card-detail {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
-
+  <!-- HTML remains unchanged -->
   <header>
     <div class="brand-title">Zam<span class="highlight">Listing</span></div>
     <h2 class="tagline">Get your Service</h2>
@@ -187,7 +270,7 @@
     <input type="text" id="searchInput" placeholder="Search services...">
     <select id="typeFilter">
       <option value="all">All Categories</option>
-      <option value="taxi">Taxi</option>
+      <option value="taxi">Book Ride</option>
       <option value="bike">Bike</option>
       <option value="item">e-shop</option>
       <option value="canter">Canter</option>
@@ -199,34 +282,48 @@
   <div id="resultCount">Showing results</div>
 
   <div class="slider-container" id="vehicleContainer">
-    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luanshya" data-type="taxi">
-      <img src="P2.jpg" alt="Taxi Hire Luanshya">
-      <div class="caption">Book Taxi-Luanshya Uber App</div>
-    </a>
-    <a href="taxi.html" class="vehicle" data-name="Taxi Hire Luangwa" data-type="taxi">
-      <img src="P5.jpg" alt="Taxi Hire Luangwa">
-      <div class="caption">Book Taxi-Luangwa Uber App</div>
-    </a>
-    <a href="bike.html" class="vehicle" data-name="Bike Hire Luangwa" data-type="bike">
-      <img src="P3.webp" alt="Bike Hire Luangwa">
-      <div class="caption">Book Bike-Luangwa Uber App</div>
-    </a>
-    <a href="istore.html" class="vehicle" data-name="Assorted Items for sell-Luangwa" data-type="item">
-      <img src="IM.png" alt="Assorted -Luangwa">
-      
-      <div class="caption">Delivery App-Luangwa e-shop</div>
-    </a>
-    <a href="#" class="vehicle" data-name="Canter Hire Luangwa" data-type="canter">
-      <img src="P4.jpg" alt="Canter Hire Luangwa">
-      <div class="caption">Canter Hire Luangwa</div>
-    </a>
     <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola" data-type="sale">
       <img src="V1.jpg" alt="Vitz Ndola">
-      <div class="caption">Sell:ZMW 90,000 :Ndola</div>
+      <div class="card-body">
+        <div class="card-title">Vitz - For Sale</div>
+        <div class="card-detail">Price: ZMW 90,000</div>
+        <div class="card-detail">Location: Ndola</div>
+      </div>
     </a>
+
     <a href="laptop.html" class="vehicle" data-name="Sell laptop Lusaka" data-type="laptop">
       <img src="L1.jpeg" alt="laptop">
-      <div class="caption">Sell:ZMW 1300 :Lusaka</div>
+      <div class="card-body">
+        <div class="card-title">Laptop - For Sale</div>
+        <div class="card-detail">Price: ZMW 1,300</div>
+        <div class="card-detail">Location: Lusaka</div>
+      </div>
+    </a>
+
+    <a href="sumsungs24.html" class="vehicle" data-name="Sell laptop Lusaka" data-type="laptop">
+      <img src="S243.webp" alt="laptop">
+      <div class="card-body">
+        <div class="card-title">Sumsung S24 - For Sale -Negotiable</div>
+        <div class="card-detail">Price: ZMW 9,000</div>
+        <div class="card-detail">Location: Lusaka</div>
+      </div>
+    </a>
+
+    <a href="customerride.html" class="vehicle" data-name="Taxi Hire Luangwa" data-type="taxi">
+      <div class="emoji-animated">🚕🏍️</div>
+      <div class="card-body">
+        <div class="card-title">Taxi & Bike Hire</div>
+        <div class="card-detail">Luangwa</div>
+        <div class="card-detail">Uber-style App</div>
+      </div>
+    </a>
+
+    <a href="istorev0.html" class="vehicle" data-name="Assorted Items for sell-Luangwa" data-type="item">
+      <div class="emoji-animated">🛒🏍️🚕</div>
+      <div class="card-body">
+        <div class="card-title">Delivery App</div>
+        <div class="card-detail">Luangwa e-shop</div>
+      </div>
     </a>
   </div>
 
@@ -276,6 +373,5 @@
     typeFilter.addEventListener("change", filterVehicles);
     filterVehicles(); // initialize on load
   </script>
-
 </body>
 </html>
