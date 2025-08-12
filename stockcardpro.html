@@ -1,85 +1,432 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AP</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Stock Manager</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-    }
-
-    iframe {
-      width: 100%;
-      height: 600px; /* Adjust height as needed */
-      border: none;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
-    .checklist {
-      max-width: 600px;
-      margin: auto;
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .checklist h2 {
-      color: #38bdf8;
-      margin-bottom: 20px;
-    }
-
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .item label {
-      flex: 1;
-      font-weight: bold;
-    }
-
-    .item select {
-      background: #334155;
-      color: #f8fafc;
-      border: 1px solid #475569;
-      border-radius: 5px;
-      padding: 5px;
-      width: 80px;
-    }
-
-    .result {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 1.2em;
-      color: #4ade80;
-    }
+    :root{--accent:#0f62fe;--muted:#6b7280;--bg:#f7f7fb}
+    *{box-sizing:border-box}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0;background:var(--bg);color:#0f1724}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    .card{background:white;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(10,15,25,0.06);margin-bottom:16px}
+    form.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    label{font-size:12px;color:var(--muted)}
+    input[type=text],input[type=number],input[type=date],select{width:100%;padding:10px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px}
+    .full{grid-column:span 4}
+    .col2{grid-column:span 2}
+    button{background:var(--accent);color:white;border:0;padding:10px 12px;border-radius:8px;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(15,98,254,0.12)}
+    .flex{display:flex;gap:8px;align-items:center}
+    .items{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .item-card{padding:12px;border-radius:10px;border:1px solid #eef2ff;background:linear-gradient(180deg, #fff, #fbfdff)}
+    .item-card h3{margin:0;font-size:16px}
+    .item-card p{margin:6px 0 0;color:var(--muted);font-size:13px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #eef2ff;text-align:left;font-size:13px}
+    th{background:#fbfbff;color:var(--muted);position:sticky;top:0}
+    .small{font-size:12px;color:var(--muted)}
+    .danger{color:#d32f2f}
+    .controls{display:flex;gap:8px;align-items:center}
+    .hidden{display:none}
+    @media(max-width:900px){form.grid{grid-template-columns:repeat(2,1fr)}.full{grid-column:span 2}.col2{grid-column:span 2}.items{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:520px){form.grid{grid-template-columns:repeat(1,1fr)}.items{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <header>
+      <h1>Simple Stock Manager</h1>
+      <div class="small">Local-only demo — data saved in browser (localStorage)</div>
+    </header>
+    <section class="card">
+      <form id="txForm" class="grid" autocomplete="off">
+        <div>
+          <label for="stockName">Stock name</label>
+          <select id="stockName" required>
+            <option value="">Select stock</option>
+            <option value="Pens">Pens</option>
+            <option value="Pencils">Pencils</option>
+            <option value="Books">Books</option>
+            <option value="Notebooks">Notebooks</option>
+            <option value="Erasers">Erasers</option>
+          </select>
+        </div>
+        <div>
+          <label for="txType">Transaction type</label>
+          <select id="txType" required>
+            <option value="in">Stock IN</option>
+            <option value="out">Stock OUT</option>
+          </select>
+        </div>
+        <div>
+          <label for="txDate">Date</label>
+          <input id="txDate" type="date" required />
+        </div>
+        <div>
+          <label for="txAmount">Amount (units)</label>
+          <input id="txAmount" type="number" min="1" step="1" value="1" required />
+        </div>
+        <div id="priceBoughtDiv" class="hidden">
+          <label for="priceBought">Price Bought (per unit)</label>
+          <input id="priceBought" type="number" min="0" step="0.01" placeholder="e.g. 1.50" />
+        </div>
+        <div id="dateSoldDiv" class="hidden">
+          <label for="dateSold">Date Sold</label>
+          <input id="dateSold" type="date" />
+        </div>
+        <div id="priceSoldDiv" class="hidden">
+          <label for="priceSold">Price Sold (per unit)</label>
+          <input id="priceSold" type="number" min="0" step="0.01" placeholder="e.g. 2.00" />
+        </div>
+        <div class="col2">
+          <label for="person">Person (in / out)</label>
+          <select id="person" required>
+            <option value="">Select person</option>
+            <option value="Angela">Angela</option>
+            <option value="Brian">Brian</option>
+            <option value="George">George</option>
+          </select>
+        </div>
+        <div class="col2">
+          <label for="note">Note (optional)</label>
+          <input id="note" type="text" placeholder="Supplier, reason, doc #" />
+        </div>
+        <div class="full flex" style="justify-content:space-between;align-items:center">
+          <div class="controls">
+            <button type="submit">Save transaction</button>
+            <button type="button" id="clearBtn" class="ghost">Clear all data</button>
+            <button type="button" id="exportBtn" class="ghost">Export CSV</button>
+          </div>
+          <div class="small">Tip: select stock and person from dropdowns</div>
+        </div>
+      </form>
+    </section>
+    <section class="card">
+      <h2 style="margin:0 0 10px">Current stock balances</h2>
+      <div id="items" class="items" aria-live="polite"></div>
+      <div id="totalProfit" class="small" style="margin-top:10px"></div>
+    </section>
+    <section class="card">
+      <h2 style="margin:0 0 10px">Transaction history</h2>
+      <div style="overflow:auto">
+        <table id="txTable" aria-live="polite">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Stock</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Price Bought</th>
+              <th>Date Sold</th>
+              <th>Price Sold</th>
+              <th>Profit</th>
+              <th>Balance After</th>
+              <th>Person</th>
+              <th>Note</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <script>
+    const LS_KEY = 'simple_stock_manager_v2'; // Updated key to avoid conflicts
+    const form = document.getElementById('txForm');
+    const stockNameEl = document.getElementById('stockName');
+    const txTypeEl = document.getElementById('txType');
+    const txDateEl = document.getElementById('txDate');
+    const txAmountEl = document.getElementById('txAmount');
+    const priceBoughtEl = document.getElementById('priceBought');
+    const dateSoldEl = document.getElementById('dateSold');
+    const priceSoldEl = document.getElementById('priceSold');
+    const personEl = document.getElementById('person');
+    const noteEl = document.getElementById('note');
+    const itemsEl = document.getElementById('items');
+    const totalProfitEl = document.getElementById('totalProfit');
+    const txTableBody = document.querySelector('#txTable tbody');
+    const clearBtn = document.getElementById('clearBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const priceBoughtDiv = document.getElementById('priceBoughtDiv');
+    const dateSoldDiv = document.getElementById('dateSoldDiv');
+    const priceSoldDiv = document.getElementById('priceSoldDiv');
 
-  <!--notes last 2 pattern-->
+    txDateEl.value = new Date().toISOString().substring(0, 10);
+    let state = loadState();
 
-  <iframe src="https://www.betway.co.zm/lobby/Casino/featured/Aviator" allow="autoplay; fullscreen"></iframe>
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : { transactions: [] };
+      } catch (e) {
+        console.error('Error loading state:', e);
+        return { transactions: [] };
+      }
+    }
 
-  <div class="checklist">
-    <!--notes last 2 pattern-->
+    function saveState() {
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Error saving state:', e);
+        alert('Failed to save data. Local storage might be full.');
+      }
+    }
 
-    
-<ul>
-  <li> 😂 </li>
-</ul>
+    function computeBalancesAndValues() {
+      const balances = {};
+      const purchasePrices = {}; // Tracks latest purchase price per stock
+      state.transactions.forEach(tx => {
+        const name = tx.stock.trim();
+        if (!balances[name]) balances[name] = 0;
+        if (tx.type === 'in') {
+          balances[name] += Number(tx.amount);
+          if (tx.priceBought != null) purchasePrices[name] = Number(tx.priceBought);
+        } else {
+          balances[name] -= Number(tx.amount);
+        }
+      });
+      return { balances, purchasePrices };
+    }
+
+    function calculateProfit() {
+      let totalProfit = 0;
+      const purchasePrices = {}; // Average purchase price up to each OUT transaction
+      const stockQuantities = {};
+      state.transactions.forEach(tx => {
+        const name = tx.stock.trim();
+        if (!stockQuantities[name]) stockQuantities[name] = 0;
+        if (!purchasePrices[name]) purchasePrices[name] = 0;
+
+        if (tx.type === 'in' && tx.priceBought != null) {
+          // Update average purchase price
+          const currentTotalValue = stockQuantities[name] * purchasePrices[name];
+          stockQuantities[name] += Number(tx.amount);
+          const newTotalValue = currentTotalValue + Number(tx.amount) * Number(tx.priceBought);
+          purchasePrices[name] = stockQuantities[name] > 0 ? newTotalValue / stockQuantities[name] : 0;
+        } else if (tx.type === 'out' && tx.priceSold != null) {
+          stockQuantities[name] -= Number(tx.amount);
+          const profit = (Number(tx.priceSold) - (purchasePrices[name] || 0)) * Number(tx.amount);
+          totalProfit += profit;
+        }
+      });
+      return totalProfit;
+    }
+
+    function renderItems() {
+      const { balances, purchasePrices } = computeBalancesAndValues();
+      itemsEl.innerHTML = '';
+      const names = Object.keys(balances).sort((a, b) => a.localeCompare(b));
+      if (names.length === 0) {
+        itemsEl.innerHTML = '<div class="small">No stock yet. Add transactions above.</div>';
+        return;
+      }
+      names.forEach(name => {
+        const bal = balances[name];
+        const price = purchasePrices[name] || 0;
+        const value = bal * price;
+        const div = document.createElement('div');
+        div.className = 'item-card';
+        div.innerHTML = `
+          <h3>${escapeHtml(name)}</h3>
+          <p class="small">Balance: <strong>${bal}</strong></p>
+          <p class="small">Unit Price: <strong>$${price.toFixed(2)}</strong></p>
+          <p class="small">Total Value: <strong>$${value.toFixed(2)}</strong></p>
+        `;
+        itemsEl.appendChild(div);
+      });
+      const totalProfit = calculateProfit();
+      totalProfitEl.textContent = `Total Profit: $${totalProfit.toFixed(2)}`;
+    }
+
+    function renderTable() {
+      txTableBody.innerHTML = '';
+      const balancesAt = calculateBalancesAfterEachTx();
+      const purchasePrices = {};
+      const stockQuantities = {};
+      state.transactions.slice().reverse().forEach(tx => {
+        const name = tx.stock.trim();
+        if (!stockQuantities[name]) stockQuantities[name] = 0;
+        if (!purchasePrices[name]) purchasePrices[name] = 0;
+
+        if (tx.type === 'in' && tx.priceBought != null) {
+          const currentTotalValue = stockQuantities[name] * purchasePrices[name];
+          stockQuantities[name] += Number(tx.amount);
+          const newTotalValue = currentTotalValue + Number(tx.amount) * Number(tx.priceBought);
+          purchasePrices[name] = stockQuantities[name] > 0 ? newTotalValue / stockQuantities[name] : 0;
+        } else if (tx.type === 'out') {
+          stockQuantities[name] -= Number(tx.amount);
+        }
+
+        const profit = tx.type === 'out' && tx.priceSold != null
+          ? ((Number(tx.priceSold) - (purchasePrices[name] || 0)) * Number(tx.amount)).toFixed(2)
+          : '';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(tx.date)}</td>
+          <td>${escapeHtml(tx.stock)}</td>
+          <td>${tx.type === 'in' ? 'IN' : 'OUT'}</td>
+          <td>${Number(tx.amount)}</td>
+          <td>${tx.priceBought != null ? '$' + Number(tx.priceBought).toFixed(2) : ''}</td>
+          <td>${escapeHtml(tx.dateSold || '')}</td>
+          <td>${tx.priceSold != null ? '$' + Number(tx.priceSold).toFixed(2) : ''}</td>
+          <td>${profit ? '$' + profit : ''}</td>
+          <td>${balancesAt[tx.id] ?? ''}</td>
+          <td>${escapeHtml(tx.person)}</td>
+          <td>${escapeHtml(tx.note)}</td>
+          <td><button data-id="${tx.id}" class="ghost">Delete</button></td>
+        `;
+        txTableBody.appendChild(tr);
+      });
+
+      txTableBody.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+      });
+
+      txTableBody.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          if (confirm('Delete this transaction? This cannot be undone.')) {
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            saveState();
+            renderAll();
+          }
+        });
+      });
+    }
+
+    function calculateBalancesAfterEachTx() {
+      const map = {};
+      const balances = {};
+      state.transactions.forEach(tx => {
+        const name = tx.stock.trim();
+        if (!balances[name]) balances[name] = 0;
+        if (tx.type === 'in') balances[name] += Number(tx.amount);
+        else balances[name] -= Number(tx.amount);
+        map[tx.id] = balances[name];
+      });
+      return map;
+    }
+
+    function renderAll() {
+      renderItems();
+      renderTable();
+    }
+
+    function togglePriceFields() {
+      const type = txTypeEl.value;
+      priceBoughtDiv.classList.toggle('hidden', type !== 'in');
+      dateSoldDiv.classList.toggle('hidden', type !== 'out');
+      priceSoldDiv.classList.toggle('hidden', type !== 'out');
+      priceBoughtEl.required = type === 'in';
+      dateSoldEl.required = type === 'out';
+      priceSoldEl.required = type === 'out';
+    }
+
+    txTypeEl.addEventListener('change', togglePriceFields);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const stock = stockNameEl.value;
+      const type = txTypeEl.value;
+      const date = txDateEl.value;
+      const amount = Number(txAmountEl.value);
+      const priceBought = type === 'in' ? Number(priceBoughtEl.value) : null;
+      const dateSold = type === 'out' ? dateSoldEl.value : null;
+      const priceSold = type === 'out' ? Number(priceSoldEl.value) : null;
+      const person = personEl.value;
+      const note = noteEl.value.trim();
+
+      if (!stock) { alert('Please select a stock name'); return; }
+      if (!date) { alert('Please enter a date'); return; }
+      if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
+      if (!person) { alert('Please select a person'); return; }
+      if (type === 'in' && (priceBought == null || priceBought < 0)) {
+        alert('Please enter a valid price bought'); return;
+      }
+      if (type === 'out' && (!dateSold)) {
+        alert('Please enter a date sold'); return;
+      }
+      if (type === 'out' && (priceSold == null || priceSold < 0)) {
+        alert('Please enter a valid price sold'); return; }
+      const balances = computeBalancesAndValues().balances;
+      const currentBal = balances[stock] ?? 0;
+      if (type === 'out' && amount > currentBal) {
+        if (!confirm(`This will result in negative stock for "${stock}" (current ${currentBal}). Proceed?`)) return;
+      }
+
+      const tx = {
+        id: crypto.randomUUID(),
+        stock,
+        type,
+        date,
+        amount,
+        priceBought,
+        dateSold,
+        priceSold,
+        person,
+        note
+      };
+      state.transactions.push(tx);
+      saveState();
+      renderAll();
+      form.reset();
+      txDateEl.value = new Date().toISOString().substring(0, 10);
+      txAmountEl.value = 1;
+      togglePriceFields();
+      stockNameEl.focus();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (confirm('Clear all saved data? This cannot be undone.')) {
+        state = { transactions: [] };
+        try {
+          localStorage.removeItem(LS_KEY);
+        } catch (e) {
+          console.error('Error clearing storage:', e);
+          alert('Failed to clear data. Local storage might be inaccessible.');
+        }
+        renderAll();
+      }
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const rows = [['Date', 'Stock', 'Type', 'Amount', 'Price Bought', 'Date Sold', 'Price Sold', 'Person', 'Note']];
+      state.transactions.forEach(tx => rows.push([
+        tx.date,
+        tx.stock,
+        tx.type,
+        tx.amount,
+        tx.priceBought != null ? tx.priceBought : '',
+        tx.dateSold || '',
+        tx.priceSold != null ? tx.priceSold : '',
+        tx.person,
+        tx.note
+      ]));
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'stock_transactions.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    function escapeHtml(s) {
+      if (!s && s !== 0) return '';
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
+    }
+
+    togglePriceFields();
+    renderAll();
+  </script>
 </body>
 </html>
