@@ -14,6 +14,7 @@
   <meta property="og:type" content="website" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Roboto', Arial, sans-serif; background-color: #f5f5f5; color: #333; }
@@ -33,7 +34,6 @@
       font-size: 1.3rem; font-weight: bold; background: #e67e22;
       padding: 8px 15px; border-radius: 5px; color: white;
     }
-    .time-listed { font-size: 0.85rem; color: #ccc; margin-top: 5px; }
     .product-container {
       max-width: 1200px; margin: 30px auto; padding: 0 20px;
       display: flex; flex-wrap: wrap; gap: 30px;
@@ -115,20 +115,42 @@
     }
     table.summary-table td { color: #2d3a4a; font-weight: 500; }
     .summary-actions-row {
-      display: flex; gap: 10px; justify-content: center; margin: 10px 0;
+      display: flex; gap: 15px; justify-content: center; margin: 10px 0; align-items: center;
       flex-wrap: wrap;
     }
-    .summary-actions-row button {
-      padding: 10px 20px; background: #2563eb; color: white;
-      border: none; border-radius: 5px; font-weight: bold;
-      cursor: pointer; font-size: 0.95rem; transition: background 0.2s;
+    .button-wrapper {
       display: flex; align-items: center; gap: 5px;
     }
-    .summary-actions-row button:hover { background: #174ea6; }
-    .whatsapp-btn { background-color: #25d366; }
-    .whatsapp-btn:hover { background-color: #25d366; }
-    .sms-btn { background-color: #808080; }
-    .sms-btn:hover { background-color: #808080; }
+    .button-label {
+      font-size: 0.95rem; color: #333; font-weight: 500;
+    }
+    .fa {
+      padding: 10px;
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      line-height: 24px;
+      text-align: center;
+      text-decoration: none;
+      margin: 5px;
+      border-radius: 50%;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fa-calculator { background: #2563eb; }
+    .fa-map { background: #2563eb; }
+    .fa-whatsapp { background: #25d366; }
+    .fa-comment { background: #ff9800; }
+    .calculate-btn:hover { background: #174ea6; }
+    .map-btn:hover { background: #174ea6; }
+    .whatsapp-btn:hover { background: #25d366; }
+    .sms-btn:hover { background: #ff9800; }
+    .calculate-btn[disabled], .map-btn[disabled], .whatsapp-btn[disabled], .sms-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .loader {
       display: none; width: 20px; height: 20px; border: 3px solid #2563eb;
       border-radius: 50%; border-top: 3px solid #e5e7eb;
@@ -222,23 +244,25 @@
             <div id="summary-table-container"></div>
           </div>
           <div class="summary-actions-row">
-            <button type="button" onclick="updateSummaryTable()">
-              <span class="material-icons">summarize</span>Calculate
-            </button>
-            <button type="button" class="sms-btn" onclick="submitTripDetails('sms')" disabled>
-              💬 SMS
-            </button>
-            <button type="button" class="whatsapp-btn" onclick="submitTripDetails('whatsapp')" disabled>
-              🟢 whatsapp
-            </button>
+            <div class="button-wrapper">
+              <a href="#" class="calculate-btn fa fa-calculator" title="Calculate" onclick="updateSummaryTable(); return false;"></a>
+              <span class="button-label">Calculate</span>
+            </div>
+            <div class="button-wrapper">
+              <a href="#" class="sms-btn fa fa-comment" title="SMS" onclick="submitTripDetails('sms'); return false;" disabled></a>
+              <span class="button-label">SMS</span>
+            </div>
+            <div class="button-wrapper">
+              <a href="#" class="whatsapp-btn fa fa-whatsapp" title="WhatsApp" onclick="submitTripDetails('whatsapp'); return false;" disabled></a>
+              <span class="button-label">WhatsApp</span>
+            </div>
+            <div class="button-wrapper">
+              <a href="#" class="map-btn fa fa-map" id="map-btn" title="Show Map" onclick="toggleMap(); return false;"></a>
+              <span class="button-label" id="map-btn-label">Show Map</span>
+            </div>
           </div>
           <div id="submit-status" class="submit-status"></div>
           <div id="loader" class="loader"></div>
-          <div class="summary-actions-row">
-            <button type="button" id="map-btn" onclick="toggleMap()">
-              <span class="material-icons">map</span><span id="map-btn-text">Show Map</span>
-            </button>
-          </div>
         </div>
       </div>
     </section>
@@ -380,7 +404,7 @@
       const destination = document.getElementById('gm-destination').value.trim();
       const frame = document.getElementById('google-map-frame');
       const mapBtn = document.getElementById('map-btn');
-      const mapBtnText = document.getElementById('map-btn-text');
+      const mapBtnLabel = document.getElementById('map-btn-label');
       const mapContainer = document.getElementById('mapContainer');
       if (mapContainer.style.display === 'none' || mapContainer.style.display === '') {
         if (!origin || !destination) {
@@ -390,12 +414,14 @@
         const embedUrl = `https://www.google.com/maps?q=${encodeURIComponent(origin + ' to ' + destination)}&output=embed`;
         frame.src = embedUrl;
         mapContainer.style.display = 'block';
-        mapBtnText.textContent = 'Hide Map';
+        mapBtn.title = 'Hide Map';
+        mapBtnLabel.textContent = 'Hide Map';
         mapBtn.setAttribute('aria-pressed', 'true');
         mapContainer.scrollIntoView({ behavior: 'smooth' });
       } else {
         mapContainer.style.display = 'none';
-        mapBtnText.textContent = 'Show Map';
+        mapBtn.title = 'Show Map';
+        mapBtnLabel.textContent = 'Show Map';
         mapBtn.setAttribute('aria-pressed', 'false');
       }
     }
@@ -517,7 +543,7 @@
         const encodedMessage = encodeURIComponent(tripDetails);
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
         window.open(whatsappUrl, '_blank');
-        statusDiv.innerHTML = '<span class="submit-status success">🟢 whatsapp opened with trip details!</span>';
+        statusDiv.innerHTML = '<span class="submit-status success">🟢 WhatsApp opened with trip details!</span>';
       }
 
       loader.style.display = 'none';
