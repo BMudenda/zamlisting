@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luangwa Delivery Platform - Transport Cart</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZamListing</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <style>
     :root {
       --primary: #2e7d32; --primary-dark: #1b5e20; --primary-light: #81c784; --accent: #ff9800;
@@ -14,32 +13,47 @@
       --border: #e0e0e0; --shadow: 0 0 8px rgba(0,0,0,0.05); --success: #e8f5e9;
       --error: #ffebee; --toast-success: #43a047; --toast-error: #c62828; --danger: #c62828;
       --whatsapp: #25D366; --sms: #2196F3;
+      --footer-bg: #2e7d32;
+      --footer-text: #fff;
+      --footer-link: #ffd600;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Roboto', sans-serif; color: var(--text); background: var(--background); line-height: 1.5; }
-    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 2.2rem 1rem 1.6rem; text-align: center; box-shadow: 0 2px 7px rgba(0,0,0,0.09); }
-    header h1 { font-weight: bold; font-size: 2.1rem; }
-    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-wrap: wrap; gap: 2rem; }
-    .masampo-wrapper, .bistore-wrapper { position: relative; flex: 2; min-width: 300px; background: var(--card-bg); border-radius: 10px; padding: 1.7rem 1.5rem; box-shadow: var(--shadow); }
-    .section-title { font-size: 1.35rem; margin-bottom: 1.1rem; color: var(--primary-dark); display: flex; align-items: center; gap: 0.5rem; font-weight: 600; }
-    .section-title i { color: var(--primary); }
-    .store-slider { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 1.5rem; padding: 1rem 0; }
-    .store-slider::-webkit-scrollbar { height: 6px; }
-    .store-slider::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .store-slider::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 10px; }
-    .product, .vehicle-item { flex: 0 0 160px; border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 0.7rem; text-align: center; background: var(--card-bg); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-    .product:hover, .vehicle-item:hover { transform: translateY(-7px) scale(1.04); box-shadow: 0 7px 22px rgba(0,0,0,0.13); }
-    .product img, .vehicle-item img { width: 100px; height: 100px; object-fit: cover; margin-bottom: 0.8rem; border-radius: 4px; border: 1px solid #eee; }
-    .product h4, .vehicle-item h4 { font-size: 1rem; margin-bottom: 0.53rem; color: var(--text); }
-    .product p, .vehicle-item p { color: var(--primary-dark); font-weight: 600; margin-bottom: 0.8rem; }
-    .vehicle-item p.location { font-size: 0.9rem; color: var(--text-light); }
-    .product button { border: none; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.2s; }
-    .product button:disabled, .product .out-stock { background: #ccc !important; cursor: not-allowed; }
+    .brand-title { font-size: 2.6rem; font-weight: 900; letter-spacing: 0.05em; color: var(--primary-dark); text-shadow: 0 1px 0 #fff; margin-bottom: 0.6rem; }
+    .brand-title .highlight { color: var(--accent); text-shadow: none; }
+    .tagline { font-size: 1.45rem; font-weight: 500; color: var(--primary); margin-bottom: 0.45rem; }
+    .subtitle { font-size: 1.1rem; color: var(--text-light); margin-bottom: 1.2rem; margin-top: -0.5rem; }
+    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark) 90%); color: white; padding: 2.2rem 1rem 1.5rem 1rem; text-align: center; box-shadow: 0 2px 7px rgba(0,0,0,0.09); border-radius: 0 0 18px 18px; margin-bottom: 1.4rem; }
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 2rem; }
+    .filter-search-section { width: 100%; margin-bottom: 1.5rem; }
+    .filter-search-section > div { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .filter-search-section label { font-weight: 500; }
+    .filter-search-section select, .filter-search-section input[type="text"] {
+      padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; font-size: 1.06rem; min-width: 120px;
+    }
+    .slider-section { position: relative; width: 100%; margin-bottom: 2rem; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem 1rem 1rem; }
+    .slider-title { display: flex; align-items: center; gap: 0.7rem; font-size: 1.42rem; margin-bottom: 1.1rem; color: var(--primary-dark); font-weight: 600; }
+    .slider-track { display: flex; overflow-x: auto; gap: 1.4rem; scroll-behavior: smooth; padding-bottom: 16px; padding-top: 6px; }
+    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.63); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2; transition: background 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.09); }
+    .slider-btn:hover { background: rgba(0,0,0,0.81); }
+    .slider-btn.prev { left: 8px; }
+    .slider-btn.next { right: 8px; }
+    .slider-section[hidden] { display: none !important; }
+    /* Taxi Hire Card */
+    .taxi-card { min-width: 250px; max-width: 270px; margin: 0 auto; background: linear-gradient(120deg, #e0f7fa 60%, #fceabb 100%); border-radius: 15px; box-shadow: 0 2px 22px rgba(0,0,0,0.12); padding: 0.6rem 1.2rem 1.2rem 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; position: relative; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; }
+    .taxi-card:hover { box-shadow: 0 7px 26px rgba(0,0,0,0.15); transform: scale(1.04);}
+    .taxi-emoji-animated { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.7rem; font-size: 2.9rem; margin: 0.7rem 0 0.3rem 0; animation: taxiEmojiBounce 1.4s infinite ease-in-out;}
+    @keyframes taxiEmojiBounce { 0% { transform: translateY(0); } 50% { transform: translateY(-10px) scale(1.07); } 100% { transform: translateY(0); } }
+    .taxi-card-title { font-size: 1.17rem; font-weight: 600; color: var(--primary-dark); display: flex; align-items: center; gap: 0.4rem; justify-content: center; margin-bottom: 0.15rem; }
+    .taxi-card-desc { color: var(--text-light); font-size: 1.01rem; text-align: center; margin-bottom: 0.2rem; }
+    .product, .vehicle-item { min-width: 160px; max-width: 170px; border: 1px solid var(--border); border-radius: 10px; padding: 1rem 0.7rem; text-align: center; background: var(--card-bg); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .product:hover, .vehicle-item:hover { transform: translateY(-7px) scale(1.04); box-shadow: 0 7px 26px rgba(0,0,0,0.15);}
+    .product img, .vehicle-item img { width: 82px; height: 82px; object-fit: cover; margin-bottom: 0.5rem; border-radius: 4px; border: 1px solid #eee; }
+    .product h4, .vehicle-item h4 { font-size: 1rem; margin-bottom: 0.2rem; color: var(--text); }
+    .product p, .vehicle-item p { color: var(--primary-dark); font-weight: 600; margin-bottom: 0.6rem; }
+    .vehicle-item p.location { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.2rem;}
     .product .out-stock { display: block; color: #b71c1c; font-size: 0.97em; font-weight: 600; margin-bottom: 0.7em; }
-    .slider-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; }
-    .slider-button:hover { background: rgba(0,0,0,0.8); }
-    .slider-button.prev { left: 0; }
-    .slider-button.next { right: 0; }
+    .product button { border: none; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.2s; font-size: 0.98em;}
+    .product button:disabled { background: #ccc !important; cursor: not-allowed; }
     .cart { border: 1px solid var(--border); padding: 1.7rem 1.3rem 2.1rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow); }
     .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 320px; overflow-y: auto; }
     .cart-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.2em; animation: fadein 0.33s; min-height: 54px; }
@@ -53,190 +67,205 @@
     .quantity-btn, .remove-btn { border: none; background: none; color: var(--primary-dark); font-size: 1.1em; margin: 0 2px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s; }
     .quantity-btn:active, .remove-btn:active { background: #f1f1f1; }
     .remove-btn { color: var(--danger); }
-    .undo-toast { background: var(--accent); color: #222; padding: 8px 20px; border-radius: 7px; position: fixed; left: 50%; bottom: 25px; transform: translateX(-50%); z-index: 999; font-size: 1.05em; }
-    .undo-btn { background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: 500; }
     .cart-total { margin: 1rem 0; padding-top: 1rem; border-top: 1px solid var(--border); }
     .cart-total p { margin: 0.5rem 0; }
-    .address-input, .phone-input { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 0.93rem; transition: border 0.2s; }
-    .address-input:focus, .phone-input:focus { outline: none; border-color: var(--primary); }
-    .btn { border: none; background: var(--primary); color: white; padding: 0.8rem 1.2rem; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: 500; width: 100%; transition: background 0.2s; }
-    .btn:hover { background: var(--primary-dark); }
-    .btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
-    .btn-accent { background: var(--accent); }
-    .btn-accent:hover { background: #e68a00; }
-    .btn-secondary { background: var(--primary-light); margin-top: 0.5rem; color: var(--primary-dark); }
-    .btn-secondary:hover { background: var(--primary); color: #fff; }
-    .submit-btn { width: 50px; height: 50px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem; color: white; transition: transform 0.2s, background 0.2s; }
-    .submit-btn:hover { transform: scale(1.1); }
-    .whatsapp-btn { background: var(--whatsapp); }
-    .sms-btn { background: var(--sms); }
-    .status-message { display: none; margin: 1.1rem 0 1.3rem; padding: 0.75rem; border-radius: 4px; text-align: center; font-weight: 500; font-size: 1.08em; }
-    .status-message.success { background: var(--success); color: var(--primary-dark); }
-    .status-message.error { background: var(--error); color: var(--danger); }
-    #searchBox { width: 100%; padding: 0.6rem; margin-bottom: 1.1rem; border-radius: 4px; border: 1px solid #ccc; font-size: 1.06rem; }
-    .autocomplete-suggestions { border: 1px solid #ccc; background: #fff; max-height: 130px; overflow-y: auto; position: absolute; width: 100%; z-index: 999; border-radius: 0 0 7px 7px; left: 0; top: 100%; margin-top: -5px; font-size: 1em; display: none; }
-    .autocomplete-suggestion { padding: 8px 14px; cursor: pointer; border-bottom: 1px solid #eee; }
-    .autocomplete-suggestion:last-child { border-bottom: none; }
-    .autocomplete-suggestion:hover { background: #e5efff; }
-    .cart-inputs-flex { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 1.2em; flex-wrap: wrap; }
-    .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { min-width: 160px; flex: 1 1 160px; margin-bottom: 0 !important; }
-    .cart-inputs-flex .mode-container { flex: 0 0 62px; min-width: 56px; max-width: 70px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 0; background: none; box-shadow: none; margin: 0; }
-    .cart-inputs-flex .mode-container label { font-size: 13px; margin-bottom: 2px; margin-top: 5px; color: #2563eb; font-weight: 500; letter-spacing: .1em; margin-left: 3px; }
-    .cart-inputs-flex .mode-group { display: flex; align-items: center; gap: 0; margin: 0; }
-    .cart-inputs-flex .mode-radio { border: 1.5px solid #e5e7eb !important; background: #f8fafc !important; color: #2563eb; cursor: pointer; font-size: 16px; transition: border 0.2s; display: flex; align-items: center; gap: 2px; font-weight: 500; min-width: 0 !important; padding: 6px 8px 6px 6px !important; border-radius: 5px 0 0 5px !important; border-right: 0; box-shadow: none; margin: 0; }
-    .cart-inputs-flex .mode-radio.selected { border: 2px solid #2563eb !important; background: #f0f6ff !important; z-index: 1; }
-    .cart-inputs-flex .mode-radio:last-child { border-radius: 0 5px 5px 0 !important; border-right: 1.5px solid #e5e7eb !important; margin-left: -1px; }
-    .cart-inputs-flex .mode-radio input[type="radio"] { accent-color: #2563eb; margin-right: 1px; margin-left: 0; width: 16px; height: 16px; }
-    .cart-inputs-flex .mode-radio span.material-icons { font-size: 20px !important; margin: 0 2px 0 0; vertical-align: middle; }
-    .transport-checkbox-container { display: flex; align-items: center; margin-bottom: 1rem; gap: 8px; }
-    .transport-checkbox-container label { font-size: 0.95rem; color: var(--text); font-weight: 500; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-content { background: var(--card-bg); border-radius: 10px; padding: 1.5rem; max-width: 500px; width: 90%; position: relative; box-shadow: var(--shadow); }
-    .modal-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text); }
-    .modal-carousel { position: relative; margin-bottom: 1rem; }
-    .modal-carousel img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; }
-    .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
-    .carousel-btn.prev { left: 10px; }
-    .carousel-btn.next { right: 10px; }
-    .modal-details p { margin: 0.5rem 0; }
-    .modal-details p strong { color: var(--primary-dark); }
-    .modal-buttons { display: flex; gap: 12px; margin-top: 1rem; }
-    .bid-input { width: 100%; padding: 0.75rem; margin: 0.5rem 0; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 0.93rem; }
-    .toast { position: fixed; left: 50%; top: 24px; transform: translateX(-50%); min-width: 190px; z-index: 9999; background: #333; color: #fff; padding: 13px 24px; border-radius: 7px; box-shadow: 0 2px 16px #0003; font-weight: 500; font-size: 1.07em; animation: fadein 0.2s; }
-    .toast.success { background: var(--toast-success); }
-    .toast.error { background: var(--toast-error); }
-    @keyframes fadein { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    @media (max-width: 650px) {
-      .cart-inputs-flex { flex-direction: column; gap: 0.2em; align-items: stretch; }
-      .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { max-width: unset; min-width: 0; flex: unset; }
-      .cart { position: static; }
-      .sticky-checkout { position: fixed !important; left: 0; right: 0; bottom: 0; width: 100vw; border-radius: 0; margin: 0; z-index: 999; }
-      .modal-buttons { flex-direction: column; }
+    /* Hide default scrollbars for slider-tracks for better look */
+    .slider-track::-webkit-scrollbar { height: 0px; background: transparent;}
+    .slider-track { scrollbar-width: none; }
+    .slider-track { -ms-overflow-style: none; }
+    .slider-track::-webkit-scrollbar-thumb { background: transparent; }
+    /* Taxi Hire Modal Styles */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.52); z-index: 2000; align-items: center; justify-content: center; animation: fadein 0.3s;}
+    .modal-content { background: #fff; border-radius: 13px; padding: 1.3rem 1.2rem; max-width: 99vw; width: 350px; box-shadow: 0 0 22px rgba(0,0,0,0.13); position: relative; display: flex; flex-direction: column; gap: 0.8rem; align-items: center;}
+    .modal-close { position: absolute; top: 11px; right: 13px; font-size: 1.4rem; color: var(--danger); background: none; border: none; cursor: pointer; z-index: 1; transition: color 0.2s;}
+    .modal-close:hover { color: var(--primary-dark);}
+    .modal-title { font-size: 1.19rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 0.3rem; text-align: center;}
+    .modal-img { width: 150px; height: 150px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee;}
+    .modal-details { font-size: 1.07rem; color: var(--text-light); text-align: left; width: 100%; margin-bottom: 0.2rem;}
+    .modal-imgs { display: flex; align-items: center; gap: 10px; margin-bottom: 0.3rem;}
+    .modal-imgs img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; cursor: pointer; transition: box-shadow 0.15s;}
+    .modal-imgs img.selected { box-shadow: 0 0 0 3px var(--primary-light); }
+    .modal-slider-arrows { display: flex; gap: 8px; align-items: center; margin-bottom: 0.3rem; margin-top: 0.1rem;}
+    .modal-slider-arrow { background: var(--primary-light); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; cursor: pointer; color: #fff; transition: background 0.18s;}
+    .modal-slider-arrow:disabled { background: #ddd; color: #aaa; cursor: not-allowed;}
+    .taxi-hire-actions { display: flex; gap: 12px; align-items: center; justify-content: center; margin: 0.8rem 0 0.2rem 0;}
+    .taxi-hire-btn { border: none; border-radius: 50%; width: 42px; height: 42px; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--primary-light); color: var(--primary-dark); transition: background 0.18s, color 0.18s;}
+    .taxi-hire-btn.sms { background: var(--sms); color: #fff;}
+    .taxi-hire-btn.whatsapp { background: var(--whatsapp); color: #fff;}
+    .taxi-hire-btn.calc { background: var(--accent); color: #fff;}
+    .taxi-hire-btn.map { background: #f8fafc; color: #2563eb;}
+    .taxi-hire-btn.hide { background: #ddd; color: var(--danger);}
+    .taxi-hire-btn:disabled { background: #ddd; color: #aaa;}
+    .taxi-hire-status { margin: 0.7rem auto 0.2rem auto; text-align: center; font-size: 1.03em;}
+    .taxi-hire-status.success { color: var(--primary-dark);}
+    .taxi-hire-status.error { color: var(--danger);}
+    .taxi-hire-map { display: none; width: 100%; height: 130px; border-radius: 7px; border: 1px solid #e0e0e0; margin-top: 0.5rem; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb; font-weight: 500; font-size: 1.08em;}
+    .taxi-hire-map.show { display: flex !important; }
+    .checkout-actions { margin-top: 1rem; display: flex; gap: 12px; justify-content: center;}
+    .checkout-btn-main { padding: 0.8rem 1.2rem; border-radius: 5px; font-size: 1.07rem; border: none; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; }
+    .checkout-btn-main i { margin-right: 8px;}
+    .checkout-btn-sms { background: var(--sms); color: #fff; border-radius: 50%; width: 42px; height: 42px; font-size: 1.35rem; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+    .checkout-btn-whatsapp { background: var(--whatsapp); color: #fff; border-radius: 50%; width: 42px; height: 42px; font-size: 1.35rem; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+    @media (max-width: 800px) {
+      .slider-track { gap: 0.8rem; }
+      .slider-section, .taxi-card { max-width: 99vw; }
+      .product, .vehicle-item { min-width: 140px; }
+      .modal-content { width: 98vw;}
     }
+    footer {
+      background: var(--footer-bg);
+      color: var(--footer-text);
+      text-align: center;
+      padding: 1.5rem 1rem 1.7rem 1rem;
+      border-radius: 18px 18px 0 0;
+      font-size: 1.08rem;
+      margin-top: 2.7rem;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    }
+    footer a { color: var(--footer-link); text-decoration: underline; font-weight: 500;}
+    footer .footer-brand { font-weight: bold; color: var(--footer-link);}
   </style>
 </head>
 <body>
   <header>
-    <h1 aria-label="Luangwa Delivery Platform"><i class="fas fa-truck"></i> Luangwa Delivery Platform</h1>
+    <div class="brand-title">Zam<span class="highlight">Listing</span></div>
+    <h2 class="tagline">Get your Service</h2>
+    <p class="subtitle">Click on a service below to proceed</p>
   </header>
   <div class="container">
-    <div class="masampo-wrapper" aria-label="Masampo">
-      <h2 class="section-title"><i class="fas fa-car"></i> Masampo</h2>
-      <button class="slider-button prev" id="prevMasampoBtn" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>
-      <div id="masampo-list" class="store-slider"></div>
-      <button class="slider-button next" id="nextMasampoBtn" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>
-      <div class="bistore-wrapper" aria-label="B-istore">
-        <h2 class="section-title"><i class="fas fa-store"></i> B-istore</h2>
-        <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
-          <label for="categoryFilter" style="font-weight: 500;">Filter by Category:</label>
-          <select id="categoryFilter" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <option value="all">All</option>
-          </select>
-        </div>
-        <input type="text" id="searchBox" placeholder="Search products..." aria-label="Search products">
-        <button class="slider-button prev" id="prevBistoreBtn" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>
-        <div id="bistore-list" class="store-slider"></div>
-        <button class="slider-button next" id="nextBistoreBtn" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>
+    <div class="filter-search-section">
+      <div>
+        <label for="categoryFilter">Show Section:</label>
+        <select id="categoryFilter">
+          <option value="all">All</option>
+          <option value="taxi">Taxi Hire</option>
+          <option value="masampo">Masampo</option>
+          <option value="bistore">B-istore</option>
+        </select>
+        <input type="text" id="searchBox" placeholder="Search products, vehicles..." aria-label="Search products, vehicles">
       </div>
     </div>
+    <div class="slider-section" id="taxiSliderSection">
+      <div class="slider-title"><i class="fa fa-taxi"></i> Taxi Hire</div>
+      <button class="slider-btn prev" id="prevTaxiBtn" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
+      <div class="slider-track" id="taxi-slider-track">
+        <div class="taxi-card" id="taxiCard">
+          <div class="taxi-emoji-animated">
+            <span role="img" aria-label="vehicle">🚗</span>
+            <span role="img" aria-label="motorbike">🏍️</span>
+          </div>
+          <span class="taxi-card-title"><span role="img" aria-label="taxi">🚕</span> Book a Taxi</span>
+          <span class="taxi-card-desc">Hire a vehicle or motorbike for your trip. Quick, safe, and affordable!</span>
+        </div>
+      </div>
+      <button class="slider-btn next" id="nextTaxiBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
+    </div>
+    <div class="slider-section" id="masampoSliderSection">
+      <div class="slider-title"><i class="fa fa-car"></i> Masampo</div>
+      <button class="slider-btn prev" id="prevMasampoBtn" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
+      <div class="slider-track" id="masampo-slider-track"></div>
+      <button class="slider-btn next" id="nextMasampoBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
+    </div>
+    <div class="slider-section" id="bistoreSliderSection">
+      <div class="slider-title"><i class="fa fa-building"></i> B-istore</div>
+      <button class="slider-btn prev" id="prevBistoreBtn" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
+      <div class="slider-track" id="bistore-slider-track"></div>
+      <button class="slider-btn next" id="nextBistoreBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
+    </div>
     <div class="cart" aria-label="Your Cart">
-      <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Your Order</h2>
+      <h2 class="section-title"><i class="fa fa-shopping-cart"></i> Your Order</h2>
       <ul id="cart-items" class="cart-items"></ul>
       <div id="empty-cart" class="empty-cart" aria-live="polite">
-        <i class="fas fa-cart-arrow-down"></i>
+        <i class="fa fa-cart-arrow-down"></i>
         <p>Your cart is empty.</p>
         <p>Add items to get started.</p>
       </div>
       <div id="cart-total" class="cart-total" style="display:none;">
         <p>Products Total: ZK <span id="products-total">0.00</span></p>
-        <p id="transportation-line" style="display:none;">
-          Transportation: <span id="transport-icon">🚗</span>
-          <span id="transportation-cost">0.00</span>
-          <span id="distance-info" style="color:#2563eb;font-size:0.87em;"></span>
-        </p>
         <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
       </div>
-      <div class="transport-checkbox-container">
-        <input type="checkbox" id="transport-required" checked>
-        <label for="transport-required">Require Transportation</label>
+      <div class="checkout-actions" id="checkoutActions" style="display:none;">
+        <button class="checkout-btn-main" id="checkout-btn">
+          <i class="fa fa-credit-card"></i> Proceed to Checkout
+        </button>
+        <button class="checkout-btn-sms" id="checkout-btn-sms" title="Send Order SMS">
+          <i class="fa fa-sms"></i>
+        </button>
+        <button class="checkout-btn-whatsapp" id="checkout-btn-whatsapp" title="Send Order WhatsApp">
+          <i class="fa fa-whatsapp"></i>
+        </button>
       </div>
-      <div id="transport-inputs" class="cart-inputs-flex">
-        <div class="mode-container">
-          <label for="mode-of-transport">Mode</label>
-          <div class="mode-group">
-            <label class="mode-radio selected" id="radio-vehicle">
-              <input type="radio" name="mode" value="vehicle" id="mode-vehicle" checked>
-              <span class="material-icons">directions_car</span>
-            </label>
-            <label class="mode-radio" id="radio-motorbike">
-              <input type="radio" name="mode" value="motorbike" id="mode-motorbike">
-              <span class="material-icons">two_wheeler</span>
-            </label>
-          </div>
-        </div>
-        <div class="input-group">
-          <label for="gm-origin">From</label>
-          <div style="position:relative;">
-            <input type="text" id="gm-origin" class="address-input" autocomplete="off" placeholder="Enter starting point">
-            <div id="gm-origin-list" class="autocomplete-suggestions"></div>
-          </div>
-        </div>
-        <div class="input-group">
-          <label for="gm-destination">To</label>
-          <div style="position:relative;">
-            <input type="text" id="gm-destination" class="address-input" autocomplete="off" placeholder="Enter destination">
-            <div id="gm-destination-list" class="autocomplete-suggestions"></div>
-          </div>
-        </div>
-        <div class="input-group" id="customer-phone-wrapper-flex">
-          <label for="customer-phone">Phone</label>
-          <input type="tel" id="customer-phone" maxlength="10" placeholder="e.g. 0966423229" inputmode="numeric" aria-label="Your phone number">
-        </div>
-      </div>
-      <button id="checkout-btn" class="btn btn-accent sticky-checkout" style="margin-top: 1rem; display:none;">
-        <i class="fas fa-credit-card"></i> Proceed to Checkout
-      </button>
       <div id="statusMessage" class="status-message"></div>
     </div>
-  </div>
-  <div id="masampoModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-      <button class="modal-close" aria-label="Close modal">&times;</button>
-      <h2 id="modalTitle"></h2>
-      <div class="modal-carousel">
-        <button class="carousel-btn prev" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>
-        <img id="modalImage" src="" alt="Vehicle image">
-        <button class="carousel-btn next" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>
+    <div class="modal" id="taxiHireModal">
+      <div class="modal-content">
+        <button class="modal-close" id="taxiHireModalClose">&times;</button>
+        <div class="modal-title">Taxi Hire Booking</div>
+        <div style="font-size:2.5rem;margin-bottom:0.6rem;">
+          <span>🚗</span>
+          <span>🏍️</span>
+        </div>
+        <div style="width:100%">
+          <label for="taxiPhoneModal">Phone Number</label>
+          <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" style="width:100%;margin-bottom:0.7rem;">
+          <label for="taxiHireMode">Mode</label>
+          <select id="taxiHireMode" style="width:100%;margin-bottom:0.7rem;">
+            <option value="vehicle">Vehicle 🚗</option>
+            <option value="motorbike">Motorbike 🏍️</option>
+          </select>
+          <label for="taxiHireFrom">From</label>
+          <input type="text" id="taxiHireFrom" placeholder="Pickup location" style="width:100%;margin-bottom:0.7rem;">
+          <label for="taxiHireTo">To</label>
+          <input type="text" id="taxiHireTo" placeholder="Drop-off location" style="width:100%;margin-bottom:0.7rem;">
+        </div>
+        <div class="taxi-hire-actions">
+          <button class="taxi-hire-btn calc" id="taxiCalcBtn" title="Calculate Fare"><i class="fa fa-calculator"></i></button>
+          <button class="taxi-hire-btn sms" id="taxiSmsBtn" title="Send Booking SMS"><i class="fa fa-sms"></i></button>
+          <button class="taxi-hire-btn whatsapp" id="taxiWhatsappBtn" title="Send Booking WhatsApp"><i class="fa fa-whatsapp"></i></button>
+          <button class="taxi-hire-btn map" id="taxiShowMapBtn" title="Show Map"><i class="fa fa-map"></i></button>
+          <button class="taxi-hire-btn hide" id="taxiHideMapBtn" title="Hide Map" style="display:none;"><i class="fa fa-eye-slash"></i></button>
+        </div>
+        <div class="taxi-hire-status" id="taxiHireStatus"></div>
+        <div id="taxiHireMap" class="taxi-hire-map">Map will appear here (Demo)</div>
+        <button class="btn btn-accent" id="taxiHireSubmitBtn" style="margin-top:0.5rem;">Submit Booking</button>
       </div>
-      <div class="modal-details">
-        <p><strong>Price:</strong> ZK <span id="modalPrice"></span></p>
-        <p><strong>Location:</strong> <span id="modalLocation"></span></p>
-        <p><strong>Condition:</strong> <span id="modalCondition"></span></p>
-        <p><strong>Contact:</strong> <span id="modalContact"></span></p>
-        <p><strong>Listed Since:</strong> <span id="modalListedSince"></span></p>
-      </div>
-      <input type="number" id="bidAmount" class="bid-input" placeholder="Enter your bid (ZK)" min="0" step="100">
-      <div class="modal-buttons">
-        <button id="modalAddToCart" class="btn btn-accent">Add to Cart</button>
-        <button id="sendBidBtn" class="btn btn-secondary">Send Bid</button>
-        <button id="modalWhatsappBtn" class="submit-btn whatsapp-btn" title="Send bid via WhatsApp"><i class="fab fa-whatsapp"></i></button>
-        <button id="modalSmsBtn" class="submit-btn sms-btn" title="Send bid via SMS"><i class="fas fa-sms"></i></button>
+    </div>
+    <div class="modal" id="detailsModal">
+      <div class="modal-content" id="detailsModalContent">
+        <button class="modal-close" id="detailsModalClose">&times;</button>
+        <div class="modal-title" id="detailsModalTitle"></div>
+        <div class="modal-imgs" id="detailsModalImgs"></div>
+        <div class="modal-slider-arrows" id="detailsModalArrows" style="display:none;">
+          <button class="modal-slider-arrow" id="detailsModalPrevImg">&lt;</button>
+          <button class="modal-slider-arrow" id="detailsModalNextImg">&gt;</button>
+        </div>
+        <img id="detailsModalImg" class="modal-img" src="" alt="Item Image">
+        <div class="modal-details" id="detailsModalDetails"></div>
       </div>
     </div>
   </div>
-  <div id="toast-container"></div>
+  <footer>
+    <div class="footer-brand">ZamListing</div>
+    <div>
+      &copy; 2025 ZamListing &middot; Powered by <a href="https://github.com/">GitHub</a>
+    </div>
+    <div>
+      <span>Contact: <a href="mailto:support@zamlisting.com">support@zamlisting.com</a></span>
+    </div>
+  </footer>
   <script>
-    // --- Sample Data ---
+    // Data
     const MASAMPO_VEHICLES = [
       {
         id: 1001, name: "Toyota Corolla 2015", price: 120000, location: "Luangwa Market",
         image: "corolla.jpg", category: "vehicle", details: { condition: "Used, good condition", contact: "0971234567" },
-        additionalImages: ["corolla_front.jpg", "corolla_side.jpg"], listedDate: "2025-08-01"
+        additionalImages: ["corolla.jpg", "corolla_front.jpg", "corolla_side.jpg"], listedDate: "2025-08-01"
       },
       {
         id: 1002, name: "Honda CR-V 2018", price: 200000, location: "Katondwe Mission Hospital",
         image: "crv.jpg", category: "vehicle", details: { condition: "Excellent, low mileage", contact: "0966543210" },
-        additionalImages: ["crv_front.jpg", "crv_rear.jpg"], listedDate: "2025-07-15"
+        additionalImages: ["crv.jpg", "crv_front.jpg", "crv_rear.jpg"], listedDate: "2025-07-15"
       }
     ];
     const BISTORE_PRODUCTS = [
@@ -255,356 +284,119 @@
       { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
       { from: "Chitope", to: "Kapoche", distance: 10 }
     ];
-
-    // --- DOM Elements ---
-    const masampoListEl = document.getElementById('masampo-list');
-    const bistoreListEl = document.getElementById('bistore-list');
-    const cartItemsEl = document.getElementById('cart-items');
-    const emptyCartEl = document.getElementById('empty-cart');
-    const cartTotalEl = document.getElementById('cart-total');
-    const productsTotalEl = document.getElementById('products-total');
-    const transportationCostEl = document.getElementById('transportation-cost');
-    const transportLineEl = document.getElementById('transportation-line');
-    const transportIconEl = document.getElementById('transport-icon');
-    const grandTotalEl = document.getElementById('grand-total');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    const searchBox = document.getElementById('searchBox');
-    const gmOriginEl = document.getElementById('gm-origin');
-    const gmDestinationEl = document.getElementById('gm-destination');
-    const modeVehicle = document.getElementById('mode-vehicle');
-    const modeMotorbike = document.getElementById('mode-motorbike');
-    const radioVehicle = document.getElementById('radio-vehicle');
-    const radioMotorbike = document.getElementById('radio-motorbike');
-    const customerPhoneInput = document.getElementById('customer-phone');
-    const toastContainer = document.getElementById('toast-container');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const distanceInfoEl = document.getElementById('distance-info');
-    const transportRequired = document.getElementById('transport-required');
-    const masampoModal = document.getElementById('masampoModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalImage = document.getElementById('modalImage');
-    const modalPrice = document.getElementById('modalPrice');
-    const modalLocation = document.getElementById('modalLocation');
-    const modalCondition = document.getElementById('modalCondition');
-    const modalContact = document.getElementById('modalContact');
-    const modalListedSince = document.getElementById('modalListedSince');
-    const modalAddToCart = document.getElementById('modalAddToCart');
-    const sendBidBtn = document.getElementById('sendBidBtn');
-    const modalWhatsappBtn = document.getElementById('modalWhatsappBtn');
-    const modalSmsBtn = document.getElementById('modalSmsBtn');
-    const bidAmountInput = document.getElementById('bidAmount');
-    const modalClose = document.querySelector('.modal-close');
-    const carouselPrev = document.querySelector('.carousel-btn.prev');
-    const carouselNext = document.querySelector('.carousel-btn.next');
-
-    // --- State ---
-    let cart = [];
-    let transportationCost = 0;
-    let transportMode = 'vehicle';
-    let selectedDistance = 0;
-    let selectedDistanceFound = false;
-    let transportNeeded = true;
-    const TRANSPORT_COST_PER3KM = { vehicle: 20, motorbike: 10 };
-    const TRANSPORT_ICON = { vehicle: "🚗", motorbike: "🏍️" };
-    let filteredProducts = BISTORE_PRODUCTS.slice();
-    let undoTimeout = null, lastRemoved = null;
-    let currentVehicle = null;
-    let currentImageIndex = 0;
-
-    // --- Calculate Listed Since ---
-    function calculateListedSince(listedDate) {
-      const listed = new Date(listedDate);
-      const today = new Date();
-      const diffTime = Math.abs(today - listed);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays === 0) return "Today";
-      if (diffDays === 1) return "1 day ago";
-      if (diffDays < 30) return `${diffDays} days ago`;
-      const diffMonths = Math.floor(diffDays / 30);
-      if (diffMonths === 1) return "1 month ago";
-      return `${diffMonths} months ago`;
+    // Filtering and Section Logic
+    let sectionMap = {
+      "taxi": document.getElementById("taxiSliderSection"),
+      "masampo": document.getElementById("masampoSliderSection"),
+      "bistore": document.getElementById("bistoreSliderSection"),
+      "all": null
+    };
+    document.getElementById("categoryFilter").addEventListener("change", function() {
+      let val = this.value;
+      Object.entries(sectionMap).forEach(([key, sec]) => {
+        if (sec) sec.hidden = (val !== "all" && val !== key);
+      });
+    });
+    // Filtering for items
+    let filteredMasampo = MASAMPO_VEHICLES.slice();
+    let filteredBistore = BISTORE_PRODUCTS.slice();
+    function updateAllFilters() {
+      const selectedCategory = categoryFilter.value;
+      const query = searchBox.value.trim().toLowerCase();
+      filteredMasampo = MASAMPO_VEHICLES.filter(v => {
+        const matchQuery = v.name.toLowerCase().includes(query) || (v.category && v.category.toLowerCase().includes(query)) || (v.location && v.location.toLowerCase().includes(query));
+        return matchQuery;
+      });
+      filteredBistore = BISTORE_PRODUCTS.filter(p => {
+        const matchQuery = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
+        return matchQuery;
+      });
+      renderMasampo();
+      renderBistore();
     }
+    const searchBox = document.getElementById('searchBox');
+    searchBox.addEventListener('input', updateAllFilters);
 
-    // --- Masampo (Vehicles) Rendering ---
+    // Slider
+    function setupSliderButtons(trackId, prevBtnId, nextBtnId) {
+      const sliderTrack = document.getElementById(trackId);
+      document.getElementById(prevBtnId).onclick = () => {
+        sliderTrack.scrollBy({ left: -180, behavior: 'smooth' });
+      };
+      document.getElementById(nextBtnId).onclick = () => {
+        sliderTrack.scrollBy({ left: 180, behavior: 'smooth' });
+      };
+    }
+    setupSliderButtons('taxi-slider-track', 'prevTaxiBtn', 'nextTaxiBtn');
+    setupSliderButtons('masampo-slider-track', 'prevMasampoBtn', 'nextMasampoBtn');
+    setupSliderButtons('bistore-slider-track', 'prevBistoreBtn', 'nextBistoreBtn');
+
+    // Render
     function renderMasampo() {
-      masampoListEl.innerHTML = '';
-      MASAMPO_VEHICLES.forEach(item => {
+      const masampoSliderTrack = document.getElementById('masampo-slider-track');
+      masampoSliderTrack.innerHTML = '';
+      filteredMasampo.forEach(item => {
         const div = document.createElement('div');
         div.className = 'vehicle-item';
         div.tabIndex = 0;
         div.setAttribute('aria-label', `${item.name}, ZK ${item.price.toLocaleString()}`);
         div.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100?text=Error';">
+          <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/82?text=Error';">
           <h4>${item.name}</h4>
           <p>ZK ${item.price.toLocaleString()}</p>
           <p class="location">${item.location}</p>
         `;
-        div.addEventListener('click', () => showMasampoModal(item));
-        masampoListEl.appendChild(div);
+        div.onclick = () => showDetailsModal(item, 'masampo');
+        masampoSliderTrack.appendChild(div);
       });
     }
-
-    // --- Masampo (Vehicles) Modal ---
-    function showMasampoModal(item) {
-      currentVehicle = item;
-      currentImageIndex = 0;
-      modalTitle.textContent = item.name;
-      modalImage.src = item.image;
-      modalPrice.textContent = item.price.toLocaleString();
-      modalLocation.textContent = item.location;
-      modalCondition.textContent = item.details.condition;
-      modalContact.textContent = item.details.contact;
-      modalListedSince.textContent = calculateListedSince(item.listedDate);
-      bidAmountInput.value = '';
-      masampoModal.style.display = 'flex';
-      updateCarouselButtons();
-    }
-
-    function updateCarouselButtons() {
-      carouselPrev.disabled = currentImageIndex === 0;
-      carouselNext.disabled = currentImageIndex === currentVehicle.additionalImages.length;
-    }
-
-    carouselPrev.addEventListener('click', () => {
-      if (currentImageIndex > 0) {
-        currentImageIndex--;
-        modalImage.src = currentVehicle.additionalImages[currentImageIndex] || currentVehicle.image;
-        updateCarouselButtons();
-      }
-    });
-
-    carouselNext.addEventListener('click', () => {
-      if (currentImageIndex < currentVehicle.additionalImages.length) {
-        currentImageIndex++;
-        modalImage.src = currentImageIndex === 0 ? currentVehicle.image : currentVehicle.additionalImages[currentImageIndex - 1];
-        updateCarouselButtons();
-      }
-    });
-
-    modalClose.addEventListener('click', () => {
-      masampoModal.style.display = 'none';
-      currentVehicle = null;
-      currentImageIndex = 0;
-      bidAmountInput.value = '';
-    });
-
-    modalAddToCart.addEventListener('click', () => {
-      if (currentVehicle) {
-        addToCart(currentVehicle.id);
-        masampoModal.style.display = 'none';
-      }
-    });
-
-    // --- Bid Submission for Masampo (Vehicles) ---
-    sendBidBtn.addEventListener('click', () => {
-      const bidAmount = parseFloat(bidAmountInput.value);
-      if (!currentVehicle || isNaN(bidAmount) || bidAmount <= 0) {
-        showToast('Please enter a valid bid amount.', 'error');
-        return;
-      }
-      showToast('Bid prepared! Use WhatsApp or SMS to send.', 'success');
-      modalWhatsappBtn.style.display = 'inline-flex';
-      modalSmsBtn.style.display = 'inline-flex';
-    });
-
-    modalWhatsappBtn.addEventListener('click', () => {
-      if (!currentVehicle) return;
-      const bidAmount = bidAmountInput.value;
-      if (!bidAmount || isNaN(bidAmount) || bidAmount <= 0) {
-        showToast('Please enter a valid bid amount.', 'error');
-        return;
-      }
-      const message = `Bid for ${currentVehicle.name}: ZK ${bidAmount}`;
-      const phone = currentVehicle.details.contact.replace(/\D/g, '');
-      if (!phone || phone.length < 10) {
-        showToast('Invalid contact number.', 'error');
-        return;
-      }
-      const whatsappUrl = `https://wa.me/+260${phone.slice(1)}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
-      showToast('Bid sent via WhatsApp!', 'success');
-      masampoModal.style.display = 'none';
-    });
-
-    modalSmsBtn.addEventListener('click', () => {
-      if (!currentVehicle) return;
-      const bidAmount = bidAmountInput.value;
-      if (!bidAmount || isNaN(bidAmount) || bidAmount <= 0) {
-        showToast('Please enter a valid bid amount.', 'error');
-        return;
-      }
-      const message = `Bid for ${currentVehicle.name}: ZK ${bidAmount}`;
-      const phone = currentVehicle.details.contact.replace(/\D/g, '');
-      if (!phone || phone.length < 10) {
-        showToast('Invalid contact number.', 'error');
-        return;
-      }
-      const smsUrl = `sms:+260${phone.slice(1)}?body=${encodeURIComponent(message)}`;
-      window.open(smsUrl, '_blank');
-      showToast('Bid sent via SMS!', 'success');
-      masampoModal.style.display = 'none';
-    });
-
-    // --- B-istore (Products) Rendering ---
     function renderBistore() {
-      bistoreListEl.innerHTML = '';
-      filteredProducts.forEach(p => {
+      const bistoreSliderTrack = document.getElementById('bistore-slider-track');
+      bistoreSliderTrack.innerHTML = '';
+      filteredBistore.forEach(p => {
         const div = document.createElement('div');
         div.className = 'product';
         div.tabIndex = 0;
         div.setAttribute('aria-label', `${p.name}, ZK ${p.price.toFixed(2)}`);
         let outStock = (p.price <= 0);
         div.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/100?text=Error';">
+          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/82?text=Error';">
           <h4>${p.name}</h4>
           <p>ZK ${p.price.toFixed(2)}</p>
           ${outStock ? '<span class="out-stock">Out of Stock</span>' : ''}
-          <button data-id="${p.id}" ${outStock ? 'disabled' : ''}>
-            <i class="fas fa-plus"></i> Add
+          <button data-id="${p.id}" ${outStock ? 'disabled' : ''} style="margin-bottom:0.3rem;">
+            <i class="fa fa-plus"></i> Add
           </button>
         `;
-        const btn = div.querySelector('button[data-id]');
-        if (btn && !outStock) {
-          btn.addEventListener("click", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            addToCart(p.id);
-          });
-        }
-        bistoreListEl.appendChild(div);
+        div.onclick = (e) => {
+          if (e.target.closest('button')) return;
+          showDetailsModal(p, 'bistore');
+        };
+        bistoreSliderTrack.appendChild(div);
       });
     }
-
-    // --- Slider Buttons ---
-    document.getElementById('prevMasampoBtn').onclick = () => masampoListEl.scrollBy({ left: -200, behavior: 'smooth' });
-    document.getElementById('nextMasampoBtn').onclick = () => masampoListEl.scrollBy({ left: 200, behavior: 'smooth' });
-    document.getElementById('prevBistoreBtn').onclick = () => bistoreListEl.scrollBy({ left: -200, behavior: 'smooth' });
-    document.getElementById('nextBistoreBtn').onclick = () => bistoreListEl.scrollBy({ left: 200, behavior: 'smooth' });
-
-    // --- Autocomplete ---
-    function setupAutocomplete(inputId, suggestionsId, sourceList) {
-      const input = document.getElementById(inputId);
-      const suggestionsBox = document.getElementById(suggestionsId);
-      input.addEventListener("input", function() {
-        const query = input.value.trim().toLowerCase();
-        suggestionsBox.innerHTML = "";
-        if (!query) { suggestionsBox.style.display = "none"; return; }
-        const matches = sourceList.filter(name => name.toLowerCase().includes(query)).slice(0, 5);
-        if (matches.length === 0) { suggestionsBox.style.display = "none"; return; }
-        matches.forEach(name => {
-          const div = document.createElement("div");
-          div.className = "autocomplete-suggestion";
-          div.innerText = name;
-          div.onclick = function() {
-            input.value = name;
-            suggestionsBox.innerHTML = "";
-            suggestionsBox.style.display = "none";
-            updateCart();
-            autoFillDistance();
-          };
-          suggestionsBox.appendChild(div);
-        });
-        suggestionsBox.style.display = "block";
-      });
-      input.addEventListener("blur", function() {
-        setTimeout(() => { suggestionsBox.style.display = "none"; }, 150);
-      });
-      input.addEventListener("focus", function() {
-        if (input.value.trim()) input.dispatchEvent(new Event("input"));
-      });
-    }
-    setupAutocomplete("gm-origin", "gm-origin-list", luangwaPlaces);
-    setupAutocomplete("gm-destination", "gm-destination-list", luangwaPlaces);
-
-    // --- Category Filter ---
-    const categories = Array.from(new Set(BISTORE_PRODUCTS.map(p => p.category).filter(Boolean)));
-    categories.forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-      categoryFilter.appendChild(option);
-    });
-
-    categoryFilter.addEventListener('change', filterProducts);
-    searchBox.addEventListener('input', filterProducts);
-
-    function filterProducts() {
-      const selectedCategory = categoryFilter.value;
-      const query = searchBox.value.trim().toLowerCase();
-      filteredProducts = BISTORE_PRODUCTS.filter(p => {
-        const matchCategory = selectedCategory === 'all' || p.category === selectedCategory;
-        const matchQuery = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
-        return matchCategory && matchQuery;
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMasampo();
       renderBistore();
-    }
-
-    // --- Cart Logic ---
-    function addToCart(id) {
-      const item = [...MASAMPO_VEHICLES, ...BISTORE_PRODUCTS].find(x => x.id === id);
-      if (item) {
-        const cartItem = cart.find(cartItem => cartItem.item.id === id);
-        if (cartItem) { cartItem.quantity += 1; }
-        else { cart.push({ item: item, quantity: 1 }); }
-        updateCart();
-        showToast(item.name + ' added to cart.', "success");
-      } else { showToast('Item not found.', "error"); }
-    }
-
-    cartItemsEl.addEventListener('click', e => {
-      const button = e.target.closest('button');
-      if (!button) return;
-      const index = parseInt(button.dataset.index, 10);
-      if (button.classList.contains('remove-btn')) {
-        let removed = cart.splice(index, 1)[0];
-        updateCart();
-        showUndoToast(removed, index);
-      } else if (button.classList.contains('increase')) {
-        cart[index].quantity += 1;
-        updateCart();
-      } else if (button.classList.contains('decrease')) {
-        cart[index].quantity -= 1;
-        if (cart[index].quantity === 0) {
-          let removed = cart.splice(index, 1)[0];
-          updateCart();
-          showUndoToast(removed, index);
-        } else updateCart();
-      }
+      updateCart();
     });
 
-    cartItemsEl.addEventListener('change', e => {
-      const input = e.target;
-      if (input.classList.contains('cart-item-qty')) {
-        let idx = parseInt(input.dataset.index, 10);
-        let qty = parseInt(input.value, 10);
-        if (!isNaN(qty) && qty >= 1) {
-          cart[idx].quantity = qty;
-          updateCart();
-        } else {
-          input.value = cart[idx].quantity;
-        }
-      }
-    });
-
-    function showUndoToast(item, idx) {
-      if (undoTimeout) clearTimeout(undoTimeout);
-      lastRemoved = { item, idx };
-      let toast = document.createElement('div');
-      toast.className = "undo-toast";
-      toast.innerHTML = `<span>Removed <b>${item.item.name}</b></span>
-        <button class="undo-btn" id="undo-btn">Undo</button>`;
-      toastContainer.appendChild(toast);
-      document.getElementById('undo-btn').onclick = function() {
-        cart.splice(idx, 0, item);
-        updateCart();
-        toast.remove();
-        lastRemoved = null;
-      };
-      undoTimeout = setTimeout(() => { toast.remove(); lastRemoved = null; }, 4500);
-    }
-
-    // --- Transport Logic ---
-    function buildGraph(segments) {
+    // Taxi Hire Modal Logic
+    const taxiCard = document.getElementById('taxiCard');
+    const taxiHireModal = document.getElementById('taxiHireModal');
+    const taxiHireModalClose = document.getElementById('taxiHireModalClose');
+    const taxiCalcBtn = document.getElementById('taxiCalcBtn');
+    const taxiSmsBtn = document.getElementById('taxiSmsBtn');
+    const taxiWhatsappBtn = document.getElementById('taxiWhatsappBtn');
+    const taxiShowMapBtn = document.getElementById('taxiShowMapBtn');
+    const taxiHideMapBtn = document.getElementById('taxiHideMapBtn');
+    const taxiHireMap = document.getElementById('taxiHireMap');
+    const taxiHireStatus = document.getElementById('taxiHireStatus');
+    taxiCard.onclick = () => { taxiHireModal.style.display = "flex"; taxiHireMap.classList.remove("show"); taxiShowMapBtn.style.display=""; taxiHideMapBtn.style.display="none"; taxiHireStatus.textContent=""; taxiHireStatus.className="taxi-hire-status";};
+    taxiHireModalClose.onclick = () => { taxiHireModal.style.display = "none"; };
+    taxiShowMapBtn.onclick = () => { taxiHireMap.classList.add("show"); taxiShowMapBtn.style.display="none"; taxiHideMapBtn.style.display=""; };
+    taxiHideMapBtn.onclick = () => { taxiHireMap.classList.remove("show"); taxiShowMapBtn.style.display=""; taxiHideMapBtn.style.display="none"; };
+    function taxiFindDistance(from, to) {
       const graph = {};
       segments.forEach(seg => {
         if (!graph[seg.from]) graph[seg.from] = [];
@@ -612,14 +404,8 @@
         graph[seg.from].push({ place: seg.to, distance: seg.distance });
         graph[seg.to].push({ place: seg.from, distance: seg.distance });
       });
-      return graph;
-    }
-
-    function findShortestDistance(from, to, segments) {
-      const graph = buildGraph(segments);
       if (!graph[from] || !graph[to]) return null;
-      const distances = {};
-      const visited = new Set();
+      const distances = {}, visited = new Set();
       luangwaPlaces.forEach(place => distances[place] = Infinity);
       distances[from] = 0;
       let queue = [{ place: from, dist: 0 }];
@@ -638,67 +424,157 @@
       }
       return null;
     }
-
-    function autoFillDistance() {
-      const from = gmOriginEl.value.trim();
-      const to = gmDestinationEl.value.trim();
-      selectedDistance = 0;
-      selectedDistanceFound = false;
-      distanceInfoEl.textContent = "";
-      if (from && to) {
-        let dist = findShortestDistance(from, to, segments);
-        if (dist != null && !isNaN(dist)) {
-          selectedDistance = Math.round(dist * 100) / 100;
-          selectedDistanceFound = true;
-          distanceInfoEl.textContent = `(Distance: ${selectedDistance} km)`;
-        } else {
-          distanceInfoEl.textContent = `(No route found)`;
-        }
-        updateCart();
+    taxiCalcBtn.onclick = () => {
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      const mode = document.getElementById('taxiHireMode').value;
+      if (!from || !to) {
+        taxiHireStatus.textContent = "Please enter both pickup and drop-off locations.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
       }
-    }
-
-    gmOriginEl.addEventListener('input', autoFillDistance);
-    gmDestinationEl.addEventListener('input', autoFillDistance);
-
-    function calcTransportationCost() {
-      if (transportNeeded && selectedDistanceFound && selectedDistance > 0) {
-        const rate = TRANSPORT_COST_PER3KM[transportMode];
-        return Math.ceil(selectedDistance / 3) * rate;
+      let dist = taxiFindDistance(from, to);
+      if (!dist) {
+        taxiHireStatus.textContent = "No known route between selected places.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
       }
-      return 0;
+      const rates = { vehicle: 20, motorbike: 10 };
+      let cost = Math.ceil(dist / 3) * rates[mode];
+      taxiHireStatus.textContent = `Distance: ${dist} km. Fare: ZK ${cost} (${mode === 'vehicle' ? 'Vehicle' : 'Motorbike'})`;
+      taxiHireStatus.className = "taxi-hire-status success";
+    };
+    taxiSmsBtn.onclick = () => {
+      const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const mode = document.getElementById('taxiHireMode').value;
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      let dist = taxiFindDistance(from, to) || "N/A";
+      const rates = { vehicle: 20, motorbike: 10 };
+      let cost = dist === "N/A" ? "N/A" : Math.ceil(dist / 3) * rates[mode];
+      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist} km\nFare: ZK ${cost}`;
+      window.open(`sms:+260978167546?body=${encodeURIComponent(msg)}`, "_blank");
+      taxiHireStatus.textContent = "Booking sent via SMS!";
+      taxiHireStatus.className = "taxi-hire-status success";
+    };
+    taxiWhatsappBtn.onclick = () => {
+      const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const mode = document.getElementById('taxiHireMode').value;
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      let dist = taxiFindDistance(from, to) || "N/A";
+      const rates = { vehicle: 20, motorbike: 10 };
+      let cost = dist === "N/A" ? "N/A" : Math.ceil(dist / 3) * rates[mode];
+      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist} km\nFare: ZK ${cost}`;
+      window.open(`https://wa.me/+260978167546?text=${encodeURIComponent(msg)}`, "_blank");
+      taxiHireStatus.textContent = "Booking sent via WhatsApp!";
+      taxiHireStatus.className = "taxi-hire-status success";
+    };
+    document.getElementById('taxiHireSubmitBtn').onclick = () => {
+      const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const mode = document.getElementById('taxiHireMode').value;
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      if (!/^0[0-9]{9}$/.test(phone)) {
+        taxiHireStatus.textContent = "Please enter a valid phone number (e.g. 0978167546).";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
+      }
+      if (!from || !to) {
+        taxiHireStatus.textContent = "Please enter both pickup and drop-off locations.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
+      }
+      taxiHireStatus.textContent = "Taxi booking submitted!";
+      taxiHireStatus.className = "taxi-hire-status success";
+      setTimeout(() => { taxiHireModal.style.display = "none"; }, 1300);
+    };
+    // Details Modal for Masampo and B-istore
+    const detailsModal = document.getElementById('detailsModal');
+    const detailsModalClose = document.getElementById('detailsModalClose');
+    const detailsModalTitle = document.getElementById('detailsModalTitle');
+    const detailsModalImg = document.getElementById('detailsModalImg');
+    const detailsModalDetails = document.getElementById('detailsModalDetails');
+    const detailsModalImgs = document.getElementById('detailsModalImgs');
+    const detailsModalArrows = document.getElementById('detailsModalArrows');
+    const detailsModalPrevImg = document.getElementById('detailsModalPrevImg');
+    const detailsModalNextImg = document.getElementById('detailsModalNextImg');
+    let currentDetailsImages = [];
+    let currentDetailsIndex = 0;
+    function showDetailsModal(item, type) {
+      detailsModalTitle.textContent = item.name;
+      let imgList = [];
+      if (type === 'masampo' && item.additionalImages && item.additionalImages.length) {
+        imgList = item.additionalImages;
+      } else if (item.image) {
+        imgList = [item.image];
+      }
+      currentDetailsImages = imgList;
+      currentDetailsIndex = 0;
+      detailsModalImg.src = imgList[0] || '';
+      detailsModalImgs.innerHTML = '';
+      imgList.forEach((img, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = img;
+        thumb.className = idx === 0 ? 'selected' : '';
+        thumb.onclick = () => { selectDetailsImage(idx); };
+        detailsModalImgs.appendChild(thumb);
+      });
+      detailsModalArrows.style.display = imgList.length > 1 ? '' : 'none';
+      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
+      detailsModalNextImg.disabled = currentDetailsIndex === imgList.length - 1;
+      let html = '';
+      if (type === 'masampo') {
+        html += `<div><b>Price:</b> ZK ${item.price.toLocaleString()}</div>`;
+        html += `<div><b>Location:</b> ${item.location}</div>`;
+        html += `<div><b>Condition:</b> ${item.details?.condition || ''}</div>`;
+        html += `<div><b>Contact:</b> ${item.details?.contact || ''}</div>`;
+        html += `<div><b>Listed Since:</b> ${item.listedDate || ''}</div>`;
+      } else {
+        html += `<div><b>Price:</b> ZK ${item.price}</div>`;
+        html += `<div><b>Category:</b> ${item.category}</div>`;
+      }
+      detailsModalDetails.innerHTML = html;
+      detailsModal.style.display = "flex";
     }
-
-    function handleModeChange() {
-      const v = modeVehicle.checked;
-      radioVehicle.classList.toggle('selected', v);
-      radioMotorbike.classList.toggle('selected', !v);
-      transportMode = v ? 'vehicle' : 'motorbike';
-      updateCart();
+    function selectDetailsImage(idx) {
+      currentDetailsIndex = idx;
+      detailsModalImg.src = currentDetailsImages[idx];
+      Array.from(detailsModalImgs.children).forEach((img, i) => {
+        img.className = i === idx ? 'selected' : '';
+      });
+      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
+      detailsModalNextImg.disabled = currentDetailsIndex === currentDetailsImages.length - 1;
     }
+    detailsModalPrevImg.onclick = () => {
+      if (currentDetailsIndex > 0) selectDetailsImage(currentDetailsIndex - 1);
+    };
+    detailsModalNextImg.onclick = () => {
+      if (currentDetailsIndex < currentDetailsImages.length - 1) selectDetailsImage(currentDetailsIndex + 1);
+    };
+    detailsModalClose.onclick = () => { detailsModal.style.display = "none"; };
 
-    modeVehicle.addEventListener('change', handleModeChange);
-    modeMotorbike.addEventListener('change', handleModeChange);
-
-    transportRequired.addEventListener('change', () => {
-      transportNeeded = transportRequired.checked;
-      transportInputs.style.display = transportNeeded ? '' : 'none';
-      customerPhoneInput.style.display = transportNeeded ? '' : 'none';
-      updateCart();
-    });
-
-    // --- Update Cart Display ---
+    // Cart Logic
+    let cart = [];
+    const cartItemsEl = document.getElementById('cart-items');
+    const emptyCartEl = document.getElementById('empty-cart');
+    const cartTotalEl = document.getElementById('cart-total');
+    const productsTotalEl = document.getElementById('products-total');
+    const grandTotalEl = document.getElementById('grand-total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const checkoutActions = document.getElementById('checkoutActions');
+    const checkoutBtnSms = document.getElementById('checkout-btn-sms');
+    const checkoutBtnWhatsapp = document.getElementById('checkout-btn-whatsapp');
     function updateCart() {
-      transportationCost = calcTransportationCost();
       if (cart.length === 0) {
         cartItemsEl.innerHTML = '';
         emptyCartEl.style.display = 'block';
         cartTotalEl.style.display = 'none';
-        checkoutBtn.style.display = 'none';
+        checkoutActions.style.display = 'none';
       } else {
         emptyCartEl.style.display = 'none';
         cartTotalEl.style.display = 'block';
-        checkoutBtn.style.display = 'block';
+        checkoutActions.style.display = 'flex';
         cartItemsEl.innerHTML = '';
         cart.forEach((item, index) => {
           const li = document.createElement('li');
@@ -713,7 +589,7 @@
                 <button class="quantity-btn decrease" data-index="${index}">-</button>
                 <input type="number" min="1" class="cart-item-qty" data-index="${index}" value="${item.quantity}">
                 <button class="quantity-btn increase" data-index="${index}">+</button>
-                <button class="remove-btn" data-index="${index}"><i class="fas fa-times"></i></button>
+                <button class="remove-btn" data-index="${index}"><i class="fa fa-times"></i></button>
               </div>
             </div>
           `;
@@ -721,80 +597,77 @@
         });
         const productsTotal = cart.reduce((sum, item) => sum + item.item.price * item.quantity, 0);
         productsTotalEl.textContent = productsTotal.toFixed(2);
-        transportationCostEl.textContent = transportationCost.toFixed(2);
-        transportLineEl.style.display = transportationCost > 0 ? 'block' : 'none';
-        transportIconEl.textContent = TRANSPORT_ICON[transportMode];
-        grandTotalEl.textContent = (productsTotal + transportationCost).toFixed(2);
+        grandTotalEl.textContent = productsTotal.toFixed(2);
       }
     }
-
-    // --- Toasts ---
-    function showToast(message, type = "success") {
-      const div = document.createElement('div');
-      div.className = `toast ${type}`;
-      div.textContent = message;
-      toastContainer.appendChild(div);
-      setTimeout(() => { div.style.opacity = 0; setTimeout(() => div.remove(), 300); }, 3000);
-    }
-
-    // --- Checkout Logic ---
-    function validatePhone(phone) {
-      return /^0[0-9]{9}$/.test(phone);
-    }
-
-    customerPhoneInput.addEventListener('input', function() {
-      if (!validatePhone(this.value) && this.value.length >= 10)
-        this.style.borderColor = "var(--danger)";
-      else this.style.borderColor = "";
+    document.getElementById('bistore-slider-track').addEventListener('click', function(e) {
+      const btn = e.target.closest('button[data-id]');
+      if (!btn) return;
+      const id = parseInt(btn.getAttribute('data-id'), 10);
+      const item = BISTORE_PRODUCTS.find(p => p.id === id);
+      if (item) {
+        const cartItem = cart.find(cartItem => cartItem.item.id === id);
+        if (cartItem) { cartItem.quantity += 1; }
+        else { cart.push({ item: item, quantity: 1 }); }
+        updateCart();
+      }
     });
-
-    checkoutBtn.addEventListener('click', () => {
+    cartItemsEl.addEventListener('click', e => {
+      const button = e.target.closest('button');
+      if (!button) return;
+      const index = parseInt(button.dataset.index, 10);
+      if (button.classList.contains('remove-btn')) {
+        cart.splice(index, 1);
+        updateCart();
+      } else if (button.classList.contains('increase')) {
+        cart[index].quantity += 1;
+        updateCart();
+      } else if (button.classList.contains('decrease')) {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity === 0) {
+          cart.splice(index, 1);
+        }
+        updateCart();
+      }
+    });
+    cartItemsEl.addEventListener('change', e => {
+      const input = e.target;
+      if (input.classList.contains('cart-item-qty')) {
+        let idx = parseInt(input.dataset.index, 10);
+        let qty = parseInt(input.value, 10);
+        if (!isNaN(qty) && qty >= 1) {
+          cart[idx].quantity = qty;
+          updateCart();
+        } else {
+          input.value = cart[idx].quantity;
+        }
+      }
+    });
+    checkoutBtn.onclick = () => {
       if (cart.length === 0) {
-        showToast('Your cart is empty.', "error");
+        alert('Your cart is empty.');
         return;
       }
-      if (transportNeeded) {
-        const from = gmOriginEl.value.trim();
-        const to = gmDestinationEl.value.trim();
-        if (!from || !to) {
-          showToast('Please enter both origin and destination.', "error");
-          return;
-        }
-        if (!selectedDistanceFound) {
-          showToast('No known route found.', "error");
-          return;
-        }
-        const phone = customerPhoneInput.value.trim();
-        if (!validatePhone(phone)) {
-          showToast('Please enter a valid phone number (e.g., 0971234567).', "error");
-          return;
-        }
-      }
-      showToast('Order submitted successfully!', "success");
+      alert("Order submitted successfully!");
       cart = [];
-      gmOriginEl.value = '';
-      gmDestinationEl.value = '';
-      customerPhoneInput.value = '';
-      selectedDistance = 0;
-      selectedDistanceFound = false;
-      distanceInfoEl.textContent = '';
       updateCart();
-    });
-
-    // --- INIT ---
-    document.addEventListener('DOMContentLoaded', () => {
-      modeVehicle.checked = true;
-      handleModeChange();
-      renderMasampo();
-      renderBistore();
-      updateCart();
-      function updateStickyCheckout() {
-        if (window.innerWidth < 650) checkoutBtn.classList.add('sticky-checkout');
-        else checkoutBtn.classList.remove('sticky-checkout');
+    };
+    checkoutBtnSms.onclick = () => {
+      if (cart.length === 0) {
+        alert('Your cart is empty.');
+        return;
       }
-      updateStickyCheckout();
-      window.addEventListener('resize', updateStickyCheckout);
-    });
+      const msg = cart.map(item => `${item.item.name} x${item.quantity} = ZK ${(item.item.price * item.quantity).toFixed(2)}`).join('\n');
+      window.open(`sms:+260978167546?body=${encodeURIComponent("Order:\n"+msg)}`, "_blank");
+    };
+    checkoutBtnWhatsapp.onclick = () => {
+      if (cart.length === 0) {
+        alert('Your cart is empty.');
+        return;
+      }
+      const msg = cart.map(item => `${item.item.name} x${item.quantity} = ZK ${(item.item.price * item.quantity).toFixed(2)}`).join('\n');
+      window.open(`https://wa.me/+260978167546?text=${encodeURIComponent("Order:\n"+msg)}`, "_blank");
+    };
   </script>
 </body>
-</html>
+  </html>
