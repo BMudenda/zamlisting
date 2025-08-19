@@ -6,99 +6,113 @@
   <title>Luangwa Delivery Platform - Transport Cart</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
       --primary: #2e7d32;
       --primary-dark: #1b5e20;
       --primary-light: #81c784;
       --accent: #ff9800;
-      --text: #333;
+      --text: #222;
       --text-light: #666;
       --background: #f5f5f5;
       --card-bg: white;
       --border: #e0e0e0;
-      --shadow: 0 0 8px rgba(0,0,0,0.5);
+      --shadow: 0 0 8px rgba(0,0,0,0.05);
       --success: #e8f5e9;
       --error: #ffebee;
+      --toast-bg: #333;
+      --toast-success: #43a047;
+      --toast-error: #c62828;
+      --danger: #c62828;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Roboto', sans-serif; color: var(--text); background-color: var(--background); line-height: 1.5; }
-    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 1.5rem; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    header h1 { font-weight: normal; font-size: 1.8rem; }
+    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 2.2rem 1rem 1.6rem 1rem; text-align: center; box-shadow: 0 2px 7px rgba(0,0,0,0.09); }
+    header h1 { font-weight: bold; font-size: 2.1rem; letter-spacing: 0.02em; }
     .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-wrap: wrap; gap: 2rem; }
-    .slider-wrapper { position: relative; flex: 2; min-width: 300px; background: var(--card-bg); border-radius: 10px; padding: 1.5rem; box-shadow: var(--shadow); }
-    .section-title { font-size: 1.3rem; margin-bottom: 1rem; color: var(--primary-dark); display: flex; align-items: center; gap: 0.5rem; }
+    .slider-wrapper { position: relative; flex: 2; min-width: 300px; background: var(--card-bg); border-radius: 10px; padding: 1.7rem 1.5rem; box-shadow: var(--shadow); }
+    .section-title { font-size: 1.35rem; margin-bottom: 1.1rem; color: var(--primary-dark); display: flex; align-items: center; gap: 0.5rem; font-weight: 600;}
     .section-title i { color: var(--primary); }
     .thumbnail-slider { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 1.5rem; padding: 1rem 0; margin: 0 -0.5rem; }
     .thumbnail-slider::-webkit-scrollbar { height: 6px; }
     .thumbnail-slider::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
     .thumbnail-slider::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 10px; }
-    .product { flex: 0 0 160px; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; background: var(--card-bg); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-    .product:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .product img { width: 100px; height: 100px; object-fit: cover; margin-bottom: 0.8rem; border-radius: 4px; }
-    .product h4 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--text); }
+    .product { flex: 0 0 160px; border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 0.7rem; text-align: center; background: var(--card-bg); transition: transform 0.2s, box-shadow 0.2s;}
+    .product:active, .product:hover { transform: translateY(-7px) scale(1.04); box-shadow: 0 7px 22px rgba(0,0,0,0.13); }
+    .product img { width: 100px; height: 100px; object-fit: cover; margin-bottom: 0.8rem; border-radius: 4px; border: 1px solid #eee;}
+    .product h4 { font-size: 1rem; margin-bottom: 0.53rem; color: var(--text); }
     .product p { color: var(--primary-dark); font-weight: 600; margin-bottom: 0.8rem; }
     .product button { border: none; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.2s; }
-    .product button:hover { background: var(--primary-dark); }
-    .slider-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background-color 0.2s; }
+    .product button:disabled,
+    .product .out-stock { background: #ccc !important; cursor: not-allowed; }
+    .product .out-stock { display: block; color: #b71c1c; font-size: 0.97em; font-weight: 600; margin-bottom: 0.7em; }
+    .slider-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2;}
     .slider-button:hover { background: rgba(0,0,0,0.8); }
     .slider-button.prev { left: 0; }
     .slider-button.next { right: 0; }
-    .cart { border: 1px solid var(--border); padding: 1.5rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow); }
-    .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 300px; overflow-y: auto; }
-    .cart-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .cart { border: 1px solid var(--border); padding: 1.7rem 1.3rem 2.1rem 1.3rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow);}
+    .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 320px; overflow-y: auto; }
+    .cart-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.2em; animation: fadein 0.33s; min-height: 54px;}
     .cart-items li:last-child { border-bottom: none; }
-    .cart-total { margin: 1rem 0; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-dark); }
+    .cart-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle; border: 1.5px solid #e5e7eb;}
+    .cart-item-info { display: flex; align-items: center; flex: 1; min-width: 0;}
+    .cart-item-title { font-weight: 500; font-size: 1.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+    .cart-item-qty { width: 44px; font-size: 1em; margin: 0 6px; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd; text-align: center;}
+    .cart-price-block { display: flex; align-items: center; gap: 4px;}
+    .quantity-controls { display: flex; align-items: center; gap: 2px;}
+    .quantity-btn, .remove-btn { border: none; background: none; color: var(--primary-dark); font-size: 1.1em; margin: 0 2px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s;}
+    .quantity-btn:active, .remove-btn:active { background: #f1f1f1;}
+    .remove-btn { color: var(--danger);}
+    .undo-toast { background: var(--accent); color: #222; padding: 8px 20px; border-radius: 7px; position: fixed; left: 50%; bottom: 25px; transform: translateX(-50%); z-index: 999; font-size: 1.05em;}
+    .undo-btn { background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: 500;}
+    .cart-total { margin: 1rem 0; padding-top: 1rem; border-top: 1px solid var(--border);}
     .cart-total p { margin: 0.5rem 0; }
-    .address-input, .phone-input { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; }
+    .address-input, .phone-input { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 0.93rem; transition: border 0.2s;}
     .address-input:focus, .phone-input:focus { outline: none; border-color: var(--primary); }
-    .btn { border: none; background: var(--primary); color: white; padding: 0.8rem 1.2rem; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: 500; width: 100%; transition: background 0.2s, opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-    .btn:hover { background: var(--primary-dark); }
+    .btn { border: none; background: var(--primary); color: white; padding: 0.8rem 1.2rem; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: 500; width: 100%; transition: background 0.2s;}
+    .btn:hover { background: var(--primary-dark);}
     .btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
-    .btn-accent { background: var(--accent); }
+    .btn-accent { background: var(--accent);}
     .btn-accent:hover { background: #e68a00; }
-    .btn-secondary { background: var(--primary-light); margin-top: 0.5rem; }
-    .btn-secondary:hover { background: var(--primary); }
-    .btn-success { background: var(--primary-dark); }
+    .btn-secondary { background: var(--primary-light); margin-top: 0.5rem; color: var(--primary-dark);}
+    .btn-secondary:hover { background: var(--primary); color: #fff;}
+    .btn-success { background: var(--primary-dark);}
     .status-message {
       display: none;
-      margin: 1rem 0;
+      margin: 1.1rem 0 1.3rem 0;
       padding: 0.75rem;
       border-radius: 4px;
       text-align: center;
       font-weight: 500;
+      font-size: 1.08em;
     }
     .status-message.success { background: var(--success); color: var(--primary-dark); }
     .status-message.error { background: var(--error); color: #c62828; }
     #searchBox {
       width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
+      padding: 0.6rem;
+      margin-bottom: 1.1rem;
       border-radius: 4px;
       border: 1px solid #ccc;
-      font-size: 1rem;
+      font-size: 1.06rem;
       box-sizing: border-box;
     }
-    .hidden-input {
-      opacity: 0;
-      position: absolute;
-      pointer-events: none;
-      height: 0;
-      width: 0;
-    }
+    .hidden-input { opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; }
     .autocomplete-suggestions {
       border: 1px solid #ccc;
       background: #fff;
       max-height: 130px;
       overflow-y: auto;
       position: absolute;
-      width: calc(100% - 2px);
+      width: 100%;
       z-index: 999;
       border-radius: 0 0 7px 7px;
       left: 0;
       top: 100%;
       margin-top: -5px;
       font-size: 1em;
+      display: none;
     }
     .autocomplete-suggestion {
       padding: 8px 14px;
@@ -109,53 +123,257 @@
     .autocomplete-suggestion:hover, .autocomplete-selected {
       background: #e5efff;
     }
-    .form-autocomplete-group { position: relative; }
-    @media (max-width: 767px) {
-      .container { flex-direction: column; }
-      .slider-wrapper, .cart { width: 100%; }
-      .slider-button { display: none; }
+    .cart-inputs-flex {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      margin-bottom: 1.2em;
+      flex-wrap: wrap;
+    }
+    .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container {
+      min-width: 160px;
+      flex: 1 1 160px;
+      margin-bottom: 0 !important;
+    }
+    .cart-inputs-flex .mode-container {
+      flex: 0 0 62px;
+      min-width: 56px;
+      max-width: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+      margin: 0;
+    }
+    .cart-inputs-flex .mode-container label {
+      font-size: 13px;
+      margin-bottom: 2px;
+      margin-top: 5px;
+      color: #2563eb;
+      font-weight: 500;
+      letter-spacing: .1em;
+      margin-left: 3px;
+    }
+    .cart-inputs-flex .mode-group {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 0;
+    }
+    .cart-inputs-flex .mode-radio {
+      border: 1.5px solid #e5e7eb !important;
+      background: #f8fafc !important;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 16px;
+      transition: border 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-weight: 500;
+      min-width: 0 !important;
+      padding: 6px 8px 6px 6px !important;
+      border-radius: 5px 0 0 5px !important;
+      border-right: 0;
+      box-shadow: none;
+      margin: 0;
+    }
+    .cart-inputs-flex .mode-radio.selected {
+      border: 2px solid #2563eb !important;
+      background: #f0f6ff !important;
+      z-index: 1;
+    }
+    .cart-inputs-flex .mode-radio:last-child {
+      border-radius: 0 5px 5px 0 !important;
+      border-right: 1.5px solid #e5e7eb !important;
+      margin-left: -1px;
+    }
+    .cart-inputs-flex .mode-radio input[type="radio"] {
+      accent-color: #2563eb;
+      margin-right: 1px;
+      margin-left: 0;
+      width: 16px;
+      height: 16px;
+    }
+    .cart-inputs-flex .mode-radio span.material-icons {
+      font-size: 20px !important;
+      margin: 0 2px 0 0;
+      vertical-align: middle;
+    }
+    .transport-checkbox-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 8px;
+    }
+    .transport-checkbox-container label {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    @media (max-width: 900px) {
+      .cart-inputs-flex { flex-wrap: wrap; gap: 6px;}
+      .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { min-width: 130px; flex: 1 1 130px; }
+    }
+    @media (max-width: 650px) {
+      .cart-inputs-flex { flex-direction: column; gap: 0.2em; align-items: stretch; }
+      .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { max-width: unset; min-width: 0; flex: unset; }
+      .cart { position: static; }
+      .sticky-checkout { position: fixed !important; left: 0; right: 0; bottom: 0; width: 100vw; border-radius: 0; margin: 0; z-index: 999;}
+    }
+    .map-btn-row { display: flex; justify-content: flex-end; margin-bottom: 0.5em; margin-top: -8px;}
+    #google-map-frame { width: 100%; height: 250px; border: none; border-radius: 10px; box-shadow: 0 2px 12px rgba(66,133,244,0.10); background: #f1f5f9; margin: 10px 0 18px 0; display: none;}
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 24px;
+      transform: translateX(-50%);
+      min-width: 190px;
+      z-index: 9999;
+      background: var(--toast-bg);
+      color: #fff;
+      padding: 13px 24px;
+      border-radius: 7px;
+      box-shadow: 0 2px 16px #0003;
+      font-weight: 500;
+      font-size: 1.07em;
+      animation: fadein 0.2s;
+    }
+    .toast.success { background: var(--toast-success);}
+    .toast.error { background: var(--toast-error);}
+    @keyframes fadein {
+      from { opacity: 0; transform: scale(0.95);}
+      to   { opacity: 1; transform: scale(1);}
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 170px;
+      background: #222c;
+      color: #fff;
+      text-align: left;
+      border-radius: 4px;
+      padding: 8px 11px;
+      position: absolute;
+      z-index: 1001;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 0.97em;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1><i class="fas fa-truck"></i> Luangwa Delivery Platform (Transport Cart)</h1>
+    <h1 aria-label="Luangwa Delivery Platform"><i class="fas fa-truck"></i> Luangwa Delivery Platform (Transport Cart)</h1>
   </header>
   <div class="container">
-    <div class="slider-wrapper">
+    <div class="slider-wrapper" aria-label="Available Products">
       <h2 class="section-title"><i class="fas fa-store"></i> Available Products</h2>
-      <input type="text" id="searchBox" placeholder="Search products...">
-      <button class="slider-button prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+      <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
+        <label for="categoryFilter" style="font-weight: 500;">Filter by Category:</label>
+        <select id="categoryFilter" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+          <option value="all">All</option>
+          <option value="plumbing">Plumbing</option>
+        </select>
+      </div>
+      <input type="text" id="searchBox" placeholder="Search products..." aria-label="Search products">
+      <button class="slider-button prev" id="prevBtn" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>
       <div id="product-list" class="thumbnail-slider"></div>
-      <button class="slider-button next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+      <button class="slider-button next" id="nextBtn" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>
     </div>
-    <div class="cart">
+    <div class="cart" aria-label="Your Cart">
       <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Your Order</h2>
       <ul id="cart-items" class="cart-items"></ul>
-      <div id="empty-cart" class="empty-cart">
+      <div id="empty-cart" class="empty-cart" aria-live="polite">
         <i class="fas fa-cart-arrow-down"></i>
         <p>Your cart is empty.</p>
         <p>Add items to get started.</p>
       </div>
       <div id="cart-total" class="cart-total" style="display:none;">
         <p>Products Total: ZK <span id="products-total">0.00</span></p>
-        <p id="transportation-line" style="display:none;">Transportation: <span id="transport-icon">🚗</span> <span id="transportation-cost">0.00</span></p>
+        <p id="transportation-line" style="display:none;">
+          Transportation: <span id="transport-icon">🚗</span>
+          <span id="transportation-cost">0.00</span>
+          <span id="distance-info" style="color:#2563eb;font-size:0.87em;"></span>
+        </p>
         <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
       </div>
       <input id="pickup" type="text" class="hidden-input" value="Luangwa Bus station" readonly>
-      <div class="form-autocomplete-group" style="margin-bottom: 1em;">
-        <label for="destination"><b>Destination:</b></label>
-        <input id="destination" class="address-input" type="text" placeholder="Enter your destination" autocomplete="off" />
-        <div id="destinationSuggestions" class="autocomplete-suggestions"></div>
+      <div class="transport-checkbox-container">
+        <input type="checkbox" id="transport-required" checked>
+        <label for="transport-required">Require Transportation</label>
       </div>
-      <label for="transportMode"><b>Select Transport Mode:</b></label>
-      <select id="transportMode" class="address-input" style="margin-bottom:1em;">
-        <option value="car">🚗 Taxi</option>
-        <option value="bike">🏍️ Bike</option>
-      </select>
-      <label for="phone">Enter phone number:</label>
-      <input id="phone" type="tel" class="phone-input" placeholder="0978167546" pattern="0[0-9]{9}" maxlength="10" />
-      <button id="checkout-btn" class="btn btn-accent" style="margin-top: 1rem; display:none;">
+      <div id="transport-inputs" class="cart-inputs-flex">
+        <div class="mode-container">
+          <label for="mode-of-transport">Mode</label>
+          <div class="mode-group" id="mode-group">
+            <label class="mode-radio" id="radio-vehicle">
+              <input type="radio" name="mode" value="vehicle" id="mode-vehicle">
+              <span class="material-icons">directions_car</span>
+            </label>
+            <label class="mode-radio" id="radio-motorbike">
+              <input type="radio" name="mode" value="motorbike" id="mode-motorbike">
+              <span class="material-icons">two_wheeler</span>
+            </label>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="material-icons input-icon">place</span>
+          <label for="gm-origin">From</label>
+          <div style="position:relative;">
+            <input type="text" id="gm-origin" class="address-input" autocomplete="off" placeholder="Enter starting point">
+            <div id="gm-origin-list" class="autocomplete-suggestions"></div>
+          </div>
+        </div>
+        <div class="input-group">
+          <span class="material-icons input-icon">flag</span>
+          <label for="gm-destination">To</label>
+          <div style="position:relative;">
+            <input type="text" id="gm-destination" class="address-input" autocomplete="off" placeholder="Enter destination">
+            <div id="gm-destination-list" class="autocomplete-suggestions"></div>
+          </div>
+        </div>
+        <div class="input-group" id="customer-phone-wrapper-flex" style="display:none;">
+          <span class="material-icons input-icon">phone</span>
+          <label for="customer-phone">Phone</label>
+          <input
+            type="tel"
+            id="customer-phone"
+            maxlength="10"
+            pattern="^0[0-9]{9}$"
+            placeholder="e.g. 0966423229"
+            autocomplete="off"
+            inputmode="numeric"
+            aria-label="Your phone number"
+          >
+        </div>
+      </div>
+      <div class="map-btn-row">
+        <button type="button" id="toggle-map-btn" class="btn btn-secondary" style="width: auto; min-width: 100px;">
+          <span class="material-icons">map</span> <span id="map-btn-text">Show Map</span>
+        </button>
+      </div>
+      <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="input-group" id="customer-phone-wrapper" style="display:none;">
+        <span class="material-icons input-icon">phone</span>
+        <label for="customer-phone">Phone Number</label>
+        <input type="tel" id="customer-phone-dummy" style="display:none">
+      </div>
+      <button id="checkout-btn" class="btn btn-accent sticky-checkout" style="margin-top: 1rem; display:none;">
         <i class="fas fa-credit-card"></i> Proceed to Checkout
       </button>
       <div id="checkout-status" class="status-message"></div>
@@ -163,64 +381,9 @@
       <div id="statusMessage" class="status-message"></div>
     </div>
   </div>
+  <div id="toast-container"></div>
   <script>
-    // --- FULL PLACES LIST ---
-    const luangwaLandmarks = {
-      "Luangwa Bus Station": 0,
-      "Luangwa Indeco":0.9,"Luangwa Market":0.5,"Luangwa District Hospital":4.6,"Luangwa Police Station":0.55,"Luangwa Post Office":1.1,
-      "Luangwa District Comission office":1.1,"Luangwa District Education Office":0.6,"Makichilo lodge":1.1,"UCZ lodge":1.2,"Luangwa Habour":0.5,
-      "Yangoma Hotel":0.8,"Anglican Church":1.2,"BM residence":2.7,"Simon Njobvu Place,Soweto":3.1,"Big 2 water Resorts":4.7,
-      "Gerasnos Lodge lodge":1.3,"Luangwa Basic School":0.45,"Luangwa Feira Day Secondary School":3.7,"Luangwa High School":48,
-      "Luangwa High School Police post":48.8,"Luangwa Filling Station":1.5,"Luangwa Council lodge":0.65,"CSchool":5,"JSchool":10,
-      "Chiriwe Basic School":46.7,"K Clinic":15,"Me":16,"MBSchool":18,"Mp":19,"Mwavi Primary School":55,"Mwavi Secondary School":60,
-      "Kaunga Basic School":25,"Kapoche Village":27.4,"Redcliff Lodge":27.7,"Kakaro Basic School":12.1,"Kakaroo Heritage Site":11.1,
-      "Katondwe Primary School":50.4,"Katondwe Girls Secondary School":51.3,"Katondwe Mission Hospital":53.2,"Katondwe SDA churches":49.8,
-      "Katondwe  Chappel":53.5,"Nc":49,"C":48.1,"Mb":52,"Mwavi Village":60,"Luangwa Air ":3.8,"K":58,"Luangwa Bridge":100,
-      "Luangwa Bridge Market":87.3,"Luangwa Bridge Station":90,"Boma Clinic":2,"Dzalo Skills Training Centre kambolozo":1.8,"Luangwa Town Council":2.1
-    };
-    const luangwaPlaces = Object.keys(luangwaLandmarks);
-
-    function setupAutocomplete(inputId, suggestionsId, sourceList) {
-      const input = document.getElementById(inputId);
-      const suggestionsBox = document.getElementById(suggestionsId);
-      input.addEventListener("input", function() {
-        const query = input.value.trim().toLowerCase();
-        suggestionsBox.innerHTML = "";
-        if (!query) {
-          suggestionsBox.style.display = "none";
-          return;
-        }
-        const matches = sourceList.filter(
-          name => name.toLowerCase().includes(query)
-        ).slice(0, 10);
-        if (matches.length === 0) {
-          suggestionsBox.style.display = "none";
-          return;
-        }
-        matches.forEach(name => {
-          const div = document.createElement("div");
-          div.className = "autocomplete-suggestion";
-          div.innerText = name;
-          div.onclick = function() {
-            input.value = name;
-            suggestionsBox.innerHTML = "";
-            suggestionsBox.style.display = "none";
-            updateCart();
-          };
-          suggestionsBox.appendChild(div);
-        });
-        suggestionsBox.style.display = "block";
-      });
-      input.addEventListener("blur", function() {
-        setTimeout(() => { suggestionsBox.style.display = "none"; }, 150);
-      });
-      input.addEventListener("focus", function() {
-        if (input.value.trim()) input.dispatchEvent(new Event("input"));
-      });
-    }
-    setupAutocomplete("destination", "destinationSuggestions", luangwaPlaces);
-
-    // --- FULL PRODUCT LIST AS PASTED ---
+    // --- PRODUCTS DATA ---
     const PRODUCTS = [
       { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
       { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages" },
@@ -321,10 +484,80 @@
       { id: 97, name: "N52", price: 0, image: "N52.jpeg", category: "beverages" },
       { id: 98, name: "N53", price: 0, image: "N53.jpeg", category: "beverages" },
       { id: 99, name: "N54", price: 0, image: "N54.jpeg", category: "beverages" },
-      { id: 100, name: "Black Label Big", price: 30, image: "BL.webp", category: "beverages" }
+      { id: 100, name: "Calculator Casio GX-14", price: 230, image: "GX.jpg", category: "stationary" },
+      { id: 101, name: "Big Clear Sellotape", price: 40, image: "sello.webp", category: "stationary" },
+      { id: 102, name: "Blue Pen", price: 3, image: "pen2.png", category: "stationary" },
+      { id: 103, name: "Red Pen", price: 3, image: "pen.png", category: "stationary" },
+      { id: 104, name: "Blue Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
+      { id: 105, name: "Red Permanent Maker", price: 6, image: "makers.jpeg", category: "stationary" },
+      { id: 106, name: "Black Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
+      { id: 107, name: "Green Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
+      { id: 108, name: "A4 Brown Envelope", price: 3, image: "envelope.jpg", category: "stationary" },
+      { id: 109, name: "Ball Stick n tack", price: 15, image: "tack.jpg", category: "stationary" },
+      { id: 110, name: "Ream of Paper", price: 80, image: "ream.jpeg", category: "stationary" },
+      { id: 111, name: "Stepler", price: 20, image: "stepp.jpg", category: "stationary" },
+      { id: 112, name: "File folder A4", price: 15, image: "dfolder2.jpg", category: "stationary" },
+      { id: 113, name: "Perforator Kangaro", price: 20, image: "perfo.jpg", category: "stationary" },
+      { id: 114, name: "Ink Pad", price: 15, image: "inkpad.jpg", category: "stationary" },
+      { id: 115, name: "Metal File Fastner ", price: 3, image: "ffast.webp", category: "stationary" },
+      { id: 116, name: "Ruller 30cm", price: 10, image: "ruller.jpeg", category: "stationary" },
+      { id: 117, name: "Disk Lock", price: 30, image: "lock.png", category: "general" },
+      { id: 118, name: "KENKO Electronic Calculator", price: 200, image: "EC1.jpg", category: "stationary" },
+      { id: 119, name: "Ream of Paper", price: 80, image: "ream2.png", category: "stationary" },
+      { id: 120, name: "File folder A4", price: 15, image: "dfolder.jpg", category: "stationary" },
+      { id: 121, name: "pencils", price: 3, image: "pencil.jpg", category: "stationary" },
+      { id: 122, name: "Heavy Duty Steppler", price: 100, image: "stepp2.jpg", category: "stationary" },
+      { id: 123, name: "Ruller 30cm", price: 10, image: "ruller2.jpg", category: "stationary" },
+      { id: 200, name: "Black Label Big", price: 30, image: "BL.webp", category: "beverages" }
     ];
-    // --- END FULL PRODUCTS ---
+    const luangwaPlaces = [
+      "Luangwa (Feira)","Chitope","Luangwa Market","Kasinsa","Kapoche","Kakaro Primary School","Makichilo Lodge","Gerasmos Safari Lodge","Justifeli Lodge","Feira Kindom Hall","Luangwa main sda churh","Pentocostal Assembly of God Joshua Assembly","UCZ","JB THREE BOARDERS MALL","yellow shop","Anglican Church","Big 2 Zambezi Water Front Resort & Safari","Luangwa Secondary School","Luangwa District Hospital","Kavalamanja","Luangwa Police Station","Zambia Electricity Supply Corporation","Luangwa Post Office","Luangwa Basic School","Luangwa Habour","Luangwa Indeco","Luangwa District Comission office","Luangwa District Education Board Offices","Luangwa Council lodge","Yangoma Hotel","Luangwa Filling Station","Dzalo Skills Training Centre kambolozo","Boma Clinic","BM residence","Luangwa Feira Day Secondary School","Katondwe Mission Hospital","Mwavi Secondary School","Luangwa Bridge","Luangwa Bridge Market"
+    ];
+    const segments = [
+      { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
+      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
+      { from: "Luangwa (Feira)",  to: "Luangwa Market", distance: 0.1 },
+      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 0.1 },
+      { from: "Luangwa (Feira)", to: "Luangwa District Hospital", distance: 4.6 },
+      { from: "Luangwa (Feira)", to: "Kakaro Primary School", distance: 12},
+      { from: "Luangwa District Hospital", to: "Kavalamanja", distance: 23 },
+      { from: "Katondwe Mission Hospital", to: "Kasinsa", distance: 16 },
+      { from: "Chitope", to: "Kasinsa", distance: 10 },
+      { from: "Luangwa (Feira)", to: "Luangwa Police Station", distance: 0.55 },
+      { from: "Luangwa (Feira)", to: "Makichilo Lodge", distance: 0.40 },
+      { from: "Luangwa (Feira)", to: "Anglican Church", distance: 0.75},
+      { from: "Luangwa (Feira)", to: "Feira Kingdom Hall", distance: 0.7 },
+      { from: "Luangwa (Feira)", to: "UCZ", distance: 0.5 },
+      { from: "Luangwa (Feira)", to: "Pentocostal Assembly of God Joshua Assembly", distance: 0.6 },
+      { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
+      { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0 },
+      { from: "Luangwa Market", to: "Luangwa Basic School", distance: 0.45 },
+      { from: "Luangwa Market", to: "Luangwa Habour", distance: 0.5 },
+      { from: "Luangwa (Feira)", to: "Luangwa Indeco", distance: 0.9 },
+      { from: "Luangwa Indeco", to: "Luangwa Council lodge", distance: 0.25 },
+      { from: "Luangwa Council lodge", to: "Yangoma Hotel", distance: 0.15 },
+      { from: "Yangoma Hotel", to: "Luangwa Filling Station", distance: 0.7 },
+      { from: "Luangwa Filling Station", to: "Dzalo Skills Training Centre kambolozo", distance: 0.3 },
+      { from: "Dzalo Skills Training Centre kambolozo", to: "Boma Clinic", distance: 0.2 },
+      { from: "Boma Clinic", to: "BM residence", distance: 0.6 },
+      { from: "BM residence", to: "Luangwa Feira Day Secondary School", distance: 1.1 },
+      { from: "Gerasmos Safari Lodge", to: "Luangwa Feira Day Secondary School", distance: 3.1 },
+      { from: "Luangwa Feira Day Secondary School", to: "Justifeli Lodge", distance: 2.2 },
+      { from: "Luangwa main sda church", to: "Justifeli Lodge", distance: 0.9 },
+      { from: "Luangwa District Education Board Offices", to: "Justifeli Lodge", distance: 2.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "yellow shop", distance: 3.3 },
+      { from: "Luangwa Feira Day Secondary School", to: "Zambia Electricity Supply Corporation", distance: 2.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "JB THREE BOARDERS MALL", distance: 3.7 },
+      { from: "Luangwa Feira Day Secondary School", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 4.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "Katondwe Mission Hospital", distance: 48 },
+      { from: "Katondwe Mission Hospital", to: "Mwavi Secondary School", distance: 7.2 },
+      { from: "Mwavi Secondary School", to: "Luangwa Bridge Market", distance: 27.3 },
+      { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
+      { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
+      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
+    ];
 
+    // --- DOM Elements ---
     const productListEl = document.getElementById('product-list');
     const cartItemsEl = document.getElementById('cart-items');
     const emptyCartEl = document.getElementById('empty-cart');
@@ -332,82 +565,137 @@
     const productsTotalEl = document.getElementById('products-total');
     const transportationCostEl = document.getElementById('transportation-cost');
     const transportLineEl = document.getElementById('transportation-line');
-    const transportModeEl = document.getElementById('transportMode');
     const transportIconEl = document.getElementById('transport-icon');
     const grandTotalEl = document.getElementById('grand-total');
-    const phoneEl = document.getElementById('phone');
     const checkoutBtn = document.getElementById('checkout-btn');
-    const checkoutStatusEl = document.getElementById('checkout-status');
     const searchBox = document.getElementById('searchBox');
-    const pickupEl = document.getElementById('pickup');
-    const destinationEl = document.getElementById('destination');
+    const gmOriginEl = document.getElementById('gm-origin');
+    const gmDestinationEl = document.getElementById('gm-destination');
+    const mapBtn = document.getElementById('toggle-map-btn');
+    const mapBtnText = document.getElementById('map-btn-text');
+    const googleMapFrame = document.getElementById('google-map-frame');
+    const modeVehicle = document.getElementById('mode-vehicle');
+    const modeMotorbike = document.getElementById('mode-motorbike');
+    const radioVehicle = document.getElementById('radio-vehicle');
+    const radioMotorbike = document.getElementById('radio-motorbike');
+    const customerPhoneWrapperFlex = document.getElementById('customer-phone-wrapper-flex');
+    const customerPhoneInput = document.getElementById('customer-phone');
+    const toastContainer = document.getElementById('toast-container');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const distanceInfoEl = document.getElementById('distance-info');
+    const transportRequired = document.getElementById('transport-required');
+    const transportInputs = document.getElementById('transport-inputs');
+
+    // --- State ---
     let cart = [];
     let transportationCost = 0;
-    let transportMode = 'car';
-    const TRANSPORT_COST_PER3KM = { car: 30, bike: 15 };
-    const TRANSPORT_ICON = { car: "🚗", bike: "🏍️" };
-    const DEFAULT_PICKUP = 'Luangwa Bus station';
+    let transportMode = 'vehicle';
+    let selectedDistance = 0;
+    let selectedDistanceFound = false;
+    let transportNeeded = true;
+    const TRANSPORT_COST_PER3KM = { vehicle: 20, motorbike: 10 };
+    const TRANSPORT_ICON = { vehicle: "🚗", motorbike: "🏍️" };
     let filteredProducts = PRODUCTS.slice();
+    let undoTimeout = null, lastRemoved = null;
 
-    searchBox.addEventListener('input', function() {
-      const query = this.value.trim().toLowerCase();
-      filteredProducts = PRODUCTS.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        (p.category && p.category.toLowerCase().includes(query))
-      );
-      renderProducts();
+    // --- Autocomplete ---
+    function setupAutocomplete(inputId, suggestionsId, sourceList) {
+      const input = document.getElementById(inputId);
+      const suggestionsBox = document.getElementById(suggestionsId);
+
+      input.addEventListener("input", function() {
+        const query = input.value.trim().toLowerCase();
+        suggestionsBox.innerHTML = "";
+        if (!query) { suggestionsBox.style.display = "none"; return; }
+        const matches = sourceList.filter(
+          name => name.toLowerCase().includes(query)
+        ).slice(0, 10);
+        if (matches.length === 0) { suggestionsBox.style.display = "none"; return; }
+        matches.forEach(name => {
+          const div = document.createElement("div");
+          div.className = "autocomplete-suggestion";
+          div.innerText = name;
+          div.onclick = function() {
+            input.value = name;
+            suggestionsBox.innerHTML = "";
+            suggestionsBox.style.display = "none";
+            updateCart();
+            autoFillDistance();
+          };
+          suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = "block";
+      });
+
+      input.addEventListener("blur", function() {
+        setTimeout(() => { suggestionsBox.style.display = "none"; }, 150);
+      });
+      input.addEventListener("focus", function() {
+        if (input.value.trim()) input.dispatchEvent(new Event("input"));
+      });
+    }
+    setupAutocomplete("gm-origin", "gm-origin-list", luangwaPlaces);
+    setupAutocomplete("gm-destination", "gm-destination-list", luangwaPlaces);
+
+    // --- Category Filter ---
+    const categories = Array.from(new Set(PRODUCTS.map(p => p.category).filter(Boolean)));
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      categoryFilter.appendChild(option);
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      renderProducts();
-      updateCart();
-      transportModeEl.value = 'car';
-      updateTransport();
-    });
-
-    function showMessage(message, type = "error") {
-      const s = document.getElementById("statusMessage");
-      s.textContent = message;
-      s.className   = `status-message ${type}`;
-      s.style.display = "block";
-      setTimeout(() => s.style.display = "none", 5000);
-    }
-
-    function calcTransportationCost() {
-      const destination = destinationEl.value.trim();
-      if (luangwaLandmarks.hasOwnProperty(destination)) {
-        const distance = Math.abs(luangwaLandmarks["Luangwa Bus Station"] - luangwaLandmarks[destination]);
-        const kmSegments = Math.ceil(distance / 3);
-        return kmSegments * TRANSPORT_COST_PER3KM[transportMode];
-      }
-      return TRANSPORT_COST_PER3KM[transportMode];
-    }
-
+    // --- Product Rendering ---
     function renderProducts() {
       productListEl.innerHTML = '';
       filteredProducts.forEach(p => {
         const div = document.createElement('div');
         div.className = 'product';
+        div.tabIndex = 0;
+        div.setAttribute('aria-label', p.name + ", ZK " + p.price.toFixed(2));
+        let outStock = (p.price <= 0);
         div.innerHTML = `
           <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/100?text=Error';">
           <h4>${p.name}</h4>
           <p>ZK ${p.price.toFixed(2)}</p>
-          <button data-id="${p.id}">
+          ${outStock?'<span class="out-stock">Out of Stock</span>':''}
+          <button data-id="${p.id}" ${outStock?'disabled':''}>
             <i class="fas fa-plus"></i> Add
           </button>
         `;
+        // --- Add button handler ---
+        const btn = div.querySelector('button[data-id]');
+        if (btn && !outStock) {
+          btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            addToCart(p.id);
+          });
+        }
         productListEl.appendChild(div);
       });
     }
+    categoryFilter.addEventListener('change', filterProducts);
+    searchBox.addEventListener('input', filterProducts);
+
+    function filterProducts() {
+      const selectedCategory = categoryFilter.value;
+      const query = searchBox.value.trim().toLowerCase();
+      filteredProducts = PRODUCTS.filter(p => {
+        const matchCategory = selectedCategory === 'all' || p.category === selectedCategory;
+        const matchQuery = p.name.toLowerCase().includes(query) ||
+          (p.category && p.category.toLowerCase().includes(query));
+        return matchCategory && matchQuery;
+      });
+      renderProducts();
+    }
+
+    // --- Slider Buttons ---
     document.getElementById('prevBtn').onclick = () => productListEl.scrollBy({ left: -200, behavior: 'smooth' });
     document.getElementById('nextBtn').onclick = () => productListEl.scrollBy({ left: 200, behavior: 'smooth' });
-    productListEl.addEventListener('click', e => {
-      const button = e.target.closest('button');
-      if (button && button.dataset.id) {
-        const id = parseInt(button.dataset.id, 10);
-        addToCart(id);
-      }
-    });
+
+    // --- Cart logic ---
     function addToCart(id) {
       const product = PRODUCTS.find(x => x.id === id);
       if (product) {
@@ -415,17 +703,186 @@
         if (cartItem) { cartItem.quantity += 1; }
         else { cart.push({ product, quantity: 1 }); }
         updateCart();
-        const btn = document.querySelector(`button[data-id="${id}"]`);
-        if (btn) {
-          btn.innerHTML = '<i class="fas fa-check"></i> Added';
-          btn.style.backgroundColor = 'var(--primary-dark)';
-          setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-plus"></i> Add';
-            btn.style.backgroundColor = '';
-          }, 1000);
-        }
+        showToast(product.name + ' added to cart.', "success");
       } else { showMessage('Product not found.'); }
     }
+
+    cartItemsEl.addEventListener('click', e => {
+      const button = e.target.closest('button');
+      if (!button) return;
+      const index = parseInt(button.dataset.index, 10);
+      if (button.classList.contains('remove-btn')) {
+        let removed = cart.splice(index, 1)[0];
+        updateCart();
+        showUndoToast(removed, index);
+      }
+      else if (button.classList.contains('increase')) { cart[index].quantity += 1; updateCart(); }
+      else if (button.classList.contains('decrease')) {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity === 0) {
+          let removed = cart.splice(index, 1)[0];
+          updateCart();
+          showUndoToast(removed, index);
+        } else updateCart();
+      }
+    });
+    cartItemsEl.addEventListener('change', e => {
+      const input = e.target;
+      if(input.classList.contains('cart-item-qty')){
+        let idx = parseInt(input.dataset.index, 10);
+        let qty = parseInt(input.value, 10);
+        if(!isNaN(qty) && qty >= 1) {
+          cart[idx].quantity = qty;
+          updateCart();
+        } else {
+          input.value = cart[idx].quantity;
+        }
+      }
+    });
+
+    function showUndoToast(item, idx) {
+      if (undoTimeout) clearTimeout(undoTimeout);
+      lastRemoved = {item, idx};
+      let toast = document.createElement('div');
+      toast.className = "undo-toast";
+      toast.innerHTML = `<span>Removed <b>${item.product.name}</b></span>
+        <button class="undo-btn" id="undo-btn">Undo</button>`;
+      toastContainer.appendChild(toast);
+      document.getElementById('undo-btn').onclick = function() {
+        cart.splice(idx, 0, item);
+        updateCart();
+        toast.remove();
+        lastRemoved = null;
+      };
+      undoTimeout = setTimeout(() => { toast.remove(); lastRemoved = null; }, 4500);
+    }
+
+    // --- Transport logic ---
+    function buildGraph(segments) {
+      const graph = {};
+      segments.forEach(seg => {
+        if (!graph[seg.from]) graph[seg.from] = [];
+        if (!graph[seg.to]) graph[seg.to] = [];
+        graph[seg.from].push({ place: seg.to, distance: seg.distance });
+        graph[seg.to].push({ place: seg.from, distance: seg.distance });
+      });
+      return graph;
+    }
+    function findShortestDistance(from, to, segments) {
+      const graph = buildGraph(segments);
+      if (!graph[from] || !graph[to]) return null;
+      const distances = {};
+      const visited = new Set();
+      luangwaPlaces.forEach(place => distances[place] = Infinity);
+      distances[from] = 0;
+      let queue = [{ place: from, dist: 0 }];
+      while (queue.length > 0) {
+        queue.sort((a, b) => a.dist - b.dist);
+        const { place, dist } = queue.shift();
+        if (place === to) return dist;
+        if (visited.has(place)) continue;
+        visited.add(place);
+        for (let neighbor of (graph[place] || [])) {
+          if (dist + neighbor.distance < distances[neighbor.place]) {
+            distances[neighbor.place] = dist + neighbor.distance;
+            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
+          }
+        }
+      }
+      return null;
+    }
+
+    function autoFillDistance() {
+      if (!transportNeeded) {
+        selectedDistance = 0;
+        selectedDistanceFound = false;
+        distanceInfoEl.textContent = "";
+        updateCart();
+        return;
+      }
+      const from = gmOriginEl.value.trim();
+      const to = gmDestinationEl.value.trim();
+      selectedDistance = 0;
+      selectedDistanceFound = false;
+      distanceInfoEl.textContent = "";
+      if (from && to) {
+        let dist = findShortestDistance(from, to, segments);
+        if (dist != null && !isNaN(dist)) {
+          selectedDistance = Math.round(dist * 100) / 100;
+          selectedDistanceFound = true;
+          distanceInfoEl.textContent = `(Distance: ${selectedDistance} km)`;
+        } else {
+          selectedDistance = 0;
+          selectedDistanceFound = false;
+          distanceInfoEl.textContent = `(No route found)`;
+        }
+        updateCart();
+      } else {
+        selectedDistance = 0;
+        selectedDistanceFound = false;
+        distanceInfoEl.textContent = "";
+        updateCart();
+      }
+    }
+    gmOriginEl.addEventListener('change', autoFillDistance);
+    gmDestinationEl.addEventListener('change', autoFillDistance);
+    gmOriginEl.addEventListener('blur', autoFillDistance);
+    gmDestinationEl.addEventListener('blur', autoFillDistance);
+    gmOriginEl.addEventListener('input', autoFillDistance);
+    gmDestinationEl.addEventListener('input', autoFillDistance);
+
+    function calcTransportationCost() {
+      if (transportNeeded && selectedDistanceFound && selectedDistance > 0) {
+        const rate = TRANSPORT_COST_PER3KM[transportMode];
+        return Math.ceil(selectedDistance / 3) * rate;
+      }
+      return 0;
+    }
+
+    function handleModeChange() {
+      const v = modeVehicle.checked;
+      const m = modeMotorbike.checked;
+      radioVehicle.classList.toggle('selected', v);
+      radioMotorbike.classList.toggle('selected', m);
+      transportMode = v ? 'vehicle' : (m ? 'motorbike' : 'vehicle');
+      updateCart();
+      handleCustomerPhoneInput();
+    }
+    function handleCustomerPhoneInput() {
+      if (!transportNeeded) {
+        customerPhoneWrapperFlex.style.display = "none";
+        customerPhoneInput.value = "";
+        return;
+      }
+      const v = modeVehicle.checked;
+      const m = modeMotorbike.checked;
+      if (v || m) { customerPhoneWrapperFlex.style.display = ""; }
+      else { customerPhoneWrapperFlex.style.display = "none"; customerPhoneInput.value = ""; }
+    }
+    modeVehicle.addEventListener('change', handleModeChange);
+    modeMotorbike.addEventListener('change', handleModeChange);
+
+    // --- Transport Required Toggle ---
+    function handleTransportRequired() {
+      transportNeeded = transportRequired.checked;
+      transportInputs.style.display = transportNeeded ? '' : 'none';
+      mapBtn.style.display = transportNeeded ? '' : 'none';
+      googleMapFrame.style.display = 'none';
+      mapBtnText.textContent = "Show Map";
+      if (!transportNeeded) {
+        gmOriginEl.value = '';
+        gmDestinationEl.value = '';
+        modeVehicle.checked = true;
+        modeMotorbike.checked = false;
+        customerPhoneInput.value = '';
+      }
+      handleModeChange();
+      autoFillDistance();
+      updateCart();
+    }
+    transportRequired.addEventListener('change', handleTransportRequired);
+
+    // --- Update Cart Display ---
     function updateCart() {
       transportationCost = calcTransportationCost();
       if (cart.length === 0) {
@@ -433,7 +890,6 @@
         emptyCartEl.style.display = 'block';
         cartTotalEl.style.display = 'none';
         checkoutBtn.style.display = 'none';
-        checkoutStatusEl.style.display = 'none';
       } else {
         emptyCartEl.style.display = 'none';
         cartTotalEl.style.display = 'block';
@@ -442,15 +898,17 @@
         cart.forEach((item, index) => {
           const li = document.createElement('li');
           li.innerHTML = `
-            <span>${item.product.name} (x${item.quantity})</span>
-            <div>
-              <span>ZK ${(item.product.price * item.quantity).toFixed(2)}</span>
+            <div class="cart-item-info">
+              <img src="${item.product.image}" alt="${item.product.name}" class="cart-thumb" onerror="this.src='https://via.placeholder.com/36?text=Err';">
+              <span class="cart-item-title">${item.product.name}</span>
+            </div>
+            <div class="cart-price-block">
+              <span style="min-width:60px;">ZK ${(item.product.price * item.quantity).toFixed(2)}</span>
               <div class="quantity-controls">
-                <button class="quantity-btn decrease" data-index="${index}">-</button>
-                <button class="quantity-btn increase" data-index="${index}">+</button>
-                <button class="remove-btn" data-index="${index}">
-                  <i class="fas fa-times"></i>
-                </button>
+                <button class="quantity-btn decrease" data-index="${index}" aria-label="Decrease quantity">-</button>
+                <input type="number" min="1" class="cart-item-qty" data-index="${index}" value="${item.quantity}" aria-label="Quantity for ${item.product.name}">
+                <button class="quantity-btn increase" data-index="${index}" aria-label="Increase quantity">+</button>
+                <button class="remove-btn" data-index="${index}" aria-label="Remove item"><i class="fas fa-times"></i></button>
               </div>
             </div>
           `;
@@ -460,60 +918,107 @@
         productsTotalEl.textContent = productsTotal.toFixed(2);
         const grandTotal = productsTotal + transportationCost;
         grandTotalEl.textContent = grandTotal.toFixed(2);
-        if (transportationCost > 0) {
+        if (transportNeeded && selectedDistanceFound && transportationCost > 0) {
           transportationCostEl.textContent = transportationCost.toFixed(2);
           transportLineEl.style.display = 'block';
-        } else { transportLineEl.style.display = 'none'; }
+        } else {
+          transportLineEl.style.display = 'none';
+        }
         transportIconEl.textContent = TRANSPORT_ICON[transportMode];
       }
     }
-    cartItemsEl.addEventListener('click', e => {
-      const button = e.target.closest('button');
-      if (!button) return;
-      const index = parseInt(button.dataset.index, 10);
-      if (button.classList.contains('remove-btn')) { cart.splice(index, 1); }
-      else if (button.classList.contains('increase')) { cart[index].quantity += 1; }
-      else if (button.classList.contains('decrease')) {
-        cart[index].quantity -= 1;
-        if (cart[index].quantity === 0) cart.splice(index, 1);
+
+    // --- Toasts and Message ---
+    function showToast(message, type = "success") {
+      const div = document.createElement('div');
+      div.className = `toast ${type}`;
+      div.textContent = message;
+      toastContainer.appendChild(div);
+      setTimeout(() => { div.style.opacity=0; setTimeout(()=>div.remove(),300); }, 3000);
+    }
+    function showMessage(message, type = "error") {
+      const s = document.getElementById("statusMessage");
+      s.textContent = message;
+      s.className = `status-message ${type}`;
+      s.style.display = "block";
+      setTimeout(() => s.style.display = "none", 5000);
+    }
+
+    // --- Map button ---
+    mapBtn.addEventListener('click', function() {
+      const from = gmOriginEl.value.trim();
+      const to = gmDestinationEl.value.trim();
+      if (!from || !to) {
+        showToast("Please enter both origin (From) and destination (To).", "error");
+        return;
       }
-      updateCart();
+      if (googleMapFrame.style.display === "block") {
+        googleMapFrame.style.display = "none";
+        mapBtnText.textContent = "Show Map";
+      } else {
+        const embedUrl = "https://www.google.com/maps?q=" +
+          encodeURIComponent(from + " to " + to) +
+          "&output=embed";
+        googleMapFrame.src = embedUrl;
+        googleMapFrame.style.display = "block";
+        googleMapFrame.scrollIntoView({behavior:"smooth"});
+        mapBtnText.textContent = "Hide Map";
+      }
     });
 
-    function updateTransport() {
-      transportMode = transportModeEl.value;
-      updateCart();
+    // --- Checkout logic ---
+    function validatePhone(phone) {
+      return /^0[0-9]{9}$/.test(phone);
     }
-    transportModeEl.addEventListener('change', updateTransport);
-    destinationEl.addEventListener('input', updateCart);
-
-    // --- CONSOLIDATED SUBMISSION METHOD ---
+    customerPhoneInput.addEventListener('input', function(){
+      if(!validatePhone(this.value) && this.value.length>=10)
+        this.style.borderColor = "var(--danger)";
+      else this.style.borderColor = "";
+    });
     function submitOrder() {
       if (cart.length === 0) {
-        showMessage('Your cart is empty. Please add items before checkout.');
+        showToast('Your cart is empty. Please add items before checkout.', "error");
         return;
       }
-      if (!destinationEl.value.trim()) {
-        showMessage('Please enter your destination before checkout.');
-        return;
-      }
-      const phoneRegex = /^0[0-9]{9}$/;
-      if (!phoneEl.value || !phoneRegex.test(phoneEl.value.trim())) {
-        showMessage('Please enter a valid Zambian phone number (e.g., 0978167546).');
-        return;
+      if (transportNeeded) {
+        const from = gmOriginEl.value.trim();
+        const to = gmDestinationEl.value.trim();
+        if (!from || !to) {
+          showToast('Please enter both origin (From) and destination (To) before checkout.', "error");
+          return;
+        }
+        if (!selectedDistanceFound) {
+          showToast('No known route found between selected locations. Cannot proceed.', "error");
+          return;
+        }
+        const v = modeVehicle.checked;
+        const m = modeMotorbike.checked;
+        if (!v && !m) {
+          showToast('Please select a mode of transport.', "error");
+          return;
+        }
+        const phone = customerPhoneInput.value.trim();
+        if (!validatePhone(phone)) {
+          showToast('Please enter a valid phone number (e.g., 0978167546).', "error");
+          customerPhoneInput.focus();
+          return;
+        }
       }
       const loader = document.getElementById("loader");
       loader.style.display = "block";
+      const productsTotal = parseFloat(productsTotalEl.textContent);
+      const grandTotal = parseFloat(grandTotalEl.textContent);
       const data = {
-        pickup            : pickupEl.value || DEFAULT_PICKUP,
-        destination       : destinationEl.value.trim(),
-        phoneNumber       : phoneEl.value.trim(),
-        productsTotal     : parseFloat(productsTotalEl.textContent),
-        transportationCost: transportationCost,
-        transportMode     : transportMode,
-        grandTotal        : parseFloat(grandTotalEl.textContent),
-        items             : cart.map(item => item.product.name + " x" + item.quantity).join(", "),
-        Date              : "" // (Backend can set timestamp)
+        from               : transportNeeded ? gmOriginEl.value.trim() : "N/A",
+        to                 : transportNeeded ? gmDestinationEl.value.trim() : "N/A",
+        phoneNumber        : transportNeeded ? customerPhoneInput.value.trim() : "N/A",
+        distance           : transportNeeded ? selectedDistance : 0,
+        productsTotal      : productsTotal,
+        transportationCost : transportationCost,
+        transportMode      : transportNeeded ? (modeVehicle.checked ? "Vehicle" : "Motorbike") : "None",
+        grandTotal         : grandTotal,
+        items              : cart.map(item => item.product.name + " x" + item.quantity).join(", "),
+        Date               : ""
       };
       const formBody = Object.keys(data)
         .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
@@ -527,23 +1032,45 @@
       .then(j => {
         loader.style.display = "none";
         if (j.status === 'success' || j.result === 'success' || (j.result && j.result.indexOf('success') !== -1)) {
-          showMessage('Order confirmed! Delivery details sent.', "success");
-          alert('Order confirmed! Delivery details will be sent to you.');
+          showToast('Order confirmed! Delivery details sent.', "success");
           cart = [];
           updateCart();
-          phoneEl.value = '';
-          destinationEl.value = '';
+          customerPhoneInput.value = '';
+          gmOriginEl.value = '';
+          gmDestinationEl.value = '';
+          selectedDistance = 0;
+          selectedDistanceFound = false;
+          distanceInfoEl.textContent = '';
+          googleMapFrame.style.display = "none";
+          mapBtnText.textContent = "Show Map";
+          transportRequired.checked = true;
+          handleTransportRequired();
         } else {
-          showMessage(j.message || "Submission failed", "error");
+          showToast(j.message || "Submission failed", "error");
         }
       })
       .catch(e => {
         loader.style.display = "none";
-        showMessage("Submission failed", "error");
+        showToast("Submission failed", "error");
         console.error(e);
       });
     }
     checkoutBtn.onclick = submitOrder;
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+      modeVehicle.checked = true;
+      handleModeChange();
+      handleTransportRequired();
+      renderProducts();
+      updateCart();
+      function updateStickyCheckout() {
+        if(window.innerWidth<680) checkoutBtn.classList.add('sticky-checkout');
+        else checkoutBtn.classList.remove('sticky-checkout');
+      }
+      updateStickyCheckout();
+      window.addEventListener('resize', updateStickyCheckout);
+    });
   </script>
 </body>
 </html>
