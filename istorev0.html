@@ -25,6 +25,8 @@
       --toast-success: #43a047;
       --toast-error: #c62828;
       --danger: #c62828;
+      --whatsapp: #25D366;
+      --sms: #2196F3;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Roboto', sans-serif; color: var(--text); background-color: var(--background); line-height: 1.5; }
@@ -203,6 +205,45 @@
       margin: 0 2px 0 0;
       vertical-align: middle;
     }
+    .transport-checkbox-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 8px;
+    }
+    .transport-checkbox-container label {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .submit-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .submit-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: white;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .submit-btn:hover {
+      transform: scale(1.1);
+    }
+    .whatsapp-btn {
+      background: var(--whatsapp);
+    }
+    .sms-btn {
+      background: var(--sms);
+    }
     @media (max-width: 900px) {
       .cart-inputs-flex { flex-wrap: wrap; gap: 6px;}
       .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { min-width: 130px; flex: 1 1 130px; }
@@ -212,6 +253,7 @@
       .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { max-width: unset; min-width: 0; flex: unset; }
       .cart { position: static; }
       .sticky-checkout { position: fixed !important; left: 0; right: 0; bottom: 0; width: 100vw; border-radius: 0; margin: 0; z-index: 999;}
+      .submit-buttons { position: fixed; bottom: 60px; left: 0; right: 0; justify-content: center; z-index: 999; }
     }
     .map-btn-row { display: flex; justify-content: flex-end; margin-bottom: 0.5em; margin-top: -8px;}
     #google-map-frame { width: 100%; height: 250px; border: none; border-radius: 10px; box-shadow: 0 2px 12px rgba(66,133,244,0.10); background: #f1f5f9; margin: 10px 0 18px 0; display: none;}
@@ -264,9 +306,6 @@
       opacity: 1;
     }
   </style>
-  <script>
-    // See below for JS
-  </script>
 </head>
 <body>
   <header>
@@ -280,7 +319,6 @@
         <select id="categoryFilter" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
           <option value="all">All</option>
           <option value="plumbing">Plumbing</option>
-          
         </select>
       </div>
       <input type="text" id="searchBox" placeholder="Search products..." aria-label="Search products">
@@ -306,7 +344,11 @@
         <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
       </div>
       <input id="pickup" type="text" class="hidden-input" value="Luangwa Bus station" readonly>
-      <div class="cart-inputs-flex">
+      <div class="transport-checkbox-container">
+        <input type="checkbox" id="transport-required" checked>
+        <label for="transport-required">Require Transportation</label>
+      </div>
+      <div id="transport-inputs" class="cart-inputs-flex">
         <div class="mode-container">
           <label for="mode-of-transport">Mode</label>
           <div class="mode-group" id="mode-group">
@@ -365,6 +407,14 @@
       <button id="checkout-btn" class="btn btn-accent sticky-checkout" style="margin-top: 1rem; display:none;">
         <i class="fas fa-credit-card"></i> Proceed to Checkout
       </button>
+      <div id="submit-buttons" class="submit-buttons" style="display:none;">
+        <button id="whatsapp-btn" class="submit-btn whatsapp-btn" title="Send via WhatsApp">
+          <i class="fab fa-whatsapp"></i>
+        </button>
+        <button id="sms-btn" class="submit-btn sms-btn" title="Send via SMS">
+          <i class="fas fa-sms"></i>
+        </button>
+      </div>
       <div id="checkout-status" class="status-message"></div>
       <div id="loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Processing...</div>
       <div id="statusMessage" class="status-message"></div>
@@ -497,12 +547,6 @@
       { id: 121, name: "pencils", price: 3, image: "pencil.jpg", category: "stationary" },
       { id: 122, name: "Heavy Duty Steppler", price: 100, image: "stepp2.jpg", category: "stationary" },
       { id: 123, name: "Ruller 30cm", price: 10, image: "ruller2.jpg", category: "stationary" },
-
-
-
-      
-
-
       { id: 200, name: "Black Label Big", price: 30, image: "BL.webp", category: "beverages" }
     ];
     const luangwaPlaces = [
@@ -578,6 +622,11 @@
     const toastContainer = document.getElementById('toast-container');
     const categoryFilter = document.getElementById('categoryFilter');
     const distanceInfoEl = document.getElementById('distance-info');
+    const transportRequired = document.getElementById('transport-required');
+    const transportInputs = document.getElementById('transport-inputs');
+    const submitButtons = document.getElementById('submit-buttons');
+    const whatsappBtn = document.getElementById('whatsapp-btn');
+    const smsBtn = document.getElementById('sms-btn');
 
     // --- State ---
     let cart = [];
@@ -585,6 +634,7 @@
     let transportMode = 'vehicle';
     let selectedDistance = 0;
     let selectedDistanceFound = false;
+    let transportNeeded = true;
     const TRANSPORT_COST_PER3KM = { vehicle: 20, motorbike: 10 };
     const TRANSPORT_ICON = { vehicle: "🚗", motorbike: "🏍️" };
     let filteredProducts = PRODUCTS.slice();
@@ -785,6 +835,13 @@
     }
 
     function autoFillDistance() {
+      if (!transportNeeded) {
+        selectedDistance = 0;
+        selectedDistanceFound = false;
+        distanceInfoEl.textContent = "";
+        updateCart();
+        return;
+      }
       const from = gmOriginEl.value.trim();
       const to = gmDestinationEl.value.trim();
       selectedDistance = 0;
@@ -817,7 +874,7 @@
     gmDestinationEl.addEventListener('input', autoFillDistance);
 
     function calcTransportationCost() {
-      if (selectedDistanceFound && selectedDistance > 0) {
+      if (transportNeeded && selectedDistanceFound && selectedDistance > 0) {
         const rate = TRANSPORT_COST_PER3KM[transportMode];
         return Math.ceil(selectedDistance / 3) * rate;
       }
@@ -834,6 +891,11 @@
       handleCustomerPhoneInput();
     }
     function handleCustomerPhoneInput() {
+      if (!transportNeeded) {
+        customerPhoneWrapperFlex.style.display = "none";
+        customerPhoneInput.value = "";
+        return;
+      }
       const v = modeVehicle.checked;
       const m = modeMotorbike.checked;
       if (v || m) { customerPhoneWrapperFlex.style.display = ""; }
@@ -841,6 +903,26 @@
     }
     modeVehicle.addEventListener('change', handleModeChange);
     modeMotorbike.addEventListener('change', handleModeChange);
+
+    // --- Transport Required Toggle ---
+    function handleTransportRequired() {
+      transportNeeded = transportRequired.checked;
+      transportInputs.style.display = transportNeeded ? '' : 'none';
+      mapBtn.style.display = transportNeeded ? '' : 'none';
+      googleMapFrame.style.display = 'none';
+      mapBtnText.textContent = "Show Map";
+      if (!transportNeeded) {
+        gmOriginEl.value = '';
+        gmDestinationEl.value = '';
+        modeVehicle.checked = true;
+        modeMotorbike.checked = false;
+        customerPhoneInput.value = '';
+      }
+      handleModeChange();
+      autoFillDistance();
+      updateCart();
+    }
+    transportRequired.addEventListener('change', handleTransportRequired);
 
     // --- Update Cart Display ---
     function updateCart() {
@@ -850,10 +932,12 @@
         emptyCartEl.style.display = 'block';
         cartTotalEl.style.display = 'none';
         checkoutBtn.style.display = 'none';
+        submitButtons.style.display = 'none';
       } else {
         emptyCartEl.style.display = 'none';
         cartTotalEl.style.display = 'block';
         checkoutBtn.style.display = 'block';
+        submitButtons.style.display = 'none';
         cartItemsEl.innerHTML = '';
         cart.forEach((item, index) => {
           const li = document.createElement('li');
@@ -878,7 +962,7 @@
         productsTotalEl.textContent = productsTotal.toFixed(2);
         const grandTotal = productsTotal + transportationCost;
         grandTotalEl.textContent = grandTotal.toFixed(2);
-        if (selectedDistanceFound && transportationCost > 0) {
+        if (transportNeeded && selectedDistanceFound && transportationCost > 0) {
           transportationCostEl.textContent = transportationCost.toFixed(2);
           transportLineEl.style.display = 'block';
         } else {
@@ -935,98 +1019,112 @@
         this.style.borderColor = "var(--danger)";
       else this.style.borderColor = "";
     });
+
+    function generateOrderMessage() {
+      const productsTotal = parseFloat(productsTotalEl.textContent);
+      const grandTotal = parseFloat(grandTotalEl.textContent);
+      const items = cart.map(item => `${item.product.name} x${item.quantity}`).join(", ");
+      let message = `New Order:\nItems: ${items}\nProducts Total: ZK ${productsTotal.toFixed(2)}`;
+      if (transportNeeded) {
+        const from = gmOriginEl.value.trim();
+        const to = gmDestinationEl.value.trim();
+        const phone = customerPhoneInput.value.trim();
+        const transportModeText = modeVehicle.checked ? "Vehicle" : "Motorbike";
+        message += `\nTransport: ${transportModeText}\nFrom: ${from}\nTo: ${to}\nDistance: ${selectedDistance} km\nTransport Cost: ZK ${transportationCost.toFixed(2)}\nPhone: ${phone}`;
+      } else {
+        message += `\nTransport: Not required`;
+      }
+      message += `\nGrand Total: ZK ${grandTotal.toFixed(2)}`;
+      return message;
+    }
+
+    function resetOrder() {
+      cart = [];
+      updateCart();
+      customerPhoneInput.value = '';
+      gmOriginEl.value = '';
+      gmDestinationEl.value = '';
+      selectedDistance = 0;
+      selectedDistanceFound = false;
+      distanceInfoEl.textContent = '';
+      googleMapFrame.style.display = "none";
+      mapBtnText.textContent = "Show Map";
+      transportRequired.checked = true;
+      handleTransportRequired();
+      submitButtons.style.display = 'none';
+    }
+
     function submitOrder() {
       if (cart.length === 0) {
         showToast('Your cart is empty. Please add items before checkout.', "error");
         return;
       }
-      const from = gmOriginEl.value.trim();
-      const to = gmDestinationEl.value.trim();
-      if (!from || !to) {
-        showToast('Please enter both origin (From) and destination (To) before checkout.', "error");
-        return;
-      }
-      if (!selectedDistanceFound) {
-        showToast('No known route found between selected locations. Cannot proceed.', "error");
-        return;
-      }
-      const v = modeVehicle.checked;
-      const m = modeMotorbike.checked;
-      if (!v && !m) {
-        showToast('Please select a mode of transport.', "error");
-        return;
-      }
-      const phone = customerPhoneInput.value.trim();
-      if (!validatePhone(phone)) {
-        showToast('Please enter a valid phone number (e.g., 0978167546).', "error");
-        customerPhoneInput.focus();
-        return;
-      }
-      const loader = document.getElementById("loader");
-      loader.style.display = "block";
-      const productsTotal = parseFloat(productsTotalEl.textContent);
-      const grandTotal = parseFloat(grandTotalEl.textContent);
-      const data = {
-        from               : from,
-        to                 : to,
-        phoneNumber        : phone,
-        distance           : selectedDistance,
-        productsTotal      : productsTotal,
-        transportationCost : transportationCost,
-        transportMode      : v ? "Vehicle" : "Motorbike",
-        grandTotal         : grandTotal,
-        items              : cart.map(item => item.product.name + " x" + item.quantity).join(", "),
-        Date               : ""
-      };
-      const formBody = Object.keys(data)
-        .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
-        .join("&");
-      fetch('https://script.google.com/macros/s/AKfycbx7R-M0nKEafAfvKnCbDq5r-m7TtQ466eNTA5SwjvTFqQKCbmT4rY8sTFZEzCtwQ9a3/exec', {
-        method : 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body   : formBody
-      })
-      .then(r => r.json())
-      .then(j => {
-        loader.style.display = "none";
-        if (j.status === 'success' || j.result === 'success' || (j.result && j.result.indexOf('success') !== -1)) {
-          showToast('Order confirmed! Delivery details sent.', "success");
-          cart = [];
-          updateCart();
-          customerPhoneInput.value = '';
-          gmOriginEl.value = '';
-          gmDestinationEl.value = '';
-          selectedDistance = 0;
-          selectedDistanceFound = false;
-          distanceInfoEl.textContent = '';
-          googleMapFrame.style.display = "none";
-          mapBtnText.textContent = "Show Map";
-        } else {
-          showToast(j.message || "Submission failed", "error");
+      if (transportNeeded) {
+        const from = gmOriginEl.value.trim();
+        const to = gmDestinationEl.value.trim();
+        if (!from || !to) {
+          showToast('Please enter both origin (From) and destination (To) before checkout.', "error");
+          return;
         }
-      })
-      .catch(e => {
-        loader.style.display = "none";
-        showToast("Submission failed", "error");
-        console.error(e);
-      });
+        if (!selectedDistanceFound) {
+          showToast('No known route found between selected locations. Cannot proceed.', "error");
+          return;
+        }
+        const v = modeVehicle.checked;
+        const m = modeMotorbike.checked;
+        if (!v && !m) {
+          showToast('Please select a mode of transport.', "error");
+          return;
+        }
+        const phone = customerPhoneInput.value.trim();
+        if (!validatePhone(phone)) {
+          showToast('Please enter a valid phone number (e.g., 0978167546).', "error");
+          customerPhoneInput.focus();
+          return;
+        }
+      }
+      checkoutBtn.style.display = 'none';
+      submitButtons.style.display = 'flex';
+      showToast('Please choose submission method: WhatsApp or SMS.', "success");
     }
+
+    whatsappBtn.addEventListener('click', function() {
+      const message = encodeURIComponent(generateOrderMessage());
+      const whatsappUrl = `https://wa.me/260978167546?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+      showToast('Order sent via WhatsApp!', "success");
+      resetOrder();
+    });
+
+    smsBtn.addEventListener('click', function() {
+      const message = encodeURIComponent(generateOrderMessage());
+      const smsUrl = `sms:+260978167546?body=${message}`;
+      window.open(smsUrl, '_self');
+      showToast('Order sent via SMS!', "success");
+      resetOrder();
+    });
+
     checkoutBtn.onclick = submitOrder;
 
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
       modeVehicle.checked = true;
       handleModeChange();
+      handleTransportRequired();
       renderProducts();
       updateCart();
       function updateStickyCheckout() {
-        if(window.innerWidth<680) checkoutBtn.classList.add('sticky-checkout');
-        else checkoutBtn.classList.remove('sticky-checkout');
+        if(window.innerWidth<680) {
+          checkoutBtn.classList.add('sticky-checkout');
+          submitButtons.classList.add('sticky-checkout');
+        } else {
+          checkoutBtn.classList.remove('sticky-checkout');
+          submitButtons.classList.remove('sticky-checkout');
+        }
       }
       updateStickyCheckout();
       window.addEventListener('resize', updateStickyCheckout);
     });
-
   </script>
 </body>
-  </html>
+</html>
