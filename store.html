@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <style>
+    /* General styles */
     :root {
       --primary: #2e7d32; --primary-dark: #1b5e20; --primary-light: #81c784; --accent: #ff9800;
       --text: #222; --text-light: #666; --background: #f5f5f5; --card-bg: white;
@@ -17,11 +18,11 @@
       --footer-link: #ffd600;
     }
     body { font-family: 'Roboto', sans-serif; color: var(--text); background: var(--background); line-height: 1.5; }
+    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark) 90%); color: white; padding: 2.2rem 1rem 1.5rem 1rem; text-align: center;}
     .brand-title { font-size: 2.6rem; font-weight: 900; letter-spacing: 0.05em; color: var(--primary-dark); text-shadow: 0 1px 0 #fff; margin-bottom: 0.6rem; }
     .brand-title .highlight { color: var(--accent); text-shadow: none; }
     .tagline { font-size: 1.45rem; font-weight: 500; color: var(--primary); margin-bottom: 0.45rem; }
     .subtitle { font-size: 1.1rem; color: var(--text-light); margin-bottom: 1.2rem; margin-top: -0.5rem; }
-    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark) 90%); color: white; padding: 2.2rem 1rem 1.5rem 1rem; text-align: center; box-shadow: 0 2px 7px rgba(0,0,0,0.09); border-radius: 0 0 18px 18px;}
     .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 2rem; }
     .filter-search-section { width: 100%; margin-bottom: 1.5rem; }
     .filter-search-section > div { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
@@ -59,7 +60,7 @@
     }
     .fa-whatsapp { background: #25d366; }
     .fa-comment { background: #ff9800; }
-    .taxi-hire-actions { display: flex; gap: 7px; align-items: center; justify-content: center; margin: 0.8rem 0 0.2rem 0;}
+    .taxi-hire-actions, .bid-actions { display: flex; gap: 7px; align-items: center; justify-content: center; margin: 0.8rem 0 0.2rem 0;}
     .taxi-hire-btn, .bid-btn {
       border: none;
       background: none;
@@ -71,13 +72,16 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      border-radius: 50%;
+      min-width: 34px;
+      min-height: 34px;
     }
-    .taxi-hire-btn.calc, .taxi-hire-btn.map, .taxi-hire-btn.hide {
+    .taxi-hire-btn.calc, .taxi-hire-btn.map, .taxi-hire-btn.hide,
+    .bid-btn.sms, .bid-btn.whatsapp {
+      font-size: 1em;
       background: none;
       color: inherit;
-      font-size: 1em;
       border-radius: 50%;
-      width: auto;
       min-width: 34px;
       min-height: 34px;
       padding: 0 8px;
@@ -90,12 +94,13 @@
     .taxi-hire-btn.hide i { color: #d32f2f; }
     .taxi-hire-btn.sms .fa-comment, .taxi-hire-btn.whatsapp .fa-whatsapp,
     .bid-btn.sms .fa-comment, .bid-btn.whatsapp .fa-whatsapp { margin-right: 4px;}
-    .taxi-hire-btn:disabled { background: #ddd; color: #aaa;}
+    .taxi-hire-btn:disabled, .bid-btn:disabled { background: #ddd; color: #aaa;}
     .taxi-hire-status { margin: 0.7rem auto 0.2rem auto; text-align: center; font-size: 1.03em;}
     .taxi-hire-status.success { color: var(--primary-dark);}
     .taxi-hire-status.error { color: var(--danger);}
-    .taxi-hire-map { display: none; width: 100%; height: 150px; border-radius: 7px; border: 1px solid #e0e0e0; margin-top: 0.5rem; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb; overflow: hidden;}
+    .taxi-hire-map { display: none; width: 100vw; height: 45vh; border: none; margin: 0; border-radius: 0; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb; position: absolute; left: 0; top: 0; z-index: 2;}
     .taxi-hire-map.show { display: flex !important; }
+    .taxi-hire-map iframe { width: 100vw; height: 100%; border: none; }
     .taxi-radio-group {display:flex;gap:18px;margin-bottom:0.7rem;}
     .taxi-radio-label {display:flex;align-items:center;gap:6px;}
     .taxi-radio-label input[type="radio"] {accent-color:var(--primary);}
@@ -126,12 +131,13 @@
     .checkout-actions { margin-top: 1rem; display: flex; gap: 10px; justify-content: center;}
     .checkout-btn-sms, .checkout-btn-whatsapp { border: none; background: none; padding: 0 8px; font-size: 1em; font-weight: 600; color: inherit; display: flex; align-items: center; }
     .checkout-btn-sms .fa-comment, .checkout-btn-whatsapp .fa-whatsapp { margin-right: 4px;}
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.52); z-index: 2000; align-items: center; justify-content: center; }
-    .modal-content { background: #fff; border-radius: 13px; padding: 1.3rem 1.2rem; max-width: 99vw; width: 370px; box-shadow: 0 0 22px rgba(0,0,0,0.13); position: relative; display: flex; flex-direction: column; }
-    .modal-close { position: absolute; top: 11px; right: 13px; font-size: 1.4rem; color: var(--danger); background: none; border: none; cursor: pointer; z-index: 1; transition: color 0.2s;}
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #fff; z-index: 2000; align-items: center; justify-content: center; }
+    .modal.show { display: flex !important; }
+    .modal-content { background: #fff; border-radius: 0; padding: 0; width: 100vw; height: 100vh; box-shadow: none; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    .modal-close { position: absolute; top: 18px; right: 18px; font-size: 2.5rem; color: var(--danger); background: none; border: none; cursor: pointer; z-index: 3; transition: color 0.2s;}
     .modal-close:hover { color: var(--primary-dark);}
-    .modal-title { font-size: 1.19rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 0.3rem; text-align: center;}
-    .modal-img { width: 220px; height: 150px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee; background: #fff;}
+    .modal-title { font-size: 2rem; font-weight: 700; color: var(--primary-dark); margin: 2.5rem 0 0.8rem 0; text-align: center;}
+    .modal-img { width: 75vw; max-width: 440px; height: 32vw; max-height: 280px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee; background: #fff;}
     .modal-imgs { display: flex; align-items: center; gap: 10px; margin-bottom: 0.3rem; flex-wrap: wrap; justify-content: center;}
     .modal-imgs img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid var(--primary-light); cursor: pointer; transition: box-shadow 0.15s; background: #fff;}
     .modal-imgs img.selected { box-shadow: 0 0 0 3px var(--primary-light); }
@@ -160,11 +166,9 @@
     footer a { color: var(--footer-link); text-decoration: underline; font-weight: 500;}
     footer .footer-brand { font-weight: bold; color: var(--footer-link);}
     @media (max-width: 800px) {
-      .slider-track { gap: 0.8rem; }
-      .slider-section, .taxi-card { max-width: 99vw; }
-      .product, .vehicle-item { min-width: 140px; }
-      .modal-content { width: 98vw;}
-      .modal-img { width: 99vw; max-width: 240px;}
+      .modal-img { width: 95vw; max-width: 290px; height: 45vw; max-height: 200px;}
+      .modal-content { width: 100vw; height: 100vh;}
+      .modal-title { font-size: 1.3rem;}
     }
   </style>
 </head>
@@ -212,7 +216,7 @@
           <span>🚗</span>
           <span>🏍️</span>
         </div>
-        <div>
+        <div style="width:100%;max-width:420px;">
           <label for="taxiPhoneModal">Phone Number</label>
           <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" style="width:100%;margin-bottom:0.7rem;">
           <label>Transport Mode</label>
@@ -243,7 +247,7 @@
         <div id="taxiHireMap" class="taxi-hire-map">
           <iframe id="taxiHireMapIframe"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.06737814816!2d31.2323422143821!3d-13.147631245757161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1947e2a8a3e25c0d%3A0xe3ee3a6f4a9c89a1!2sLuangwa!5e0!3m2!1sen!2szm!4v1692550000000!5m2!1sen!2szm"
-            width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
         </div>
       </div>
     </div>
@@ -286,7 +290,7 @@
     </div>
     <!-- Masampo Details Modal -->
     <div class="modal" id="detailsModal">
-      <div class="modal-content" id="detailsModalContent">
+      <div class="modal-content">
         <button class="modal-close" id="detailsModalClose">&times;</button>
         <div class="modal-title" id="detailsModalTitle"></div>
         <div class="modal-imgs" id="detailsModalImgs"></div>
@@ -369,7 +373,7 @@
     const taxiHireMap = document.getElementById('taxiHireMap');
     const taxiHireStatus = document.getElementById('taxiHireStatus');
     taxiCard.onclick = () => {
-      taxiHireModal.style.display = "flex";
+      taxiHireModal.classList.add("show");
       taxiHireMap.classList.remove("show");
       taxiShowMapBtn.style.display="";
       taxiHideMapBtn.style.display="none";
@@ -379,14 +383,17 @@
       document.getElementById('taxiHireTo').value = '';
       document.querySelector('input[name="taxiHireMode"][value="vehicle"]').checked = true;
     };
-    taxiHireModalClose.onclick = () => { taxiHireModal.style.display = "none"; };
+    taxiHireModalClose.onclick = () => { taxiHireModal.classList.remove("show"); };
     window.addEventListener('keydown', function(e) {
-      if (e.key === "Escape" && taxiHireModal.style.display === "flex") {
-        taxiHireModal.style.display = "none";
+      if (e.key === "Escape" && taxiHireModal.classList.contains("show")) {
+        taxiHireModal.classList.remove("show");
+      }
+      if (e.key === "Escape" && detailsModal.classList.contains("show")) {
+        detailsModal.classList.remove("show");
       }
     });
     taxiHireModal.addEventListener('mousedown', function(e) {
-      if (e.target === taxiHireModal) taxiHireModal.style.display = "none";
+      if (e.target === taxiHireModal) taxiHireModal.classList.remove("show");
     });
     taxiShowMapBtn.onclick = () => {
       taxiHireMap.classList.add("show");
@@ -734,7 +741,7 @@
       currentMasampoItem = item;
       masampoBidDestLabel.textContent = `${getOwnerPhone(item)} (Owner)`;
       detailsModalDetails.innerHTML = html;
-      detailsModal.style.display = "flex";
+      detailsModal.classList.add("show");
     }
     function selectDetailsImage(idx) {
       currentDetailsIndex = idx;
@@ -751,14 +758,9 @@
     detailsModalNextImg.onclick = () => {
       if (currentDetailsIndex < currentDetailsImages.length - 1) selectDetailsImage(currentDetailsIndex + 1);
     };
-    detailsModalClose.onclick = () => { detailsModal.style.display = "none"; };
-    window.addEventListener('keydown', function(e) {
-      if (e.key === "Escape" && detailsModal.style.display === "flex") {
-        detailsModal.style.display = "none";
-      }
-    });
+    detailsModalClose.onclick = () => { detailsModal.classList.remove("show"); };
     detailsModal.addEventListener('mousedown', function(e) {
-      if (e.target === detailsModal) detailsModal.style.display = "none";
+      if (e.target === detailsModal) detailsModal.classList.remove("show");
     });
 
     function validateBidFields() {
