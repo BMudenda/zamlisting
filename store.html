@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>ZamListing</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <style>
     :root {
       --primary: #2e7d32; --primary-dark: #1b5e20; --primary-light: #81c784; --accent: #ff9800;
       --text: #222; --text-light: #666; --background: #f5f5f5; --card-bg: white;
       --border: #e0e0e0; --shadow: 0 0 8px rgba(0,0,0,0.05); --success: #e8f5e9;
-      --error: #ffebee; --toast-success: #43a047; --toast-error: #c62828; --danger: #c62828;
-      --whatsapp: #25D366; --sms: #2196F3;
+      --error: #ffebee; --danger: #c62828;
+      --whatsapp: #25d366; --sms: #ff9800;
       --footer-bg: #2e7d32;
       --footer-text: #fff;
       --footer-link: #ffd600;
@@ -33,7 +32,7 @@
     .slider-section { position: relative; width: 100%; margin-bottom: 2rem; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem 1rem 1rem; }
     .slider-title { display: flex; align-items: center; gap: 0.7rem; font-size: 1.42rem; margin-bottom: 1.1rem; color: var(--primary-dark); font-weight: 600; }
     .slider-track { display: flex; overflow-x: auto; gap: 1.4rem; scroll-behavior: smooth; padding-bottom: 16px; padding-top: 6px; }
-    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.63); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2;}
+    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.63); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2; }
     .slider-btn:hover { background: rgba(0,0,0,0.81); }
     .slider-btn.prev { left: 8px; }
     .slider-btn.next { right: 8px; }
@@ -44,20 +43,76 @@
     @keyframes taxiEmojiBounce { 0% { transform: translateY(0); } 50% { transform: translateY(-10px) scale(1.07); } 100% { transform: translateY(0); } }
     .taxi-card-title { font-size: 1.17rem; font-weight: 600; color: var(--primary-dark); display: flex; align-items: center; gap: 0.4rem; justify-content: center; margin-bottom: 0.15rem; }
     .taxi-card-desc { color: var(--text-light); font-size: 1.01rem; text-align: center; margin-bottom: 0.2rem; }
+    .fa {
+      padding: 5px;
+      font-size: 18px;
+      width: 34px;
+      height: 34px;
+      line-height: 18px;
+      text-align: center;
+      text-decoration: none;
+      margin: 3px;
+      border-radius: 50%;
+      color: white;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .fa-whatsapp { background: #25d366; }
+    .fa-comment { background: #ff9800; }
+    .taxi-hire-actions { display: flex; gap: 7px; align-items: center; justify-content: center; margin: 0.8rem 0 0.2rem 0;}
+    .taxi-hire-btn, .bid-btn {
+      border: none;
+      background: none;
+      padding: 0 8px;
+      font-size: 1em;
+      font-weight: 600;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .taxi-hire-btn.calc, .taxi-hire-btn.map, .taxi-hire-btn.hide {
+      background: none;
+      color: inherit;
+      font-size: 1em;
+      border-radius: 50%;
+      width: auto;
+      min-width: 34px;
+      min-height: 34px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .taxi-hire-btn.calc i { color: #ff9800; }
+    .taxi-hire-btn.map i { color: #00897b; }
+    .taxi-hire-btn.hide i { color: #d32f2f; }
+    .taxi-hire-btn.sms .fa-comment, .taxi-hire-btn.whatsapp .fa-whatsapp,
+    .bid-btn.sms .fa-comment, .bid-btn.whatsapp .fa-whatsapp { margin-right: 4px;}
+    .taxi-hire-btn:disabled { background: #ddd; color: #aaa;}
+    .taxi-hire-status { margin: 0.7rem auto 0.2rem auto; text-align: center; font-size: 1.03em;}
+    .taxi-hire-status.success { color: var(--primary-dark);}
+    .taxi-hire-status.error { color: var(--danger);}
+    .taxi-hire-map { display: none; width: 100%; height: 150px; border-radius: 7px; border: 1px solid #e0e0e0; margin-top: 0.5rem; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb; overflow: hidden;}
+    .taxi-hire-map.show { display: flex !important; }
+    .taxi-radio-group {display:flex;gap:18px;margin-bottom:0.7rem;}
+    .taxi-radio-label {display:flex;align-items:center;gap:6px;}
+    .taxi-radio-label input[type="radio"] {accent-color:var(--primary);}
     .product, .vehicle-item { min-width: 160px; max-width: 170px; border: 1px solid var(--border); border-radius: 10px; padding: 1rem 0.7rem; text-align: center; background: var(--card-bg); transition: box-shadow 0.18s, transform 0.11s;}
     .product:hover, .vehicle-item:hover { transform: translateY(-7px) scale(1.04); box-shadow: 0 7px 26px rgba(0,0,0,0.15);}
-    .product img, .vehicle-item img { width: 82px; height: 82px; object-fit: cover; margin-bottom: 0.5rem; border-radius: 4px; border: 1px solid #eee; }
+    .product img, .vehicle-item img { width: 120px; height: 82px; object-fit: cover; margin-bottom: 0.5rem; border-radius: 4px; border: 2px solid var(--primary-light); background: #fff; }
     .product h4, .vehicle-item h4 { font-size: 1rem; margin-bottom: 0.2rem; color: var(--text); }
     .product p, .vehicle-item p { color: var(--primary-dark); font-weight: 600; margin-bottom: 0.6rem; }
     .vehicle-item p.location { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.2rem;}
     .product .out-stock { display: block; color: #b71c1c; font-size: 0.97em; font-weight: 600; margin-bottom: 0.7em; }
-    .product button { border: none; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.15s;}
+    .product button, .vehicle-item button { border: none; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.15s;}
     .product button:disabled { background: #ccc !important; cursor: not-allowed; }
     .cart { border: 1px solid var(--border); padding: 1.7rem 1.3rem 2.1rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow);}
     .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 320px; overflow-y: auto; }
     .cart-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.2em; animation: fadein 0.33s; min-height: 54px;}
     .cart-items li:last-child { border-bottom: none; }
-    .cart-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle; border: 1.5px solid #e5e7eb; }
+    .cart-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle; border: 1.5px solid #e5e7eb; background: #fff; }
     .cart-item-info { display: flex; align-items: center; flex: 1; min-width: 0; }
     .cart-item-title { font-weight: 500; font-size: 1.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cart-item-qty { width: 44px; font-size: 1em; margin: 0 6px; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd; text-align: center; }
@@ -68,47 +123,30 @@
     .remove-btn { color: var(--danger); }
     .cart-total { margin: 1rem 0; padding-top: 1rem; border-top: 1px solid var(--border); }
     .cart-total p { margin: 0.5rem 0; }
-    .slider-track::-webkit-scrollbar { height: 0px; background: transparent;}
-    .slider-track { scrollbar-width: none; }
-    .slider-track { -ms-overflow-style: none; }
-    .slider-track::-webkit-scrollbar-thumb { background: transparent; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.52); z-index: 2000; align-items: center; justify-content: center; animation: fadein 0.3s;}
-    .modal-content { background: #fff; border-radius: 13px; padding: 1.3rem 1.2rem; max-width: 99vw; width: 350px; box-shadow: 0 0 22px rgba(0,0,0,0.13); position: relative; display: flex; flex-direction: column; }
+    .checkout-actions { margin-top: 1rem; display: flex; gap: 10px; justify-content: center;}
+    .checkout-btn-sms, .checkout-btn-whatsapp { border: none; background: none; padding: 0 8px; font-size: 1em; font-weight: 600; color: inherit; display: flex; align-items: center; }
+    .checkout-btn-sms .fa-comment, .checkout-btn-whatsapp .fa-whatsapp { margin-right: 4px;}
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.52); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-content { background: #fff; border-radius: 13px; padding: 1.3rem 1.2rem; max-width: 99vw; width: 370px; box-shadow: 0 0 22px rgba(0,0,0,0.13); position: relative; display: flex; flex-direction: column; }
     .modal-close { position: absolute; top: 11px; right: 13px; font-size: 1.4rem; color: var(--danger); background: none; border: none; cursor: pointer; z-index: 1; transition: color 0.2s;}
     .modal-close:hover { color: var(--primary-dark);}
     .modal-title { font-size: 1.19rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 0.3rem; text-align: center;}
-    .modal-img { width: 150px; height: 150px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee;}
-    .modal-imgs { display: flex; align-items: center; gap: 10px; margin-bottom: 0.3rem;}
-    .modal-imgs img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; cursor: pointer; transition: box-shadow 0.15s;}
+    .modal-img { width: 220px; height: 150px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee; background: #fff;}
+    .modal-imgs { display: flex; align-items: center; gap: 10px; margin-bottom: 0.3rem; flex-wrap: wrap; justify-content: center;}
+    .modal-imgs img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid var(--primary-light); cursor: pointer; transition: box-shadow 0.15s; background: #fff;}
     .modal-imgs img.selected { box-shadow: 0 0 0 3px var(--primary-light); }
     .modal-slider-arrows { display: flex; gap: 8px; align-items: center; margin-bottom: 0.3rem; margin-top: 0.1rem;}
     .modal-slider-arrow { background: var(--primary-light); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; cursor: pointer; color: #fff; transition: background 0.18s;}
     .modal-slider-arrow:disabled { background: #ddd; color: #aaa; cursor: not-allowed;}
-    .taxi-hire-actions { display: flex; gap: 12px; align-items: center; justify-content: center; margin: 0.8rem 0 0.2rem 0;}
-    .taxi-hire-btn { border: none; border-radius: 50%; width: 42px; height: 42px; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--primary-light); color: #fff;}
-    .taxi-hire-btn.sms { background: var(--sms); color: #fff;}
-    .taxi-hire-btn.whatsapp { background: var(--whatsapp); color: #fff;}
-    .taxi-hire-btn.calc { background: var(--accent); color: #fff;}
-    .taxi-hire-btn.map { background: #f8fafc; color: #2563eb;}
-    .taxi-hire-btn.hide { background: #ddd; color: var(--danger);}
-    .taxi-hire-btn:disabled { background: #ddd; color: #aaa;}
-    .taxi-hire-status { margin: 0.7rem auto 0.2rem auto; text-align: center; font-size: 1.03em;}
-    .taxi-hire-status.success { color: var(--primary-dark);}
-    .taxi-hire-status.error { color: var(--danger);}
-    .taxi-hire-map { display: none; width: 100%; height: 130px; border-radius: 7px; border: 1px solid #e0e0e0; margin-top: 0.5rem; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb;}
-    .taxi-hire-map.show { display: flex !important; }
-    .checkout-actions { margin-top: 1rem; display: flex; gap: 12px; justify-content: center;}
-    .checkout-btn-main { padding: 0.8rem 1.2rem; border-radius: 5px; font-size: 1.07rem; border: none; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; }
-    .checkout-btn-main i { margin-right: 8px;}
-    .checkout-btn-sms { background: var(--sms); color: #fff; border-radius: 50%; width: 42px; height: 42px; font-size: 1.35rem; border: none; display: flex; align-items: center; justify-content: center;}
-    .checkout-btn-whatsapp { background: var(--whatsapp); color: #fff; border-radius: 50%; width: 42px; height: 42px; font-size: 1.35rem; border: none; display: flex; align-items: center; justify-content: center;}
-    @media (max-width: 800px) {
-      .slider-track { gap: 0.8rem; }
-      .slider-section, .taxi-card { max-width: 99vw; }
-      .product, .vehicle-item { min-width: 140px; }
-      .modal-content { width: 98vw;}
-    }
+    .masampo-bid-block {margin: 0.7rem 0 0.2rem 0;}
+    .masampo-bid-block input, .masampo-bid-block label {display:block;width:100%;font-size:1.06rem;margin-bottom:0.55rem;}
+    .masampo-bid-block label {font-weight:500;}
+    .masampo-bid-block .bid-actions {display:flex;gap:14px;justify-content:center;margin-top:0.4rem;}
+    .bid-status {margin:0.4rem auto 0.1rem auto;text-align:center;font-size:1.02em;}
+    .bid-status.success {color:var(--primary-dark);}
+    .bid-status.error {color:var(--danger);}
+    .bid-label {font-size:0.95em;color:var(--text-light);margin-bottom:8px;display:block;}
+    .bid-dest-label {font-weight:600;font-size:0.99em;margin-bottom:3px;}
     footer {
       background: var(--footer-bg);
       color: var(--footer-text);
@@ -121,6 +159,13 @@
     }
     footer a { color: var(--footer-link); text-decoration: underline; font-weight: 500;}
     footer .footer-brand { font-weight: bold; color: var(--footer-link);}
+    @media (max-width: 800px) {
+      .slider-track { gap: 0.8rem; }
+      .slider-section, .taxi-card { max-width: 99vw; }
+      .product, .vehicle-item { min-width: 140px; }
+      .modal-content { width: 98vw;}
+      .modal-img { width: 99vw; max-width: 240px;}
+    }
   </style>
 </head>
 <body>
@@ -142,6 +187,7 @@
         <input type="text" id="searchBox" placeholder="Search products, vehicles..." aria-label="Search products, vehicles">
       </div>
     </div>
+    <!-- Taxi Hire Section -->
     <div class="slider-section" id="taxiSliderSection">
       <div class="slider-title"><i class="fa fa-taxi"></i> Taxi Hire</div>
       <button class="slider-btn prev" id="prevTaxiBtn" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
@@ -157,18 +203,65 @@
       </div>
       <button class="slider-btn next" id="nextTaxiBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
     </div>
+    <!-- Taxi Hire Modal -->
+    <div class="modal" id="taxiHireModal">
+      <div class="modal-content">
+        <button class="modal-close" id="taxiHireModalClose" title="Close">&times;</button>
+        <div class="modal-title">Taxi Hire Booking</div>
+        <div style="font-size:2.5rem; margin-bottom:0.6rem;">
+          <span>🚗</span>
+          <span>🏍️</span>
+        </div>
+        <div>
+          <label for="taxiPhoneModal">Phone Number</label>
+          <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" style="width:100%;margin-bottom:0.7rem;">
+          <label>Transport Mode</label>
+          <div class="taxi-radio-group">
+            <label class="taxi-radio-label">
+              <input type="radio" name="taxiHireMode" value="vehicle" checked>
+              <span>Vehicle 🚗</span>
+            </label>
+            <label class="taxi-radio-label">
+              <input type="radio" name="taxiHireMode" value="motorbike">
+              <span>Motorbike 🏍️</span>
+            </label>
+          </div>
+          <label for="taxiHireFrom">From</label>
+          <input list="placesList" id="taxiHireFrom" placeholder="Pickup location" style="width:100%;margin-bottom:0.7rem;">
+          <label for="taxiHireTo">To</label>
+          <input list="placesList" id="taxiHireTo" placeholder="Drop-off location" style="width:100%;margin-bottom:0.7rem;">
+          <datalist id="placesList"></datalist>
+        </div>
+        <div class="taxi-hire-actions">
+          <button class="taxi-hire-btn calc" id="taxiCalcBtn" title="Calculate Fare"><i class="fa fa-calculator"></i> Calculate</button>
+          <button class="taxi-hire-btn sms" id="taxiSmsBtn" title="Send Booking SMS"><span class="fa fa-comment"></span> Send via SMS</button>
+          <button class="taxi-hire-btn whatsapp" id="taxiWhatsappBtn" title="Send Booking WhatsApp"><span class="fa fa-whatsapp"></span> Send via WhatsApp</button>
+          <button class="taxi-hire-btn map" id="taxiShowMapBtn" title="Show Map"><i class="fa fa-map"></i> Map</button>
+          <button class="taxi-hire-btn hide" id="taxiHideMapBtn" title="Hide Map" style="display:none;"><i class="fa fa-eye-slash"></i> Hide</button>
+        </div>
+        <div class="taxi-hire-status" id="taxiHireStatus"></div>
+        <div id="taxiHireMap" class="taxi-hire-map">
+          <iframe id="taxiHireMapIframe"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.06737814816!2d31.2323422143821!3d-13.147631245757161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1947e2a8a3e25c0d%3A0xe3ee3a6f4a9c89a1!2sLuangwa!5e0!3m2!1sen!2szm!4v1692550000000!5m2!1sen!2szm"
+            width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+    <!-- Masampo Section -->
     <div class="slider-section" id="masampoSliderSection">
       <div class="slider-title"><i class="fa fa-car"></i> Masampo</div>
       <button class="slider-btn prev" id="prevMasampoBtn" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
       <div class="slider-track" id="masampo-slider-track"></div>
       <button class="slider-btn next" id="nextMasampoBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
     </div>
+    <!-- B-istore Section -->
     <div class="slider-section" id="bistoreSliderSection">
       <div class="slider-title"><i class="fa fa-building"></i> B-istore</div>
       <button class="slider-btn prev" id="prevBistoreBtn" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
       <div class="slider-track" id="bistore-slider-track"></div>
       <button class="slider-btn next" id="nextBistoreBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
     </div>
+    <!-- Cart System -->
     <div class="cart" aria-label="Your Cart">
       <h2 class="section-title"><i class="fa fa-shopping-cart"></i> Your Order</h2>
       <ul id="cart-items" class="cart-items"></ul>
@@ -182,53 +275,16 @@
         <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
       </div>
       <div class="checkout-actions" id="checkoutActions" style="display:none;">
-        <button class="checkout-btn-main" id="checkout-btn">
-          <i class="fa fa-credit-card"></i> Proceed to Checkout
-        </button>
         <button class="checkout-btn-sms" id="checkout-btn-sms" title="Send Order SMS">
-          <i class="fa fa-sms"></i>
+          <span class="fa fa-comment"></span> Send via SMS
         </button>
         <button class="checkout-btn-whatsapp" id="checkout-btn-whatsapp" title="Send Order WhatsApp">
-          <i class="fa fa-whatsapp"></i>
+          <span class="fa fa-whatsapp"></span> Send via WhatsApp
         </button>
       </div>
       <div id="statusMessage" class="status-message"></div>
     </div>
-    <!-- Taxi Hire Modal -->
-    <div class="modal" id="taxiHireModal">
-      <div class="modal-content">
-        <button class="modal-close" id="taxiHireModalClose">&times;</button>
-        <div class="modal-title">Taxi Hire Booking</div>
-        <div style="font-size:2.5rem;margin-bottom:0.6rem;">
-          <span>🚗</span>
-          <span>🏍️</span>
-        </div>
-        <div style="width:100%">
-          <label for="taxiPhoneModal">Phone Number</label>
-          <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" style="width:100%;margin-bottom:0.7rem;">
-          <label for="taxiHireMode">Mode</label>
-          <select id="taxiHireMode" style="width:100%;margin-bottom:0.7rem;">
-            <option value="vehicle">Vehicle 🚗</option>
-            <option value="motorbike">Motorbike 🏍️</option>
-          </select>
-          <label for="taxiHireFrom">From</label>
-          <input type="text" id="taxiHireFrom" placeholder="Pickup location" style="width:100%;margin-bottom:0.7rem;">
-          <label for="taxiHireTo">To</label>
-          <input type="text" id="taxiHireTo" placeholder="Drop-off location" style="width:100%;margin-bottom:0.7rem;">
-        </div>
-        <div class="taxi-hire-actions">
-          <button class="taxi-hire-btn calc" id="taxiCalcBtn" title="Calculate Fare"><i class="fa fa-calculator"></i></button>
-          <button class="taxi-hire-btn sms" id="taxiSmsBtn" title="Send Booking SMS"><i class="fa fa-sms"></i></button>
-          <button class="taxi-hire-btn whatsapp" id="taxiWhatsappBtn" title="Send Booking WhatsApp"><i class="fa fa-whatsapp"></i></button>
-          <button class="taxi-hire-btn map" id="taxiShowMapBtn" title="Show Map"><i class="fa fa-map"></i></button>
-          <button class="taxi-hire-btn hide" id="taxiHideMapBtn" title="Hide Map" style="display:none;"><i class="fa fa-eye-slash"></i></button>
-        </div>
-        <div class="taxi-hire-status" id="taxiHireStatus"></div>
-        <div id="taxiHireMap" class="taxi-hire-map">Map will appear here (Demo)</div>
-        <button class="btn btn-accent" id="taxiHireSubmitBtn" style="margin-top:0.5rem;">Submit Booking</button>
-      </div>
-    </div>
-    <!-- Details Modal -->
+    <!-- Masampo Details Modal -->
     <div class="modal" id="detailsModal">
       <div class="modal-content" id="detailsModalContent">
         <button class="modal-close" id="detailsModalClose">&times;</button>
@@ -240,6 +296,24 @@
         </div>
         <img id="detailsModalImg" class="modal-img" src="" alt="Item Image">
         <div class="modal-details" id="detailsModalDetails"></div>
+        <!-- Bid block for Masampo modal -->
+        <div id="masampoBidBlock" class="masampo-bid-block" style="display:none;">
+          <span class="bid-label">Bid/Order will be sent to:</span>
+          <span class="bid-dest-label" id="masampoBidDestLabel"></span>
+          <label for="masampoBidValue">Your Bid Value (ZK):</label>
+          <input type="number" min="1" id="masampoBidValue" placeholder="Enter bid value">
+          <label for="masampoBidPhone">Your Phone Number:</label>
+          <input type="tel" id="masampoBidPhone" maxlength="10" placeholder="e.g. 0978000000">
+          <div class="bid-actions">
+            <button class="bid-btn sms" id="masampoBidSms" title="Send Bid SMS">
+              <span class="fa fa-comment"></span> Send via SMS
+            </button>
+            <button class="bid-btn whatsapp" id="masampoBidWhatsapp" title="Send Bid WhatsApp">
+              <span class="fa fa-whatsapp"></span> Send via WhatsApp
+            </button>
+          </div>
+          <div class="bid-status" id="masampoBidStatus"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -253,7 +327,128 @@
     </div>
   </footer>
   <script>
-    // Data
+    // Luangwa places and distances (in km, symmetric)
+    const LUANGWA_PLACES = [
+      "Market", "Hospital", "Police", "Bus Station", "School", "Clinic", "Bridge", "Post Office"
+    ];
+    const LUANGWA_DISTANCES = {
+      "Market|Hospital": 3,
+      "Market|Police": 2.5,
+      "Hospital|Bus Station": 1.5,
+      "School|Clinic": 2.2,
+      "Police|Bus Station": 2.8,
+      "Market|Bus Station": 3,
+      "Market|School": 2.7,
+      "Post Office|Bridge": 3,
+      "Clinic|Bridge": 1.2,
+      "Market|Clinic": 2.6,
+    };
+    function findLuangwaDistance(from, to) {
+      if (!from || !to || from === to) return 0;
+      let key = from + "|" + to;
+      let revKey = to + "|" + from;
+      return LUANGWA_DISTANCES[key] ?? LUANGWA_DISTANCES[revKey] ?? null;
+    }
+    // Populate datalist for autocomplete
+    const placesList = document.getElementById('placesList');
+    LUANGWA_PLACES.forEach(place => {
+      const opt = document.createElement('option');
+      opt.value = place;
+      placesList.appendChild(opt);
+    });
+
+    // Taxi hire modal logic
+    const taxiCard = document.getElementById('taxiCard');
+    const taxiHireModal = document.getElementById('taxiHireModal');
+    const taxiHireModalClose = document.getElementById('taxiHireModalClose');
+    const taxiCalcBtn = document.getElementById('taxiCalcBtn');
+    const taxiSmsBtn = document.getElementById('taxiSmsBtn');
+    const taxiWhatsappBtn = document.getElementById('taxiWhatsappBtn');
+    const taxiShowMapBtn = document.getElementById('taxiShowMapBtn');
+    const taxiHideMapBtn = document.getElementById('taxiHideMapBtn');
+    const taxiHireMap = document.getElementById('taxiHireMap');
+    const taxiHireStatus = document.getElementById('taxiHireStatus');
+    taxiCard.onclick = () => {
+      taxiHireModal.style.display = "flex";
+      taxiHireMap.classList.remove("show");
+      taxiShowMapBtn.style.display="";
+      taxiHideMapBtn.style.display="none";
+      taxiHireStatus.textContent = '';
+      document.getElementById('taxiPhoneModal').value = '';
+      document.getElementById('taxiHireFrom').value = '';
+      document.getElementById('taxiHireTo').value = '';
+      document.querySelector('input[name="taxiHireMode"][value="vehicle"]').checked = true;
+    };
+    taxiHireModalClose.onclick = () => { taxiHireModal.style.display = "none"; };
+    window.addEventListener('keydown', function(e) {
+      if (e.key === "Escape" && taxiHireModal.style.display === "flex") {
+        taxiHireModal.style.display = "none";
+      }
+    });
+    taxiHireModal.addEventListener('mousedown', function(e) {
+      if (e.target === taxiHireModal) taxiHireModal.style.display = "none";
+    });
+    taxiShowMapBtn.onclick = () => {
+      taxiHireMap.classList.add("show");
+      taxiShowMapBtn.style.display = "none";
+      taxiHideMapBtn.style.display = "";
+    };
+    taxiHideMapBtn.onclick = () => {
+      taxiHireMap.classList.remove("show");
+      taxiShowMapBtn.style.display = "";
+      taxiHideMapBtn.style.display = "none";
+    };
+    function getSelectedTaxiMode() {
+      const radios = document.getElementsByName('taxiHireMode');
+      for (let radio of radios) if (radio.checked) return radio.value;
+      return "vehicle";
+    }
+    taxiCalcBtn.onclick = () => {
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      const mode = getSelectedTaxiMode();
+      if (!from || !to) {
+        taxiHireStatus.textContent = "Please enter both pickup and drop-off locations.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
+      }
+      let dist = findLuangwaDistance(from, to);
+      if (dist === null) {
+        taxiHireStatus.textContent = "No known route between selected places.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
+      }
+      let cost = mode === "motorbike" ? Math.ceil(dist / 3) * 10 : Math.ceil(dist / 3) * 20;
+      taxiHireStatus.textContent = `Distance: ${dist} km. Fare: ZK ${cost} (${mode === 'vehicle' ? 'Vehicle' : 'Motorbike'})`;
+      taxiHireStatus.className = "taxi-hire-status success";
+    };
+    taxiSmsBtn.onclick = () => {
+      const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const mode = getSelectedTaxiMode();
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      let dist = findLuangwaDistance(from, to);
+      let cost = (dist === null) ? "N/A" : (mode === "motorbike" ? Math.ceil(dist / 3) * 10 : Math.ceil(dist / 3) * 20);
+      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist ?? "N/A"} km\nFare: ZK ${cost}`;
+      window.open(`sms:+260978167546?body=${encodeURIComponent(msg)}`, "_blank");
+      taxiHireStatus.textContent = "Booking sent via SMS!";
+      taxiHireStatus.className = "taxi-hire-status success";
+    };
+    taxiWhatsappBtn.onclick = () => {
+      const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const mode = getSelectedTaxiMode();
+      const from = document.getElementById('taxiHireFrom').value.trim();
+      const to = document.getElementById('taxiHireTo').value.trim();
+      let dist = findLuangwaDistance(from, to);
+      let cost = (dist === null) ? "N/A" : (mode === "motorbike" ? Math.ceil(dist / 3) * 10 : Math.ceil(dist / 3) * 20);
+      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist ?? "N/A"} km\nFare: ZK ${cost}`;
+      window.open(`https://wa.me/+260978167546?text=${encodeURIComponent(msg)}`, "_blank");
+      taxiHireStatus.textContent = "Booking sent via WhatsApp!";
+      taxiHireStatus.className = "taxi-hire-status success";
+    };
+
+    // --- Sections and cart logic ---
+    // Demo data for Masampo and B-istore
     const MASAMPO_VEHICLES = [
       {
         id: 1011,
@@ -262,8 +457,8 @@
         location: "Ndola",
         image: "V1.jpg",
         category: "vehicle",
-        details: { condition: "For Sale", contact: "" },
-        additionalImages: ["V1.jpg", "V2.jpg", "V3.jpg"],
+        details: { condition: "For Hire", contact: "0978123456" },
+        additionalImages: ["V1.jpg", "V2.jpg", "V3.jpg", "V4.jpg", "V5.jpg", "V6.jpg"],
         listedDate: "2025-08-12"
       },
       {
@@ -273,7 +468,7 @@
         location: "Lusaka",
         image: "L1.jpeg",
         category: "laptop",
-        details: { condition: "11.6-inch, 4 GB RAM", contact: "" },
+        details: { condition: "11.6-inch, 4 GB RAM", contact: "0978234567" },
         additionalImages: ["L1.jpeg", "L2.jpeg", "L3.jpeg"],
         listedDate: "2025-08-12"
       },
@@ -284,140 +479,15 @@
         location: "Lusaka",
         image: "S241.webp",
         category: "phone",
-        details: { condition: "For Sale - Negotiable", contact: "" },
-        additionalImages: ["S241.webp"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1014,
-        name: "Villaon V20 SE",
-        price: 600,
-        location: "Lusaka",
-        image: "V201.jpeg",
-        category: "phone",
-        details: { condition: "6.3-inch LCD, 2 GB RAM", contact: "" },
-        additionalImages: ["V201.jpeg"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1015,
-        name: "Taxi & Bike Hire",
-        price: 0,
-        location: "Luangwa",
-        image: "Uber.png",
-        category: "taxi",
-        details: { condition: "Uber-style App", contact: "" },
-        additionalImages: ["Uber.png"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1016,
-        name: "Delivery App",
-        price: 0,
-        location: "Luangwa e-shop",
-        image: "Eco1.png",
-        category: "item",
-        details: { condition: "Assorted Items", contact: "" },
-        additionalImages: ["Eco1.png"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1017,
-        name: "CASIO GX-14 Calculator",
-        price: 230,
-        location: "Luangwa",
-        image: "GX.jpg",
-        category: "calculator",
-        details: { condition: "14 Digits", contact: "" },
-        additionalImages: ["GX.jpg"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1018,
-        name: "Mark X Ndola",
-        price: 68000,
-        location: "Ndola",
-        image: "mx.jpg",
-        category: "vehicle",
-        details: { condition: "For Sale", contact: "" },
-        additionalImages: ["mx.jpg"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1019,
-        name: "KENKO 8585-12 Calculator",
-        price: 200,
-        location: "Luangwa",
-        image: "EC1.jpg",
-        category: "calculator",
-        details: { condition: "12 Digits - Negotiable - Brand New Boxed", contact: "" },
-        additionalImages: ["EC1.jpg"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1020,
-        name: "Contractor Services",
-        price: 0,
-        location: "Luangwa",
-        image: "Con.png",
-        category: "contractor",
-        details: {
-          plumbing: "Leaks, Installations",
-          electrician: "Wiring, Repairs",
-          construction: "Building & Renovation, Tiles & Ceiling Installation",
-          contact: ""
-        },
-        additionalImages: ["Con.png"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1021,
-        name: "Laptop Lusaka (Dead Battery)",
-        price: 400,
-        location: "Luangwa",
-        image: "L1.jpeg",
-        category: "laptop",
-        details: { condition: "11.6-inch, 4 GB RAM, Dead Battery", contact: "" },
-        additionalImages: ["L1.jpeg"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1022,
-        name: "Toyota Vits Lusaka",
-        price: 98000,
-        location: "Lusaka",
-        image: "vi1.png",
-        category: "vehicle",
-        details: { condition: "For Sale", contact: "" },
-        additionalImages: ["vi1.png"],
+        details: { condition: "For Sale - Negotiable", contact: "0978000003" },
+        additionalImages: ["S241.webp", "S242.webp"],
         listedDate: "2025-08-12"
       }
     ];
-    // BISTORE_PRODUCTS copied from previous, omitted for brevity
-    // Please use your own BISTORE_PRODUCTS array from previous code (it's too long to repeat here).
-
-    // For demonstration purposes, here's a small sample
     const BISTORE_PRODUCTS = [
       { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
-      { id: 100, name: "Calculator Casio GX-14", price: 230, image: "GX.jpg", category: "stationary" },
-      // ... add your full list here
+      { id: 100, name: "Calculator Casio GX-14", price: 230, image: "GX.jpg", category: "stationary" }
     ];
-
-    // Place data and segments omitted for brevity; use your previous code
-    const luangwaPlaces = [
-      "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche",
-      "Kakaro Primary School", "Makichilo Lodge", "Gerasmos Safari Lodge",
-      // ... rest of the places
-      "Luangwa Bridge Market", "Luangwa Bridge"
-    ];
-    const segments = [
-      { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
-      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
-      // ... rest of the segments
-      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
-    ];
-
-    // Filtering and Section Logic
     let sectionMap = {
       "taxi": document.getElementById("taxiSliderSection"),
       "masampo": document.getElementById("masampoSliderSection"),
@@ -433,7 +503,6 @@
     let filteredMasampo = MASAMPO_VEHICLES.slice();
     let filteredBistore = BISTORE_PRODUCTS.slice();
     function updateAllFilters() {
-      const selectedCategory = categoryFilter.value;
       const query = searchBox.value.trim().toLowerCase();
       filteredMasampo = MASAMPO_VEHICLES.filter(v => {
         const matchQuery = v.name.toLowerCase().includes(query) || (v.category && v.category.toLowerCase().includes(query)) || (v.location && v.location.toLowerCase().includes(query));
@@ -449,7 +518,6 @@
     const searchBox = document.getElementById('searchBox');
     searchBox.addEventListener('input', updateAllFilters);
 
-    // Slider
     function setupSliderButtons(trackId, prevBtnId, nextBtnId) {
       const sliderTrack = document.getElementById(trackId);
       document.getElementById(prevBtnId).onclick = () => {
@@ -463,7 +531,6 @@
     setupSliderButtons('masampo-slider-track', 'prevMasampoBtn', 'nextMasampoBtn');
     setupSliderButtons('bistore-slider-track', 'prevBistoreBtn', 'nextBistoreBtn');
 
-    // Render
     function renderMasampo() {
       const masampoSliderTrack = document.getElementById('masampo-slider-track');
       masampoSliderTrack.innerHTML = '';
@@ -471,14 +538,14 @@
         const div = document.createElement('div');
         div.className = 'vehicle-item';
         div.tabIndex = 0;
-        div.setAttribute('aria-label', `${item.name}, ZK ${item.price.toLocaleString()}`);
         div.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/82?text=Error';">
+          <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/120x82?text=Error';">
           <h4>${item.name}</h4>
           <p>ZK ${item.price.toLocaleString()}</p>
           <p class="location">${item.location}</p>
+          <button class="bid-btn" onclick="event.stopPropagation();showDetailsModal('${item.id}');"><i class="fa fa-eye"></i> View</button>
         `;
-        div.onclick = () => showDetailsModal(item, 'masampo');
+        div.onclick = () => showDetailsModal(item.id);
         masampoSliderTrack.appendChild(div);
       });
     }
@@ -489,21 +556,14 @@
         const div = document.createElement('div');
         div.className = 'product';
         div.tabIndex = 0;
-        div.setAttribute('aria-label', `${p.name}, ZK ${p.price.toFixed(2)}`);
         let outStock = (p.price <= 0);
         div.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/82?text=Error';">
+          <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/120x82?text=Error';">
           <h4>${p.name}</h4>
           <p>ZK ${p.price.toFixed(2)}</p>
           ${outStock ? '<span class="out-stock">Out of Stock</span>' : ''}
-          <button data-id="${p.id}" ${outStock ? 'disabled' : ''} style="margin-bottom:0.3rem;">
-            <i class="fa fa-plus"></i> Add
-          </button>
+          <button class="bid-btn" onclick="event.stopPropagation();addToCart('${p.id}');"><i class="fa fa-plus"></i> Add</button>
         `;
-        div.onclick = (e) => {
-          if (e.target.closest('button')) return;
-          showDetailsModal(p, 'bistore');
-        };
         bistoreSliderTrack.appendChild(div);
       });
     }
@@ -513,191 +573,20 @@
       updateCart();
     });
 
-    // Taxi Hire Modal Logic
-    const taxiCard = document.getElementById('taxiCard');
-    const taxiHireModal = document.getElementById('taxiHireModal');
-    const taxiHireModalClose = document.getElementById('taxiHireModalClose');
-    const taxiCalcBtn = document.getElementById('taxiCalcBtn');
-    const taxiSmsBtn = document.getElementById('taxiSmsBtn');
-    const taxiWhatsappBtn = document.getElementById('taxiWhatsappBtn');
-    const taxiShowMapBtn = document.getElementById('taxiShowMapBtn');
-    const taxiHideMapBtn = document.getElementById('taxiHideMapBtn');
-    const taxiHireMap = document.getElementById('taxiHireMap');
-    const taxiHireStatus = document.getElementById('taxiHireStatus');
-    taxiCard.onclick = () => { taxiHireModal.style.display = "flex"; taxiHireMap.classList.remove("show"); taxiShowMapBtn.style.display=""; taxiHideMapBtn.style.display="none"; taxiHireStatus.textContent=''; };
-    taxiHireModalClose.onclick = () => { taxiHireModal.style.display = "none"; };
-    taxiShowMapBtn.onclick = () => { taxiHireMap.classList.add("show"); taxiShowMapBtn.style.display="none"; taxiHideMapBtn.style.display=""; };
-    taxiHideMapBtn.onclick = () => { taxiHireMap.classList.remove("show"); taxiShowMapBtn.style.display=""; taxiHideMapBtn.style.display="none"; };
-    function taxiFindDistance(from, to) {
-      const graph = {};
-      segments.forEach(seg => {
-        if (!graph[seg.from]) graph[seg.from] = [];
-        if (!graph[seg.to]) graph[seg.to] = [];
-        graph[seg.from].push({ place: seg.to, distance: seg.distance });
-        graph[seg.to].push({ place: seg.from, distance: seg.distance });
-      });
-      if (!graph[from] || !graph[to]) return null;
-      const distances = {}, visited = new Set();
-      luangwaPlaces.forEach(place => distances[place] = Infinity);
-      distances[from] = 0;
-      let queue = [{ place: from, dist: 0 }];
-      while (queue.length > 0) {
-        queue.sort((a, b) => a.dist - b.dist);
-        const { place, dist } = queue.shift();
-        if (place === to) return dist;
-        if (visited.has(place)) continue;
-        visited.add(place);
-        for (let neighbor of (graph[place] || [])) {
-          if (dist + neighbor.distance < distances[neighbor.place]) {
-            distances[neighbor.place] = dist + neighbor.distance;
-            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
-          }
-        }
-      }
-      return null;
+    function getMasampoItemById(id) {
+      return MASAMPO_VEHICLES.find(item => String(item.id) === String(id));
     }
-    taxiCalcBtn.onclick = () => {
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
-      const mode = document.getElementById('taxiHireMode').value;
-      if (!from || !to) {
-        taxiHireStatus.textContent = "Please enter both pickup and drop-off locations.";
-        taxiHireStatus.className = "taxi-hire-status error";
-        return;
-      }
-      let dist = taxiFindDistance(from, to);
-      if (!dist) {
-        taxiHireStatus.textContent = "No known route between selected places.";
-        taxiHireStatus.className = "taxi-hire-status error";
-        return;
-      }
-      const rates = { vehicle: 20, motorbike: 10 };
-      let cost = Math.ceil(dist / 3) * rates[mode];
-      taxiHireStatus.textContent = `Distance: ${dist} km. Fare: ZK ${cost} (${mode === 'vehicle' ? 'Vehicle' : 'Motorbike'})`;
-      taxiHireStatus.className = "taxi-hire-status success";
-    };
-    taxiSmsBtn.onclick = () => {
-      const phone = document.getElementById('taxiPhoneModal').value.trim();
-      const mode = document.getElementById('taxiHireMode').value;
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
-      let dist = taxiFindDistance(from, to) || "N/A";
-      const rates = { vehicle: 20, motorbike: 10 };
-      let cost = dist === "N/A" ? "N/A" : Math.ceil(dist / 3) * rates[mode];
-      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist} km\nFare: ZK ${cost}`;
-      window.open(`sms:+260978167546?body=${encodeURIComponent(msg)}`, "_blank");
-      taxiHireStatus.textContent = "Booking sent via SMS!";
-      taxiHireStatus.className = "taxi-hire-status success";
-    };
-    taxiWhatsappBtn.onclick = () => {
-      const phone = document.getElementById('taxiPhoneModal').value.trim();
-      const mode = document.getElementById('taxiHireMode').value;
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
-      let dist = taxiFindDistance(from, to) || "N/A";
-      const rates = { vehicle: 20, motorbike: 10 };
-      let cost = dist === "N/A" ? "N/A" : Math.ceil(dist / 3) * rates[mode];
-      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist} km\nFare: ZK ${cost}`;
-      window.open(`https://wa.me/+260978167546?text=${encodeURIComponent(msg)}`, "_blank");
-      taxiHireStatus.textContent = "Booking sent via WhatsApp!";
-      taxiHireStatus.className = "taxi-hire-status success";
-    };
-    document.getElementById('taxiHireSubmitBtn').onclick = () => {
-      const phone = document.getElementById('taxiPhoneModal').value.trim();
-      const mode = document.getElementById('taxiHireMode').value;
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
-      if (!/^0[0-9]{9}$/.test(phone)) {
-        taxiHireStatus.textContent = "Please enter a valid phone number (e.g. 0978167546).";
-        taxiHireStatus.className = "taxi-hire-status error";
-        return;
-      }
-      if (!from || !to) {
-        taxiHireStatus.textContent = "Please enter both pickup and drop-off locations.";
-        taxiHireStatus.className = "taxi-hire-status error";
-        return;
-      }
-      taxiHireStatus.textContent = "Taxi booking submitted!";
-      taxiHireStatus.className = "taxi-hire-status success";
-      setTimeout(() => { taxiHireModal.style.display = "none"; }, 1300);
-    };
 
-    // Details Modal for Masampo and B-istore
-    const detailsModal = document.getElementById('detailsModal');
-    const detailsModalClose = document.getElementById('detailsModalClose');
-    const detailsModalTitle = document.getElementById('detailsModalTitle');
-    const detailsModalImg = document.getElementById('detailsModalImg');
-    const detailsModalDetails = document.getElementById('detailsModalDetails');
-    const detailsModalImgs = document.getElementById('detailsModalImgs');
-    const detailsModalArrows = document.getElementById('detailsModalArrows');
-    const detailsModalPrevImg = document.getElementById('detailsModalPrevImg');
-    const detailsModalNextImg = document.getElementById('detailsModalNextImg');
-    let currentDetailsImages = [];
-    let currentDetailsIndex = 0;
-    function showDetailsModal(item, type) {
-      detailsModalTitle.textContent = item.name;
-      let imgList = [];
-      if (type === 'masampo' && item.additionalImages && item.additionalImages.length) {
-        imgList = item.additionalImages;
-      } else if (item.image) {
-        imgList = [item.image];
-      }
-      currentDetailsImages = imgList;
-      currentDetailsIndex = 0;
-      detailsModalImg.src = imgList[0] || '';
-      detailsModalImgs.innerHTML = '';
-      imgList.forEach((img, idx) => {
-        const thumb = document.createElement('img');
-        thumb.src = img;
-        thumb.className = idx === 0 ? 'selected' : '';
-        thumb.onclick = () => { selectDetailsImage(idx); };
-        detailsModalImgs.appendChild(thumb);
-      });
-      detailsModalArrows.style.display = imgList.length > 1 ? '' : 'none';
-      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
-      detailsModalNextImg.disabled = currentDetailsIndex === imgList.length - 1;
-      let html = '';
-      if (type === 'masampo') {
-        html += `<div><b>Price:</b> ZK ${item.price.toLocaleString()}</div>`;
-        html += `<div><b>Location:</b> ${item.location}</div>`;
-        html += `<div><b>Condition:</b> ${item.details?.condition || ''}</div>`;
-        html += `<div><b>Contact:</b> ${item.details?.contact || ''}</div>`;
-        html += `<div><b>Listed Since:</b> ${item.listedDate || ''}</div>`;
-      } else {
-        html += `<div><b>Price:</b> ZK ${item.price}</div>`;
-        html += `<div><b>Category:</b> ${item.category}</div>`;
-      }
-      detailsModalDetails.innerHTML = html;
-      detailsModal.style.display = "flex";
-    }
-    function selectDetailsImage(idx) {
-      currentDetailsIndex = idx;
-      detailsModalImg.src = currentDetailsImages[idx];
-      Array.from(detailsModalImgs.children).forEach((img, i) => {
-        img.className = i === idx ? 'selected' : '';
-      });
-      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
-      detailsModalNextImg.disabled = currentDetailsIndex === currentDetailsImages.length - 1;
-    }
-    detailsModalPrevImg.onclick = () => {
-      if (currentDetailsIndex > 0) selectDetailsImage(currentDetailsIndex - 1);
-    };
-    detailsModalNextImg.onclick = () => {
-      if (currentDetailsIndex < currentDetailsImages.length - 1) selectDetailsImage(currentDetailsIndex + 1);
-    };
-    detailsModalClose.onclick = () => { detailsModal.style.display = "none"; };
-
-    // Cart Logic
+    // Cart logic
     let cart = [];
     const cartItemsEl = document.getElementById('cart-items');
     const emptyCartEl = document.getElementById('empty-cart');
     const cartTotalEl = document.getElementById('cart-total');
     const productsTotalEl = document.getElementById('products-total');
     const grandTotalEl = document.getElementById('grand-total');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    const checkoutActions = document.getElementById('checkoutActions');
     const checkoutBtnSms = document.getElementById('checkout-btn-sms');
     const checkoutBtnWhatsapp = document.getElementById('checkout-btn-whatsapp');
+    const checkoutActions = document.getElementById('checkoutActions');
     function updateCart() {
       if (cart.length === 0) {
         cartItemsEl.innerHTML = '';
@@ -713,7 +602,7 @@
           const li = document.createElement('li');
           li.innerHTML = `
             <div class="cart-item-info">
-              <img src="${item.item.image}" alt="${item.item.name}" class="cart-thumb" onerror="this.src='https://via.placeholder.com/36?text=Err';">
+              <img src="${item.item.image}" alt="${item.item.name}" class="cart-thumb" loading="lazy" onerror="this.src='https://via.placeholder.com/36?text=Err';">
               <span class="cart-item-title">${item.item.name}</span>
             </div>
             <div class="cart-price-block">
@@ -733,18 +622,15 @@
         grandTotalEl.textContent = productsTotal.toFixed(2);
       }
     }
-    document.getElementById('bistore-slider-track').addEventListener('click', function(e) {
-      const btn = e.target.closest('button[data-id]');
-      if (!btn) return;
-      const id = parseInt(btn.getAttribute('data-id'), 10);
-      const item = BISTORE_PRODUCTS.find(p => p.id === id);
+    function addToCart(id) {
+      const item = BISTORE_PRODUCTS.find(p => String(p.id) === String(id));
       if (item) {
-        const cartItem = cart.find(cartItem => cartItem.item.id === id);
+        const cartItem = cart.find(cartItem => cartItem.item.id === item.id);
         if (cartItem) { cartItem.quantity += 1; }
         else { cart.push({ item: item, quantity: 1 }); }
         updateCart();
       }
-    });
+    }
     cartItemsEl.addEventListener('click', e => {
       const button = e.target.closest('button');
       if (!button) return;
@@ -776,15 +662,6 @@
         }
       }
     });
-    checkoutBtn.onclick = () => {
-      if (cart.length === 0) {
-        alert('Your cart is empty.');
-        return;
-      }
-      alert("Order submitted successfully!");
-      cart = [];
-      updateCart();
-    };
     checkoutBtnSms.onclick = () => {
       if (cart.length === 0) {
         alert('Your cart is empty.');
@@ -800,6 +677,131 @@
       }
       const msg = cart.map(item => `${item.item.name} x${item.quantity} = ZK ${(item.item.price * item.quantity).toFixed(2)}`).join('\n');
       window.open(`https://wa.me/+260978167546?text=${encodeURIComponent("Order:\n"+msg)}`, "_blank");
+    };
+
+    // Masampo Details Modal logic
+    const detailsModal = document.getElementById('detailsModal');
+    const detailsModalClose = document.getElementById('detailsModalClose');
+    const detailsModalTitle = document.getElementById('detailsModalTitle');
+    const detailsModalImg = document.getElementById('detailsModalImg');
+    const detailsModalDetails = document.getElementById('detailsModalDetails');
+    const detailsModalImgs = document.getElementById('detailsModalImgs');
+    const detailsModalArrows = document.getElementById('detailsModalArrows');
+    const detailsModalPrevImg = document.getElementById('detailsModalPrevImg');
+    const detailsModalNextImg = document.getElementById('detailsModalNextImg');
+    const masampoBidBlock = document.getElementById('masampoBidBlock');
+    const masampoBidDestLabel = document.getElementById('masampoBidDestLabel');
+    const masampoBidValue = document.getElementById('masampoBidValue');
+    const masampoBidPhone = document.getElementById('masampoBidPhone');
+    const masampoBidSms = document.getElementById('masampoBidSms');
+    const masampoBidWhatsapp = document.getElementById('masampoBidWhatsapp');
+    const masampoBidStatus = document.getElementById('masampoBidStatus');
+    let currentDetailsImages = [];
+    let currentDetailsIndex = 0;
+    let currentMasampoItem = null;
+
+    window.showDetailsModal = function(id) {
+      const item = getMasampoItemById(id);
+      if (!item) return;
+      detailsModalTitle.textContent = item.name;
+      let imgList = Array.isArray(item.additionalImages) && item.additionalImages.length
+        ? item.additionalImages.filter(Boolean)
+        : [item.image];
+      while (imgList.length < 6) imgList.push(item.image);
+      currentDetailsImages = imgList;
+      currentDetailsIndex = 0;
+      detailsModalImg.src = imgList[0] || '';
+      detailsModalImgs.innerHTML = '';
+      imgList.forEach((img, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = img;
+        thumb.className = idx === 0 ? 'selected' : '';
+        thumb.onclick = () => { selectDetailsImage(idx); };
+        detailsModalImgs.appendChild(thumb);
+      });
+      detailsModalArrows.style.display = imgList.length > 1 ? '' : 'none';
+      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
+      detailsModalNextImg.disabled = currentDetailsIndex === imgList.length - 1;
+      let html = `<div><b>Price:</b> ZK ${item.price.toLocaleString()}</div>`;
+      html += `<div><b>Location:</b> ${item.location}</div>`;
+      html += `<div><b>Condition:</b> ${item.details?.condition || ''}</div>`;
+      html += `<div><b>Contact:</b> ${item.details?.contact || ''}</div>`;
+      html += `<div><b>Listed Since:</b> ${item.listedDate || ''}</div>`;
+      masampoBidBlock.style.display = '';
+      masampoBidValue.value = '';
+      masampoBidPhone.value = '';
+      masampoBidStatus.textContent = '';
+      currentMasampoItem = item;
+      masampoBidDestLabel.textContent = `${getOwnerPhone(item)} (Owner)`;
+      detailsModalDetails.innerHTML = html;
+      detailsModal.style.display = "flex";
+    }
+    function selectDetailsImage(idx) {
+      currentDetailsIndex = idx;
+      detailsModalImg.src = currentDetailsImages[idx];
+      Array.from(detailsModalImgs.children).forEach((img, i) => {
+        img.className = i === idx ? 'selected' : '';
+      });
+      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
+      detailsModalNextImg.disabled = currentDetailsIndex === currentDetailsImages.length - 1;
+    }
+    detailsModalPrevImg.onclick = () => {
+      if (currentDetailsIndex > 0) selectDetailsImage(currentDetailsIndex - 1);
+    };
+    detailsModalNextImg.onclick = () => {
+      if (currentDetailsIndex < currentDetailsImages.length - 1) selectDetailsImage(currentDetailsIndex + 1);
+    };
+    detailsModalClose.onclick = () => { detailsModal.style.display = "none"; };
+    window.addEventListener('keydown', function(e) {
+      if (e.key === "Escape" && detailsModal.style.display === "flex") {
+        detailsModal.style.display = "none";
+      }
+    });
+    detailsModal.addEventListener('mousedown', function(e) {
+      if (e.target === detailsModal) detailsModal.style.display = "none";
+    });
+
+    function validateBidFields() {
+      let bid = parseInt(masampoBidValue.value, 10);
+      let phone = masampoBidPhone.value.trim();
+      if (isNaN(bid) || bid < 1) {
+        masampoBidStatus.textContent = "Please enter a valid bid value.";
+        masampoBidStatus.className = "bid-status error";
+        return false;
+      }
+      if (!/^0[0-9]{9}$/.test(phone)) {
+        masampoBidStatus.textContent = "Please enter a valid phone number (e.g. 0978000000).";
+        masampoBidStatus.className = "bid-status error";
+        return false;
+      }
+      return true;
+    }
+    function getOwnerPhone(item) {
+      let phone = (item.details && item.details.contact) ? item.details.contact : "";
+      if (!/^0[0-9]{9}$/.test(phone)) return "0978167546";
+      return phone;
+    }
+    masampoBidSms.onclick = () => {
+      if (!currentMasampoItem) return;
+      if (!validateBidFields()) return;
+      let bid = masampoBidValue.value.trim();
+      let phone = masampoBidPhone.value.trim();
+      let ownerPhone = getOwnerPhone(currentMasampoItem);
+      const msg = `Bid/Order for ${currentMasampoItem.name}: ZK ${bid}\nYour Phone: ${phone}`;
+      window.open(`sms:+260${ownerPhone.replace(/^0/, '')}?body=${encodeURIComponent(msg)}`, "_blank");
+      masampoBidStatus.textContent = "Bid/Order sent via SMS!";
+      masampoBidStatus.className = "bid-status success";
+    };
+    masampoBidWhatsapp.onclick = () => {
+      if (!currentMasampoItem) return;
+      if (!validateBidFields()) return;
+      let bid = masampoBidValue.value.trim();
+      let phone = masampoBidPhone.value.trim();
+      let ownerPhone = getOwnerPhone(currentMasampoItem);
+      const msg = `Bid/Order for ${currentMasampoItem.name}: ZK ${bid}\nYour Phone: ${phone}`;
+      window.open(`https://wa.me/+260${ownerPhone.replace(/^0/, '')}?text=${encodeURIComponent(msg)}`, "_blank");
+      masampoBidStatus.textContent = "Bid/Order sent via WhatsApp!";
+      masampoBidStatus.className = "bid-status success";
     };
   </script>
 </body>
