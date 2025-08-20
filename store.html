@@ -105,9 +105,9 @@
       padding: 1.5rem 1rem 1rem;
     }
     .slider-title {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 0.7rem;
+      gap: 0.8rem;
       font-size: 1.42rem;
       margin-bottom: 1.1rem;
       color: var(--primary-dark);
@@ -115,7 +115,8 @@
     }
     .slider-title .fa {
       color: var(--primary-dark);
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+      line-height: 1;
       vertical-align: middle;
       aria-hidden: true;
     }
@@ -199,8 +200,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.7rem;
-      font-size: 2.9rem;
+      gap: 1rem;
+      font-size: 2.5rem;
       margin: 0.7rem 0 0.3rem 0;
       animation: taxiEmojiBounce 1.4s ease-in-out infinite;
     }
@@ -218,15 +219,9 @@
       font-size: 1.17rem;
       font-weight: 600;
       color: var(--primary-dark);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      justify-content: center;
+      display: block;
+      text-align: center;
       margin-bottom: 0.15rem;
-    }
-    .taxi-card-title [role="img"] {
-      font-size: 1.2rem;
-      aria-hidden: true;
     }
     .taxi-card-desc {
       color: var(--text-light);
@@ -242,9 +237,7 @@
       text-decoration: none;
       vertical-align: middle;
       font-size: 14px;
-      width: 24px;
-      height: 24px;
-      line-height: 24px;
+      line-height: 1;
       text-align: center;
       margin: 3px;
     }
@@ -254,26 +247,18 @@
     .fa-comment {
       color: var(--sms);
     }
-    .fa-calculator, .fa-map, .fa-eye-slash {
-      color: #00897b;
-      display: none;
-    }
     .section-title .fa {
       color: var(--primary-dark);
-      font-size: 1.3rem;
-      margin-right: 0.5rem;
-      aria-hidden: true;
-    }
-    .empty-cart .fa-cart-arrow-down {
-      font-size: 2rem;
-      color: var(--text-light);
-      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+      margin-right: 0.6rem;
+      line-height: 1;
       aria-hidden: true;
     }
     .masampo-modal-header .fa {
       color: var(--primary-dark);
-      font-size: 1.8rem;
-      margin-right: 0.5rem;
+      font-size: 1.6rem;
+      margin-right: 0.6rem;
+      line-height: 1;
       aria-hidden: true;
     }
     .product,
@@ -452,8 +437,9 @@
     .checkout-actions {
       margin-top: 1rem;
       display: flex;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .checkout-btn-sms,
     .checkout-btn-whatsapp {
@@ -463,7 +449,7 @@
       font-size: 1em;
       font-weight: 600;
       color: var(--text);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       cursor: pointer;
       transition: background 0.2s;
@@ -474,7 +460,7 @@
     }
     .checkout-btn-sms .fa-comment,
     .checkout-btn-whatsapp .fa-whatsapp {
-      margin-right: 4px;
+      margin-right: 6px;
       font-size: 14px;
       line-height: 1;
       vertical-align: middle;
@@ -638,9 +624,10 @@
     }
     .masampo-bid-block .bid-actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
       margin-top: 0.4rem;
+      flex-wrap: wrap;
     }
     .bid-status {
       margin: 0.4rem auto 0.1rem auto;
@@ -707,22 +694,14 @@
       .cart {
         min-width: 100%;
       }
-      .bid-actions {
-        flex-wrap: wrap;
-      }
-      .modal-imgs {
-        gap: 6px;
-      }
-      .modal-imgs img {
-        width: 50px;
-        height: 50px;
-      }
-      .masampo-modal-header {
-        font-size: 1.6rem;
-        padding: 0.6rem;
+      .slider-title .fa {
+        font-size: 1.1rem;
       }
       .masampo-modal-header .fa {
         font-size: 1.4rem;
+      }
+      .taxi-emoji-animated {
+        font-size: 2rem;
       }
     }
     @media (max-width: 400px) {
@@ -743,6 +722,13 @@
       .checkout-btn-sms .fa-comment,
       .checkout-btn-whatsapp .fa-whatsapp {
         font-size: 12px;
+        margin-right: 4px;
+      }
+      .slider-title .fa {
+        font-size: 1rem;
+      }
+      .taxi-emoji-animated {
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -785,8 +771,7 @@
       <h2 class="section-title"><i class="fa fa-shopping-cart"></i> Your Order</h2>
       <ul id="cart-items" class="cart-items"></ul>
       <div id="empty-cart" class="empty-cart" aria-live="polite">
-        <i class="fa fa-cart-arrow-down"></i>
-        <p>Your cart is empty.</p>
+        <p>Cart Empty</p>
         <p>Add items to get started.</p>
       </div>
       <div id="cart-total" class="cart-total" style="display:none;">
@@ -811,10 +796,9 @@
         <div class="taxi-card" id="taxiCard">
           <div class="taxi-emoji-animated">
             <span role="img" aria-label="vehicle">🚗</span>
-            <span role="img" aria-label="motorbike">🏍️</span>
           </div>
-          <span class="taxi-card-title"><span role="img" aria-label="taxi">🚕</span> Book a Taxi</span>
-          <span class="taxi-card-desc">Hire a vehicle or motorbike for your trip. Quick, safe, and affordable!</span>
+          <span class="taxi-card-title">Book a Taxi</span>
+          <span class="taxi-card-desc">Hire a vehicle for your trip. Quick, safe, and affordable!</span>
         </div>
       </div>
       <button class="slider-btn next" id="nextTaxiBtn" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
@@ -1344,7 +1328,6 @@
           else if (icon.classList.contains('fa-building')) icon.textContent = '🏢';
           else if (icon.classList.contains('fa-taxi')) icon.textContent = '🚕';
           else if (icon.classList.contains('fa-shopping-cart')) icon.textContent = '🛒';
-          else if (icon.classList.contains('fa-cart-arrow-down')) icon.textContent = '🛒';
           else if (icon.classList.contains('fa-chevron-left')) icon.textContent = '<';
           else if (icon.classList.contains('fa-chevron-right')) icon.textContent = '>';
           else icon.textContent = '?';
