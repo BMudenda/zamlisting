@@ -251,6 +251,10 @@
     .bid-btn:hover {
       background: #f1f1f1;
     }
+    .taxi-hire-btn.calc,
+    .taxi-hire-btn.map {
+      border-radius: 50%;
+    }
     .taxi-hire-btn.calc i { color: #ff9800; }
     .taxi-hire-btn.map i { color: #00897b; }
     .taxi-hire-btn.hide i { color: #d32f2f; }
@@ -312,6 +316,19 @@
     .taxi-radio-label input[type="radio"] {
       accent-color: var(--primary);
     }
+    .taxi-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      width: 100%;
+      justify-content: center;
+    }
     .product,
     .vehicle-item {
       min-width: 160px;
@@ -330,8 +347,8 @@
     }
     .product img,
     .vehicle-item img {
-      width: 120px;
-      height: 82px;
+      width: 140px;
+      height: 100px;
       object-fit: cover;
       margin-bottom: 0.5rem;
       border-radius: 4px;
@@ -692,6 +709,15 @@
       font-size: 0.99em;
       margin-bottom: 3px;
     }
+    .taxi-hire-modal-inputs input,
+    .taxi-hire-modal-inputs select {
+      padding: 0.7rem;
+      font-size: 1.1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 100%;
+      margin-bottom: 0.7rem;
+    }
     footer {
       background: var(--footer-bg);
       color: var(--footer-text);
@@ -750,11 +776,24 @@
         width: 50px;
         height: 50px;
       }
+      .taxi-modal-header {
+        font-size: 1.5rem;
+      }
+      .taxi-hire-modal-inputs input,
+      .taxi-hire-modal-inputs select {
+        font-size: 1rem;
+        padding: 0.6rem;
+      }
     }
     @media (max-width: 400px) {
       .modal-imgs img {
         width: 45px;
         height: 45px;
+      }
+      .product img,
+      .vehicle-item img {
+        width: 120px;
+        height: 80px;
       }
     }
   </style>
@@ -798,14 +837,16 @@
     <div class="modal" id="taxiHireModal">
       <div class="modal-content">
         <button class="modal-close" id="taxiHireModalClose" title="Close" aria-label="Close modal">&times;</button>
-        <div class="modal-title">Taxi Hire Booking</div>
+        <div class="taxi-modal-header">
+          <i class="fa fa-taxi"></i> Book Your Taxi
+        </div>
         <div style="font-size:2.5rem; margin-bottom:0.6rem;">
           <span>🚗</span>
           <span>🏍️</span>
         </div>
-        <div style="width:100%;max-width:500px;">
+        <div class="taxi-hire-modal-inputs" style="width:100%;max-width:500px;">
           <label for="taxiPhoneModal">Phone Number</label>
-          <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" style="width:100%;margin-bottom:0.7rem;" aria-label="Enter phone number">
+          <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" aria-label="Enter phone number">
           <label>Transport Mode</label>
           <div class="taxi-radio-group">
             <label class="taxi-radio-label">
@@ -818,16 +859,16 @@
             </label>
           </div>
           <label for="taxiHireFrom">From</label>
-          <select id="taxiHireFrom" style="width:100%;margin-bottom:0.7rem;" aria-label="Select pickup location"></select>
+          <select id="taxiHireFrom" aria-label="Select pickup location"></select>
           <label for="taxiHireTo">To</label>
-          <select id="taxiHireTo" style="width:100%;margin-bottom:0.7rem;" aria-label="Select drop-off location"></select>
+          <select id="taxiHireTo" aria-label="Select drop-off location"></select>
         </div>
         <div class="taxi-hire-actions">
-          <button class="taxi-hire-btn calc" id="taxiCalcBtn" title="Calculate Fare" aria-label="Calculate fare"><i class="fa fa-calculator"></i> Calculate</button>
+          <button class="taxi-hire-btn calc" id="taxiCalcBtn" title="Calculate Fare" aria-label="Calculate fare"><i class="fa fa-calculator"></i></button>
           <button class="taxi-hire-btn sms" id="taxiSmsBtn" title="Send Booking SMS" aria-label="Send booking via SMS"><span class="fa fa-comment"></span> Send via SMS</button>
           <button class="taxi-hire-btn whatsapp" id="taxiWhatsappBtn" title="Send Booking WhatsApp" aria-label="Send booking via WhatsApp"><span class="fa fa-whatsapp"></span> Send via WhatsApp</button>
-          <button class="taxi-hire-btn map" id="taxiShowMapBtn" title="Show Map" aria-label="Show map"><i class="fa fa-map"></i> Map</button>
-          <button class="taxi-hire-btn hide" id="taxiHideMapBtn" title="Hide Map" style="display:none;" aria-label="Hide map"><i class="fa fa-eye-slash"></i> Hide</button>
+          <button class="taxi-hire-btn map" id="taxiShowMapBtn" title="Show Map" aria-label="Show map"><i class="fa fa-map"></i></button>
+          <button class="taxi-hire-btn hide" id="taxiHideMapBtn" title="Hide Map" style="display:none;" aria-label="Hide map"><i class="fa fa-eye-slash"></i></button>
         </div>
         <div class="taxi-hire-status" id="taxiHireStatus" aria-live="polite"></div>
         <div id="taxiHireMap" class="taxi-hire-map">
@@ -916,73 +957,23 @@
   <script>
     // --- Taxi Hire Data ---
     const places = [
-      "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche",
-      "Kakaro Primary School", "Makichilo Lodge", "Gerasmos Safari Lodge",
-      "Justifeli Lodge", "Kantuleni executive Lodge", "Feira Kindom Hall",
-      "Luangwa main sda churh", "Pentocostal Assembly of God Joshua Assembly",
-      "UCZ", "JB THREE BOARDERS MALL", "yellow shop", "Anglican Church",
-      "Big 2 Zambezi Water Front Resort & Safari", "Luangwa Secondary School",
-      "Luangwa District Hospital", "Kavalamanja", "Luangwa Police Station",
-      "Zambia Electricity Supply Corporation", "Luangwa Post Office",
-      "Luangwa Basic School", "Luangwa Habour", "Luangwa Indeco",
-      "Luangwa District Comission office", "Luangwa District Education Board Offices",
-      "Luangwa Council lodge", "Yangoma Hotel", "Luangwa Filling Station",
-      "Dzalo Skills Training Centre kambolozo", "Boma Clinic", "BM residence",
-      "Luangwa Feira Day Secondary School", "Katondwe Mission Hospital",
-      "Mwavi Secondary School", "Luangwa Bridge", "Luangwa Bridge Market"
+      "Luangwa (Feira)",
+      "Luangwa Market",
+      "Luangwa District Hospital",
+      "Katondwe Mission Hospital",
+      "Luangwa Police Station"
     ];
 
     const segments = [
-      { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
-      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
       { from: "Luangwa (Feira)", to: "Luangwa Market", distance: 0.1 },
-      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 0.1 },
       { from: "Luangwa (Feira)", to: "Luangwa District Hospital", distance: 4.6 },
-      { from: "Luangwa (Feira)", to: "Kakaro Primary School", distance: 12 },
-      { from: "Luangwa District Hospital", to: "Kavalamanja", distance: 23 },
-      { from: "Katondwe Mission Hospital", to: "Kasinsa", distance: 16 },
-      { from: "Chitope", to: "Kasinsa", distance: 10 },
+      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
       { from: "Luangwa (Feira)", to: "Luangwa Police Station", distance: 0.55 },
-      { from: "Luangwa (Feira)", to: "Makichilo Lodge", distance: 0.40 },
-      { from: "Luangwa (Feira)", to: "Anglican Church", distance: 0.75 },
-      { from: "Luangwa (Feira)", to: "Feira Kindom Hall", distance: 0.7 },
-      { from: "Luangwa (Feira)", to: "UCZ", distance: 0.5 },
-      { from: "Luangwa (Feira)", to: "Pentocostal Assembly of God Joshua Assembly", distance: 0.6 },
-      { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
-      { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0 },
-      { from: "Luangwa Market", to: "Luangwa Basic School", distance: 0.45 },
-      { from: "Luangwa Market", to: "Luangwa Habour", distance: 0.5 },
-      { from: "Luangwa (Feira)", to: "Luangwa Indeco", distance: 0.9 },
-      { from: "Luangwa Indeco", to: "Luangwa Council lodge", distance: 0.25 },
-      { from: "Luangwa Council lodge", to: "Yangoma Hotel", distance: 0.15 },
-      { from: "Luangwa Council lodge", to: "Zambia Electricity Supply Corporation", distance: 2.4 },
-      { from: "Yangoma Hotel", to: "Luangwa Filling Station", distance: 0.7 },
-      { from: "Kantuleni executive Lodge", to: "Luangwa Filling Station", distance: 0.190 },
-      { from: "Luangwa Filling Station", to: "Dzalo Skills Training Centre kambolozo", distance: 0.3 },
-      { from: "Dzalo Skills Training Centre kambolozo", to: "Boma Clinic", distance: 0.2 },
-      { from: "Boma Clinic", to: "BM residence", distance: 0.6 },
-      { from: "BM residence", to: "Luangwa Feira Day Secondary School", distance: 1.1 },
-      { from: "Gerasmos Safari Lodge", to: "Luangwa Feira Day Secondary School", distance: 3.1 },
-      { from: "Luangwa Feira Day Secondary School", to: "Justifeli Lodge", distance: 2.2 },
-      { from: "Luangwa main sda churh", to: "Justifeli Lodge", distance: 0.9 },
-      { from: "Luangwa District Education Board Offices", to: "Justifeli Lodge", distance: 2.0 },
-      { from: "Luangwa Feira Day Secondary School", to: "yellow shop", distance: 3.3 },
-      { from: "Luangwa Feira Day Secondary School", to: "Zambia Electricity Supply Corporation", distance: 2.0 },
-      { from: "yellow shop", to: "JB THREE BOARDERS MALL", distance: 0.45 },
-      { from: "yellow shop", to: "Luangwa Indeco", distance: 0.45 },
-      { from: "yellow shop", to: "Luangwa main sda churh", distance: 0.70 },
-      { from: "Luangwa main sda churh", to: "Zambia Electricity Supply Corporation", distance: 0.65 },
-      { from: "Luangwa District Hospital", to: "Zambia Electricity Supply Corporation", distance: 2.8 },
-      { from: "Luangwa Feira Day Secondary School", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 4.0 },
-      { from: "Luangwa Feira Day Secondary School", to: "Katondwe Mission Hospital", distance: 48 },
-      { from: "Katondwe Mission Hospital", to: "Mwavi Secondary School", distance: 7.2 },
-      { from: "Mwavi Secondary School", to: "Luangwa Bridge Market", distance: 27.3 },
-      { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
-      { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
-      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
+      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 0.1 },
+      { from: "Luangwa District Hospital", to: "Luangwa Police Station", distance: 4.05 }
     ];
 
-    // --- Masampo Items (Updated with Six Images) ---
+    // --- Masampo Items ---
     const masampoItems = [
       {
         id: 1011,
@@ -1041,134 +1032,13 @@
       }
     ];
 
-    // --- B-istore Items (Limited to 5) ---
+    // --- B-istore Items ---
     const bistoreItems = [
       { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages", stock: 100 },
       { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages", stock: 100 },
       { id: 3, name: "Coca-Cola Bottled", price: 12, image: "MC.jpg", category: "beverages", stock: 100 },
       { id: 4, name: "Blue Pen", price: 3, image: "pen2.png", category: "stationary", stock: 200 },
-      { id: 4, name: "Black Label", price: 20, image: "BL.webp", category: "beverages" },
-      { id: 5, name: "Coca-Cola bottled", price: 12, image: "MC.jpg", category: "beverages" },
-      { id: 6, name: "Fanta", price: 12, image: "F.jpeg", category: "beverages" },
-      { id: 7, name: "Disposable Fanta", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 8, name: "Disposable Coke", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 9, name: "Disposable Sprite", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 10, name: "Fresh_Up", price: 15.9, image: "Freshup.png", category: "beverages" },
-      { id: 11, name: "Black Label Cained", price: 30, image: "BL.webp", category: "beverages" },
-      { id: 12, name: "Fruitcana", price: 15, image: "Fruitc.webp", category: "beverages" },
-      { id: 13, name: "Kunfu", price: 15, image: "Konfu.png", category: "beverages" },
-      { id: 14, name: "Mojo", price: 15, image: "Mojo.png", category: "beverages" },
-      { id: 15, name: "Red Rock", price: 15, image: "RR.png", category: "beverages" },
-      { id: 16, name: "Rasta", price: 15, image: "Rasta.png", category: "beverages" },
-      { id: 17, name: "Life Shots", price: 15, image: "Shots.webp", category: "beverages" },
-      { id: 18, name: "Fruitcana Red Smoothie", price: 15, image: "Smoothy.png", category: "beverages" },
-      { id: 19, name: "Sun Dance", price: 15, image: "Sund.png", category: "beverages" },
-      { id: 20, name: "Tonic Water Brothers", price: 15, image: "Tonic.png", category: "beverages" },
-      { id: 21, name: "Vatra", price: 15, image: "Vatra.png", category: "beverages" },
-      { id: 22, name: "Wild Cat", price: 15, image: "Wildcat.png", category: "beverages" },
-      { id: 23, name: "Fruit-up", price: 15, image: "Fruitup.png", category: "beverages" },
-      { id: 24, name: "DP", price: 0, image: "D1.jpeg", category: "beverages" },
-      { id: 25, name: "DP", price: 0, image: "D2.png", category: "beverages" },
-      { id: 26, name: "DP", price: 0, image: "D3.jpeg", category: "beverages" },
-      { id: 27, name: "DP", price: 0, image: "D4.jpeg", category: "beverages" },
-      { id: 28, name: "DP", price: 0, image: "D5.jpeg", category: "beverages" },
-      { id: 29, name: "DP", price: 0, image: "D6.jpeg", category: "beverages" },
-      { id: 30, name: "DP", price: 0, image: "D7.jpeg", category: "beverages" },
-      { id: 31, name: "DP", price: 0, image: "D8.jpeg", category: "beverages" },
-      { id: 32, name: "o1", price: 0, image: "O1.jpeg", category: "beverages" },
-      { id: 33, name: "o2", price: 0, image: "O2.jpeg", category: "beverages" },
-      { id: 34, name: "o3", price: 0, image: "O3.jpeg", category: "beverages" },
-      { id: 35, name: "o4", price: 0, image: "O4.jpg", category: "beverages" },
-      { id: 36, name: "o5", price: 0, image: "O5.jpeg", category: "beverages" },
-      { id: 37, name: "o6", price: 0, image: "O6.jpeg", category: "beverages" },
-      { id: 38, name: "o7", price: 0, image: "O7.jpeg", category: "beverages" },
-      { id: 39, name: "o8", price: 0, image: "O8.jpg", category: "beverages" },
-      { id: 40, name: "o9", price: 0, image: "O9.jpeg", category: "beverages" },
-      { id: 41, name: "10", price: 0, image: "010.jpeg", category: "beverages" },
-      { id: 42, name: "11", price: 0, image: "O11.png", category: "beverages" },
-      { id: 43, name: "12", price: 0, image: "012.jpeg", category: "beverages" },
-      { id: 44, name: "13", price: 0, image: "O13.jpeg", category: "beverages" },
-      { id: 45, name: "N1", price: 0, image: "N1.jpg", category: "beverages" },
-      { id: 46, name: "N2", price: 0, image: "N2.jpeg", category: "beverages" },
-      { id: 47, name: "N3", price: 0, image: "N3.jpeg", category: "beverages" },
-      { id: 48, name: "N4", price: 0, image: "N4.jpeg", category: "beverages" },
-      { id: 49, name: "N5", price: 0, image: "N5.jpeg", category: "beverages" },
-      { id: 50, name: "N6", price: 0, image: "N6.jpeg", category: "beverages" },
-      { id: 51, name: "N7", price: 0, image: "N7.jpeg", category: "beverages" },
-      { id: 52, name: "N8", price: 0, image: "N8.jpeg", category: "beverages" },
-      { id: 53, name: "N9", price: 0, image: "N9.jpeg", category: "beverages" },
-      { id: 54, name: "N10", price: 0, image: "N10.jpeg", category: "beverages" },
-      { id: 55, name: "N11", price: 0, image: "N11.jpeg", category: "beverages" },
-      { id: 56, name: "N12", price: 0, image: "N12.jpeg", category: "beverages" },
-      { id: 57, name: "N13", price: 0, image: "N13.jpeg", category: "beverages" },
-      { id: 58, name: "N14", price: 0, image: "N14.jpeg", category: "beverages" },
-      { id: 59, name: "N15", price: 0, image: "N15.jpeg", category: "beverages" },
-      { id: 60, name: "N16", price: 0, image: "N16.jpeg", category: "beverages" },
-      { id: 61, name: "N17", price: 0, image: "N17.jpeg", category: "beverages" },
-      { id: 62, name: "N18", price: 0, image: "N18.jpeg", category: "beverages" },
-      { id: 63, name: "N18", price: 0, image: "N18.jpeg", category: "beverages" },
-      { id: 64, name: "N19", price: 0, image: "N19.jpeg", category: "beverages" },
-      { id: 65, name: "N20", price: 0, image: "N20.jpeg", category: "beverages" },
-      { id: 66, name: "N21", price: 0, image: "N21.jpeg", category: "beverages" },
-      { id: 67, name: "N22", price: 0, image: "N22.jpeg", category: "beverages" },
-      { id: 68, name: "N23", price: 0, image: "N23.jpeg", category: "beverages" },
-      { id: 69, name: "N24", price: 0, image: "N24.jpeg", category: "beverages" },
-      { id: 70, name: "N25", price: 0, image: "N25.jpeg", category: "beverages" },
-      { id: 71, name: "N26", price: 0, image: "N26.jpeg", category: "beverages" },
-      { id: 72, name: "N27", price: 0, image: "N27.webp", category: "beverages" },
-      { id: 73, name: "N28", price: 0, image: "N28.webp", category: "beverages" },
-      { id: 74, name: "N29", price: 0, image: "N29.jpeg", category: "beverages" },
-      { id: 75, name: "N30", price: 0, image: "N30.jpeg", category: "beverages" },
-      { id: 76, name: "N31", price: 0, image: "N31.jpeg", category: "beverages" },
-      { id: 77, name: "N32", price: 0, image: "N32.jpeg", category: "beverages" },
-      { id: 78, name: "N33", price: 0, image: "N33.jpeg", category: "beverages" },
-      { id: 79, name: "N34", price: 0, image: "N34.jpeg", category: "beverages" },
-      { id: 80, name: "N35", price: 0, image: "N35.jpeg", category: "beverages" },
-      { id: 81, name: "N36", price: 0, image: "N36.jpeg", category: "beverages" },
-      { id: 82, name: "N37", price: 0, image: "N37.jpeg", category: "beverages" },
-      { id: 83, name: "N38", price: 0, image: "N38.jpeg", category: "beverages" },
-      { id: 84, name: "N39", price: 0, image: "N39.jpeg", category: "beverages" },
-      { id: 85, name: "N40", price: 0, image: "N40.jpeg", category: "beverages" },
-      { id: 86, name: "N41", price: 0, image: "N41.jpeg", category: "beverages" },
-      { id: 87, name: "N42", price: 0, image: "N42.jpeg", category: "beverages" },
-      { id: 88, name: "N43", price: 0, image: "N43.jpeg", category: "beverages" },
-      { id: 89, name: "N44", price: 0, image: "N44.jpeg", category: "beverages" },
-      { id: 90, name: "N45", price: 0, image: "N45.jpeg", category: "beverages" },
-      { id: 91, name: "N46", price: 0, image: "N46.jpeg", category: "beverages" },
-      { id: 92, name: "N47", price: 0, image: "N47.jpeg", category: "beverages" },
-      { id: 93, name: "N48", price: 0, image: "N48.jpeg", category: "beverages" },
-      { id: 94, name: "N49", price: 0, image: "N49.jpeg", category: "beverages" },
-      { id: 95, name: "N50", price: 0, image: "N50.jpeg", category: "beverages" },
-      { id: 96, name: "N51", price: 0, image: "N51.jpeg", category: "beverages" },
-      { id: 97, name: "N52", price: 0, image: "N52.jpeg", category: "beverages" },
-      { id: 98, name: "N53", price: 0, image: "N53.jpeg", category: "beverages" },
-      { id: 99, name: "N54", price: 0, image: "N54.jpeg", category: "beverages" },
-      { id: 100, name: "Calculator Casio GX-14", price: 230, image: "GX.jpg", category: "stationary" },
-      { id: 101, name: "Big Clear Sellotape", price: 40, image: "sello.webp", category: "stationary" },
-      { id: 102, name: "Blue Pen", price: 3, image: "pen2.png", category: "stationary" },
-      { id: 103, name: "Red Pen", price: 3, image: "pen.png", category: "stationary" },
-      { id: 104, name: "Blue Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 105, name: "Red Permanent Maker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 106, name: "Black Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 107, name: "Green Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 108, name: "A4 Brown Envelope", price: 3, image: "envelope.jpg", category: "stationary" },
-      { id: 109, name: "Ball Stick n tack", price: 15, image: "tack.jpg", category: "stationary" },
-      { id: 110, name: "Ream of Paper", price: 80, image: "ream.jpeg", category: "stationary" },
-      { id: 111, name: "Stepler", price: 20, image: "stepp.jpg", category: "stationary" },
-      { id: 112, name: "File folder A4", price: 15, image: "dfolder2.jpg", category: "stationary" },
-      { id: 113, name: "Perforator Kangaro", price: 20, image: "perfo.jpg", category: "stationary" },
-      { id: 114, name: "Ink Pad", price: 15, image: "inkpad.jpg", category: "stationary" },
-      { id: 115, name: "Metal File Fastner ", price: 3, image: "ffast.webp", category: "stationary" },
-      { id: 116, name: "Ruller 30cm", price: 10, image: "ruller.jpeg", category: "stationary" },
-      { id: 117, name: "Disk Lock", price: 30, image: "lock.png", category: "general" },
-      { id: 118, name: "KENKO Electronic Calculator", price: 200, image: "EC1.jpg", category: "stationary" },
-      { id: 119, name: "Ream of Paper", price: 80, image: "ream2.png", category: "stationary" },
-      { id: 120, name: "File folder A4", price: 15, image: "dfolder.jpg", category: "stationary" },
-      { id: 121, name: "pencils", price: 3, image: "pencil.jpg", category: "stationary" },
-      { id: 122, name: "Heavy Duty Steppler", price: 100, image: "stepp2.jpg", category: "stationary" },
-      { id: 123, name: "Ruller 30cm", price: 10, image: "ruller2.jpg", category: "stationary" },
-      
-      { id: 200, name: "Ream of Paper", price: 80, image: "ream.jpeg", category: "stationary", stock: 50 }
+      { id: 5, name: "Ream of Paper", price: 80, image: "ream.jpeg", category: "stationary", stock: 50 }
     ];
 
     // --- Utility Functions ---
@@ -1582,7 +1452,6 @@
         thumbs.forEach(thumb => thumb.className = thumb.src === src ? 'selected' : '');
         detailsModalPrevImg.disabled = images.indexOf(src) === 0;
         detailsModalNextImg.disabled = images.indexOf(src) === images.length - 1;
-        // Scroll the selected thumbnail into view
         const selectedThumb = detailsModalImgs.querySelector('img.selected');
         if (selectedThumb) {
           selectedThumb.scrollIntoView({ behavior: 'smooth', inline: 'center' });
@@ -1700,32 +1569,32 @@
     const categoryFilter = document.getElementById('categoryFilter');
     const searchBox = document.getElementById('searchBox');
 
-    function filterItems() {
+    function filterAndSearch() {
       const category = categoryFilter.value;
-      const search = searchBox.value.toLowerCase();
-      const taxiSection = document.getElementById('taxiSliderSection');
-      const masampoSection = document.getElementById('masampoSliderSection');
-      const bistoreSection = document.getElementById('bistoreSliderSection');
+      const searchTerm = searchBox.value.toLowerCase();
 
-      taxiSection.hidden = category !== 'all' && category !== 'taxi';
-      masampoSection.hidden = category !== 'all' && category !== 'masampo';
-      bistoreSection.hidden = category !== 'all' && category !== 'bistore';
+      // Show/hide sections based on category
+      document.getElementById('taxiSliderSection').style.display = category === 'all' || category === 'taxi' ? 'block' : 'none';
+      document.getElementById('masampoSliderSection').style.display = category === 'all' || category === 'masampo' ? 'block' : 'none';
+      document.getElementById('bistoreSliderSection').style.display = category === 'all' || category === 'bistore' ? 'block' : 'none';
 
-      const filteredMasampo = masampoItems.filter(item =>
-        (category === 'all' || category === 'masampo') &&
-        (item.name.toLowerCase().includes(search) || item.location.toLowerCase().includes(search) || item.category.toLowerCase().includes(search))
-      );
-      const filteredBistore = bistoreItems.filter(item =>
-        (category === 'all' || category === 'bistore') &&
-        (item.name.toLowerCase().includes(search) || item.category.toLowerCase().includes(search))
-      );
-
+      // Filter Masampo items
+      const filteredMasampo = masampoItems.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.location.toLowerCase().includes(searchTerm) || item.category.toLowerCase().includes(searchTerm);
+        return (category === 'all' || category === 'masampo') && matchesSearch;
+      });
       renderMasampoItems(filteredMasampo);
+
+      // Filter B-istore items
+      const filteredBistore = bistoreItems.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.category.toLowerCase().includes(searchTerm);
+        return (category === 'all' || category === 'bistore') && matchesSearch;
+      });
       renderBistoreItems(filteredBistore);
     }
 
-    categoryFilter.onchange = filterItems;
-    searchBox.oninput = debounce(filterItems, 300);
+    categoryFilter.onchange = filterAndSearch;
+    searchBox.oninput = debounce(filterAndSearch, 300);
 
     // Initial render
     renderMasampoItems(masampoItems);
@@ -1733,4 +1602,4 @@
     renderCart();
   </script>
 </body>
-  </html>
+</html>
