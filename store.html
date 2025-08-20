@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <style>
-    /* General styles */
     :root {
       --primary: #2e7d32; --primary-dark: #1b5e20; --primary-light: #81c784; --accent: #ff9800;
       --text: #222; --text-light: #666; --background: #f5f5f5; --card-bg: white;
@@ -17,7 +16,7 @@
       --footer-text: #fff;
       --footer-link: #ffd600;
     }
-    body { font-family: 'Roboto', sans-serif; color: var(--text); background: var(--background); line-height: 1.5; }
+    body { font-family: 'Roboto', sans-serif; color: var(--text); background: var(--background); line-height: 1.5; margin: 0; }
     header { background: linear-gradient(135deg, var(--primary), var(--primary-dark) 90%); color: white; padding: 2.2rem 1rem 1.5rem 1rem; text-align: center;}
     .brand-title { font-size: 2.6rem; font-weight: 900; letter-spacing: 0.05em; color: var(--primary-dark); text-shadow: 0 1px 0 #fff; margin-bottom: 0.6rem; }
     .brand-title .highlight { color: var(--accent); text-shadow: none; }
@@ -33,13 +32,14 @@
     .slider-section { position: relative; width: 100%; margin-bottom: 2rem; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); padding: 1.5rem 1rem 1rem; }
     .slider-title { display: flex; align-items: center; gap: 0.7rem; font-size: 1.42rem; margin-bottom: 1.1rem; color: var(--primary-dark); font-weight: 600; }
     .slider-track { display: flex; overflow-x: auto; gap: 1.4rem; scroll-behavior: smooth; padding-bottom: 16px; padding-top: 6px; }
-    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.63); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2; }
+    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.63); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 1.3rem;}
     .slider-btn:hover { background: rgba(0,0,0,0.81); }
     .slider-btn.prev { left: 8px; }
     .slider-btn.next { right: 8px; }
+    .slider-btn:disabled { background: #ddd; cursor: not-allowed; }
     .slider-section[hidden] { display: none !important; }
-    .taxi-card { min-width: 250px; max-width: 270px; margin: 0 auto; background: linear-gradient(120deg, #e0f7fa 60%, #fceabb 100%); border-radius: 15px; box-shadow: 0 2px 22px rgba(0,0,0,0.12); padding: 1.2rem 1rem; cursor: pointer; transition: box-shadow 0.18s, transform 0.11s;}
-    .taxi-card:hover { box-shadow: 0 7px 26px rgba(0,0,0,0.15); transform: scale(1.04);}
+    .taxi-card { min-width: 250px; max-width: 270px; margin: 0 auto; background: linear-gradient(120deg, #e0f7fa 60%, #fceabb 100%); border-radius: 15px; box-shadow: 0 2px 22px rgba(0,0,0,0.12); padding: 1.3rem 1rem; transition: box-shadow 0.2s, transform 0.17s;}
+    .taxi-card:hover { box-shadow: 0 7px 26px rgba(0,0,0,0.15); transform: scale(1.04); cursor: pointer;}
     .taxi-emoji-animated { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.7rem; font-size: 2.9rem; margin: 0.7rem 0 0.3rem 0; animation: taxiEmojiBounce 1.4s infinite;}
     @keyframes taxiEmojiBounce { 0% { transform: translateY(0); } 50% { transform: translateY(-10px) scale(1.07); } 100% { transform: translateY(0); } }
     .taxi-card-title { font-size: 1.17rem; font-weight: 600; color: var(--primary-dark); display: flex; align-items: center; gap: 0.4rem; justify-content: center; margin-bottom: 0.15rem; }
@@ -94,24 +94,24 @@
     .taxi-hire-btn.hide i { color: #d32f2f; }
     .taxi-hire-btn.sms .fa-comment, .taxi-hire-btn.whatsapp .fa-whatsapp,
     .bid-btn.sms .fa-comment, .bid-btn.whatsapp .fa-whatsapp { margin-right: 4px;}
-    .taxi-hire-btn:disabled, .bid-btn:disabled { background: #ddd; color: #aaa;}
+    .taxi-hire-btn:disabled, .bid-btn:disabled { background: #ddd; color: #aaa; cursor: not-allowed;}
     .taxi-hire-status { margin: 0.7rem auto 0.2rem auto; text-align: center; font-size: 1.03em;}
     .taxi-hire-status.success { color: var(--primary-dark);}
     .taxi-hire-status.error { color: var(--danger);}
-    .taxi-hire-map { display: none; width: 100vw; height: 45vh; border: none; margin: 0; border-radius: 0; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb; position: absolute; left: 0; top: 0; z-index: 2;}
+    .taxi-hire-map { display: none; width: 100%; max-height: 60vh; border: none; margin: 0.5rem 0; border-radius: 8px; background: #f8fafc; align-items: center; justify-content: center; color: #2563eb;}
     .taxi-hire-map.show { display: flex !important; }
-    .taxi-hire-map iframe { width: 100vw; height: 100%; border: none; }
-    .taxi-radio-group {display:flex;gap:18px;margin-bottom:0.7rem;}
-    .taxi-radio-label {display:flex;align-items:center;gap:6px;}
-    .taxi-radio-label input[type="radio"] {accent-color:var(--primary);}
-    .product, .vehicle-item { min-width: 160px; max-width: 170px; border: 1px solid var(--border); border-radius: 10px; padding: 1rem 0.7rem; text-align: center; background: var(--card-bg); transition: box-shadow 0.18s, transform 0.11s;}
+    .taxi-hire-map iframe { width: 100%; height: 60vh; max-height: 400px; border: none; border-radius: 8px; }
+    .taxi-radio-group { display: flex; gap: 18px; margin-bottom: 0.7rem; }
+    .taxi-radio-label { display: flex; align-items: center; gap: 6px; }
+    .taxi-radio-label input[type="radio"] { accent-color: var(--primary); }
+    .product, .vehicle-item { min-width: 160px; max-width: 170px; border: 1px solid var(--border); border-radius: 10px; padding: 1rem 0.7rem; text-align: center; background: var(--card-bg); transition: box-shadow 0.2s, transform 0.17s;}
     .product:hover, .vehicle-item:hover { transform: translateY(-7px) scale(1.04); box-shadow: 0 7px 26px rgba(0,0,0,0.15);}
     .product img, .vehicle-item img { width: 120px; height: 82px; object-fit: cover; margin-bottom: 0.5rem; border-radius: 4px; border: 2px solid var(--primary-light); background: #fff; }
     .product h4, .vehicle-item h4 { font-size: 1rem; margin-bottom: 0.2rem; color: var(--text); }
     .product p, .vehicle-item p { color: var(--primary-dark); font-weight: 600; margin-bottom: 0.6rem; }
     .vehicle-item p.location { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.2rem;}
     .product .out-stock { display: block; color: #b71c1c; font-size: 0.97em; font-weight: 600; margin-bottom: 0.7em; }
-    .product button, .vehicle-item button { border: none; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.15s;}
+    .product button, .vehicle-item button { border: none; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500;}
     .product button:disabled { background: #ccc !important; cursor: not-allowed; }
     .cart { border: 1px solid var(--border); padding: 1.7rem 1.3rem 2.1rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow);}
     .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 320px; overflow-y: auto; }
@@ -123,7 +123,7 @@
     .cart-item-qty { width: 44px; font-size: 1em; margin: 0 6px; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd; text-align: center; }
     .cart-price-block { display: flex; align-items: center; gap: 4px; }
     .quantity-controls { display: flex; align-items: center; gap: 2px; }
-    .quantity-btn, .remove-btn { border: none; background: none; color: var(--primary-dark); font-size: 1.1em; margin: 0 2px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.12s;}
+    .quantity-btn, .remove-btn { border: none; background: none; color: var(--primary-dark); font-size: 1.1em; margin: 0 2px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s;}
     .quantity-btn:active, .remove-btn:active { background: #f1f1f1; }
     .remove-btn { color: var(--danger); }
     .cart-total { margin: 1rem 0; padding-top: 1rem; border-top: 1px solid var(--border); }
@@ -131,28 +131,31 @@
     .checkout-actions { margin-top: 1rem; display: flex; gap: 10px; justify-content: center;}
     .checkout-btn-sms, .checkout-btn-whatsapp { border: none; background: none; padding: 0 8px; font-size: 1em; font-weight: 600; color: inherit; display: flex; align-items: center; }
     .checkout-btn-sms .fa-comment, .checkout-btn-whatsapp .fa-whatsapp { margin-right: 4px;}
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #fff; z-index: 2000; align-items: center; justify-content: center; }
+    .status-message { margin: 0.7rem auto 0.2rem auto; text-align: center; font-size: 1.03em;}
+    .status-message.success { color: var(--primary-dark);}
+    .status-message.error { color: var(--danger);}
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; overflow: auto; }
     .modal.show { display: flex !important; }
-    .modal-content { background: #fff; border-radius: 0; padding: 0; width: 100vw; height: 100vh; box-shadow: none; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-    .modal-close { position: absolute; top: 18px; right: 18px; font-size: 2.5rem; color: var(--danger); background: none; border: none; cursor: pointer; z-index: 3; transition: color 0.2s;}
+    .modal-content { background: #fff; border-radius: 8px; padding: 1.5rem; max-width: 90vw; max-height: 90vh; width: 100%; height: auto; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; box-sizing: border-box;}
+    .modal-close { position: fixed; top: 1rem; right: 1rem; font-size: 2rem; color: var(--danger); background: none; border: none; cursor: pointer; z-index: 3; transition: color 0.2s;}
     .modal-close:hover { color: var(--primary-dark);}
-    .modal-title { font-size: 2rem; font-weight: 700; color: var(--primary-dark); margin: 2.5rem 0 0.8rem 0; text-align: center;}
-    .modal-img { width: 75vw; max-width: 440px; height: 32vw; max-height: 280px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee; background: #fff;}
+    .modal-title { font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); margin: 1rem 0 0.8rem 0; text-align: center;}
+    .modal-img { width: 80vw; max-width: 600px; height: auto; max-height: 400px; object-fit: cover; border-radius: 9px; margin-bottom: 0.5rem; border: 1.5px solid #eee; background: #fff;}
     .modal-imgs { display: flex; align-items: center; gap: 10px; margin-bottom: 0.3rem; flex-wrap: wrap; justify-content: center;}
-    .modal-imgs img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid var(--primary-light); cursor: pointer; transition: box-shadow 0.15s; background: #fff;}
+    .modal-imgs img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 2px solid var(--primary-light); cursor: pointer; transition: box-shadow 0.15s; background: #fff;}
     .modal-imgs img.selected { box-shadow: 0 0 0 3px var(--primary-light); }
     .modal-slider-arrows { display: flex; gap: 8px; align-items: center; margin-bottom: 0.3rem; margin-top: 0.1rem;}
     .modal-slider-arrow { background: var(--primary-light); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; cursor: pointer; color: #fff; transition: background 0.18s;}
     .modal-slider-arrow:disabled { background: #ddd; color: #aaa; cursor: not-allowed;}
-    .masampo-bid-block {margin: 0.7rem 0 0.2rem 0;}
-    .masampo-bid-block input, .masampo-bid-block label {display:block;width:100%;font-size:1.06rem;margin-bottom:0.55rem;}
-    .masampo-bid-block label {font-weight:500;}
-    .masampo-bid-block .bid-actions {display:flex;gap:14px;justify-content:center;margin-top:0.4rem;}
-    .bid-status {margin:0.4rem auto 0.1rem auto;text-align:center;font-size:1.02em;}
-    .bid-status.success {color:var(--primary-dark);}
-    .bid-status.error {color:var(--danger);}
-    .bid-label {font-size:0.95em;color:var(--text-light);margin-bottom:8px;display:block;}
-    .bid-dest-label {font-weight:600;font-size:0.99em;margin-bottom:3px;}
+    .masampo-bid-block { margin: 0.7rem 0 0.2rem 0; width: 100%; max-width: 500px; }
+    .masampo-bid-block input, .masampo-bid-block label { display: block; width: 100%; font-size: 1.06rem; margin-bottom: 0.55rem; }
+    .masampo-bid-block label { font-weight: 500; }
+    .masampo-bid-block .bid-actions { display: flex; gap: 14px; justify-content: center; margin-top: 0.4rem; }
+    .bid-status { margin: 0.4rem auto 0.1rem auto; text-align: center; font-size: 1.02em; }
+    .bid-status.success { color: var(--primary-dark); }
+    .bid-status.error { color: var(--danger); }
+    .bid-label { font-size: 0.95em; color: var(--text-light); margin-bottom: 8px; display: block; }
+    .bid-dest-label { font-weight: 600; font-size: 0.99em; margin-bottom: 3px; }
     footer {
       background: var(--footer-bg);
       color: var(--footer-text);
@@ -163,12 +166,17 @@
       margin-top: 2.7rem;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
     }
-    footer a { color: var(--footer-link); text-decoration: underline; font-weight: 500;}
-    footer .footer-brand { font-weight: bold; color: var(--footer-link);}
+    footer a { color: var(--footer-link); text-decoration: underline; font-weight: 500; }
+    footer .footer-brand { font-weight: bold; color: var(--footer-link); }
     @media (max-width: 800px) {
-      .modal-img { width: 95vw; max-width: 290px; height: 45vw; max-height: 200px;}
-      .modal-content { width: 100vw; height: 100vh;}
-      .modal-title { font-size: 1.3rem;}
+      .modal-content { padding: 1rem; max-width: 95vw; max-height: 95vh; }
+      .modal-title { font-size: 1.5rem; }
+      .modal-img { width: 90vw; max-width: 400px; max-height: 250px; }
+      .modal-imgs img { width: 50px; height: 50px; }
+      .taxi-hire-map iframe { height: 50vh; max-height: 300px; }
+      .container { margin: 1rem auto; }
+      .cart { min-width: 100%; }
+      .taxi-hire-actions, .bid-actions { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -216,7 +224,7 @@
           <span>🚗</span>
           <span>🏍️</span>
         </div>
-        <div style="width:100%;max-width:420px;">
+        <div style="width:100%;max-width:500px;">
           <label for="taxiPhoneModal">Phone Number</label>
           <input type="tel" id="taxiPhoneModal" maxlength="10" placeholder="e.g. 0978167546" style="width:100%;margin-bottom:0.7rem;">
           <label>Transport Mode</label>
@@ -231,10 +239,9 @@
             </label>
           </div>
           <label for="taxiHireFrom">From</label>
-          <input list="placesList" id="taxiHireFrom" placeholder="Pickup location" style="width:100%;margin-bottom:0.7rem;">
+          <select id="taxiHireFrom" style="width:100%;margin-bottom:0.7rem;"></select>
           <label for="taxiHireTo">To</label>
-          <input list="placesList" id="taxiHireTo" placeholder="Drop-off location" style="width:100%;margin-bottom:0.7rem;">
-          <datalist id="placesList"></datalist>
+          <select id="taxiHireTo" style="width:100%;margin-bottom:0.7rem;"></select>
         </div>
         <div class="taxi-hire-actions">
           <button class="taxi-hire-btn calc" id="taxiCalcBtn" title="Calculate Fare"><i class="fa fa-calculator"></i> Calculate</button>
@@ -245,9 +252,7 @@
         </div>
         <div class="taxi-hire-status" id="taxiHireStatus"></div>
         <div id="taxiHireMap" class="taxi-hire-map">
-          <iframe id="taxiHireMapIframe"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.06737814816!2d31.2323422143821!3d-13.147631245757161!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1947e2a8a3e25c0d%3A0xe3ee3a6f4a9c89a1!2sLuangwa!5e0!3m2!1sen!2szm!4v1692550000000!5m2!1sen!2szm"
-            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+          <iframe id="taxiHireMapIframe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
         </div>
       </div>
     </div>
@@ -300,7 +305,6 @@
         </div>
         <img id="detailsModalImg" class="modal-img" src="" alt="Item Image">
         <div class="modal-details" id="detailsModalDetails"></div>
-        <!-- Bid block for Masampo modal -->
         <div id="masampoBidBlock" class="masampo-bid-block" style="display:none;">
           <span class="bid-label">Bid/Order will be sent to:</span>
           <span class="bid-dest-label" id="masampoBidDestLabel"></span>
@@ -331,35 +335,127 @@
     </div>
   </footer>
   <script>
-    // Luangwa places and distances (in km, symmetric)
-    const LUANGWA_PLACES = [
-      "Market", "Hospital", "Police", "Bus Station", "School", "Clinic", "Bridge", "Post Office"
+    // --- Taxi Hire Luangwa Places & Segments ---
+    const places = [
+      "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche",
+      "Kakaro Primary School", "Makichilo Lodge", "Gerasmos Safari Lodge",
+      "Justifeli Lodge", "Kantuleni executive Lodge", "Feira Kindom Hall",
+      "Luangwa main sda churh", "Pentocostal Assembly of God Joshua Assembly",
+      "UCZ", "JB THREE BOARDERS MALL", "yellow shop", "Anglican Church",
+      "Big 2 Zambezi Water Front Resort & Safari", "Luangwa Secondary School",
+      "Luangwa District Hospital", "Kavalamanja", "Luangwa Police Station",
+      "Zambia Electricity Supply Corporation", "Luangwa Post Office",
+      "Luangwa Basic School", "Luangwa Habour", "Luangwa Indeco",
+      "Luangwa District Comission office", "Luangwa District Education Board Offices",
+      "Luangwa Council lodge", "Yangoma Hotel", "Luangwa Filling Station",
+      "Dzalo Skills Training Centre kambolozo", "Boma Clinic", "BM residence",
+      "Luangwa Feira Day Secondary School", "Katondwe Mission Hospital",
+      "Mwavi Secondary School", "Luangwa Bridge", "Luangwa Bridge Market"
     ];
-    const LUANGWA_DISTANCES = {
-      "Market|Hospital": 3,
-      "Market|Police": 2.5,
-      "Hospital|Bus Station": 1.5,
-      "School|Clinic": 2.2,
-      "Police|Bus Station": 2.8,
-      "Market|Bus Station": 3,
-      "Market|School": 2.7,
-      "Post Office|Bridge": 3,
-      "Clinic|Bridge": 1.2,
-      "Market|Clinic": 2.6,
-    };
-    function findLuangwaDistance(from, to) {
-      if (!from || !to || from === to) return 0;
-      let key = from + "|" + to;
-      let revKey = to + "|" + from;
-      return LUANGWA_DISTANCES[key] ?? LUANGWA_DISTANCES[revKey] ?? null;
+
+    const segments = [
+      { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
+      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
+      { from: "Luangwa (Feira)", to: "Luangwa Market", distance: 0.1 },
+      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 0.1 },
+      { from: "Luangwa (Feira)", to: "Luangwa District Hospital", distance: 4.6 },
+      { from: "Luangwa (Feira)", to: "Kakaro Primary School", distance: 12 },
+      { from: "Luangwa District Hospital", to: "Kavalamanja", distance: 23 },
+      { from: "Katondwe Mission Hospital", to: "Kasinsa", distance: 16 },
+      { from: "Chitope", to: "Kasinsa", distance: 10 },
+      { from: "Luangwa (Feira)", to: "Luangwa Police Station", distance: 0.55 },
+      { from: "Luangwa (Feira)", to: "Makichilo Lodge", distance: 0.40 },
+      { from: "Luangwa (Feira)", to: "Anglican Church", distance: 0.75 },
+      { from: "Luangwa (Feira)", to: "Feira Kindom Hall", distance: 0.7 },
+      { from: "Luangwa (Feira)", to: "UCZ", distance: 0.5 },
+      { from: "Luangwa (Feira)", to: "Pentocostal Assembly of God Joshua Assembly", distance: 0.6 },
+      { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
+      { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0 },
+      { from: "Luangwa Market", to: "Luangwa Basic School", distance: 0.45 },
+      { from: "Luangwa Market", to: "Luangwa Habour", distance: 0.5 },
+      { from: "Luangwa (Feira)", to: "Luangwa Indeco", distance: 0.9 },
+      { from: "Luangwa Indeco", to: "Luangwa Council lodge", distance: 0.25 },
+      { from: "Luangwa Council lodge", to: "Yangoma Hotel", distance: 0.15 },
+      { from: "Luangwa Council lodge", to: "Zambia Electricity Supply Corporation", distance: 2.4 },
+      { from: "Yangoma Hotel", to: "Luangwa Filling Station", distance: 0.7 },
+      { from: "Kantuleni executive Lodge", to: "Luangwa Filling Station", distance: 0.190 },
+      { from: "Luangwa Filling Station", to: "Dzalo Skills Training Centre kambolozo", distance: 0.3 },
+      { from: "Dzalo Skills Training Centre kambolozo", to: "Boma Clinic", distance: 0.2 },
+      { from: "Boma Clinic", to: "BM residence", distance: 0.6 },
+      { from: "BM residence", to: "Luangwa Feira Day Secondary School", distance: 1.1 },
+      { from: "Gerasmos Safari Lodge", to: "Luangwa Feira Day Secondary School", distance: 3.1 },
+      { from: "Luangwa Feira Day Secondary School", to: "Justifeli Lodge", distance: 2.2 },
+      { from: "Luangwa main sda churh", to: "Justifeli Lodge", distance: 0.9 },
+      { from: "Luangwa District Education Board Offices", to: "Justifeli Lodge", distance: 2.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "yellow shop", distance: 3.3 },
+      { from: "Luangwa Feira Day Secondary School", to: "Zambia Electricity Supply Corporation", distance: 2.0 },
+      { from: "yellow shop", to: "JB THREE BOARDERS MALL", distance: 0.45 },
+      { from: "yellow shop", to: "Luangwa Indeco", distance: 0.45 },
+      { from: "yellow shop", to: "Luangwa main sda churh", distance: 0.70 },
+      { from: "Luangwa main sda churh", to: "Zambia Electricity Supply Corporation", distance: 0.65 },
+      { from: "Luangwa District Hospital", to: "Zambia Electricity Supply Corporation", distance: 2.8 },
+      { from: "Luangwa Feira Day Secondary School", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 4.0 },
+      { from: "Luangwa Feira Day Secondary School", to: "Katondwe Mission Hospital", distance: 48 },
+      { from: "Katondwe Mission Hospital", to: "Mwavi Secondary School", distance: 7.2 },
+      { from: "Mwavi Secondary School", to: "Luangwa Bridge Market", distance: 27.3 },
+      { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
+      { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
+      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
+    ];
+
+    function buildGraph(segments) {
+      const graph = {};
+      segments.forEach(seg => {
+        if (!graph[seg.from]) graph[seg.from] = [];
+        if (!graph[seg.to]) graph[seg.to] = [];
+        graph[seg.from].push({ place: seg.to, distance: seg.distance });
+        graph[seg.to].push({ place: seg.from, distance: seg.distance });
+      });
+      return graph;
     }
-    // Populate datalist for autocomplete
-    const placesList = document.getElementById('placesList');
-    LUANGWA_PLACES.forEach(place => {
-      const opt = document.createElement('option');
-      opt.value = place;
-      placesList.appendChild(opt);
-    });
+
+    function findShortestDistance(from, to, segments) {
+      const graph = buildGraph(segments);
+      if (!graph[from] || !graph[to]) return null;
+      const distances = {};
+      const visited = new Set();
+      places.forEach(place => distances[place] = Infinity);
+      distances[from] = 0;
+      let queue = [{ place: from, dist: 0 }];
+      while (queue.length > 0) {
+        queue.sort((a, b) => a.dist - b.dist);
+        const { place, dist } = queue.shift();
+        if (place === to) return dist;
+        if (visited.has(place)) continue;
+        visited.add(place);
+        for (let neighbor of (graph[place] || [])) {
+          if (dist + neighbor.distance < distances[neighbor.place]) {
+            distances[neighbor.place] = dist + neighbor.distance;
+            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
+          }
+        }
+      }
+      return null;
+    }
+
+    // Populate select dropdowns for from/to
+    function populateTaxiPlacesSelect() {
+      const fromSel = document.getElementById('taxiHireFrom');
+      const toSel = document.getElementById('taxiHireTo');
+      fromSel.innerHTML = '<option value="">Select pickup location</option>';
+      toSel.innerHTML = '<option value="">Select drop-off location</option>';
+      places.forEach(place => {
+        let opt1 = document.createElement('option');
+        opt1.value = place;
+        opt1.textContent = place;
+        fromSel.appendChild(opt1);
+        let opt2 = document.createElement('option');
+        opt2.value = place;
+        opt2.textContent = place;
+        toSel.appendChild(opt2);
+      });
+    }
+    populateTaxiPlacesSelect();
 
     // Taxi hire modal logic
     const taxiCard = document.getElementById('taxiCard');
@@ -371,19 +467,24 @@
     const taxiShowMapBtn = document.getElementById('taxiShowMapBtn');
     const taxiHideMapBtn = document.getElementById('taxiHideMapBtn');
     const taxiHireMap = document.getElementById('taxiHireMap');
+    const taxiHireMapIframe = document.getElementById('taxiHireMapIframe');
     const taxiHireStatus = document.getElementById('taxiHireStatus');
+
     taxiCard.onclick = () => {
       taxiHireModal.classList.add("show");
       taxiHireMap.classList.remove("show");
-      taxiShowMapBtn.style.display="";
-      taxiHideMapBtn.style.display="none";
+      taxiShowMapBtn.style.display = "";
+      taxiHideMapBtn.style.display = "none";
       taxiHireStatus.textContent = '';
       document.getElementById('taxiPhoneModal').value = '';
-      document.getElementById('taxiHireFrom').value = '';
-      document.getElementById('taxiHireTo').value = '';
+      document.getElementById('taxiHireFrom').selectedIndex = 0;
+      document.getElementById('taxiHireTo').selectedIndex = 0;
       document.querySelector('input[name="taxiHireMode"][value="vehicle"]').checked = true;
+      taxiHireMapIframe.src = 'https://www.google.com/maps?q=Luangwa&output=embed';
     };
+
     taxiHireModalClose.onclick = () => { taxiHireModal.classList.remove("show"); };
+
     window.addEventListener('keydown', function(e) {
       if (e.key === "Escape" && taxiHireModal.classList.contains("show")) {
         taxiHireModal.classList.remove("show");
@@ -392,310 +493,337 @@
         detailsModal.classList.remove("show");
       }
     });
+
     taxiHireModal.addEventListener('mousedown', function(e) {
       if (e.target === taxiHireModal) taxiHireModal.classList.remove("show");
     });
+
     taxiShowMapBtn.onclick = () => {
+      const from = document.getElementById('taxiHireFrom').value;
+      const to = document.getElementById('taxiHireTo').value;
+      if (!from || !to) {
+        taxiHireStatus.textContent = "Please select both pickup and drop-off locations to view the map.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return;
+      }
+      const embedUrl = `https://www.google.com/maps?q=${encodeURIComponent(from + ' to ' + to)}&output=embed`;
+      taxiHireMapIframe.src = embedUrl;
       taxiHireMap.classList.add("show");
       taxiShowMapBtn.style.display = "none";
       taxiHideMapBtn.style.display = "";
     };
+
     taxiHideMapBtn.onclick = () => {
       taxiHireMap.classList.remove("show");
       taxiShowMapBtn.style.display = "";
       taxiHideMapBtn.style.display = "none";
     };
+
     function getSelectedTaxiMode() {
       const radios = document.getElementsByName('taxiHireMode');
       for (let radio of radios) if (radio.checked) return radio.value;
       return "vehicle";
     }
+
     taxiCalcBtn.onclick = () => {
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
+      const from = document.getElementById('taxiHireFrom').value;
+      const to = document.getElementById('taxiHireTo').value;
       const mode = getSelectedTaxiMode();
       if (!from || !to) {
-        taxiHireStatus.textContent = "Please enter both pickup and drop-off locations.";
+        taxiHireStatus.textContent = "Please select both pickup and drop-off locations.";
         taxiHireStatus.className = "taxi-hire-status error";
         return;
       }
-      let dist = findLuangwaDistance(from, to);
+      let dist = findShortestDistance(from, to, segments);
       if (dist === null) {
         taxiHireStatus.textContent = "No known route between selected places.";
         taxiHireStatus.className = "taxi-hire-status error";
         return;
       }
       let cost = mode === "motorbike" ? Math.ceil(dist / 3) * 10 : Math.ceil(dist / 3) * 20;
-      taxiHireStatus.textContent = `Distance: ${dist} km. Fare: ZK ${cost} (${mode === 'vehicle' ? 'Vehicle' : 'Motorbike'})`;
+      taxiHireStatus.textContent = `Distance: ${dist.toFixed(2)} km. Fare: ZK ${cost} (${mode === 'vehicle' ? 'Vehicle' : 'Motorbike'})`;
       taxiHireStatus.className = "taxi-hire-status success";
     };
-    taxiSmsBtn.onclick = () => {
+
+    function validateTaxiInputs() {
       const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const from = document.getElementById('taxiHireFrom').value;
+      const to = document.getElementById('taxiHireTo').value;
+      if (!phone || !/^\d{10}$/.test(phone)) {
+        taxiHireStatus.textContent = "Please enter a valid 10-digit phone number.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return false;
+      }
+      if (!from || !to) {
+        taxiHireStatus.textContent = "Please select both pickup and drop-off locations.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return false;
+      }
+      if (from === to) {
+        taxiHireStatus.textContent = "Pickup and drop-off locations cannot be the same.";
+        taxiHireStatus.className = "taxi-hire-status error";
+        return false;
+      }
+      return { phone, from, to };
+    }
+
+    taxiSmsBtn.onclick = () => {
+      const inputs = validateTaxiInputs();
+      if (!inputs) return;
+      const { phone, from, to } = inputs;
       const mode = getSelectedTaxiMode();
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
-      let dist = findLuangwaDistance(from, to);
+      let dist = findShortestDistance(from, to, segments);
       let cost = (dist === null) ? "N/A" : (mode === "motorbike" ? Math.ceil(dist / 3) * 10 : Math.ceil(dist / 3) * 20);
-      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist ?? "N/A"} km\nFare: ZK ${cost}`;
+      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist !== null ? dist.toFixed(2) : "N/A"} km\nFare: ZK ${cost}`;
       window.open(`sms:+260978167546?body=${encodeURIComponent(msg)}`, "_blank");
       taxiHireStatus.textContent = "Booking sent via SMS!";
       taxiHireStatus.className = "taxi-hire-status success";
     };
+
     taxiWhatsappBtn.onclick = () => {
-      const phone = document.getElementById('taxiPhoneModal').value.trim();
+      const inputs = validateTaxiInputs();
+      if (!inputs) return;
+      const { phone, from, to } = inputs;
       const mode = getSelectedTaxiMode();
-      const from = document.getElementById('taxiHireFrom').value.trim();
-      const to = document.getElementById('taxiHireTo').value.trim();
-      let dist = findLuangwaDistance(from, to);
+      let dist = findShortestDistance(from, to, segments);
       let cost = (dist === null) ? "N/A" : (mode === "motorbike" ? Math.ceil(dist / 3) * 10 : Math.ceil(dist / 3) * 20);
-      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist ?? "N/A"} km\nFare: ZK ${cost}`;
+      const msg = `Taxi Booking:\nMode: ${mode}\nFrom: ${from}\nTo: ${to}\nCustomer: ${phone}\nDistance: ${dist !== null ? dist.toFixed(2) : "N/A"} km\nFare: ZK ${cost}`;
       window.open(`https://wa.me/+260978167546?text=${encodeURIComponent(msg)}`, "_blank");
       taxiHireStatus.textContent = "Booking sent via WhatsApp!";
       taxiHireStatus.className = "taxi-hire-status success";
     };
 
-    // --- Sections and cart logic ---
-    // Demo data for Masampo and B-istore
-    const MASAMPO_VEHICLES = [
+    // --- Masampo Section ---
+    const masampoItems = [
       {
-        id: 1011,
-        name: "Vitz Ndola",
-        price: 90000,
-        location: "Ndola",
-        image: "V1.jpg",
-        category: "vehicle",
-        details: { condition: "For Hire", contact: "0978123456" },
-        additionalImages: ["V1.jpg", "V2.jpg", "V3.jpg", "V4.jpg", "V5.jpg", "V6.jpg"],
-        listedDate: "2025-08-12"
+        id: 1,
+        name: "Toyota Corolla",
+        location: "Luangwa (Feira)",
+        price: 15000,
+        images: [
+          "https://via.placeholder.com/120x82?text=Corolla1",
+          "https://via.placeholder.com/120x82?text=Corolla2",
+          "https://via.placeholder.com/120x82?text=Corolla3"
+        ],
+        description: "2018 model, excellent condition, available for bidding.",
+        contact: "+260978167546"
       },
       {
-        id: 1012,
-        name: "Laptop Lusaka",
-        price: 1200,
-        location: "Lusaka",
-        image: "L1.jpeg",
-        category: "laptop",
-        details: { condition: "11.6-inch, 4 GB RAM", contact: "0978234567" },
-        additionalImages: ["L1.jpeg", "L2.jpeg", "L3.jpeg"],
-        listedDate: "2025-08-12"
-      },
-      {
-        id: 1013,
-        name: "Samsung S24",
-        price: 26000,
-        location: "Lusaka",
-        image: "S241.webp",
-        category: "phone",
-        details: { condition: "For Sale - Negotiable", contact: "0978000003" },
-        additionalImages: ["S241.webp", "S242.webp"],
-        listedDate: "2025-08-12"
+        id: 2,
+        name: "Honda CR-V",
+        location: "Katondwe Mission Hospital",
+        price: 22000,
+        images: [
+          "https://via.placeholder.com/120x82?text=CR-V1",
+          "https://via.placeholder.com/120x82?text=CR-V2"
+        ],
+        description: "2020 model, low mileage, ready for immediate sale.",
+        contact: "+260978167546"
       }
     ];
-    const BISTORE_PRODUCTS = [
-      { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
-      { id: 100, name: "Calculator Casio GX-14", price: 230, image: "GX.jpg", category: "stationary" }
+
+    function populateMasampoSection() {
+      const track = document.getElementById('masampo-slider-track');
+      track.innerHTML = '';
+      masampoItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'vehicle-item';
+        card.innerHTML = `
+          <img src="${item.images[0]}" alt="${item.name}">
+          <h4>${item.name}</h4>
+          <p class="location">${item.location}</p>
+          <p>ZK ${item.price.toLocaleString()}</p>
+          <button onclick="showDetailsModal('masampo', ${item.id})">View Details</button>
+        `;
+        track.appendChild(card);
+      });
+    }
+    populateMasampoSection();
+
+    // --- B-istore Section ---
+    const bistoreItems = [
+      {
+        id: 1,
+        name: "Smartphone",
+        price: 2500,
+        stock: 5,
+        images: [
+          "https://via.placeholder.com/120x82?text=Smartphone1",
+          "https://via.placeholder.com/120x82?text=Smartphone2"
+        ],
+        description: "Latest model smartphone with 128GB storage."
+      },
+      {
+        id: 2,
+        name: "Laptop",
+        price: 8500,
+        stock: 0,
+        images: [
+          "https://via.placeholder.com/120x82?text=Laptop1",
+          "https://via.placeholder.com/120x82?text=Laptop2"
+        ],
+        description: "High-performance laptop, out of stock."
+      },
+      {
+        id: 3,
+        name: "Headphones",
+        price: 500,
+        stock: 10,
+        images: [
+          "https://via.placeholder.com/120x82?text=Headphones1"
+        ],
+        description: "Wireless headphones with noise cancellation."
+      }
     ];
-    let sectionMap = {
-      "taxi": document.getElementById("taxiSliderSection"),
-      "masampo": document.getElementById("masampoSliderSection"),
-      "bistore": document.getElementById("bistoreSliderSection"),
-      "all": null
-    };
-    document.getElementById("categoryFilter").addEventListener("change", function() {
-      let val = this.value;
-      Object.entries(sectionMap).forEach(([key, sec]) => {
-        if (sec) sec.hidden = (val !== "all" && val !== key);
-      });
-    });
-    let filteredMasampo = MASAMPO_VEHICLES.slice();
-    let filteredBistore = BISTORE_PRODUCTS.slice();
-    function updateAllFilters() {
-      const query = searchBox.value.trim().toLowerCase();
-      filteredMasampo = MASAMPO_VEHICLES.filter(v => {
-        const matchQuery = v.name.toLowerCase().includes(query) || (v.category && v.category.toLowerCase().includes(query)) || (v.location && v.location.toLowerCase().includes(query));
-        return matchQuery;
-      });
-      filteredBistore = BISTORE_PRODUCTS.filter(p => {
-        const matchQuery = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
-        return matchQuery;
-      });
-      renderMasampo();
-      renderBistore();
-    }
-    const searchBox = document.getElementById('searchBox');
-    searchBox.addEventListener('input', updateAllFilters);
 
-    function setupSliderButtons(trackId, prevBtnId, nextBtnId) {
-      const sliderTrack = document.getElementById(trackId);
-      document.getElementById(prevBtnId).onclick = () => {
-        sliderTrack.scrollBy({ left: -180, behavior: 'smooth' });
-      };
-      document.getElementById(nextBtnId).onclick = () => {
-        sliderTrack.scrollBy({ left: 180, behavior: 'smooth' });
-      };
-    }
-    setupSliderButtons('taxi-slider-track', 'prevTaxiBtn', 'nextTaxiBtn');
-    setupSliderButtons('masampo-slider-track', 'prevMasampoBtn', 'nextMasampoBtn');
-    setupSliderButtons('bistore-slider-track', 'prevBistoreBtn', 'nextBistoreBtn');
-
-    function renderMasampo() {
-      const masampoSliderTrack = document.getElementById('masampo-slider-track');
-      masampoSliderTrack.innerHTML = '';
-      filteredMasampo.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'vehicle-item';
-        div.tabIndex = 0;
-        div.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/120x82?text=Error';">
+    function populateBistoreSection() {
+      const track = document.getElementById('bistore-slider-track');
+      track.innerHTML = '';
+      bistoreItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product';
+        card.innerHTML = `
+          <img src="${item.images[0]}" alt="${item.name}">
           <h4>${item.name}</h4>
           <p>ZK ${item.price.toLocaleString()}</p>
-          <p class="location">${item.location}</p>
-          <button class="bid-btn" onclick="event.stopPropagation();showDetailsModal('${item.id}');"><i class="fa fa-eye"></i> View</button>
+          ${item.stock > 0 ? '' : '<span class="out-stock">Out of stock</span>'}
+          <button ${item.stock > 0 ? '' : 'disabled'} onclick="addToCart(${item.id})">Add to Cart</button>
         `;
-        div.onclick = () => showDetailsModal(item.id);
-        masampoSliderTrack.appendChild(div);
+        track.appendChild(card);
       });
     }
-    function renderBistore() {
-      const bistoreSliderTrack = document.getElementById('bistore-slider-track');
-      bistoreSliderTrack.innerHTML = '';
-      filteredBistore.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'product';
-        div.tabIndex = 0;
-        let outStock = (p.price <= 0);
-        div.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/120x82?text=Error';">
-          <h4>${p.name}</h4>
-          <p>ZK ${p.price.toFixed(2)}</p>
-          ${outStock ? '<span class="out-stock">Out of Stock</span>' : ''}
-          <button class="bid-btn" onclick="event.stopPropagation();addToCart('${p.id}');"><i class="fa fa-plus"></i> Add</button>
-        `;
-        bistoreSliderTrack.appendChild(div);
-      });
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      renderMasampo();
-      renderBistore();
-      updateCart();
-    });
+    populateBistoreSection();
 
-    function getMasampoItemById(id) {
-      return MASAMPO_VEHICLES.find(item => String(item.id) === String(id));
-    }
-
-    // Cart logic
+    // --- Cart System ---
     let cart = [];
-    const cartItemsEl = document.getElementById('cart-items');
-    const emptyCartEl = document.getElementById('empty-cart');
-    const cartTotalEl = document.getElementById('cart-total');
-    const productsTotalEl = document.getElementById('products-total');
-    const grandTotalEl = document.getElementById('grand-total');
-    const checkoutBtnSms = document.getElementById('checkout-btn-sms');
-    const checkoutBtnWhatsapp = document.getElementById('checkout-btn-whatsapp');
-    const checkoutActions = document.getElementById('checkoutActions');
-    function updateCart() {
-      if (cart.length === 0) {
-        cartItemsEl.innerHTML = '';
-        emptyCartEl.style.display = 'block';
-        cartTotalEl.style.display = 'none';
-        checkoutActions.style.display = 'none';
-      } else {
-        emptyCartEl.style.display = 'none';
-        cartTotalEl.style.display = 'block';
-        checkoutActions.style.display = 'flex';
-        cartItemsEl.innerHTML = '';
-        cart.forEach((item, index) => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="cart-item-info">
-              <img src="${item.item.image}" alt="${item.item.name}" class="cart-thumb" loading="lazy" onerror="this.src='https://via.placeholder.com/36?text=Err';">
-              <span class="cart-item-title">${item.item.name}</span>
-            </div>
-            <div class="cart-price-block">
-              <span style="min-width:60px;">ZK ${(item.item.price * item.quantity).toFixed(2)}</span>
-              <div class="quantity-controls">
-                <button class="quantity-btn decrease" data-index="${index}">-</button>
-                <input type="number" min="1" class="cart-item-qty" data-index="${index}" value="${item.quantity}">
-                <button class="quantity-btn increase" data-index="${index}">+</button>
-                <button class="remove-btn" data-index="${index}"><i class="fa fa-times"></i></button>
-              </div>
-            </div>
-          `;
-          cartItemsEl.appendChild(li);
-        });
-        const productsTotal = cart.reduce((sum, item) => sum + item.item.price * item.quantity, 0);
-        productsTotalEl.textContent = productsTotal.toFixed(2);
-        grandTotalEl.textContent = productsTotal.toFixed(2);
-      }
-    }
-    function addToCart(id) {
-      const item = BISTORE_PRODUCTS.find(p => String(p.id) === String(id));
-      if (item) {
-        const cartItem = cart.find(cartItem => cartItem.item.id === item.id);
-        if (cartItem) { cartItem.quantity += 1; }
-        else { cart.push({ item: item, quantity: 1 }); }
-        updateCart();
-      }
-    }
-    cartItemsEl.addEventListener('click', e => {
-      const button = e.target.closest('button');
-      if (!button) return;
-      const index = parseInt(button.dataset.index, 10);
-      if (button.classList.contains('remove-btn')) {
-        cart.splice(index, 1);
-        updateCart();
-      } else if (button.classList.contains('increase')) {
-        cart[index].quantity += 1;
-        updateCart();
-      } else if (button.classList.contains('decrease')) {
-        cart[index].quantity -= 1;
-        if (cart[index].quantity === 0) {
-          cart.splice(index, 1);
-        }
-        updateCart();
-      }
-    });
-    cartItemsEl.addEventListener('change', e => {
-      const input = e.target;
-      if (input.classList.contains('cart-item-qty')) {
-        let idx = parseInt(input.dataset.index, 10);
-        let qty = parseInt(input.value, 10);
-        if (!isNaN(qty) && qty >= 1) {
-          cart[idx].quantity = qty;
-          updateCart();
+
+    function addToCart(productId) {
+      const product = bistoreItems.find(p => p.id === productId);
+      if (!product || product.stock === 0) return;
+      const cartItem = cart.find(item => item.id === productId);
+      if (cartItem) {
+        if (cartItem.quantity < product.stock) {
+          cartItem.quantity += 1;
         } else {
-          input.value = cart[idx].quantity;
+          showStatusMessage(`Cannot add more ${product.name}. Stock limit reached.`, 'error');
+          return;
         }
+      } else {
+        cart.push({ id: productId, name: product.name, price: product.price, quantity: 1, image: product.images[0] });
       }
-    });
-    checkoutBtnSms.onclick = () => {
+      updateCart();
+      showStatusMessage(`${product.name} added to cart!`, 'success');
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cart-items');
+      const emptyCart = document.getElementById('empty-cart');
+      const cartTotal = document.getElementById('cart-total');
+      const checkoutActions = document.getElementById('checkoutActions');
+      cartItems.innerHTML = '';
       if (cart.length === 0) {
-        alert('Your cart is empty.');
+        emptyCart.style.display = 'block';
+        cartTotal.style.display = 'none';
+        checkoutActions.style.display = 'none';
         return;
       }
-      const msg = cart.map(item => `${item.item.name} x${item.quantity} = ZK ${(item.item.price * item.quantity).toFixed(2)}`).join('\n');
-      window.open(`sms:+260978167546?body=${encodeURIComponent("Order:\n"+msg)}`, "_blank");
-    };
-    checkoutBtnWhatsapp.onclick = () => {
+      emptyCart.style.display = 'none';
+      cartTotal.style.display = 'block';
+      checkoutActions.style.display = 'flex';
+      let total = 0;
+      cart.forEach(item => {
+        const product = bistoreItems.find(p => p.id === item.id);
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="cart-item-info">
+            <img src="${item.image}" class="cart-thumb" alt="${item.name}">
+            <span class="cart-item-title">${item.name}</span>
+          </div>
+          <div class="cart-price-block">
+            <span>ZK ${item.price}</span>
+            <div class="quantity-controls">
+              <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+              <input type="number" class="cart-item-qty" value="${item.quantity}" min="1" max="${product.stock}" onchange="updateQuantity(${item.id}, this.value)">
+              <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+            </div>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">&times;</button>
+          </div>
+        `;
+        cartItems.appendChild(li);
+        total += item.price * item.quantity;
+      });
+      document.getElementById('products-total').textContent = total.toFixed(2);
+      document.getElementById('grand-total').textContent = total.toFixed(2);
+    }
+
+    function updateQuantity(productId, value) {
+      const cartItem = cart.find(item => item.id === productId);
+      const product = bistoreItems.find(p => p.id === productId);
+      let newQuantity = typeof value === 'number' ? cartItem.quantity + value : parseInt(value);
+      if (newQuantity < 1) newQuantity = 1;
+      if (newQuantity > product.stock) {
+        newQuantity = product.stock;
+        showStatusMessage(`Cannot exceed stock limit of ${product.name}.`, 'error');
+      }
+      cartItem.quantity = newQuantity;
+      updateCart();
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      updateCart();
+      showStatusMessage('Item removed from cart.', 'success');
+    }
+
+    function showStatusMessage(message, type) {
+      const statusMessage = document.getElementById('statusMessage');
+      statusMessage.textContent = message;
+      statusMessage.className = `status-message ${type}`;
+      setTimeout(() => { statusMessage.textContent = ''; statusMessage.className = 'status-message'; }, 3000);
+    }
+
+    document.getElementById('checkout-btn-sms').onclick = () => {
       if (cart.length === 0) {
-        alert('Your cart is empty.');
+        showStatusMessage('Your cart is empty. Add items to proceed.', 'error');
         return;
       }
-      const msg = cart.map(item => `${item.item.name} x${item.quantity} = ZK ${(item.item.price * item.quantity).toFixed(2)}`).join('\n');
-      window.open(`https://wa.me/+260978167546?text=${encodeURIComponent("Order:\n"+msg)}`, "_blank");
+      let message = 'Order Details:\n';
+      let total = 0;
+      cart.forEach(item => {
+        message += `${item.name} - ZK ${item.price} x ${item.quantity}\n`;
+        total += item.price * item.quantity;
+      });
+      message += `Total: ZK ${total.toFixed(2)}`;
+      window.open(`sms:+260978167546?body=${encodeURIComponent(message)}`, "_blank");
+      showStatusMessage('Order sent via SMS!', 'success');
     };
 
-    // Masampo Details Modal logic
+    document.getElementById('checkout-btn-whatsapp').onclick = () => {
+      if (cart.length === 0) {
+        showStatusMessage('Your cart is empty. Add items to proceed.', 'error');
+        return;
+      }
+      let message = 'Order Details:\n';
+      let total = 0;
+      cart.forEach(item => {
+        message += `${item.name} - ZK ${item.price} x ${item.quantity}\n`;
+        total += item.price * item.quantity;
+      });
+      message += `Total: ZK ${total.toFixed(2)}`;
+      window.open(`https://wa.me/+260978167546?text=${encodeURIComponent(message)}`, "_blank");
+      showStatusMessage('Order sent via WhatsApp!', 'success');
+    };
+
+    // --- Details Modal ---
     const detailsModal = document.getElementById('detailsModal');
     const detailsModalClose = document.getElementById('detailsModalClose');
     const detailsModalTitle = document.getElementById('detailsModalTitle');
     const detailsModalImg = document.getElementById('detailsModalImg');
-    const detailsModalDetails = document.getElementById('detailsModalDetails');
     const detailsModalImgs = document.getElementById('detailsModalImgs');
     const detailsModalArrows = document.getElementById('detailsModalArrows');
     const detailsModalPrevImg = document.getElementById('detailsModalPrevImg');
     const detailsModalNextImg = document.getElementById('detailsModalNextImg');
+    const detailsModalDetails = document.getElementById('detailsModalDetails');
     const masampoBidBlock = document.getElementById('masampoBidBlock');
     const masampoBidDestLabel = document.getElementById('masampoBidDestLabel');
     const masampoBidValue = document.getElementById('masampoBidValue');
@@ -703,108 +831,201 @@
     const masampoBidSms = document.getElementById('masampoBidSms');
     const masampoBidWhatsapp = document.getElementById('masampoBidWhatsapp');
     const masampoBidStatus = document.getElementById('masampoBidStatus');
-    let currentDetailsImages = [];
-    let currentDetailsIndex = 0;
-    let currentMasampoItem = null;
 
-    window.showDetailsModal = function(id) {
-      const item = getMasampoItemById(id);
+    function showDetailsModal(type, id) {
+      const item = type === 'masampo' ? masampoItems.find(i => i.id === id) : bistoreItems.find(i => i.id === id);
       if (!item) return;
       detailsModalTitle.textContent = item.name;
-      let imgList = Array.isArray(item.additionalImages) && item.additionalImages.length
-        ? item.additionalImages.filter(Boolean)
-        : [item.image];
-      while (imgList.length < 6) imgList.push(item.image);
-      currentDetailsImages = imgList;
-      currentDetailsIndex = 0;
-      detailsModalImg.src = imgList[0] || '';
-      detailsModalImgs.innerHTML = '';
-      imgList.forEach((img, idx) => {
-        const thumb = document.createElement('img');
-        thumb.src = img;
-        thumb.className = idx === 0 ? 'selected' : '';
-        thumb.onclick = () => { selectDetailsImage(idx); };
-        detailsModalImgs.appendChild(thumb);
-      });
-      detailsModalArrows.style.display = imgList.length > 1 ? '' : 'none';
-      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
-      detailsModalNextImg.disabled = currentDetailsIndex === imgList.length - 1;
-      let html = `<div><b>Price:</b> ZK ${item.price.toLocaleString()}</div>`;
-      html += `<div><b>Location:</b> ${item.location}</div>`;
-      html += `<div><b>Condition:</b> ${item.details?.condition || ''}</div>`;
-      html += `<div><b>Contact:</b> ${item.details?.contact || ''}</div>`;
-      html += `<div><b>Listed Since:</b> ${item.listedDate || ''}</div>`;
-      masampoBidBlock.style.display = '';
-      masampoBidValue.value = '';
-      masampoBidPhone.value = '';
-      masampoBidStatus.textContent = '';
-      currentMasampoItem = item;
-      masampoBidDestLabel.textContent = `${getOwnerPhone(item)} (Owner)`;
-      detailsModalDetails.innerHTML = html;
-      detailsModal.classList.add("show");
+      detailsModalImg.src = item.images[0];
+      detailsModalImg.alt = item.name;
+      detailsModalImgs.innerHTML = item.images.map((img, index) => `
+        <img src="${img}" alt="${item.name} ${index + 1}" class="${index === 0 ? 'selected' : ''}" onclick="changeModalImage(${index}, ${JSON.stringify(item.images)})">
+      `).join('');
+      detailsModalDetails.textContent = item.description;
+      detailsModalArrows.style.display = item.images.length > 1 ? 'flex' : 'none';
+      detailsModalPrevImg.disabled = true;
+      detailsModalNextImg.disabled = item.images.length <= 1;
+      let currentImageIndex = 0;
+
+      detailsModalPrevImg.onclick = () => {
+        if (currentImageIndex > 0) {
+          currentImageIndex--;
+          detailsModalImg.src = item.images[currentImageIndex];
+          updateModalImageSelection(currentImageIndex);
+          detailsModalPrevImg.disabled = currentImageIndex === 0;
+          detailsModalNextImg.disabled = false;
+        }
+      };
+
+      detailsModalNextImg.onclick = () => {
+        if (currentImageIndex < item.images.length - 1) {
+          currentImageIndex++;
+          detailsModalImg.src = item.images[currentImageIndex];
+          updateModalImageSelection(currentImageIndex);
+          detailsModalNextImg.disabled = currentImageIndex === item.images.length - 1;
+          detailsModalPrevImg.disabled = false;
+        }
+      };
+
+      if (type === 'masampo') {
+        masampoBidBlock.style.display = 'block';
+        masampoBidDestLabel.textContent = item.contact;
+        masampoBidValue.value = '';
+        masampoBidPhone.value = '';
+        masampoBidStatus.textContent = '';
+      } else {
+        masampoBidBlock.style.display = 'none';
+      }
+
+      detailsModal.classList.add('show');
     }
-    function selectDetailsImage(idx) {
-      currentDetailsIndex = idx;
-      detailsModalImg.src = currentDetailsImages[idx];
-      Array.from(detailsModalImgs.children).forEach((img, i) => {
-        img.className = i === idx ? 'selected' : '';
-      });
-      detailsModalPrevImg.disabled = currentDetailsIndex === 0;
-      detailsModalNextImg.disabled = currentDetailsIndex === currentDetailsImages.length - 1;
+
+    function changeModalImage(index, images) {
+      detailsModalImg.src = images[index];
+      updateModalImageSelection(index);
+      detailsModalPrevImg.disabled = index === 0;
+      detailsModalNextImg.disabled = index === images.length - 1;
     }
-    detailsModalPrevImg.onclick = () => {
-      if (currentDetailsIndex > 0) selectDetailsImage(currentDetailsIndex - 1);
-    };
-    detailsModalNextImg.onclick = () => {
-      if (currentDetailsIndex < currentDetailsImages.length - 1) selectDetailsImage(currentDetailsIndex + 1);
-    };
-    detailsModalClose.onclick = () => { detailsModal.classList.remove("show"); };
+
+    function updateModalImageSelection(index) {
+      const thumbs = detailsModalImgs.querySelectorAll('img');
+      thumbs.forEach((thumb, i) => {
+        thumb.classList.toggle('selected', i === index);
+      });
+    }
+
+    detailsModalClose.onclick = () => { detailsModal.classList.remove('show'); };
     detailsModal.addEventListener('mousedown', function(e) {
-      if (e.target === detailsModal) detailsModal.classList.remove("show");
+      if (e.target === detailsModal) detailsModal.classList.remove('show');
     });
 
-    function validateBidFields() {
-      let bid = parseInt(masampoBidValue.value, 10);
-      let phone = masampoBidPhone.value.trim();
-      if (isNaN(bid) || bid < 1) {
-        masampoBidStatus.textContent = "Please enter a valid bid value.";
-        masampoBidStatus.className = "bid-status error";
+    function validateBidInputs() {
+      const bidValue = masampoBidValue.value.trim();
+      const phone = masampoBidPhone.value.trim();
+      if (!bidValue || isNaN(bidValue) || bidValue <= 0) {
+        masampoBidStatus.textContent = 'Please enter a valid bid value.';
+        masampoBidStatus.className = 'bid-status error';
         return false;
       }
-      if (!/^0[0-9]{9}$/.test(phone)) {
-        masampoBidStatus.textContent = "Please enter a valid phone number (e.g. 0978000000).";
-        masampoBidStatus.className = "bid-status error";
+      if (!phone || !/^\d{10}$/.test(phone)) {
+        masampoBidStatus.textContent = 'Please enter a valid 10-digit phone number.';
+        masampoBidStatus.className = 'bid-status error';
         return false;
       }
-      return true;
+      return { bidValue, phone };
     }
-    function getOwnerPhone(item) {
-      let phone = (item.details && item.details.contact) ? item.details.contact : "";
-      if (!/^0[0-9]{9}$/.test(phone)) return "0978167546";
-      return phone;
-    }
+
     masampoBidSms.onclick = () => {
-      if (!currentMasampoItem) return;
-      if (!validateBidFields()) return;
-      let bid = masampoBidValue.value.trim();
-      let phone = masampoBidPhone.value.trim();
-      let ownerPhone = getOwnerPhone(currentMasampoItem);
-      const msg = `Bid/Order for ${currentMasampoItem.name}: ZK ${bid}\nYour Phone: ${phone}`;
-      window.open(`sms:+260${ownerPhone.replace(/^0/, '')}?body=${encodeURIComponent(msg)}`, "_blank");
-      masampoBidStatus.textContent = "Bid/Order sent via SMS!";
-      masampoBidStatus.className = "bid-status success";
+      const inputs = validateBidInputs();
+      if (!inputs) return;
+      const { bidValue, phone } = inputs;
+      const item = masampoItems.find(i => i.name === detailsModalTitle.textContent);
+      const message = `Bid for ${item.name}:\nBid Value: ZK ${bidValue}\nCustomer Phone: ${phone}\nLocation: ${item.location}`;
+      window.open(`sms:${item.contact}?body=${encodeURIComponent(message)}`, "_blank");
+      masampoBidStatus.textContent = 'Bid sent via SMS!';
+      masampoBidStatus.className = 'bid-status success';
     };
+
     masampoBidWhatsapp.onclick = () => {
-      if (!currentMasampoItem) return;
-      if (!validateBidFields()) return;
-      let bid = masampoBidValue.value.trim();
-      let phone = masampoBidPhone.value.trim();
-      let ownerPhone = getOwnerPhone(currentMasampoItem);
-      const msg = `Bid/Order for ${currentMasampoItem.name}: ZK ${bid}\nYour Phone: ${phone}`;
-      window.open(`https://wa.me/+260${ownerPhone.replace(/^0/, '')}?text=${encodeURIComponent(msg)}`, "_blank");
-      masampoBidStatus.textContent = "Bid/Order sent via WhatsApp!";
-      masampoBidStatus.className = "bid-status success";
+      const inputs = validateBidInputs();
+      if (!inputs) return;
+      const { bidValue, phone } = inputs;
+      const item = masampoItems.find(i => i.name === detailsModalTitle.textContent);
+      const message = `Bid for ${item.name}:\nBid Value: ZK ${bidValue}\nCustomer Phone: ${phone}\nLocation: ${item.location}`;
+      window.open(`https://wa.me/${item.contact}?text=${encodeURIComponent(message)}`, "_blank");
+      masampoBidStatus.textContent = 'Bid sent via WhatsApp!';
+      masampoBidStatus.className = 'bid-status success';
     };
+
+    // --- Slider Navigation ---
+    function setupSlider(sectionId, prevBtnId, nextBtnId, trackId) {
+      const prevBtn = document.getElementById(prevBtnId);
+      const nextBtn = document.getElementById(nextBtnId);
+      const track = document.getElementById(trackId);
+
+      function updateButtons() {
+        const scrollLeft = track.scrollLeft;
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        prevBtn.disabled = scrollLeft <= 0;
+        nextBtn.disabled = scrollLeft >= maxScroll - 1;
+      }
+
+      prevBtn.onclick = () => {
+        track.scrollBy({ left: -270, behavior: 'smooth' });
+        setTimeout(updateButtons, 300);
+      };
+
+      nextBtn.onclick = () => {
+        track.scrollBy({ left: 270, behavior: 'smooth' });
+        setTimeout(updateButtons, 300);
+      };
+
+      track.addEventListener('scroll', updateButtons);
+      updateButtons();
+    }
+
+    setupSlider('taxiSliderSection', 'prevTaxiBtn', 'nextTaxiBtn', 'taxi-slider-track');
+    setupSlider('masampoSliderSection', 'prevMasampoBtn', 'nextMasampoBtn', 'masampo-slider-track');
+    setupSlider('bistoreSliderSection', 'prevBistoreBtn', 'nextBistoreBtn', 'bistore-slider-track');
+
+    // --- Filter and Search ---
+    const categoryFilter = document.getElementById('categoryFilter');
+    const searchBox = document.getElementById('searchBox');
+
+    function filterSections() {
+      const category = categoryFilter.value;
+      const search = searchBox.value.toLowerCase();
+      const sections = {
+        'all': ['taxiSliderSection', 'masampoSliderSection', 'bistoreSliderSection'],
+        'taxi': ['taxiSliderSection'],
+        'masampo': ['masampoSliderSection'],
+        'bistore': ['bistoreSliderSection']
+      };
+
+      document.getElementById('taxiSliderSection').style.display = sections[category].includes('taxiSliderSection') ? 'block' : 'none';
+      document.getElementById('masampoSliderSection').style.display = sections[category].includes('masampoSliderSection') ? 'block' : 'none';
+      document.getElementById('bistoreSliderSection').style.display = sections[category].includes('bistoreSliderSection') ? 'block' : 'none';
+
+      const masampoTrack = document.getElementById('masampo-slider-track');
+      masampoTrack.innerHTML = '';
+      masampoItems
+        .filter(item => item.name.toLowerCase().includes(search) || item.location.toLowerCase().includes(search))
+        .forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'vehicle-item';
+          card.innerHTML = `
+            <img src="${item.images[0]}" alt="${item.name}">
+            <h4>${item.name}</h4>
+            <p class="location">${item.location}</p>
+            <p>ZK ${item.price.toLocaleString()}</p>
+            <button onclick="showDetailsModal('masampo', ${item.id})">View Details</button>
+          `;
+          masampoTrack.appendChild(card);
+        });
+
+      const bistoreTrack = document.getElementById('bistore-slider-track');
+      bistoreTrack.innerHTML = '';
+      bistoreItems
+        .filter(item => item.name.toLowerCase().includes(search) || item.description.toLowerCase().includes(search))
+        .forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'product';
+          card.innerHTML = `
+            <img src="${item.images[0]}" alt="${item.name}">
+            <h4>${item.name}</h4>
+            <p>ZK ${item.price.toLocaleString()}</p>
+            ${item.stock > 0 ? '' : '<span class="out-stock">Out of stock</span>'}
+            <button ${item.stock > 0 ? '' : 'disabled'} onclick="addToCart(${item.id})">Add to Cart</button>
+          `;
+          bistoreTrack.appendChild(card);
+        });
+
+      setupSlider('masampoSliderSection', 'prevMasampoBtn', 'nextMasampoBtn', 'masampo-slider-track');
+      setupSlider('bistoreSliderSection', 'prevBistoreBtn', 'nextBistoreBtn', 'bistore-slider-track');
+    }
+
+    categoryFilter.onchange = filterSections;
+    searchBox.oninput = filterSections;
   </script>
 </body>
 </html>
