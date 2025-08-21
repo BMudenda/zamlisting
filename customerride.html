@@ -17,9 +17,25 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Roboto', Arial, sans-serif; background-color: #f5f5f5; color: #333; }
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #ff9900;
+      --success-color: #1aaf5d;
+      --whatsapp-color: #25d366;
+      --fail-color: #dc2626;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --bg-color-input: #f5f7fa;
+      --border-color-light: #ccc;
+      --border-color-blue: #2563eb;
+      --box-shadow-light: 0 2px 5px rgba(0,0,0,0.1);
+      --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
+      --font-color-dark: #333;
+      --font-color-medium: #2d3a4a;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
     header {
-      background: #333; color: white; padding: 20px; text-align: left;
+      background: var(--font-color-dark); color: white; padding: 20px; text-align: left;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .header-content {
@@ -27,7 +43,7 @@
       justify-content: space-between; align-items: center; gap: 15px;
     }
     .company-info { flex: 1 1 60%; }
-    .company-info h2 { font-size: 1.4rem; color: #ff9900; }
+    .company-info h2 { font-size: 1.4rem; color: var(--secondary-color); }
     .company-info ul { list-style: none; margin-top: 8px; }
     .company-info li { margin-bottom: 5px; font-size: 0.95rem; }
     .price-tag {
@@ -42,49 +58,37 @@
     .booking-section { flex: 1 1 35%; min-width: 300px; }
     .map-container {
       background: white; border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;
+      box-shadow: var(--box-shadow-light); overflow: hidden;
       height: 400px; display: none;
     }
     #google-map-frame {
       width: 100%; height: 100%; border: none; border-radius: 8px;
     }
     .booking-container {
-      background: white; border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background: var(--bg-color-card); border-radius: 8px;
+      box-shadow: var(--box-shadow-strong);
       padding: 20px;
     }
     .inputs-wrapper { display: flex; flex-direction: column; gap: 15px; margin: 15px 0; }
     .input-group {
-      position: relative; background: #f5f7fa; border-radius: 5px;
+      position: relative; background: var(--bg-color-input); border-radius: 5px;
       padding: 10px 10px 10px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .input-group label {
-      font-weight: bold; color: #2563eb; font-size: 0.9rem;
+      font-weight: bold; color: var(--primary-color); font-size: 0.9rem;
       margin-bottom: 5px; display: block;
     }
     .input-group .material-icons.input-icon {
       position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-      color: #2563eb; font-size: 20px; opacity: 0.85;
+      color: var(--primary-color); font-size: 20px; opacity: 0.85;
     }
-    .autocomplete-wrapper { position: relative; }
     input, select {
       width: 100%; padding: 10px; font-size: 1rem; border-radius: 5px;
-      border: 1px solid #ccc; transition: border 0.2s, box-shadow 0.2s;
+      border: 1px solid var(--border-color-light); transition: border 0.2s, box-shadow 0.2s;
+      background-color: transparent;
     }
     input:focus, select:focus {
-      border: 1px solid #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
-    }
-    .autocomplete-list {
-      position: absolute; background: white; border: 1px solid #ccc;
-      max-height: 150px; overflow-y: auto; z-index: 1000; width: 100%;
-      border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .autocomplete-item {
-      padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
-      font-size: 0.95rem; transition: background 0.2s;
-    }
-    .autocomplete-item:hover, .autocomplete-item.active {
-      background-color: #f0f6ff; color: #2563eb;
+      border: 1px solid var(--border-color-blue); box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
     }
     .mode-group {
       display: flex; gap: 10px; flex-wrap: wrap;
@@ -95,11 +99,11 @@
     }
     .mode-radio input { width: auto; margin-right: 5px; }
     .summary-table-section {
-      margin-top: 20px; padding: 15px; background: white;
-      border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-top: 20px; padding: 15px; background: var(--bg-color-card);
+      border-radius: 8px; box-shadow: var(--box-shadow-light);
     }
     .section-title {
-      font-weight: bold; color: #2563eb; font-size: 1.1rem;
+      font-weight: bold; color: var(--primary-color); font-size: 1.1rem;
       margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
     }
     .summary-table-wrapper { overflow-x: auto; }
@@ -113,7 +117,7 @@
     table.summary-table th {
       background-color: #e7f0fe; color: #222; font-weight: bold;
     }
-    table.summary-table td { color: #2d3a4a; font-weight: 500; }
+    table.summary-table td { color: var(--font-color-medium); font-weight: 500; }
     .summary-actions-row {
       display: flex; gap: 15px; justify-content: center; margin: 10px 0; align-items: center;
       flex-wrap: wrap;
@@ -122,7 +126,7 @@
       display: flex; align-items: center; gap: 5px;
     }
     .button-label {
-      font-size: 0.95rem; color: #333; font-weight: 500;
+      font-size: 0.95rem; color: var(--font-color-dark); font-weight: 500;
     }
     .fa {
       padding: 10px;
@@ -139,20 +143,22 @@
       align-items: center;
       justify-content: center;
     }
-    .fa-calculator { background: #2563eb; }
-    .fa-map { background: #2563eb; }
-    .fa-whatsapp { background: #25d366; }
-    .fa-comment { background: #ff9800; }
+    .fa-calculator { background: var(--primary-color); }
+    .fa-map { background: var(--primary-color); }
+    .fa-whatsapp { background: var(--whatsapp-color); }
+    .fa-comment { background: var(--secondary-color); }
+    .fa-share-alt { background: #3498db; }
     .calculate-btn:hover { background: #174ea6; }
     .map-btn:hover { background: #174ea6; }
-    .whatsapp-btn:hover { background: #25d366; }
+    .whatsapp-btn:hover { background: var(--whatsapp-color); }
     .sms-btn:hover { background: #ff9800; }
+    .fa-share-alt:hover { background: #2980b9; }
     .calculate-btn[disabled], .map-btn[disabled], .whatsapp-btn[disabled], .sms-btn[disabled] {
       opacity: 0.5;
       cursor: not-allowed;
     }
     .loader {
-      display: none; width: 20px; height: 20px; border: 3px solid #2563eb;
+      display: none; width: 20px; height: 20px; border: 3px solid var(--primary-color);
       border-radius: 50%; border-top: 3px solid #e5e7eb;
       animation: spin 1s linear infinite; margin: 10px auto;
     }
@@ -161,9 +167,15 @@
       display: flex; align-items: center; gap: 5px; margin-top: 10px;
       justify-content: center; font-weight: 500;
     }
-    .submit-status.success { color: #1aaf5d; }
-    .submit-status.failed { color: #dc2626; }
+    .submit-status.success { color: var(--success-color); }
+    .submit-status.failed { color: var(--fail-color); }
     .material-icons { font-size: 20px; vertical-align: middle; }
+    .share-options {
+      display: none;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -196,11 +208,11 @@
             <label for="mode-of-transport">Preferred Mode</label>
             <div class="mode-group" id="mode-group">
               <label class="mode-radio">
-                <input type="radio" name="mode" value="vehicle" id="mode-vehicle" onchange="handleModeChange();handleCustomerPhoneInput();">
+                <input type="radio" name="mode" value="vehicle" id="mode-vehicle">
                 <span class="material-icons">directions_car</span>Vehicle
               </label>
               <label class="mode-radio">
-                <input type="radio" name="mode" value="motorbike" id="mode-motorbike" onchange="handleModeChange();handleCustomerPhoneInput();">
+                <input type="radio" name="mode" value="motorbike" id="mode-motorbike">
                 <span class="material-icons">two_wheeler</span>Motorbike
               </label>
             </div>
@@ -212,7 +224,6 @@
               type="tel"
               id="customer-phone"
               maxlength="10"
-              pattern="^0[0-9]{9}$"
               placeholder="0XXXXXXXXX"
               autocomplete="off"
               inputmode="numeric"
@@ -221,18 +232,12 @@
           <div class="input-group">
             <span class="material-icons input-icon">place</span>
             <label for="gm-origin">From</label>
-            <div class="autocomplete-wrapper">
-              <input type="text" id="gm-origin" autocomplete="off" placeholder="Enter starting point" oninput="showSuggestions(this, 'gm-origin')" aria-label="Origin">
-              <div id="gm-origin-list" class="autocomplete-list"></div>
-            </div>
+            <select id="gm-origin"></select>
           </div>
           <div class="input-group">
             <span class="material-icons input-icon">flag</span>
             <label for="gm-destination">To</label>
-            <div class="autocomplete-wrapper">
-              <input type="text" id="gm-destination" autocomplete="off" placeholder="Enter destination" oninput="showSuggestions(this, 'gm-destination')" aria-label="Destination">
-              <div id="gm-destination-list" class="autocomplete-list"></div>
-            </div>
+            <select id="gm-destination"></select>
           </div>
         </div>
         <div class="summary-table-section">
@@ -245,31 +250,74 @@
           </div>
           <div class="summary-actions-row">
             <div class="button-wrapper">
-              <a href="#" class="calculate-btn fa fa-calculator" title="Calculate" onclick="updateSummaryTable(); return false;"></a>
+              <a href="#" class="calculate-btn fa fa-calculator" title="Calculate" id="calculate-btn"></a>
               <span class="button-label">Calculate</span>
             </div>
             <div class="button-wrapper">
-              <a href="#" class="sms-btn fa fa-comment" title="SMS" onclick="submitTripDetails('sms'); return false;" disabled></a>
-              <span class="button-label">SMS</span>
-            </div>
-            <div class="button-wrapper">
-              <a href="#" class="whatsapp-btn fa fa-whatsapp" title="WhatsApp" onclick="submitTripDetails('whatsapp'); return false;" disabled></a>
-              <span class="button-label">WhatsApp</span>
-            </div>
-            <div class="button-wrapper">
-              <a href="#" class="map-btn fa fa-map" id="map-btn" title="Show Map" onclick="toggleMap(); return false;"></a>
+              <a href="#" class="map-btn fa fa-map" id="map-btn" title="Show Map"></a>
               <span class="button-label" id="map-btn-label">Show Map</span>
             </div>
           </div>
           <div id="submit-status" class="submit-status"></div>
           <div id="loader" class="loader"></div>
+          
+          <div class="share-link-section">
+              <div class="section-title" style="justify-content: center;">
+                  <span class="material-icons">share</span>
+                  Share Trip
+              </div>
+              <div class="summary-actions-row">
+                <a href="#" class="fa fa-share-alt" title="Share Trip Details" id="share-trip-btn"></a>
+              </div>
+              <div class="share-options" id="share-options-container">
+                <div class="button-wrapper">
+                  <a href="#" class="sms-btn fa fa-comment" title="Share via SMS" id="share-sms-btn"></a>
+                  <span class="button-label">SMS</span>
+                </div>
+                <div class="button-wrapper">
+                  <a href="#" class="whatsapp-btn fa fa-whatsapp" title="Share via WhatsApp" id="share-whatsapp-btn"></a>
+                  <span class="button-label">WhatsApp</span>
+                </div>
+              </div>
+          </div>
         </div>
+        
+        <div class="share-link-section">
+            <div class="section-title" style="justify-content: center;">
+                <span class="material-icons">link</span>
+                Share Link
+            </div>
+            <div class="summary-actions-row">
+              <a href="#" class="fa fa-share-alt" title="Share Link" id="share-page-btn"></a>
+            </div>
+            <div class="share-options" id="share-page-options-container">
+              <div class="button-wrapper">
+                <a href="#" class="sms-btn fa fa-comment" title="Share via SMS" id="share-page-sms-btn"></a>
+                <span class="button-label">SMS</span>
+              </div>
+              <div class="button-wrapper">
+                <a href="#" class="whatsapp-btn fa fa-whatsapp" title="Share via WhatsApp" id="share-page-whatsapp-btn"></a>
+                <span class="button-label">WhatsApp</span>
+              </div>
+            </div>
+        </div>
+
       </div>
     </section>
   </main>
 
   <script>
-    // Places and Segments
+    // Data and Configuration
+    const config = {
+      smsNumber: '0978167546',
+      whatsappNumber: '+260978167546',
+      vehiclePricePer3Km: 20,
+      motorbikePricePer3Km: 10,
+      avgSpeed: 60,
+      googleMapsBaseUrl: 'http://googleusercontent.com/maps.google.com/8',
+      shareLinkUrl: 'https://zamlisting.com/taxi'
+    };
+
     const places = [
       "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche",
       "Kakaro Primary School", "Makichilo Lodge", "Gerasmos Safari Lodge",
@@ -337,6 +385,48 @@
       { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
     ];
 
+    // DOM Elements
+    const originSelect = document.getElementById('gm-origin');
+    const destinationSelect = document.getElementById('gm-destination');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const mapBtn = document.getElementById('map-btn');
+    const mapBtnLabel = document.getElementById('map-btn-label');
+    const mapContainer = document.getElementById('mapContainer');
+    const summaryTableContainer = document.getElementById('summary-table-container');
+    const submitStatusDiv = document.getElementById('submit-status');
+    const loader = document.getElementById('loader');
+    
+    // Trip Share Elements
+    const shareTripBtn = document.getElementById('share-trip-btn');
+    const shareOptionsContainer = document.getElementById('share-options-container');
+    const shareSmsBtn = document.getElementById('share-sms-btn');
+    const shareWhatsappBtn = document.getElementById('share-whatsapp-btn');
+    
+    // Page Share Elements
+    const sharePageBtn = document.getElementById('share-page-btn');
+    const sharePageOptionsContainer = document.getElementById('share-page-options-container');
+    const sharePageSmsBtn = document.getElementById('share-page-sms-btn');
+    const sharePageWhatsappBtn = document.getElementById('share-page-whatsapp-btn');
+
+    let summaryData = null;
+
+    // Populate dropdowns on page load
+    function populateDropdowns() {
+      const sortedPlaces = places.slice().sort();
+      sortedPlaces.forEach(place => {
+        const option1 = document.createElement('option');
+        option1.value = place;
+        option1.textContent = place;
+        originSelect.appendChild(option1);
+
+        const option2 = document.createElement('option');
+        option2.value = place;
+        option2.textContent = place;
+        destinationSelect.appendChild(option2);
+      });
+    }
+
+    // Graph Functions (Dijkstra-like algorithm)
     function buildGraph(segments) {
       const graph = {};
       segments.forEach(seg => {
@@ -372,133 +462,87 @@
       return null;
     }
 
-    window.onload = function() {
-      document.getElementById('mode-group-wrapper').style.display = '';
-      document.getElementById('customer-phone-wrapper').style.display = '';
-      document.getElementById('mapContainer').style.display = 'none';
-    };
-
-    function handleModeChange() {}
-    function handleCustomerPhoneInput() {
-      document.getElementById('customer-phone-wrapper').style.display = '';
-    }
-
-    function showSuggestions(input, field) {
-      const listId = field + '-list';
-      const list = document.getElementById(listId);
-      const value = input.value;
-      list.innerHTML = '';
-      if (!value) return;
-      const filtered = places.filter(place => place.toLowerCase().includes(value.trim().toLowerCase()));
-      filtered.forEach(place => {
-        const item = document.createElement('div');
-        item.classList.add('autocomplete-item');
-        item.textContent = place;
-        item.onclick = () => { input.value = place; list.innerHTML = ''; };
-        list.appendChild(item);
-      });
-    }
-
-    function toggleMap() {
-      const origin = document.getElementById('gm-origin').value.trim();
-      const destination = document.getElementById('gm-destination').value.trim();
-      const frame = document.getElementById('google-map-frame');
-      const mapBtn = document.getElementById('map-btn');
-      const mapBtnLabel = document.getElementById('map-btn-label');
-      const mapContainer = document.getElementById('mapContainer');
-      if (mapContainer.style.display === 'none' || mapContainer.style.display === '') {
-        if (!origin || !destination) {
-          alert('Please enter both origin and destination.');
-          return;
-        }
-        const embedUrl = `https://www.google.com/maps?q=${encodeURIComponent(origin + ' to ' + destination)}&output=embed`;
-        frame.src = embedUrl;
-        mapContainer.style.display = 'block';
-        mapBtn.title = 'Hide Map';
-        mapBtnLabel.textContent = 'Hide Map';
-        mapBtn.setAttribute('aria-pressed', 'true');
-        mapContainer.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        mapContainer.style.display = 'none';
-        mapBtn.title = 'Show Map';
-        mapBtnLabel.textContent = 'Show Map';
-        mapBtn.setAttribute('aria-pressed', 'false');
-      }
-    }
-
-    let summaryData = null;
-
+    // Event Handlers
     function updateSummaryTable() {
-      const origin = document.getElementById('gm-origin').value.trim();
-      const destination = document.getElementById('gm-destination').value.trim();
-      const container = document.getElementById('summary-table-container');
-      const submitButtons = document.querySelectorAll('.sms-btn, .whatsapp-btn');
-      let mode = '';
-      let pricePer3Km = 20;
-      let customerPhone = '';
-      let distance = null;
-      distance = findShortestDistance(origin, destination, segments);
-      if (distance === null || isNaN(distance)) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter both origin and destination from the supported list, and ensure a route exists between them.</div>';
-        submitButtons.forEach(btn => btn.disabled = true);
-        summaryData = null;
-        return;
+      const origin = originSelect.value;
+      const destination = destinationSelect.value;
+      const customerPhone = document.getElementById('customer-phone').value.trim();
+
+      // Reset state
+      summaryTableContainer.innerHTML = '';
+      shareOptionsContainer.style.display = 'none';
+      summaryData = null;
+      submitStatusDiv.innerHTML = '';
+
+      // Validation
+      if (origin === destination) {
+        displayStatus('Please select different origin and destination points.', 'failed');
+        return false;
       }
-      const v = document.getElementById('mode-vehicle').checked;
-      const m = document.getElementById('mode-motorbike').checked;
-      if (!v && !m) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please select a mode of transport above.</div>';
-        submitButtons.forEach(btn => btn.disabled = true);
-        summaryData = null;
-        return;
-      }
-      if (v) { mode = 'Vehicle'; pricePer3Km = 20; }
-      else if (m) { mode = 'Motorbike'; pricePer3Km = 10; }
-      customerPhone = document.getElementById('customer-phone').value.trim();
+      
       if (!customerPhone.match(/^0[0-9]{9}$/)) {
-        container.innerHTML = '<div style="color:red;margin-top:10px;">Please enter a valid phone number in the format 0978167546.</div>';
-        submitButtons.forEach(btn => btn.disabled = true);
-        summaryData = null;
-        return;
+        displayStatus('Please enter a valid phone number in the format 0978167546.', 'failed');
+        return false;
       }
-      const avgSpeed = 60;
-      const timeHours = distance / avgSpeed;
+
+      const vehicleRadio = document.getElementById('mode-vehicle');
+      const motorbikeRadio = document.getElementById('mode-motorbike');
+      if (!vehicleRadio.checked && !motorbikeRadio.checked) {
+        displayStatus('Please select a mode of transport.', 'failed');
+        return false;
+      }
+
+      const mode = vehicleRadio.checked ? 'Vehicle' : 'Motorbike';
+      const pricePer3Km = vehicleRadio.checked ? config.vehiclePricePer3Km : config.motorbikePricePer3Km;
+
+      const distance = findShortestDistance(origin, destination, segments);
+      if (distance === null || isNaN(distance)) {
+        displayStatus('A route could not be found between the selected places.', 'failed');
+        return false;
+      }
+
+      const timeHours = distance / config.avgSpeed;
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
-      let price = Math.ceil(distance / 3) * pricePer3Km;
+      const price = Math.ceil(distance / 3) * pricePer3Km;
       let timeText = '';
       if (wholeHours > 0) {
-        timeText += wholeHours + ' hr';
-        if (minutes > 0) timeText += ' ' + minutes + ' min';
+        timeText += `${wholeHours} hr`;
+        if (minutes > 0) timeText += ` ${minutes} min`;
       } else {
-        timeText += minutes + ' min';
+        timeText += `${minutes} min`;
       }
-      let tableHeader = `
-        <tr>
-          <th>Mode</th>
-          <th>Phone</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Distance (km)</th>
-          <th>Time</th>
-          <th>Price (K)</th>
-        </tr>`;
-      let tableRow = `
-        <tr>
-          <td>${mode}</td>
-          <td>${customerPhone}</td>
-          <td>${origin}</td>
-          <td>${destination}</td>
-          <td>${distance.toFixed(2)}</td>
-          <td>${timeText}</td>
-          <td><b>K${price}</b></td>
-        </tr>`;
-      container.innerHTML = `
+      
+      // Update UI with summary data
+      const tableHTML = `
         <table class="summary-table">
-          ${tableHeader}
-          ${tableRow}
+          <thead>
+            <tr>
+              <th>Mode</th>
+              <th>Phone</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Distance (km)</th>
+              <th>Time</th>
+              <th>Price (K)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${mode}</td>
+              <td>${customerPhone}</td>
+              <td>${origin}</td>
+              <td>${destination}</td>
+              <td>${distance.toFixed(2)}</td>
+              <td>${timeText}</td>
+              <td><b>K${price}</b></td>
+            </tr>
+          </tbody>
         </table>
       `;
+      summaryTableContainer.innerHTML = tableHTML;
+      
+      // Store summary data
       summaryData = {
         preferredMode: mode,
         phone: customerPhone,
@@ -508,50 +552,121 @@
         estimatedTime: timeText,
         price: price
       };
-      submitButtons.forEach(btn => btn.disabled = false);
-      document.getElementById('submit-status').innerHTML = '';
-    }
 
-    function submitTripDetails(method) {
-      const statusDiv = document.getElementById('submit-status');
-      const submitButtons = document.querySelectorAll('.sms-btn, .whatsapp-btn');
-      const loader = document.getElementById('loader');
+      displayStatus('Trip details calculated. Click the share button to send your request.', 'success');
+
+      return true;
+    }
+    
+    function toggleTripShareOptions() {
       if (!summaryData) {
-        statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>No data to submit.</span>';
+        displayStatus('No trip details to share. Please calculate the trip first.', 'failed');
         return;
       }
-      let requiredFields = ['from', 'to', 'distance', 'estimatedTime', 'price', 'phone', 'preferredMode'];
-      for (const key of requiredFields) {
-        if (!summaryData[key] || summaryData[key].toString().trim() === '') {
-          statusDiv.innerHTML = '<span class="submit-status failed"><span class="material-icons">error</span>Missing required field: ' + key + '</span>';
+      
+      if (shareOptionsContainer.style.display === 'flex') {
+        shareOptionsContainer.style.display = 'none';
+        submitStatusDiv.innerHTML = '';
+      } else {
+        shareOptionsContainer.style.display = 'flex';
+        displayStatus('Click a button to share trip details!', 'success');
+      }
+    }
+    
+    function togglePageShareOptions() {
+      if (sharePageOptionsContainer.style.display === 'flex') {
+        sharePageOptionsContainer.style.display = 'none';
+        submitStatusDiv.innerHTML = '';
+      } else {
+        sharePageOptionsContainer.style.display = 'flex';
+        displayStatus('Click a button to share the link!', 'success');
+      }
+    }
+
+    function toggleMap() {
+      const origin = originSelect.value;
+      const destination = destinationSelect.value;
+      const frame = document.getElementById('google-map-frame');
+
+      if (mapContainer.style.display === 'none' || mapContainer.style.display === '') {
+        if (!origin || !destination) {
+          alert('Please select both origin and destination.');
           return;
         }
+        const mapUrl = `${config.googleMapsBaseUrl}${encodeURIComponent(origin + ' to ' + destination)}&output=embed`;
+        frame.src = mapUrl;
+        mapContainer.style.display = 'block';
+        mapBtnLabel.textContent = 'Hide Map';
+        mapBtn.title = 'Hide Map';
+        mapContainer.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        mapContainer.style.display = 'none';
+        mapBtnLabel.textContent = 'Show Map';
+        mapBtn.title = 'Show Map';
       }
-      submitButtons.forEach(btn => btn.disabled = true);
-      loader.style.display = 'inline-block';
-      statusDiv.innerHTML = '';
+    }
 
+    function shareTripDetails(method) {
+      if (!summaryData) {
+        displayStatus('No trip details to share. Please calculate the trip first.', 'failed');
+        return;
+      }
+      
       const tripDetails = `Trip: ${summaryData.from} to ${summaryData.to}, Mode: ${summaryData.preferredMode}, Phone: ${summaryData.phone}, Distance: ${summaryData.distance}km, Time: ${summaryData.estimatedTime}, Price: K${summaryData.price}`;
+      
+      loader.style.display = 'inline-block';
 
       if (method === 'sms') {
-        const smsNumber = '0978167546';
-        const smsUrl = `sms:${smsNumber}?body=${encodeURIComponent(tripDetails)}`;
-        window.location.href = smsUrl;
-        statusDiv.innerHTML = '<span class="submit-status success">💬 SMS app opened with trip details!</span>';
+        window.location.href = `sms:${config.smsNumber}?body=${encodeURIComponent(tripDetails)}`;
       } else if (method === 'whatsapp') {
-        const whatsappNumber = '+260978167546';
-        const encodedMessage = encodeURIComponent(tripDetails);
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
-        window.open(whatsappUrl, '_blank');
-        statusDiv.innerHTML = '<span class="submit-status success">🟢 WhatsApp opened with trip details!</span>';
+        window.open(`https://api.whatsapp.com/send?phone=${config.whatsappNumber}&text=${encodeURIComponent(tripDetails)}`, '_blank');
       }
 
       loader.style.display = 'none';
+      displayStatus(`Trip details sent via ${method.toUpperCase()}!`, 'success');
+      
       setTimeout(() => {
-        statusDiv.innerHTML = '';
-        submitButtons.forEach(btn => btn.disabled = false);
+        submitStatusDiv.innerHTML = '';
+        shareOptionsContainer.style.display = 'none';
       }, 3000);
     }
+    
+    function sharePageLink(method) {
+      const message = `Check out ZamTaxi to book your next ride: ${config.shareLinkUrl}`;
+
+      if (method === 'sms') {
+        window.location.href = `sms:?body=${encodeURIComponent(message)}`;
+      } else if (method === 'whatsapp') {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+      }
+      
+      displayStatus(`Page link shared via ${method.toUpperCase()}!`, 'success');
+      setTimeout(() => {
+        submitStatusDiv.innerHTML = '';
+        sharePageOptionsContainer.style.display = 'none';
+      }, 3000);
+    }
+    
+    function displayStatus(message, type) {
+      submitStatusDiv.className = `submit-status ${type}`;
+      let icon = type === 'success' ? 'check_circle' : 'error';
+      submitStatusDiv.innerHTML = `<span class="material-icons">${icon}</span>${message}`;
+    }
+
+    // Initializers and Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      populateDropdowns();
+      calculateBtn.addEventListener('click', updateSummaryTable);
+      mapBtn.addEventListener('click', toggleMap);
+      
+      shareTripBtn.addEventListener('click', toggleTripShareOptions);
+      shareSmsBtn.addEventListener('click', () => shareTripDetails('sms'));
+      shareWhatsappBtn.addEventListener('click', () => shareTripDetails('whatsapp'));
+      
+      sharePageBtn.addEventListener('click', togglePageShareOptions);
+      sharePageSmsBtn.addEventListener('click', () => sharePageLink('sms'));
+      sharePageWhatsappBtn.addEventListener('click', () => sharePageLink('whatsapp'));
+    });
   </script>
 </body>
 </html>
