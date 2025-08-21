@@ -382,6 +382,20 @@
 
     // Populate dropdowns on page load
     function populateDropdowns() {
+      const defaultOptionOrigin = document.createElement('option');
+      defaultOptionOrigin.value = "";
+      defaultOptionOrigin.textContent = "Select...";
+      defaultOptionOrigin.disabled = true;
+      defaultOptionOrigin.selected = true;
+      originSelect.appendChild(defaultOptionOrigin);
+
+      const defaultOptionDestination = document.createElement('option');
+      defaultOptionDestination.value = "";
+      defaultOptionDestination.textContent = "Select...";
+      defaultOptionDestination.disabled = true;
+      defaultOptionDestination.selected = true;
+      destinationSelect.appendChild(defaultOptionDestination);
+
       const sortedPlaces = places.slice().sort();
       sortedPlaces.forEach(place => {
         const option1 = document.createElement('option');
@@ -445,7 +459,7 @@
       submitStatusDiv.innerHTML = '';
 
       // Validation
-      if (origin === destination) {
+      if (!origin || !destination || origin === destination) {
         displayStatus('Please select different origin and destination points.', 'failed');
         return false;
       }
