@@ -281,27 +281,6 @@
               </div>
           </div>
         </div>
-        
-        <div class="share-link-section">
-            <div class="section-title" style="justify-content: center;">
-                <span class="material-icons">link</span>
-                Share Link
-            </div>
-            <div class="summary-actions-row">
-              <a href="#" class="fa fa-share-alt" title="Share Link" id="share-page-btn"></a>
-            </div>
-            <div class="share-options" id="share-page-options-container">
-              <div class="button-wrapper">
-                <a href="#" class="sms-btn fa fa-comment" title="Share via SMS" id="share-page-sms-btn"></a>
-                <span class="button-label">SMS</span>
-              </div>
-              <div class="button-wrapper">
-                <a href="#" class="whatsapp-btn fa fa-whatsapp" title="Share via WhatsApp" id="share-page-whatsapp-btn"></a>
-                <span class="button-label">WhatsApp</span>
-              </div>
-            </div>
-        </div>
-
       </div>
     </section>
   </main>
@@ -315,7 +294,7 @@
       motorbikePricePer3Km: 10,
       avgSpeed: 60,
       googleMapsBaseUrl: 'http://googleusercontent.com/maps.google.com/8',
-      shareLinkUrl: 'https://zamlisting.com/taxi'
+      shareLinkUrl: 'www.zamlisting.com/customerride'
     };
 
     const places = [
@@ -402,12 +381,6 @@
     const shareSmsBtn = document.getElementById('share-sms-btn');
     const shareWhatsappBtn = document.getElementById('share-whatsapp-btn');
     
-    // Page Share Elements
-    const sharePageBtn = document.getElementById('share-page-btn');
-    const sharePageOptionsContainer = document.getElementById('share-page-options-container');
-    const sharePageSmsBtn = document.getElementById('share-page-sms-btn');
-    const sharePageWhatsappBtn = document.getElementById('share-page-whatsapp-btn');
-
     let summaryData = null;
 
     // Populate dropdowns on page load
@@ -573,16 +546,6 @@
       }
     }
     
-    function togglePageShareOptions() {
-      if (sharePageOptionsContainer.style.display === 'flex') {
-        sharePageOptionsContainer.style.display = 'none';
-        submitStatusDiv.innerHTML = '';
-      } else {
-        sharePageOptionsContainer.style.display = 'flex';
-        displayStatus('Click a button to share the link!', 'success');
-      }
-    }
-
     function toggleMap() {
       const origin = originSelect.value;
       const destination = destinationSelect.value;
@@ -612,7 +575,7 @@
         return;
       }
       
-      const tripDetails = `Trip: ${summaryData.from} to ${summaryData.to}, Mode: ${summaryData.preferredMode}, Phone: ${summaryData.phone}, Distance: ${summaryData.distance}km, Time: ${summaryData.estimatedTime}, Price: K${summaryData.price}`;
+      const tripDetails = `Trip: ${summaryData.from} to ${summaryData.to}, Mode: ${summaryData.preferredMode}, Phone: ${summaryData.phone}, Distance: ${summaryData.distance}km, Time: ${summaryData.estimatedTime}, Price: K${summaryData.price}. Book your ride now: ${config.shareLinkUrl}`;
       
       loader.style.display = 'inline-block';
 
@@ -631,22 +594,6 @@
       }, 3000);
     }
     
-    function sharePageLink(method) {
-      const message = `Check out ZamTaxi to book your next ride: ${config.shareLinkUrl}`;
-
-      if (method === 'sms') {
-        window.location.href = `sms:?body=${encodeURIComponent(message)}`;
-      } else if (method === 'whatsapp') {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
-      }
-      
-      displayStatus(`Page link shared via ${method.toUpperCase()}!`, 'success');
-      setTimeout(() => {
-        submitStatusDiv.innerHTML = '';
-        sharePageOptionsContainer.style.display = 'none';
-      }, 3000);
-    }
-    
     function displayStatus(message, type) {
       submitStatusDiv.className = `submit-status ${type}`;
       let icon = type === 'success' ? 'check_circle' : 'error';
@@ -662,10 +609,6 @@
       shareTripBtn.addEventListener('click', toggleTripShareOptions);
       shareSmsBtn.addEventListener('click', () => shareTripDetails('sms'));
       shareWhatsappBtn.addEventListener('click', () => shareTripDetails('whatsapp'));
-      
-      sharePageBtn.addEventListener('click', togglePageShareOptions);
-      sharePageSmsBtn.addEventListener('click', () => sharePageLink('sms'));
-      sharePageWhatsappBtn.addEventListener('click', () => sharePageLink('whatsapp'));
     });
   </script>
 </body>
