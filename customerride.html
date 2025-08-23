@@ -60,9 +60,17 @@
       background: white; border-radius: 8px;
       box-shadow: var(--box-shadow-light); overflow: hidden;
       height: 400px; display: none;
+      padding-bottom: 20px;
     }
     #google-map-frame {
       width: 100%; height: 100%; border: none; border-radius: 8px;
+    }
+    .map-disclaimer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 10px;
+      font-style: italic;
     }
     .booking-container {
       background: var(--bg-color-card); border-radius: 8px;
@@ -143,17 +151,15 @@
       align-items: center;
       justify-content: center;
     }
-    .fa-calculator { background: var(--primary-color); }
     .fa-map { background: var(--primary-color); }
     .fa-whatsapp { background: var(--whatsapp-color); }
     .fa-comment { background: var(--secondary-color); }
     .fa-share-alt { background: #3498db; }
-    .calculate-btn:hover { background: #174ea6; }
     .map-btn:hover { background: #174ea6; }
     .whatsapp-btn:hover { background: var(--whatsapp-color); }
     .sms-btn:hover { background: #ff9800; }
     .fa-share-alt:hover { background: #2980b9; }
-    .calculate-btn[disabled], .map-btn[disabled], .whatsapp-btn[disabled], .sms-btn[disabled] {
+    .map-btn[disabled], .whatsapp-btn[disabled], .sms-btn[disabled] {
       opacity: 0.5;
       cursor: not-allowed;
     }
@@ -197,6 +203,9 @@
     <section class="map-section">
       <div class="map-container" id="mapContainer">
         <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="map-disclaimer" id="map-disclaimer" style="display: none;">
+          **This is a demo. The route may vary and is subject to revision by the taxi operator.**
+        </div>
       </div>
     </section>
 
@@ -250,16 +259,12 @@
           </div>
           <div class="summary-actions-row">
             <div class="button-wrapper">
-              <a href="#" class="calculate-btn fa fa-calculator" title="Calculate" id="calculate-btn"></a>
-              <span class="button-label">Calculate</span>
+              <a href="#" class="fa fa-share-alt" title="Share Trip Details" id="share-trip-btn"></a>
+              <span class="button-label">Share</span>
             </div>
             <div class="button-wrapper">
               <a href="#" class="map-btn fa fa-map" id="map-btn" title="Show Map"></a>
-              <span class="button-label" id="map-btn-label">Show Map</span>
-            </div>
-            <div class="button-wrapper">
-              <a href="#" class="fa fa-share-alt" title="Share Trip Details" id="share-trip-btn"></a>
-              <span class="button-label">Share</span>
+              <span class="button-label" id="map-btn-label">Show Map (optional)</span>
             </div>
           </div>
           <div id="submit-status" class="submit-status"></div>
@@ -364,10 +369,12 @@
     // DOM Elements
     const originSelect = document.getElementById('gm-origin');
     const destinationSelect = document.getElementById('gm-destination');
-    const calculateBtn = document.getElementById('calculate-btn');
+    const customerPhoneInput = document.getElementById('customer-phone');
+    const modeGroup = document.getElementById('mode-group');
     const mapBtn = document.getElementById('map-btn');
     const mapBtnLabel = document.getElementById('map-btn-label');
     const mapContainer = document.getElementById('mapContainer');
+    const mapDisclaimer = document.getElementById('map-disclaimer');
     const summaryTableContainer = document.getElementById('summary-table-container');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
@@ -450,39 +457,38 @@
     function updateSummaryTable() {
       const origin = originSelect.value;
       const destination = destinationSelect.value;
-      const customerPhone = document.getElementById('customer-phone').value.trim();
-
-      // Reset state
+      const customerPhone = customerPhoneInput.value.trim();
+      const vehicleRadio = document.getElementById('mode-vehicle');
+      const motorbikeRadio = document.getElementById('mode-motorbike');
+      
       summaryTableContainer.innerHTML = '';
       shareOptionsContainer.style.display = 'none';
       summaryData = null;
-      submitStatusDiv.innerHTML = '';
-
-      // Validation
-      if (!origin || !destination || origin === destination) {
+      
+      // Validation checks
+      if (!origin || origin === 'Select...' || !destination || destination === 'Select...') {
         displayStatus('Please select different origin and destination points.', 'failed');
-        return false;
+        return;
       }
       
       if (!customerPhone.match(/^0[0-9]{9}$/)) {
-        displayStatus('Please enter a valid phone number in the format 09XXXXXXXX.', 'failed');
-        return false;
+        displayStatus('Please enter a valid phone number (e.g., 09XXXXXXXX).', 'failed');
+        return;
       }
-
-      const vehicleRadio = document.getElementById('mode-vehicle');
-      const motorbikeRadio = document.getElementById('mode-motorbike');
+      
       if (!vehicleRadio.checked && !motorbikeRadio.checked) {
         displayStatus('Please select a mode of transport.', 'failed');
-        return false;
+        return;
       }
 
+      // If all inputs are valid, proceed with calculation
       const mode = vehicleRadio.checked ? 'Vehicle' : 'Motorbike';
       const pricePer3Km = vehicleRadio.checked ? config.vehiclePricePer3Km : config.motorbikePricePer3Km;
 
       const distance = findShortestDistance(origin, destination, segments);
       if (distance === null || isNaN(distance)) {
         displayStatus('A route could not be found between the selected places.', 'failed');
-        return false;
+        return;
       }
 
       const timeHours = distance / config.avgSpeed;
@@ -536,15 +542,13 @@
         estimatedTime: timeText,
         price: price
       };
-
+      
       displayStatus('Trip details calculated. Click the share button to send your request.', 'success');
-
-      return true;
     }
-    
+
     function toggleTripShareOptions() {
       if (!summaryData) {
-        displayStatus('No trip details to share. Please calculate the trip first.', 'failed');
+        displayStatus('Please complete all trip details before sharing.', 'failed');
         return;
       }
       
@@ -570,19 +574,21 @@
         const mapUrl = `${config.googleMapsBaseUrl}${encodeURIComponent(origin)}+to+${encodeURIComponent(destination)}&output=embed`;
         frame.src = mapUrl;
         mapContainer.style.display = 'block';
-        mapBtnLabel.textContent = 'Hide Map';
+        mapDisclaimer.style.display = 'block';
+        mapBtnLabel.textContent = 'Hide Map (optional)';
         mapBtn.title = 'Hide Map';
         mapContainer.scrollIntoView({ behavior: 'smooth' });
       } else {
         mapContainer.style.display = 'none';
-        mapBtnLabel.textContent = 'Show Map';
+        mapDisclaimer.style.display = 'none';
+        mapBtnLabel.textContent = 'Show Map (optional)';
         mapBtn.title = 'Show Map';
       }
     }
 
     function shareTripDetails(method) {
       if (!summaryData) {
-        displayStatus('No trip details to share. Please calculate the trip first.', 'failed');
+        displayStatus('Please complete all trip details before sharing.', 'failed');
         return;
       }
       
@@ -614,7 +620,13 @@
     // Initializers and Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
-      calculateBtn.addEventListener('click', updateSummaryTable);
+      
+      // Attach event listeners to all input fields that trigger a calculation
+      originSelect.addEventListener('change', updateSummaryTable);
+      destinationSelect.addEventListener('change', updateSummaryTable);
+      customerPhoneInput.addEventListener('input', updateSummaryTable);
+      modeGroup.addEventListener('change', updateSummaryTable);
+
       mapBtn.addEventListener('click', toggleMap);
       
       shareTripBtn.addEventListener('click', toggleTripShareOptions);
