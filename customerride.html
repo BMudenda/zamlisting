@@ -154,9 +154,7 @@
     .fa-map { background: var(--primary-color); }
     .fa-whatsapp { background: var(--whatsapp-color); }
     .fa-comment { background: var(--secondary-color); }
-    /* CHANGE MADE HERE */
     .fa-send-o { background: var(--primary-color); }
-    /* END OF CHANGE */
     .map-btn:hover { background: #174ea6; }
     .submit-btn:hover { background: #138244; }
     .map-btn[disabled], .submit-btn[disabled] {
@@ -563,6 +561,20 @@
         return;
       }
       
+      // Add timestamp to the summary data
+      const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
+
+      const payload = {
+          "preferredMode": summaryData.preferredMode,
+          "phone": summaryData.phone,
+          "from": summaryData.from,
+          "to": summaryData.to,
+          "distance": summaryData.distance,
+          "estimatedTime": summaryData.estimatedTime,
+          "price": summaryData.price,
+          "timestamp": timestamp // Add timestamp at the end
+      };
+
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
       loader.style.display = "inline-block";
@@ -570,7 +582,7 @@
       
       fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        body: new URLSearchParams(summaryData)
+        body: new URLSearchParams(payload)
       })
       .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
       .then(txt => {
