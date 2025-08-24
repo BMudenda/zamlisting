@@ -154,12 +154,12 @@
     .fa-map { background: var(--primary-color); }
     .fa-whatsapp { background: var(--whatsapp-color); }
     .fa-comment { background: var(--secondary-color); }
-    .fa-share-alt { background: #3498db; }
+    /* CHANGE MADE HERE */
+    .fa-send-o { background: var(--primary-color); }
+    /* END OF CHANGE */
     .map-btn:hover { background: #174ea6; }
-    .whatsapp-btn:hover { background: var(--whatsapp-color); }
-    .sms-btn:hover { background: #ff9800; }
-    .fa-share-alt:hover { background: #2980b9; }
-    .map-btn[disabled], .whatsapp-btn[disabled], .sms-btn[disabled] {
+    .submit-btn:hover { background: #138244; }
+    .map-btn[disabled], .submit-btn[disabled] {
       opacity: 0.5;
       cursor: not-allowed;
     }
@@ -259,8 +259,8 @@
           </div>
           <div class="summary-actions-row">
             <div class="button-wrapper">
-              <a href="#" class="fa fa-share-alt" title="Share Trip Details" id="share-trip-btn"></a>
-              <span class="button-label">Share</span>
+              <a href="#" class="fa fa-send-o" id="submit-btn" title="Submit Trip Details"></a>
+              <span class="button-label">Submit Trip</span>
             </div>
             <div class="button-wrapper">
               <a href="#" class="map-btn fa fa-map" id="map-btn" title="Show Map"></a>
@@ -269,19 +269,6 @@
           </div>
           <div id="submit-status" class="submit-status"></div>
           <div id="loader" class="loader"></div>
-          
-          <div class="share-link-section">
-              <div class="share-options" id="share-options-container">
-                <div class="button-wrapper">
-                  <a href="#" class="sms-btn fa fa-comment" title="Share via SMS" id="share-sms-btn"></a>
-                  <span class="button-label">SMS</span>
-                </div>
-                <div class="button-wrapper">
-                  <a href="#" class="whatsapp-btn fa fa-whatsapp" title="Share via WhatsApp" id="share-whatsapp-btn"></a>
-                  <span class="button-label">WhatsApp</span>
-                </div>
-              </div>
-          </div>
         </div>
       </div>
     </section>
@@ -290,14 +277,15 @@
   <script>
     // Data and Configuration
     const config = {
-      smsNumber: '0978167546',
-      whatsappNumber: '+260978167546',
       vehiclePricePer3Km: 20,
       motorbikePricePer3Km: 10,
       avgSpeed: 60,
       googleMapsBaseUrl: 'https://maps.google.com/maps?q=',
       shareLinkUrl: 'http://www.zamlisting.com/customerride'
     };
+
+    // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
 
     const places = [
       "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche",
@@ -376,14 +364,9 @@
     const mapContainer = document.getElementById('mapContainer');
     const mapDisclaimer = document.getElementById('map-disclaimer');
     const summaryTableContainer = document.getElementById('summary-table-container');
+    const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
-    
-    // Trip Share Elements
-    const shareTripBtn = document.getElementById('share-trip-btn');
-    const shareOptionsContainer = document.getElementById('share-options-container');
-    const shareSmsBtn = document.getElementById('share-sms-btn');
-    const shareWhatsappBtn = document.getElementById('share-whatsapp-btn');
     
     let summaryData = null;
 
@@ -462,7 +445,8 @@
       const motorbikeRadio = document.getElementById('mode-motorbike');
       
       summaryTableContainer.innerHTML = '';
-      shareOptionsContainer.style.display = 'none';
+      submitBtn.classList.add('disabled');
+      submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
       
       // Validation checks
@@ -543,24 +527,11 @@
         price: price
       };
       
-      displayStatus('Trip details calculated. Click the share button to send your request.', 'success');
+      displayStatus('Trip details calculated. Click submit to send your request.', 'success');
+      submitBtn.classList.remove('disabled');
+      submitBtn.removeAttribute('disabled');
     }
 
-    function toggleTripShareOptions() {
-      if (!summaryData) {
-        displayStatus('Please complete all trip details before sharing.', 'failed');
-        return;
-      }
-      
-      if (shareOptionsContainer.style.display === 'flex') {
-        shareOptionsContainer.style.display = 'none';
-        submitStatusDiv.innerHTML = '';
-      } else {
-        shareOptionsContainer.style.display = 'flex';
-        displayStatus('Click a button to share trip details!', 'success');
-      }
-    }
-    
     function toggleMap() {
       const origin = originSelect.value;
       const destination = destinationSelect.value;
@@ -586,31 +557,34 @@
       }
     }
 
-    function shareTripDetails(method) {
+    function submitToGoogleSheet() {
       if (!summaryData) {
-        displayStatus('Please complete all trip details before sharing.', 'failed');
+        displayStatus('No data to submit.', 'failed');
         return;
       }
       
-      const tripDetails = `Trip: ${summaryData.from} to ${summaryData.to}, Mode: ${summaryData.preferredMode}, Phone: ${summaryData.phone}, Distance: ${summaryData.distance}km, Time: ${summaryData.estimatedTime}, Price: K${summaryData.price}. Book your ride now: ${config.shareLinkUrl}`;
+      submitBtn.classList.add('disabled');
+      submitBtn.setAttribute('disabled', 'true');
+      loader.style.display = "inline-block";
+      submitStatusDiv.innerHTML = "";
       
-      loader.style.display = 'inline-block';
-
-      if (method === 'sms') {
-        window.location.href = `sms:${config.smsNumber}?body=${encodeURIComponent(tripDetails)}`;
-      } else if (method === 'whatsapp') {
-        window.open(`https://api.whatsapp.com/send?phone=${config.whatsappNumber}&text=${encodeURIComponent(tripDetails)}`, '_blank');
-      }
-
-      loader.style.display = 'none';
-      displayStatus(`Trip details sent via ${method.toUpperCase()}!`, 'success');
-      
-      setTimeout(() => {
-        submitStatusDiv.innerHTML = '';
-        shareOptionsContainer.style.display = 'none';
-      }, 3000);
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams(summaryData)
+      })
+      .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
+      .then(txt => {
+        displayStatus("Submitted successfully!", "success");
+      })
+      .catch(err => {
+        displayStatus("Submission failed. Please try again.", "failed");
+        console.error('Error submitting data:', err);
+      })
+      .finally(() => {
+        loader.style.display = "none";
+      });
     }
-    
+
     function displayStatus(message, type) {
       submitStatusDiv.className = `submit-status ${type}`;
       let icon = type === 'success' ? 'check_circle' : 'error';
@@ -628,10 +602,7 @@
       modeGroup.addEventListener('change', updateSummaryTable);
 
       mapBtn.addEventListener('click', toggleMap);
-      
-      shareTripBtn.addEventListener('click', toggleTripShareOptions);
-      shareSmsBtn.addEventListener('click', () => shareTripDetails('sms'));
-      shareWhatsappBtn.addEventListener('click', () => shareTripDetails('whatsapp'));
+      submitBtn.addEventListener('click', submitToGoogleSheet);
     });
   </script>
 </body>
