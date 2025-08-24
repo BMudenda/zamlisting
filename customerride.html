@@ -90,10 +90,24 @@
       position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
       color: var(--primary-color); font-size: 20px; opacity: 0.85;
     }
+    .input-group .material-icons.validation-tick {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--success-color);
+        font-size: 24px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .input-group.valid .validation-tick {
+      opacity: 1;
+    }
     input, select {
       width: 100%; padding: 10px; font-size: 1rem; border-radius: 5px;
       border: 1px solid var(--border-color-light); transition: border 0.2s, box-shadow 0.2s;
       background-color: transparent;
+      box-sizing: border-box; /* Ensures consistent sizing */
     }
     input:focus, select:focus {
       border: 1px solid var(--border-color-blue); box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
@@ -106,6 +120,28 @@
       cursor: pointer;
     }
     .mode-radio input { width: auto; margin-right: 5px; }
+
+    /* New CSS for hidden inputs and masked values */
+    .input-group.valid input,
+    .input-group.valid select {
+      display: none;
+    }
+    .masked-value {
+      display: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid var(--border-color-light);
+      background-color: var(--bg-color-card);
+      color: var(--font-color-dark);
+      cursor: pointer;
+      min-height: 40px;
+    }
+    .input-group.valid .masked-value {
+      display: block;
+    }
+
     .summary-table-section {
       margin-top: 20px; padding: 15px; background: var(--bg-color-card);
       border-radius: 8px; box-shadow: var(--box-shadow-light);
@@ -235,16 +271,22 @@
               autocomplete="off"
               inputmode="numeric"
             >
+            <span class="material-icons validation-tick">check_circle</span>
+            <span class="masked-value" id="masked-phone"></span>
           </div>
           <div class="input-group">
             <span class="material-icons input-icon">place</span>
             <label for="gm-origin">From</label>
             <select id="gm-origin"></select>
+            <span class="material-icons validation-tick">check_circle</span>
+            <span class="masked-value" id="masked-origin"></span>
           </div>
           <div class="input-group">
             <span class="material-icons input-icon">flag</span>
             <label for="gm-destination">To</label>
             <select id="gm-destination"></select>
+            <span class="material-icons validation-tick">check_circle</span>
+            <span class="masked-value" id="masked-destination"></span>
           </div>
         </div>
         <div class="summary-table-section">
@@ -285,21 +327,17 @@
     // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
 
+    // UPDATED COMPREHENSIVE PLACES LIST (ALPHABETICAL)
     const places = [
-      "Luangwa (Feira)", "Chitope", "Luangwa Market", "Kasinsa", "Kapoche",
-      "Kakaro Primary School", "Makichilo Lodge", "Gerasmos Safari Lodge",
-      "Justifeli Lodge", "Kantuleni executive Lodge", "Feira Kindom Hall",
-      "Luangwa main sda churh", "Pentocostal Assembly of God Joshua Assembly",
-      "UCZ", "JB THREE BOARDERS MALL", "yellow shop", "Anglican Church",
-      "Big 2 Zambezi Water Front Resort & Safari", "Luangwa Secondary School",
-      "Luangwa District Hospital", "Kavalamanja", "Luangwa Police Station",
-      "Zambia Electricity Supply Corporation", "Luangwa Post Office",
-      "Luangwa Basic School", "Luangwa Habour", "Luangwa Indeco",
-      "Luangwa District Comission office", "Luangwa District Education Board Offices",
-      "Luangwa Council lodge", "Yangoma Hotel", "Luangwa Filling Station",
-      "Dzalo Skills Training Centre kambolozo", "Boma Clinic", "BM residence",
-      "Luangwa Feira Day Secondary School", "Katondwe Mission Hospital",
-      "Mwavi Secondary School", "Luangwa Bridge", "Luangwa Bridge Market"
+      "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "BM residence", "Boma Clinic", "Chidada Village", "Chitope",
+      "Dzalo Skills Training Centre kambolozo", "Feira Kindom Hall", "Gerasmos Safari Lodge", "JB THREE BOARDERS MALL",
+      "Justifeli Lodge", "Kakaro Primary School", "Kantuleni executive Lodge", "Kaunga School", "Kapoche", "Kasinsa",
+      "Katondwe Mission Hospital", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge",
+      "Luangwa Bridge Market", "Luangwa Council lodge", "Luangwa District Comission office", "Luangwa District Education Board Offices",
+      "Luangwa District Hospital", "Luangwa Filling Station", "Luangwa Habour", "Luangwa Indeco", "Luangwa Market",
+      "Luangwa main sda churh", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Secondary School", "Makichilo Lodge",
+      "Mwavi Secondary School", "Pentocostal Assembly of God Joshua Assembly", "UCZ", "Yangoma Hotel", "yellow shop",
+      "Zambia Electricity Supply Corporation"
     ];
 
     const segments = [
@@ -349,7 +387,11 @@
       { from: "Mwavi Secondary School", to: "Luangwa Bridge Market", distance: 27.3 },
       { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
       { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
-      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
+      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 },
+      { from: "Chidada Village", to: "Kaunga School", distance: 5.5 }, 
+      { from: "Luangwa (Feira)", to: "Chidada Village", distance: 15 },
+      { from: "Luangwa (Feira)", to: "Kaunga School", distance: 18.5 },
+      { from: "Katondwe Mission Hospital", to: "Chidada Village", distance: 37 }
     ];
 
     // DOM Elements
@@ -365,6 +407,11 @@
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
+    
+    // New masked value elements
+    const maskedPhone = document.getElementById('masked-phone');
+    const maskedOrigin = document.getElementById('masked-origin');
+    const maskedDestination = document.getElementById('masked-destination');
     
     let summaryData = null;
 
@@ -434,8 +481,63 @@
       return null;
     }
 
+    // Function to update validation tick status
+    function updateValidationStatus(element, isValid) {
+        const parentGroup = element.closest('.input-group');
+        if (isValid) {
+            parentGroup.classList.add('valid');
+        } else {
+            parentGroup.classList.remove('valid');
+        }
+    }
+
+    // New function to hide input values and display masked ones
+    function maskInputValues(origin, destination, phone) {
+      // Mask phone number
+      const isPhoneValid = phone.match(/^0[0-9]{9}$/);
+      if (isPhoneValid) {
+        maskedPhone.textContent = '**********';
+        updateValidationStatus(customerPhoneInput, true);
+      } else {
+        maskedPhone.textContent = '';
+        updateValidationStatus(customerPhoneInput, false);
+      }
+
+      // Mask origin
+      const isOriginValid = origin && origin !== '';
+      if (isOriginValid) {
+        maskedOrigin.textContent = '****';
+        updateValidationStatus(originSelect, true);
+      } else {
+        maskedOrigin.textContent = '';
+        updateValidationStatus(originSelect, false);
+      }
+
+      // Mask destination
+      const isDestinationValid = destination && destination !== '';
+      if (isDestinationValid) {
+        maskedDestination.textContent = '****';
+        updateValidationStatus(destinationSelect, true);
+      } else {
+        maskedDestination.textContent = '';
+        updateValidationStatus(destinationSelect, false);
+      }
+    }
+
+    // Function to reset the form and allow editing
+    function resetValidation(event) {
+      const parentGroup = event.target.closest('.input-group');
+      parentGroup.classList.remove('valid');
+      summaryTableContainer.innerHTML = '';
+      submitBtn.classList.add('disabled');
+      submitBtn.setAttribute('disabled', 'true');
+      summaryData = null;
+      displayStatus('Edit your details and click enter to re-calculate.', 'failed');
+    }
+    
     // Event Handlers
     function updateSummaryTable() {
+      // Capture the current values before any hiding happens
       const origin = originSelect.value;
       const destination = destinationSelect.value;
       const customerPhone = customerPhoneInput.value.trim();
@@ -447,20 +549,18 @@
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
       
-      // Validation checks
-      if (!origin || origin === 'Select...' || !destination || destination === 'Select...') {
-        displayStatus('Please select different origin and destination points.', 'failed');
-        return;
-      }
-      
-      if (!customerPhone.match(/^0[0-9]{9}$/)) {
-        displayStatus('Please enter a valid phone number (e.g., 09XXXXXXXX).', 'failed');
-        return;
-      }
-      
-      if (!vehicleRadio.checked && !motorbikeRadio.checked) {
-        displayStatus('Please select a mode of transport.', 'failed');
-        return;
+      // Check for valid inputs
+      const isOriginValid = origin && origin !== '';
+      const isDestinationValid = destination && destination !== '';
+      const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
+      const isModeSelected = vehicleRadio.checked || motorbikeRadio.checked;
+
+      // Update validation ticks and masked values
+      maskInputValues(origin, destination, customerPhone);
+
+      if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
+          displayStatus('Please fill in all details correctly.', 'failed');
+          return;
       }
 
       // If all inputs are valid, proceed with calculation
@@ -531,16 +631,14 @@
     }
 
     function toggleMap() {
-      const origin = originSelect.value;
-      const destination = destinationSelect.value;
       const frame = document.getElementById('google-map-frame');
 
       if (mapContainer.style.display === 'none' || mapContainer.style.display === '') {
-        if (!origin || !destination) {
-          alert('Please select both origin and destination.');
+        if (!summaryData) {
+          alert('Please calculate the trip details first.');
           return;
         }
-        const mapUrl = `${config.googleMapsBaseUrl}${encodeURIComponent(origin)}+to+${encodeURIComponent(destination)}&output=embed`;
+        const mapUrl = `${config.googleMapsBaseUrl}${encodeURIComponent(summaryData.from)}+to+${encodeURIComponent(summaryData.to)}&output=embed`;
         frame.src = mapUrl;
         mapContainer.style.display = 'block';
         mapDisclaimer.style.display = 'block';
@@ -561,7 +659,6 @@
         return;
       }
       
-      // Add timestamp to the summary data
       const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
 
       const payload = {
@@ -572,7 +669,7 @@
           "distance": summaryData.distance,
           "estimatedTime": summaryData.estimatedTime,
           "price": summaryData.price,
-          "timestamp": timestamp // Add timestamp at the end
+          "timestamp": timestamp
       };
 
       submitBtn.classList.add('disabled');
@@ -607,14 +704,22 @@
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
       
-      // Attach event listeners to all input fields that trigger a calculation
       originSelect.addEventListener('change', updateSummaryTable);
       destinationSelect.addEventListener('change', updateSummaryTable);
-      customerPhoneInput.addEventListener('input', updateSummaryTable);
+      customerPhoneInput.addEventListener('blur', updateSummaryTable);
+      customerPhoneInput.addEventListener('input', () => {
+        const isPhoneValid = customerPhoneInput.value.trim().match(/^0[0-9]{9}$/);
+        updateValidationStatus(customerPhoneInput, isPhoneValid);
+      });
       modeGroup.addEventListener('change', updateSummaryTable);
 
       mapBtn.addEventListener('click', toggleMap);
       submitBtn.addEventListener('click', submitToGoogleSheet);
+
+      // New event listeners for masked values
+      maskedPhone.addEventListener('click', resetValidation);
+      maskedOrigin.addEventListener('click', resetValidation);
+      maskedDestination.addEventListener('click', resetValidation);
     });
   </script>
 </body>
