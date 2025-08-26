@@ -150,17 +150,21 @@
       font-weight: bold; color: var(--primary-color); font-size: 1.1rem;
       margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
     }
-    .summary-table-wrapper { 
-      max-width: 170px; /* Adjusted for a smaller, scrolling view */
-      overflow-x: auto; 
+    #summary-table-container {
+      width: 100%;
     }
     table.summary-table {
-      width: 100%; border-collapse: collapse; font-size: 0.9rem; /* Increased font size */
-      background: #f9fbfd; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      white-space: nowrap; /* Prevents wrapping and enables horizontal scroll */
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 0.9rem; 
+      background: #f9fbfd; 
+      border-radius: 6px; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      white-space: normal;
     }
     table.summary-table th, table.summary-table td {
-      border: 1px solid #dbeafe; padding: 8px; /* Increased padding */
+      border: 1px solid #dbeafe; 
+      padding: 8px; 
       text-align: left;
     }
     table.summary-table th {
@@ -220,6 +224,17 @@
       justify-content: center;
       gap: 15px;
       margin-top: 10px;
+    }
+
+    /* New CSS for hiding/revealing values */
+    .hidden-value {
+      display: none;
+      color: green;
+      font-weight: bold;
+    }
+    .eye-btn {
+      cursor: pointer;
+      font-size: 18px;
     }
   </style>
 </head>
@@ -296,11 +311,9 @@
             <span class="material-icons">table_chart</span>
             Trip Summary
           </div>
-          <div class="summary-table-wrapper">
-            <div id="summary-table-container"></div>
-          </div>
+          <div id="summary-table-container"></div>
           <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
-            Slide to view and verify all information!
+            Review and verify all trip information.
           </p>
           <div class="summary-actions-row">
             <div class="button-wrapper">
@@ -539,6 +552,18 @@
       displayStatus('Edit your details and click enter to re-calculate.', 'failed');
     }
     
+    // Function to reveal the hidden values
+    function reveal(eye) {
+      // Hide all values and show all eyes again
+      document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
+      document.querySelectorAll(".eye-btn").forEach(e => e.style.display = "inline");
+
+      // Show only the clicked one
+      let value = eye.previousElementSibling;
+      value.style.display = "inline";
+      eye.style.display = "none";
+    }
+
     // Event Handlers
     function updateSummaryTable() {
       // Capture the current values before any hiding happens
@@ -605,13 +630,34 @@
           </thead>
           <tbody>
             <tr>
-              <td>${mode}</td>
-              <td>${customerPhone}</td>
-              <td>${origin}</td>
-              <td>${destination}</td>
-              <td>${distance.toFixed(2)}</td>
-              <td>${timeText}</td>
-              <td><b>K${price}</b></td>
+              <td>
+                <span class="hidden-value">${mode}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value">${customerPhone}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value">${origin}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value">${destination}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value">${distance.toFixed(2)}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value">${timeText}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value"><b>K${price}</b></span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
             </tr>
           </tbody>
         </table>
