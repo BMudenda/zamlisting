@@ -594,8 +594,7 @@
 
       // If all inputs are valid, proceed with calculation
       const mode = vehicleRadio.checked ? 'Vehicle' : 'Motorbike';
-      const pricePer3Km = vehicleRadio.checked ? config.vehiclePricePer3Km : config.motorbikePricePer3Km;
-
+      
       const distance = findShortestDistance(origin, destination, segments);
       if (distance === null || isNaN(distance)) {
         displayStatus('A route could not be found between the selected places.', 'failed');
@@ -605,7 +604,16 @@
       const timeHours = distance / config.avgSpeed;
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
-      const price = Math.ceil(distance / 4) * pricePer3Km;
+
+      // --- UPDATED PRICING LOGIC ---
+      let price = 0;
+      if (mode === 'Vehicle') {
+        price = 20;
+      } else {
+        price = 10;
+      }
+      // --- END OF UPDATED PRICING LOGIC ---
+      
       let timeText = '';
       if (wholeHours > 0) {
         timeText += `${wholeHours} hr`;
