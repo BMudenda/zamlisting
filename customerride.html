@@ -352,10 +352,11 @@
   <script>
     // Data and Configuration
     const config = {
-      vehiclePricePerKm: 5,
-      motorbikePricePerKm: 2.5,
-      vehicleMinPrice: 20,
-      motorbikeMinPrice: 10,
+      // Pricing Logic
+      vehiclePricePerKm: 5,   // Price per kilometer for a vehicle
+      motorbikePricePerKm: 2.5, // Price per kilometer for a motorbike
+      vehicleMinPrice: 20,    // Minimum price for a vehicle ride
+      motorbikeMinPrice: 10,   // Minimum price for a motorbike ride
       avgSpeed: 60,
       googleMapsBaseUrl: 'https://maps.google.com/maps?q=',
       shareLinkUrl: 'http://www.zamlisting.com/customerride'
@@ -624,19 +625,23 @@
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
 
-      // --- UPDATED PRICING LOGIC ---
+      // --- START OF PRICING LOGIC ---
       let price = 0;
       if (mode === 'Vehicle') {
+        // Calculate price based on distance
         price = distance * config.vehiclePricePerKm;
+        // Ensure price is at least the minimum
         price = Math.max(price, config.vehicleMinPrice);
       } else { // Motorbike
+        // Calculate price based on distance
         price = distance * config.motorbikePricePerKm;
+        // Ensure price is at least the minimum
         price = Math.max(price, config.motorbikeMinPrice);
       }
       
-      // Round the price to the nearest whole number
+      // Round the final price to the nearest whole number
       price = Math.round(price);
-      // --- END OF UPDATED PRICING LOGIC ---
+      // --- END OF PRICING LOGIC ---
       
       let timeText = '';
       if (wholeHours > 0) {
