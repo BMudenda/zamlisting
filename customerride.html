@@ -352,8 +352,10 @@
   <script>
     // Data and Configuration
     const config = {
-      vehiclePricePer3Km: 20,
-      motorbikePricePer3Km: 10,
+      vehiclePricePerKm: 5,
+      motorbikePricePerKm: 2.5,
+      vehicleMinPrice: 20,
+      motorbikeMinPrice: 10,
       avgSpeed: 60,
       googleMapsBaseUrl: 'https://maps.google.com/maps?q=',
       shareLinkUrl: 'http://www.zamlisting.com/customerride'
@@ -625,9 +627,11 @@
       // --- UPDATED PRICING LOGIC ---
       let price = 0;
       if (mode === 'Vehicle') {
-        price = distance * 5;
-      } else {
-        price = distance * 2.5;
+        price = distance * config.vehiclePricePerKm;
+        price = Math.max(price, config.vehicleMinPrice);
+      } else { // Motorbike
+        price = distance * config.motorbikePricePerKm;
+        price = Math.max(price, config.motorbikeMinPrice);
       }
       
       // Round the price to the nearest whole number
