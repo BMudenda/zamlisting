@@ -212,8 +212,6 @@
       justify-content: center;
     }
     .fa-map { background: var(--primary-color); }
-    .fa-whatsapp { background: var(--whatsapp-color); }
-    .fa-comment { background: var(--secondary-color); }
     .fa-send-o { background: var(--primary-color); }
     .map-btn:hover { background: #174ea6; }
     .submit-btn:hover { background: #138244; }
@@ -377,8 +375,7 @@
       vehicleMinPrice: 20,    // Minimum price for a vehicle ride
       motorbikeMinPrice: 10,   // Minimum price for a motorbike ride
       avgSpeed: 60,
-      googleMapsBaseUrl: 'https://maps.google.com/maps?q=',
-      shareLinkUrl: 'http://www.zamlisting.com/customerride'
+      googleMapsBaseUrl: 'https://maps.google.com/maps?q='
     };
 
     // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
@@ -808,8 +805,7 @@
       .then(data => {
         loader.style.display = 'none';
         if (data.result === 'success') {
-          displayStatus('Booking request sent successfully!', 'success');
-          showShareOptions(payload);
+          displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
         } else {
           displayStatus(`Failed to submit: ${data.error || 'Unknown error.'}`, 'failed');
           submitBtn.removeAttribute('disabled');
@@ -825,35 +821,6 @@
     function displayStatus(message, type) {
       submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
       submitStatusDiv.className = `submit-status ${type}`;
-    }
-
-    function showShareOptions(data) {
-      const message = `*ZamTaxi Booking Request*\n\nMode: ${data.preferredMode}\nExtra Luggage: ${data.extraLuggage}\nFrom: ${data.from}\nTo: ${data.to}\nDistance: ${data.distance} km\nPrice: K${data.price}\n\nThank you for booking with us!`;
-
-      // Whatsapp Link
-      const whatsappLink = `https://wa.me/260971000000?text=${encodeURIComponent(message)}`;
-      const whatsappBtn = document.createElement('a');
-      whatsappBtn.href = whatsappLink;
-      whatsappBtn.className = 'fa fa-whatsapp';
-      whatsappBtn.title = 'Send via WhatsApp';
-      whatsappBtn.target = '_blank';
-      whatsappBtn.textContent = '';
-
-      // SMS Link (Note: SMS link format is not universal across all devices)
-      const smsLink = `sms:0971000000?body=${encodeURIComponent(message)}`;
-      const smsBtn = document.createElement('a');
-      smsBtn.href = smsLink;
-      smsBtn.className = 'fa fa-comment';
-      smsBtn.title = 'Send via SMS';
-      smsBtn.textContent = '';
-      
-      const shareOptionsDiv = document.createElement('div');
-      shareOptionsDiv.className = 'share-options';
-      shareOptionsDiv.appendChild(whatsappBtn);
-      shareOptionsDiv.appendChild(smsBtn);
-      
-      summaryTableContainer.appendChild(shareOptionsDiv);
-      shareOptionsDiv.style.display = 'flex';
     }
 
     // Event Listeners
