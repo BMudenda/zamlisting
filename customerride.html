@@ -161,6 +161,13 @@
     #summary-table-container {
       width: 100%;
     }
+    
+    /* ADDED CSS FOR SCROLLING */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     table.summary-table {
       width: 100%; 
       border-collapse: collapse; 
@@ -168,7 +175,7 @@
       background: #f9fbfd; 
       border-radius: 6px; 
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      white-space: normal;
+      white-space: nowrap; /* Prevents text from wrapping */
     }
     table.summary-table th, table.summary-table td {
       border: 1px solid #dbeafe; 
@@ -340,7 +347,7 @@
             <span class="material-icons">table_chart</span>
             Trip Summary
           </div>
-          <div id="summary-table-container"></div>
+          <div id="summary-table-container" class="table-responsive"></div>
           <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
             Review and verify all trip information.
           </p>
@@ -785,58 +792,93 @@
           "price": summaryData.price,
           "timestamp": timestamp
       };
-
-      submitBtn.classList.add('disabled');
+      
+      displayStatus('Submitting...', 'info');
+      loader.style.display = 'block';
       submitBtn.setAttribute('disabled', 'true');
-      loader.style.display = "inline-block";
-      submitStatusDiv.innerHTML = "";
       
       fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        body: new URLSearchParams(payload)
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
       })
-      .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
-      .then(txt => {
-        displayStatus("Submitted successfully!", "success");
+      .then(response => response.json())
+      .then(data => {
+        loader.style.display = 'none';
+        if (data.result === 'success') {
+          displayStatus('Booking request sent successfully!', 'success');
+          showShareOptions(payload);
+        } else {
+          displayStatus(`Failed to submit: ${data.error || 'Unknown error.'}`, 'failed');
+          submitBtn.removeAttribute('disabled');
+        }
       })
-      .catch(err => {
-        displayStatus("Submission failed. Please try again.", "failed");
-        console.error('Error submitting data:', err);
-      })
-      .finally(() => {
-        loader.style.display = "none";
+      .catch(error => {
+        loader.style.display = 'none';
+        displayStatus(`Network error: ${error}`, 'failed');
+        submitBtn.removeAttribute('disabled');
       });
     }
 
     function displayStatus(message, type) {
+      submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
       submitStatusDiv.className = `submit-status ${type}`;
-      let icon = type === 'success' ? 'check_circle' : 'error';
-      submitStatusDiv.innerHTML = `<span class="material-icons">${icon}</span>${message}`;
     }
 
-    // Initializers and Event Listeners
+    function showShareOptions(data) {
+      const message = `*ZamTaxi Booking Request*\n\nMode: ${data.preferredMode}\nExtra Luggage: ${data.extraLuggage}\nFrom: ${data.from}\nTo: ${data.to}\nDistance: ${data.distance} km\nPrice: K${data.price}\n\nThank you for booking with us!`;
+
+      // Whatsapp Link
+      const whatsappLink = `https://wa.me/260971000000?text=${encodeURIComponent(message)}`;
+      const whatsappBtn = document.createElement('a');
+      whatsappBtn.href = whatsappLink;
+      whatsappBtn.className = 'fa fa-whatsapp';
+      whatsappBtn.title = 'Send via WhatsApp';
+      whatsappBtn.target = '_blank';
+      whatsappBtn.textContent = '';
+
+      // SMS Link (Note: SMS link format is not universal across all devices)
+      const smsLink = `sms:0971000000?body=${encodeURIComponent(message)}`;
+      const smsBtn = document.createElement('a');
+      smsBtn.href = smsLink;
+      smsBtn.className = 'fa fa-comment';
+      smsBtn.title = 'Send via SMS';
+      smsBtn.textContent = '';
+      
+      const shareOptionsDiv = document.createElement('div');
+      shareOptionsDiv.className = 'share-options';
+      shareOptionsDiv.appendChild(whatsappBtn);
+      shareOptionsDiv.appendChild(smsBtn);
+      
+      summaryTableContainer.appendChild(shareOptionsDiv);
+      shareOptionsDiv.style.display = 'flex';
+    }
+
+    // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
-      
-      // Update event listeners for the new "extra luggage" radio buttons
-      document.getElementById('extra-luggage-group').addEventListener('change', updateSummaryTable);
+    });
 
-      originSelect.addEventListener('change', updateSummaryTable);
-      destinationSelect.addEventListener('change', updateSummaryTable);
-      customerPhoneInput.addEventListener('blur', updateSummaryTable);
-      customerPhoneInput.addEventListener('input', () => {
-        const isPhoneValid = customerPhoneInput.value.trim().match(/^0[0-9]{9}$/);
-        updateValidationStatus(customerPhoneInput, isPhoneValid);
-      });
-      modeGroup.addEventListener('change', updateSummaryTable);
+    originSelect.addEventListener('change', updateSummaryTable);
+    destinationSelect.addEventListener('change', updateSummaryTable);
+    customerPhoneInput.addEventListener('input', updateSummaryTable);
+    modeGroup.addEventListener('change', updateSummaryTable);
+    document.getElementById('extra-luggage-group').addEventListener('change', updateSummaryTable);
 
-      mapBtn.addEventListener('click', toggleMap);
-      submitBtn.addEventListener('click', submitToGoogleSheet);
+    maskedPhone.addEventListener('click', resetValidation);
+    maskedOrigin.addEventListener('click', resetValidation);
+    maskedDestination.addEventListener('click', resetValidation);
 
-      // New event listeners for masked values
-      maskedPhone.addEventListener('click', resetValidation);
-      maskedOrigin.addEventListener('click', resetValidation);
-      maskedDestination.addEventListener('click', resetValidation);
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitToGoogleSheet();
+    });
+
+    mapBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleMap();
     });
   </script>
 </body>
