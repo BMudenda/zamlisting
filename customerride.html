@@ -297,6 +297,18 @@
               </label>
             </div>
           </div>
+          <div class="input-group" id="extra-luggage-wrapper">
+            <span class="material-icons input-icon">shopping_bag</span>
+            <label for="extra-luggage-yes">Extra Person/Luggage?</label>
+            <div class="mode-group" id="extra-luggage-group">
+              <label class="mode-radio">
+                <input type="radio" name="extraLuggage" value="yes" id="extra-luggage-yes"> Yes
+              </label>
+              <label class="mode-radio">
+                <input type="radio" name="extraLuggage" value="no" id="extra-luggage-no" checked> No
+              </label>
+            </div>
+          </div>
           <div class="input-group" id="customer-phone-wrapper">
             <span class="material-icons input-icon">phone</span>
             <label for="customer-phone">Phone Number</label>
@@ -592,6 +604,8 @@
       const customerPhone = customerPhoneInput.value.trim();
       const vehicleRadio = document.getElementById('mode-vehicle');
       const motorbikeRadio = document.getElementById('mode-motorbike');
+      const extraLuggageRadio = document.querySelector('input[name="extraLuggage"]:checked');
+      const hasExtraLuggage = extraLuggageRadio.value === 'yes';
       
       summaryTableContainer.innerHTML = '';
       submitBtn.classList.add('disabled');
@@ -638,6 +652,11 @@
         // Ensure price is at least the minimum
         price = Math.max(price, config.motorbikeMinPrice);
       }
+
+      // Add 25% to the price if extra luggage is selected
+      if (hasExtraLuggage) {
+        price = price * 1.25;
+      }
       
       // Round the final price to the nearest whole number
       price = Math.round(price);
@@ -657,6 +676,7 @@
           <thead>
             <tr>
               <th>Mode</th>
+              <th>Extra Luggage</th>
               <th>Phone</th>
               <th>From</th>
               <th>To</th>
@@ -669,6 +689,10 @@
             <tr>
               <td>
                 <span class="hidden-value">${mode}</span>
+                <span class="eye-btn" onclick="reveal(this)">👁️</span>
+              </td>
+              <td>
+                <span class="hidden-value">${hasExtraLuggage ? 'Yes' : 'No'}</span>
                 <span class="eye-btn" onclick="reveal(this)">👁️</span>
               </td>
               <td>
@@ -704,6 +728,7 @@
       // Store summary data
       summaryData = {
         preferredMode: mode,
+        extraLuggage: hasExtraLuggage ? 'Yes' : 'No',
         phone: customerPhone,
         from: origin,
         to: destination,
@@ -750,6 +775,7 @@
 
       const payload = {
           "preferredMode": summaryData.preferredMode,
+          "extraLuggage": summaryData.extraLuggage,
           "phone": summaryData.phone,
           "from": summaryData.from,
           "to": summaryData.to,
@@ -791,6 +817,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
       
+      // Update event listeners for the new "extra luggage" radio buttons
+      document.getElementById('extra-luggage-group').addEventListener('change', updateSummaryTable);
+
       originSelect.addEventListener('change', updateSummaryTable);
       destinationSelect.addEventListener('change', updateSummaryTable);
       customerPhoneInput.addEventListener('blur', updateSummaryTable);
