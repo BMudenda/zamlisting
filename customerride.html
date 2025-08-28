@@ -281,7 +281,7 @@
         <div class="map-disclaimer" id="map-disclaimer">
           **This is a demo. The route may vary and is subject to revision by the taxi operator.**
         </div>
-        <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe id="google-map-frame" style="display: none;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </section>
 
@@ -795,35 +795,34 @@
       submitBtn.removeAttribute('disabled');
     }
 
+    // REPLACED FUNCTION WITH THE PROVIDED WORKING CODE
     function toggleMap() {
-      const frame = document.getElementById('google-map-frame');
+        const origin = document.getElementById('gm-origin').value.trim();
+        const destination = document.getElementById('gm-destination').value.trim();
+        const frame = document.getElementById('google-map-frame');
+        const mapContainer = document.getElementById('mapContainer');
+        const mapDisclaimer = document.getElementById('map-disclaimer');
+        const mapBtnLabel = document.getElementById('map-btn-label');
+        const mapBtn = document.getElementById('map-btn');
 
-      // Get the selected locations by their names.
-      const originName = originSelect.value;
-      const destinationName = destinationSelect.value;
-
-      if (!originName || !destinationName) {
-        alert('Please select both a start and end location.');
-        return;
-      }
-
-      // The URL format that performs a direct search for directions.
-      // This is the version that was working for you before.
-      const mapUrl = `https://www.google.com/maps/embed/v1/directions?key=YOUR_API_KEY6?q=${encodeURIComponent(originName)} to ${encodeURIComponent(destinationName)}&output=embed`;
-
-      if (mapContainer.style.display === 'none') {
-          frame.src = mapUrl;
-          mapContainer.style.display = 'block';
-          mapDisclaimer.style.display = 'block';
-          mapBtnLabel.textContent = 'Hide Map (optional)';
-          mapBtn.title = 'Hide Map';
-          mapContainer.scrollIntoView({ behavior: 'smooth' });
-      } else {
-          mapContainer.style.display = 'none';
-          mapDisclaimer.style.display = 'none';
-          mapBtnLabel.textContent = 'Show Map (optional)';
-          mapBtn.title = 'Show Map';
-      }
+        if (mapContainer.style.display === "none" || mapContainer.style.display === "") {
+            if (!origin || !destination) {
+                alert("Please select both a start and end location.");
+                return;
+            }
+            const embedUrl = `https://www.google.com/maps/embed/v1/directions?key=YOUR_API_KEY9${encodeURIComponent(origin + " to " + destination)}&output=embed`;
+            frame.src = embedUrl;
+            mapContainer.style.display = "block";
+            mapDisclaimer.style.display = "block";
+            mapBtnLabel.textContent = "Hide Map (optional)";
+            mapBtn.title = "Hide Map";
+            mapContainer.scrollIntoView({behavior:"smooth"});
+        } else {
+            mapContainer.style.display = "none";
+            mapDisclaimer.style.display = "none";
+            mapBtnLabel.textContent = "Show Map (optional)";
+            mapBtn.title = "Show Map";
+        }
     }
 
     function submitToGoogleSheet() {
