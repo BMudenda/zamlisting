@@ -375,17 +375,15 @@
       vehicleMinPrice: 20,    // Minimum price for a vehicle ride
       motorbikeMinPrice: 10,   // Minimum price for a motorbike ride
       avgSpeed: 60,
-      googleMapsBaseUrl: 'https://www.google.com/maps/embed/v1/directions'
     };
 
     // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
     
     // START OF NEW DATA STRUCTURE FOR PLUS CODES
-    // NOTE: You MUST replace the placeholder Plus Codes with the correct ones for each location.
     const placesWithPlusCodes = [
         { name: "Anglican Church", plusCode: "99HR+W3H" },
-        { name: "Big 2 Zambezi Water Front Resort & Safari", plusCode: "994J+F8X, Luangwa" },
+        { name: "Big 2 Zambezi Water Front Resort & Safari", plusCode: "" },
         { name: "BM residence", plusCode: "" },
         { name: "Boma Clinic", plusCode: "" },
         { name: "Chitope", plusCode: "" },
@@ -800,34 +798,31 @@
     function toggleMap() {
       const frame = document.getElementById('google-map-frame');
 
-      // Get the selected options
-      const originOption = originSelect.options[originSelect.selectedIndex];
-      const destinationOption = destinationSelect.options[destinationSelect.selectedIndex];
-      
-      // Get the plus codes from the data attributes
-      const originPlusCode = originOption.dataset.plusCode;
-      const destinationPlusCode = destinationOption.dataset.plusCode;
+      // Get the selected locations by their names.
+      const originName = originSelect.value;
+      const destinationName = destinationSelect.value;
 
-      if (!originPlusCode || !destinationPlusCode) {
-          alert('Plus Codes for one or both locations are missing. Please update your data list.');
-          return;
+      if (!originName || !destinationName) {
+        alert('Please select both a start and end location.');
+        return;
       }
-      
-      // Construct the Google Maps URL without an API key
-      const mapUrl = `https://www.google.com/maps/embed/v1/directions?key=YOUR_API_KEY&origin=$8? q=${encodeURIComponent(originPlusCode)} to ${encodeURIComponent(destinationPlusCode)}`;
+
+      // The URL format that performs a direct search for directions.
+      // This is the version that was working for you before.
+      const mapUrl = `https://www.google.com/maps/embed/v1/directions?key=YOUR_API_KEY6?q=${encodeURIComponent(originName)} to ${encodeURIComponent(destinationName)}&output=embed`;
 
       if (mapContainer.style.display === 'none') {
-        frame.src = mapUrl;
-        mapContainer.style.display = 'block';
-        mapDisclaimer.style.display = 'block';
-        mapBtnLabel.textContent = 'Hide Map (optional)';
-        mapBtn.title = 'Hide Map';
-        mapContainer.scrollIntoView({ behavior: 'smooth' });
+          frame.src = mapUrl;
+          mapContainer.style.display = 'block';
+          mapDisclaimer.style.display = 'block';
+          mapBtnLabel.textContent = 'Hide Map (optional)';
+          mapBtn.title = 'Hide Map';
+          mapContainer.scrollIntoView({ behavior: 'smooth' });
       } else {
-        mapContainer.style.display = 'none';
-        mapDisclaimer.style.display = 'none';
-        mapBtnLabel.textContent = 'Show Map (optional)';
-        mapBtn.title = 'Show Map';
+          mapContainer.style.display = 'none';
+          mapDisclaimer.style.display = 'none';
+          mapBtnLabel.textContent = 'Show Map (optional)';
+          mapBtn.title = 'Show Map';
       }
     }
 
