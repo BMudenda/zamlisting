@@ -281,7 +281,7 @@
         <div class="map-disclaimer" id="map-disclaimer">
           **This is a demo. The route may vary and is subject to revision by the taxi operator.**
         </div>
-        <iframe id="google-map-frame" style="display: none;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </section>
 
@@ -375,58 +375,24 @@
       vehicleMinPrice: 20,    // Minimum price for a vehicle ride
       motorbikeMinPrice: 10,   // Minimum price for a motorbike ride
       avgSpeed: 60,
+      googleMapsBaseUrl: 'https://maps.google.com/maps?q='
     };
 
     // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
-    
-    // START OF NEW DATA STRUCTURE FOR PLUS CODES
-    const placesWithPlusCodes = [
-        { name: "Anglican Church", plusCode: "99HR+W3H" },
-        { name: "Big 2 Zambezi Water Front Resort & Safari", plusCode: "" },
-        { name: "BM residence", plusCode: "" },
-        { name: "Boma Clinic", plusCode: "" },
-        { name: "Chitope", plusCode: "" },
-        { name: "Chilombwe Community School", plusCode: "" },
-        { name: "Chiriwe Primary School", plusCode: "" },
-        { name: "Dzalo Skills Training Centre kambolozo", plusCode: "" },
-        { name: "Feira Kindom Hall", plusCode: "" },
-        { name: "Feira Day Secondary School", plusCode: "" },
-        { name: "Gerasmos Safari Lodge", plusCode: "" },
-        { name: "JB THREE BOARDERS MALL", plusCode: "" },
-        { name: "Justifeli Lodge", plusCode: "" },
-        { name: "Kakaro Primary School", plusCode: "" },
-        { name: "Kantuleni executive Lodge", plusCode: "" },
-        { name: "Kapoche", plusCode: "" },
-        { name: "Kasinsa", plusCode: "" },
-        { name: "Katondwe Mission Hospital", plusCode: "" },
-        { name: "Kavalamanja", plusCode: "" },
-        { name: "Luangwa (Feira)", plusCode: "99HR+W3H" },
-        { name: "Luangwa Basic School", plusCode: "" },
-        { name: "Luangwa Bridge", plusCode: "" },
-        { name: "Luangwa Bridge Market", plusCode: "" },
-        { name: "Luangwa Council lodge", plusCode: "" },
-        { name: "Luangwa District Comission office", plusCode: "" },
-        { name: "Luangwa District Education Board Offices", plusCode: "" },
-        { name: "Luangwa District Hospital", plusCode: "" },
-        { name: "Luangwa Filling Station", plusCode: "" },
-        { name: "Luangwa Habour", plusCode: "" },
-        { name: "Luangwa Indeco", plusCode: "" },
-        { name: "Luangwa Market", plusCode: "" },
-        { name: "Luangwa main sda churh", plusCode: "" },
-        { name: "Luangwa Police Station", plusCode: "" },
-        { name: "Luangwa Post Office", plusCode: "" },
-        { name: "Luangwa Secondary School", plusCode: "" },
-        { name: "Makichilo Lodge", plusCode: "" },
-        { name: "Mwavi Secondary School", plusCode: "" },
-        { name: "Mwalila Primary School", plusCode: "" },
-        { name: "Pentocostal Assembly of God Joshua Assembly", plusCode: "" },
-        { name: "UCZ", plusCode: "" },
-        { name: "Yangoma Hotel", plusCode: "" },
-        { name: "yellow shop", plusCode: "" },
-        { name: "Zambia Electricity Supply Corporation", plusCode: "" }
+
+    // UPDATED COMPREHENSIVE PLACES LIST (ALPHABETICAL)
+    const places = [
+      "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "BM residence", "Boma Clinic", "Chitope", "Chilombwe Community School","Chiriwe Primary School",
+      "Dzalo Skills Training Centre kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "JB THREE BOARDERS MALL",
+      "Justifeli Lodge", "Kakaro Primary School", "Kantuleni executive Lodge", "Kapoche", "Kavalamanja", "Kasinsa",
+      "Katondwe Mission Hospital", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market",
+      "Luangwa Council lodge", "Luangwa District Comission office", "Luangwa District Education Board Offices",
+      "Luangwa District Hospital", "Luangwa Filling Station", "Luangwa Habour", "Luangwa Indeco", "Luangwa Market",
+      "Luangwa main sda churh", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Secondary School", "Makichilo Lodge",
+      "Mwavi Secondary School","Mwalila Primary School", "Pentocostal Assembly of God Joshua Assembly", "UCZ", "Yangoma Hotel", "yellow shop",
+      "Zambia Electricity Supply Corporation"
     ];
-    // END OF NEW DATA STRUCTURE
 
     const segments = [
       { from: "Anglican Church", to: "Feira Kindom Hall", distance: 0.1 },
@@ -529,18 +495,16 @@
       defaultOptionDestination.selected = true;
       destinationSelect.appendChild(defaultOptionDestination);
 
-      const sortedPlaces = placesWithPlusCodes.slice().sort((a, b) => a.name.localeCompare(b.name));
+      const sortedPlaces = places.slice().sort();
       sortedPlaces.forEach(place => {
         const option1 = document.createElement('option');
-        option1.value = place.name;
-        option1.textContent = place.name;
-        option1.dataset.plusCode = place.plusCode; // Add plus code as a data attribute
+        option1.value = place;
+        option1.textContent = place;
         originSelect.appendChild(option1);
 
         const option2 = document.createElement('option');
-        option2.value = place.name;
-        option2.textContent = place.name;
-        option2.dataset.plusCode = place.plusCode;
+        option2.value = place;
+        option2.textContent = place;
         destinationSelect.appendChild(option2);
       });
     }
@@ -562,7 +526,7 @@
       if (!graph[from] || !graph[to]) return null;
       const distances = {};
       const visited = new Set();
-      placesWithPlusCodes.forEach(place => distances[place.name] = Infinity);
+      places.forEach(place => distances[place] = Infinity);
       distances[from] = 0;
       let queue = [{ place: from, dist: 0 }];
       while (queue.length > 0) {
@@ -795,34 +759,27 @@
       submitBtn.removeAttribute('disabled');
     }
 
-    // REPLACED FUNCTION WITH THE PROVIDED WORKING CODE
     function toggleMap() {
-        const origin = document.getElementById('gm-origin').value.trim();
-        const destination = document.getElementById('gm-destination').value.trim();
-        const frame = document.getElementById('google-map-frame');
-        const mapContainer = document.getElementById('mapContainer');
-        const mapDisclaimer = document.getElementById('map-disclaimer');
-        const mapBtnLabel = document.getElementById('map-btn-label');
-        const mapBtn = document.getElementById('map-btn');
+      const frame = document.getElementById('google-map-frame');
 
-        if (mapContainer.style.display === "none" || mapContainer.style.display === "") {
-            if (!origin || !destination) {
-                alert("Please select both a start and end location.");
-                return;
-            }
-            const embedUrl = `https://www.google.com/maps/embed/v1/directions?key=YOUR_API_KEY9${encodeURIComponent(origin + " to " + destination)}&output=embed`;
-            frame.src = embedUrl;
-            mapContainer.style.display = "block";
-            mapDisclaimer.style.display = "block";
-            mapBtnLabel.textContent = "Hide Map (optional)";
-            mapBtn.title = "Hide Map";
-            mapContainer.scrollIntoView({behavior:"smooth"});
-        } else {
-            mapContainer.style.display = "none";
-            mapDisclaimer.style.display = "none";
-            mapBtnLabel.textContent = "Show Map (optional)";
-            mapBtn.title = "Show Map";
+      if (mapContainer.style.display === 'none') {
+        if (!summaryData) {
+          alert('Please calculate the trip details first.');
+          return;
         }
+        const mapUrl = `${config.googleMapsBaseUrl}${encodeURIComponent(summaryData.from)}+to+${encodeURIComponent(summaryData.to)}&output=embed`;
+        frame.src = mapUrl;
+        mapContainer.style.display = 'block';
+        mapDisclaimer.style.display = 'block';
+        mapBtnLabel.textContent = 'Hide Map (optional)';
+        mapBtn.title = 'Hide Map';
+        mapContainer.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        mapContainer.style.display = 'none';
+        mapDisclaimer.style.display = 'none';
+        mapBtnLabel.textContent = 'Show Map (optional)';
+        mapBtn.title = 'Show Map';
+      }
     }
 
     function submitToGoogleSheet() {
