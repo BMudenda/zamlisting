@@ -318,7 +318,7 @@
                 <span class="heart-icon"></span>Yes
               </label>
               <label class="mode-radio">
-                <input type="radio" name="extraLuggage" value="no" id="extra-luggage-no" checked>
+                <input type="radio" name="extraLuggage" value="no" id="extra-luggage-no">
                 <span class="heart-icon"></span>No
               </label>
             </div>
@@ -540,7 +540,7 @@
             parentGroup.classList.remove('valid');
         }
     }
-    function maskInputValues(origin, destination, phone) {
+    function maskInputValues(origin, destination, phone, mode, extraLuggage) {
       const isPhoneValid = phone.match(/^0[0-9]{9}$/);
       if (isPhoneValid) {
         maskedPhone.textContent = '**********';
@@ -589,7 +589,7 @@
       const vehicleRadio = document.getElementById('mode-vehicle');
       const motorbikeRadio = document.getElementById('mode-motorbike');
       const extraLuggageRadio = document.querySelector('input[name="extraLuggage"]:checked');
-      const hasExtraLuggage = extraLuggageRadio.value === 'yes';
+      const hasExtraLuggage = extraLuggageRadio ? extraLuggageRadio.value === 'yes' : null;
       summaryTableContainer.innerHTML = '';
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
@@ -598,8 +598,9 @@
       const isDestinationValid = destination && destination !== '';
       const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
       const isModeSelected = vehicleRadio.checked || motorbikeRadio.checked;
-      maskInputValues(origin, destination, customerPhone);
-      if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
+      const isExtraLuggageSelected = extraLuggageRadio !== null;
+      maskInputValues(origin, destination, customerPhone, isModeSelected, isExtraLuggageSelected);
+      if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected || !isExtraLuggageSelected) {
           displayStatus('Please fill in all details correctly.', 'failed');
           return;
       }
@@ -749,20 +750,15 @@
           'Content-Type': 'application/x-www-form-urlencoded'
         },
       })
-      .then(response => response.json())
-      .then(data => {
+      .then(response => {
         loader.style.display = 'none';
-        if (data.result === 'success') {
-          displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
-        } else {
-          displayStatus(`Failed to submit: ${data.error || 'Unknown error.'}`, 'failed');
-          submitBtn.removeAttribute('disabled');
-        }
+        displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
+        submitBtn.removeAttribute('disabled');
       })
       .catch(error => {
         loader.style.display = 'none';
-        displayStatus(`Network error: ${error}`, 'failed');
         submitBtn.removeAttribute('disabled');
+        console.error('Submission error:', error);
       });
     }
     function displayStatus(message, type) {
