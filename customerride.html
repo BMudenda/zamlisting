@@ -54,18 +54,18 @@
       max-width: 1200px; margin: 30px auto; padding: 0 20px;
       display: flex; flex-wrap: wrap; gap: 30px;
     }
-    .map-section { 
-      flex: 1 1 100%; 
-      min-width: 300px; 
+    .map-section {
+      flex: 1 1 100%;
+      min-width: 300px;
     }
-    .booking-section { 
-      flex: 1 1 100%; 
-      min-width: 300px; 
+    .booking-section {
+      flex: 1 1 100%;
+      min-width: 300px;
     }
     .map-container {
       background: white; border-radius: 8px;
       box-shadow: var(--box-shadow-light); overflow: hidden;
-      height: 400px; 
+      height: 400px;
       padding: 20px;
       display: none;
     }
@@ -188,7 +188,7 @@
     #summary-table-container {
       width: 100%;
     }
-    
+
     /* ADDED CSS FOR SCROLLING */
     .table-responsive {
       overflow-x: auto;
@@ -196,17 +196,17 @@
     }
 
     table.summary-table {
-      width: 100%; 
-      border-collapse: collapse; 
-      font-size: 0.9rem; 
-      background: #f9fbfd; 
-      border-radius: 6px; 
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: #f9fbfd;
+      border-radius: 6px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       white-space: nowrap; /* Prevents text from wrapping */
     }
     table.summary-table th, table.summary-table td {
-      border: 1px solid #dbeafe; 
-      padding: 8px; 
+      border: 1px solid #dbeafe;
+      padding: 8px;
       text-align: left;
     }
     table.summary-table th {
@@ -279,7 +279,7 @@
 
     @media (min-width: 768px) {
       .map-section {
-        flex: 1 1 60%; 
+        flex: 1 1 60%;
       }
       .booking-section {
         flex: 1 1 35%;
@@ -336,7 +336,7 @@
             <label for="extra-luggage-yes">Extra Person/Luggage?</label>
             <div class="mode-group" id="extra-luggage-group">
               <label class="mode-radio">
-                <input type="radio" name="extraLuggage" value="yes" id="extra-luggage-yes"> 
+                <input type="radio" name="extraLuggage" value="yes" id="extra-luggage-yes">
                 <span class="heart-icon"></span>Yes
               </label>
               <label class="mode-radio">
@@ -409,8 +409,8 @@
       googleMapsBaseUrl: 'https://maps.google.com/maps?q='
     };
 
-    // CHANGE TO YOUR ACTUAL GOOGLE SCRIPT URL
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXsFAuKlId6lbjSWzfrVoV-o8vgYxFiMiivw9v_WUv9r2ejay5prrDaSuFNSYYYEbj/exec";
+    // ⚠️ Updated with your new URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzN_LoIE8sb7H9wuhzIz8kYNqNd-0aWCSS2t0duusBaLqC2DjcK3Affih3Q-3R3QhE/exec";
 
     // UPDATED COMPREHENSIVE PLACES LIST (ALPHABETICAL)
     const places = [
@@ -502,12 +502,12 @@
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
-    
+
     // New masked value elements
     const maskedPhone = document.getElementById('masked-phone');
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
-    
+
     let summaryData = null;
 
     // Populate dropdowns on page load
@@ -629,7 +629,7 @@
       summaryData = null;
       displayStatus('Edit your details and click enter to re-calculate.', 'failed');
     }
-    
+
     // Function to reveal the hidden values
     function reveal(eye) {
       // Hide all values and show all eyes again
@@ -652,12 +652,12 @@
       const motorbikeRadio = document.getElementById('mode-motorbike');
       const extraLuggageRadio = document.querySelector('input[name="extraLuggage"]:checked');
       const hasExtraLuggage = extraLuggageRadio.value === 'yes';
-      
+
       summaryTableContainer.innerHTML = '';
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
-      
+
       // Check for valid inputs
       const isOriginValid = origin && origin !== '';
       const isDestinationValid = destination && destination !== '';
@@ -674,7 +674,7 @@
 
       // If all inputs are valid, proceed with calculation
       const mode = vehicleRadio.checked ? 'Vehicle' : 'Motorbike';
-      
+
       const distance = findShortestDistance(origin, destination, segments);
       if (distance === null || isNaN(distance)) {
         displayStatus('A route could not be found between the selected places.', 'failed');
@@ -703,11 +703,11 @@
       if (hasExtraLuggage) {
         price = price * 1.25;
       }
-      
+
       // Round the final price to the nearest whole number
       price = Math.round(price);
       // --- END OF PRICING LOGIC ---
-      
+
       let timeText = '';
       if (wholeHours > 0) {
         timeText += `${wholeHours} hr`;
@@ -715,7 +715,7 @@
       } else {
         timeText += `${minutes} min`;
       }
-      
+
       // Update UI with summary data
       const tableHTML = `
         <div class="table-responsive">
@@ -772,7 +772,7 @@
         </div>
       `;
       summaryTableContainer.innerHTML = tableHTML;
-      
+
       // Store summary data
       summaryData = {
         preferredMode: mode,
@@ -784,7 +784,7 @@
         estimatedTime: timeText,
         price: price
       };
-      
+
       displayStatus('Trip details calculated. Click submit to send your request.', 'success');
       submitBtn.classList.remove('disabled');
       submitBtn.removeAttribute('disabled');
@@ -818,7 +818,7 @@
         displayStatus('No data to submit.', 'failed');
         return;
       }
-      
+
       const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
 
       const payload = {
@@ -832,11 +832,11 @@
           "price": summaryData.price,
           "timestamp": timestamp
       };
-      
+
       displayStatus('Submitting...', 'info');
       loader.style.display = 'block';
       submitBtn.setAttribute('disabled', 'true');
-      
+
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify(payload),
