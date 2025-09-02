@@ -127,36 +127,23 @@
       display: flex; align-items: center; gap: 5px; font-size: 0.95rem;
       cursor: pointer;
     }
-
-    /* --- Start of new radio button styling --- */
-    /* Hide the original radio input */
     .mode-radio input[type="radio"] {
       display: none;
     }
-
-    /* Style the custom heart icon container */
     .heart-icon {
       font-size: 20px;
-      color: #ccc; /* Unselected color */
+      color: #ccc;
       transition: color 0.2s ease;
     }
-
-    /* Display the empty heart emoji */
     .heart-icon::before {
       content: "♡";
     }
-
-    /* When the radio input is checked, change the color and emoji of the adjacent heart-icon span */
     .mode-radio input[type="radio"]:checked + .heart-icon {
       color: var(--primary-color);
     }
-
     .mode-radio input[type="radio"]:checked + .heart-icon::before {
       content: "♥";
     }
-    /* --- End of new radio button styling --- */
-
-    /* New CSS for hidden inputs and masked values */
     .input-group.valid input,
     .input-group.valid select {
       display: none;
@@ -176,7 +163,6 @@
     .input-group.valid .masked-value {
       display: block;
     }
-
     .summary-table-section {
       margin-top: 20px; padding: 15px; background: var(--bg-color-card);
       border-radius: 8px; box-shadow: var(--box-shadow-light);
@@ -188,13 +174,10 @@
     #summary-table-container {
       width: 100%;
     }
-
-    /* ADDED CSS FOR SCROLLING */
     .table-responsive {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
-
     table.summary-table {
       width: 100%;
       border-collapse: collapse;
@@ -202,7 +185,7 @@
       background: #f9fbfd;
       border-radius: 6px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      white-space: nowrap; /* Prevents text from wrapping */
+      white-space: nowrap;
     }
     table.summary-table th, table.summary-table td {
       border: 1px solid #dbeafe;
@@ -265,8 +248,6 @@
       gap: 15px;
       margin-top: 10px;
     }
-
-    /* New CSS for hiding/revealing values */
     .hidden-value {
       display: none;
       color: green;
@@ -276,7 +257,6 @@
       cursor: pointer;
       font-size: 18px;
     }
-
     @media (min-width: 768px) {
       .map-section {
         flex: 1 1 60%;
@@ -301,7 +281,6 @@
       </div>
     </div>
   </header>
-
   <main class="product-container">
     <section class="map-section">
       <div class="map-container" id="mapContainer">
@@ -311,7 +290,6 @@
         <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </section>
-
     <section class="booking-section">
       <div class="booking-container">
         <div class="inputs-wrapper">
@@ -396,23 +374,16 @@
       </div>
     </section>
   </main>
-
   <script>
-    // Data and Configuration
     const config = {
-      // Pricing Logic
-      vehiclePricePerKm: 6.0,   // Price per kilometer for a vehicle
-      motorbikePricePerKm: 3.0, // Price per kilometer for a motorbike
-      vehicleMinPrice: 20,    // Minimum price for a vehicle ride
-      motorbikeMinPrice: 10,   // Minimum price for a motorbike ride
+      vehiclePricePerKm: 6.0,
+      motorbikePricePerKm: 3.0,
+      vehicleMinPrice: 20,
+      motorbikeMinPrice: 10,
       avgSpeed: 60,
-      googleMapsBaseUrl: 'https://maps.google.com/maps?q='
+      googleMapsBaseUrl: 'https://www.google.com/maps/dir/?api=1&origin='
     };
-
-    // ⚠️ Updated with your new URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzN_LoIE8sb7H9wuhzIz8kYNqNd-0aWCSS2t0duusBaLqC2DjcK3Affih3Q-3R3QhE/exec";
-
-    // UPDATED COMPREHENSIVE PLACES LIST (ALPHABETICAL)
     const places = [
       "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "BM residence", "Boma Clinic", "Chitope", "Chilombwe Community School","Chiriwe Primary School",
       "Dzalo Skills Training Centre kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "JB THREE BOARDERS MALL",
@@ -424,7 +395,6 @@
       "Mwavi Secondary School","Mwalila Primary School", "Pentocostal Assembly of God Joshua Assembly", "UCZ", "Yangoma Hotel", "yellow shop",
       "Zambia Electricity Supply Corporation"
     ];
-
     const segments = [
       { from: "Anglican Church", to: "Feira Kindom Hall", distance: 0.1 },
       { from: "Anglican Church", to: "Feira Day Secondary School", distance: 3.5 },
@@ -488,8 +458,6 @@
       { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0 },
       { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 }
     ];
-
-    // DOM Elements
     const originSelect = document.getElementById('gm-origin');
     const destinationSelect = document.getElementById('gm-destination');
     const customerPhoneInput = document.getElementById('customer-phone');
@@ -502,15 +470,10 @@
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
-
-    // New masked value elements
     const maskedPhone = document.getElementById('masked-phone');
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
-
     let summaryData = null;
-
-    // Populate dropdowns on page load
     function populateDropdowns() {
       const defaultOptionOrigin = document.createElement('option');
       defaultOptionOrigin.value = "";
@@ -518,29 +481,24 @@
       defaultOptionOrigin.disabled = true;
       defaultOptionOrigin.selected = true;
       originSelect.appendChild(defaultOptionOrigin);
-
       const defaultOptionDestination = document.createElement('option');
       defaultOptionDestination.value = "";
       defaultOptionDestination.textContent = "Select...";
       defaultOptionDestination.disabled = true;
       defaultOptionDestination.selected = true;
       destinationSelect.appendChild(defaultOptionDestination);
-
       const sortedPlaces = places.slice().sort();
       sortedPlaces.forEach(place => {
         const option1 = document.createElement('option');
         option1.value = place;
         option1.textContent = place;
         originSelect.appendChild(option1);
-
         const option2 = document.createElement('option');
         option2.value = place;
         option2.textContent = place;
         destinationSelect.appendChild(option2);
       });
     }
-
-    // Graph Functions (Dijkstra-like algorithm)
     function buildGraph(segments) {
       const graph = {};
       segments.forEach(seg => {
@@ -551,7 +509,6 @@
       });
       return graph;
     }
-
     function findShortestDistance(from, to, segments) {
       const graph = buildGraph(segments);
       if (!graph[from] || !graph[to]) return null;
@@ -575,8 +532,6 @@
       }
       return null;
     }
-
-    // Function to update validation tick status
     function updateValidationStatus(element, isValid) {
         const parentGroup = element.closest('.input-group');
         if (isValid) {
@@ -585,10 +540,7 @@
             parentGroup.classList.remove('valid');
         }
     }
-
-    // New function to hide input values and display masked ones
     function maskInputValues(origin, destination, phone) {
-      // Mask phone number
       const isPhoneValid = phone.match(/^0[0-9]{9}$/);
       if (isPhoneValid) {
         maskedPhone.textContent = '**********';
@@ -597,8 +549,6 @@
         maskedPhone.textContent = '';
         updateValidationStatus(customerPhoneInput, false);
       }
-
-      // Mask origin
       const isOriginValid = origin && origin !== '';
       if (isOriginValid) {
         maskedOrigin.textContent = '**********';
@@ -607,8 +557,6 @@
         maskedOrigin.textContent = '';
         updateValidationStatus(originSelect, false);
       }
-
-      // Mask destination
       const isDestinationValid = destination && destination !== '';
       if (isDestinationValid) {
         maskedDestination.textContent = '**********';
@@ -618,8 +566,6 @@
         updateValidationStatus(destinationSelect, false);
       }
     }
-
-    // Function to reset the form and allow editing
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
       parentGroup.classList.remove('valid');
@@ -629,22 +575,14 @@
       summaryData = null;
       displayStatus('Edit your details and click enter to re-calculate.', 'failed');
     }
-
-    // Function to reveal the hidden values
     function reveal(eye) {
-      // Hide all values and show all eyes again
       document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
       document.querySelectorAll(".eye-btn").forEach(e => e.style.display = "inline");
-
-      // Show only the clicked one
       let value = eye.previousElementSibling;
       value.style.display = "inline";
       eye.style.display = "none";
     }
-
-    // Event Handlers
     function updateSummaryTable() {
-      // Capture the current values before any hiding happens
       const origin = originSelect.value;
       const destination = destinationSelect.value;
       const customerPhone = customerPhoneInput.value.trim();
@@ -652,62 +590,40 @@
       const motorbikeRadio = document.getElementById('mode-motorbike');
       const extraLuggageRadio = document.querySelector('input[name="extraLuggage"]:checked');
       const hasExtraLuggage = extraLuggageRadio.value === 'yes';
-
       summaryTableContainer.innerHTML = '';
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
-
-      // Check for valid inputs
       const isOriginValid = origin && origin !== '';
       const isDestinationValid = destination && destination !== '';
       const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
       const isModeSelected = vehicleRadio.checked || motorbikeRadio.checked;
-
-      // Update validation ticks and masked values
       maskInputValues(origin, destination, customerPhone);
-
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
           displayStatus('Please fill in all details correctly.', 'failed');
           return;
       }
-
-      // If all inputs are valid, proceed with calculation
       const mode = vehicleRadio.checked ? 'Vehicle' : 'Motorbike';
-
       const distance = findShortestDistance(origin, destination, segments);
       if (distance === null || isNaN(distance)) {
         displayStatus('A route could not be found between the selected places.', 'failed');
         return;
       }
-
       const timeHours = distance / config.avgSpeed;
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
-
-      // --- START OF PRICING LOGIC ---
       let price = 0;
       if (mode === 'Vehicle') {
-        // Calculate price based on distance
         price = distance * config.vehiclePricePerKm;
-        // Ensure price is at least the minimum
         price = Math.max(price, config.vehicleMinPrice);
-      } else { // Motorbike
-        // Calculate price based on distance
+      } else {
         price = distance * config.motorbikePricePerKm;
-        // Ensure price is at least the minimum
         price = Math.max(price, config.motorbikeMinPrice);
       }
-
-      // Add 25% to the price if extra luggage is selected
       if (hasExtraLuggage) {
         price = price * 1.25;
       }
-
-      // Round the final price to the nearest whole number
       price = Math.round(price);
-      // --- END OF PRICING LOGIC ---
-
       let timeText = '';
       if (wholeHours > 0) {
         timeText += `${wholeHours} hr`;
@@ -715,8 +631,6 @@
       } else {
         timeText += `${minutes} min`;
       }
-
-      // Update UI with summary data
       const tableHTML = `
         <div class="table-responsive">
           <table class="summary-table">
@@ -772,8 +686,6 @@
         </div>
       `;
       summaryTableContainer.innerHTML = tableHTML;
-
-      // Store summary data
       summaryData = {
         preferredMode: mode,
         extraLuggage: hasExtraLuggage ? 'Yes' : 'No',
@@ -784,21 +696,18 @@
         estimatedTime: timeText,
         price: price
       };
-
       displayStatus('Trip details calculated. Click submit to send your request.', 'success');
       submitBtn.classList.remove('disabled');
       submitBtn.removeAttribute('disabled');
     }
-
     function toggleMap() {
       const frame = document.getElementById('google-map-frame');
-
       if (mapContainer.style.display === 'none') {
         if (!summaryData) {
           alert('Please calculate the trip details first.');
           return;
         }
-        const mapUrl = `${config.googleMapsBaseUrl}${encodeURIComponent(summaryData.from)}+to+${encodeURIComponent(summaryData.to)}&output=embed`;
+        const mapUrl = `${config.googleMapsBaseUrl}S_PLACEHOLDER&destination=${encodeURIComponent(summaryData.to)}&origin=${encodeURIComponent(summaryData.from)}`;
         frame.src = mapUrl;
         mapContainer.style.display = 'block';
         mapDisclaimer.style.display = 'block';
@@ -812,36 +721,32 @@
         mapBtn.title = 'Show Map';
       }
     }
-
     function submitToGoogleSheet() {
       if (!summaryData) {
         displayStatus('No data to submit.', 'failed');
         return;
       }
-
       const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
-
       const payload = {
-          "preferredMode": summaryData.preferredMode,
-          "extraLuggage": summaryData.extraLuggage,
-          "phone": summaryData.phone,
-          "from": summaryData.from,
-          "to": summaryData.to,
-          "distance": summaryData.distance,
-          "estimatedTime": summaryData.estimatedTime,
-          "price": summaryData.price,
-          "timestamp": timestamp
+        "preferredMode": summaryData.preferredMode,
+        "extraLuggage": summaryData.extraLuggage,
+        "phone": summaryData.phone,
+        "from": summaryData.from,
+        "to": summaryData.to,
+        "distance": summaryData.distance,
+        "estimatedTime": summaryData.estimatedTime,
+        "price": summaryData.price,
+        "timestamp": timestamp
       };
-
+      const formBody = new URLSearchParams(payload);
       displayStatus('Submitting...', 'info');
       loader.style.display = 'block';
       submitBtn.setAttribute('disabled', 'true');
-
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: formBody,
         headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
       })
       .then(response => response.json())
@@ -860,32 +765,25 @@
         submitBtn.removeAttribute('disabled');
       });
     }
-
     function displayStatus(message, type) {
       submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
       submitStatusDiv.className = `submit-status ${type}`;
     }
-
-    // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
     });
-
     originSelect.addEventListener('change', updateSummaryTable);
     destinationSelect.addEventListener('change', updateSummaryTable);
     customerPhoneInput.addEventListener('input', updateSummaryTable);
     modeGroup.addEventListener('change', updateSummaryTable);
     document.getElementById('extra-luggage-group').addEventListener('change', updateSummaryTable);
-
     maskedPhone.addEventListener('click', resetValidation);
     maskedOrigin.addEventListener('click', resetValidation);
     maskedDestination.addEventListener('click', resetValidation);
-
     submitBtn.addEventListener('click', (e) => {
       e.preventDefault();
       submitToGoogleSheet();
     });
-
     mapBtn.addEventListener('click', (e) => {
       e.preventDefault();
       toggleMap();
