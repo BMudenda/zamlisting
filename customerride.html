@@ -395,6 +395,53 @@
       "Mwavi Secondary School","Mwalila Primary School", "Pentocostal Assembly of God Joshua Assembly", "UCZ", "Yangoma Hotel", "yellow shop",
       "Zambia Electricity Supply Corporation"
     ];
+
+    const placeCoordinates = {
+      "Anglican Church": { lat: -15.613, lng: 30.419 },
+      "Big 2 Zambezi Water Front Resort & Safari": { lat: -15.625, lng: 30.395 },
+      "BM residence": { lat: -15.617, lng: 30.417 },
+      "Boma Clinic": { lat: -15.621, lng: 30.418 },
+      "Chitope": { lat: -15.500, lng: 30.350 },
+      "Chilombwe Community School": { lat: -15.545, lng: 30.360 },
+      "Chiriwe Primary School": { lat: -15.200, lng: 30.220 },
+      "Dzalo Skills Training Centre kambolozo": { lat: -15.623, lng: 30.419 },
+      "Feira Kindom Hall": { lat: -15.614, lng: 30.418 },
+      "Feira Day Secondary School": { lat: -15.603, lng: 30.392 },
+      "Gerasmos Safari Lodge": { lat: -15.608, lng: 30.420 },
+      "JB THREE BOARDERS MALL": { lat: -15.215, lng: 30.225 },
+      "Justifeli Lodge": { lat: -15.605, lng: 30.419 },
+      "Kakaro Primary School": { lat: -15.580, lng: 30.380 },
+      "Kantuleni executive Lodge": { lat: -15.622, lng: 30.419 },
+      "Kapoche": { lat: -15.545, lng: 30.360 },
+      "Kavalamanja": { lat: -15.630, lng: 30.440 },
+      "Kasinsa": { lat: -15.530, lng: 30.340 },
+      "Katondwe Mission Hospital": { lat: -15.190, lng: 30.210 },
+      "Luangwa (Feira)": { lat: -15.616, lng: 30.416 },
+      "Luangwa Basic School": { lat: -15.618, lng: 30.417 },
+      "Luangwa Bridge": { lat: -15.620, lng: 30.425 },
+      "Luangwa Bridge Market": { lat: -15.616, lng: 30.416 },
+      "Luangwa Council lodge": { lat: -15.618, lng: 30.418 },
+      "Luangwa District Comission office": { lat: -15.617, lng: 30.417 },
+      "Luangwa District Education Board Offices": { lat: -15.606, lng: 30.420 },
+      "Luangwa District Hospital": { lat: -15.620, lng: 30.420 },
+      "Luangwa Filling Station": { lat: -15.620, lng: 30.418 },
+      "Luangwa Habour": { lat: -15.620, lng: 30.420 },
+      "Luangwa Indeco": { lat: -15.618, lng: 30.419 },
+      "Luangwa Market": { lat: -15.615, lng: 30.417 },
+      "Luangwa main sda churh": { lat: -15.607, lng: 30.419 },
+      "Luangwa Police Station": { lat: -15.617, lng: 30.416 },
+      "Luangwa Post Office": { lat: -15.616, lng: 30.417 },
+      "Luangwa Secondary School": { lat: -15.233, lng: 30.233 },
+      "Makichilo Lodge": { lat: -15.615, lng: 30.418 },
+      "Mwavi Secondary School": { lat: -15.200, lng: 30.220 },
+      "Mwalila Primary School": { lat: -15.560, lng: 30.370 },
+      "Pentocostal Assembly of God Joshua Assembly": { lat: -15.617, lng: 30.418 },
+      "UCZ": { lat: -15.618, lng: 30.419 },
+      "Yangoma Hotel": { lat: -15.619, lng: 30.418 },
+      "yellow shop": { lat: -15.616, lng: 30.417 },
+      "Zambia Electricity Supply Corporation": { lat: -15.604, lng: 30.400 }
+    };
+
     const segments = [
       { from: "Anglican Church", to: "Feira Kindom Hall", distance: 0.1 },
       { from: "Anglican Church", to: "Feira Day Secondary School", distance: 3.5 },
@@ -708,7 +755,11 @@
           alert('Please calculate the trip details first.');
           return;
         }
-        const mapUrl = `${config.googleMapsBaseUrl}S_PLACEHOLDER&destination=${encodeURIComponent(summaryData.to)}&origin=${encodeURIComponent(summaryData.from)}`;
+
+        const fromCoords = placeCoordinates[summaryData.from];
+        const toCoords = placeCoordinates[summaryData.to];
+        const mapUrl = `https://maps.google.com/maps?q=&saddr=${fromCoords.lat},${fromCoords.lng}&daddr=${toCoords.lat},${toCoords.lng}&output=embed`;
+
         frame.src = mapUrl;
         mapContainer.style.display = 'block';
         mapDisclaimer.style.display = 'block';
