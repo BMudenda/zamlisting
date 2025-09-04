@@ -241,6 +241,62 @@
         flex: 1 1 50%;
       }
     }
+    .option-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+    }
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .radio-item, .checkbox-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 10px;
+      font-size: 1rem;
+    }
+    .radio-item input[type="radio"], .checkbox-item input[type="checkbox"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+    }
+    .radio-item input[type="radio"] {
+        border-radius: 50%;
+    }
+    .radio-item input[type="radio"]:checked:after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .checkbox-item input[type="checkbox"]:checked {
+      background-color: var(--primary-color);
+    }
+    .checkbox-item input[type="checkbox"]:checked:after {
+      content: '✔';
+      color: white;
+      font-size: 14px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   </style>
 </head>
 <body>
@@ -261,34 +317,26 @@
     <section class="booking-section">
       <div class="booking-container">
         <div class="inputs-wrapper">
-          <div class="input-group" id="mode-group-wrapper">
+          <div class="input-group" id="service-wrapper">
             <span class="material-icons input-icon">commute</span>
-            <label for="mode-of-transport">Preferred Mode</label>
-            <div class="mode-group" id="mode-group">
-              <label class="mode-radio">
-                <input type="radio" name="mode" value="vehicle" id="mode-vehicle">
-                <span class="heart-icon"></span>
-                <span class="material-icons">directions_car</span>Vehicle
-              </label>
-              <label class="mode-radio">
-                <input type="radio" name="mode" value="motorbike" id="mode-motorbike">
-                <span class="heart-icon"></span>
-                <span class="material-icons">two_wheeler</span>Motorbike
-              </label>
-            </div>
-          </div>
-          <div class="input-group" id="extra-luggage-wrapper">
-            <span class="material-icons input-icon">shopping_bag</span>
-            <label for="extra-luggage-yes">Extra Person/Luggage?</label>
-            <div class="mode-group" id="extra-luggage-group">
-              <label class="mode-radio">
-                <input type="radio" name="extraLuggage" value="yes" id="extra-luggage-yes">
-                <span class="heart-icon"></span>Yes
-              </label>
-              <label class="mode-radio">
-                <input type="radio" name="extraLuggage" value="no" id="extra-luggage-no">
-                <span class="heart-icon"></span>No
-              </label>
+            <label>Preferred Transport mode & Extras</label>
+            <div class="option-group">
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="mode-vehicle" name="mode" value="vehicle" checked>
+                        <label for="mode-vehicle">Vehicle 🚗</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="mode-motorbike" name="mode" value="motorbike">
+                        <label for="mode-motorbike">Motorbike 🏍️</label>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="extra-luggage-checkbox" name="extra-luggage" value="yes">
+                        <label for="extra-luggage-checkbox">Luggage/persons🧳</label>
+                    </div>
+                </div>
             </div>
           </div>
           <div class="input-group" id="customer-phone-wrapper">
@@ -350,8 +398,8 @@
     const places = [
       "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "BM residence", "Boma Clinic", "Chitope", "Chilombwe Community School","Chiriwe Primary School",
       "Dzalo Skills Training Centre kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "JB THREE BOARDERS MALL",
-      "Justifeli Lodge", "Kakaro Primary School", "Kantuleni executive Lodge", "Kapoche", "Kavalamanja", "Kasinsa",
-      "Katondwe Mission Hospital", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market",
+      "Justifeli Lodge", "Kakaro Primary School", "Kantuleni executive Lodge", "Kapoche", "Kasinsa",
+      "Katondwe Mission Hospital", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market",
       "Luangwa Council lodge", "Luangwa District Comission office", "Luangwa District Education Board Offices",
       "Luangwa District Hospital", "Luangwa Filling Station", "Luangwa Habour", "Luangwa Indeco", "Luangwa Market",
       "Luangwa main sda churh", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Secondary School", "Makichilo Lodge",
@@ -424,7 +472,9 @@
     const originSelect = document.getElementById('gm-origin');
     const destinationSelect = document.getElementById('gm-destination');
     const customerPhoneInput = document.getElementById('customer-phone');
-    const modeGroup = document.getElementById('mode-group');
+    const modeVehicleRadio = document.getElementById('mode-vehicle');
+    const modeMotorbikeRadio = document.getElementById('mode-motorbike');
+    const extraLuggageCheckbox = document.getElementById('extra-luggage-checkbox');
     const summaryTableContainer = document.getElementById('summary-table-container');
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
@@ -499,31 +549,18 @@
             parentGroup.classList.remove('valid');
         }
     }
-    function maskInputValues(origin, destination, phone, mode, extraLuggage) {
+    function maskInputValues(origin, destination, phone) {
       const isPhoneValid = phone.match(/^0[0-9]{9}$/);
-      if (isPhoneValid) {
-        maskedPhone.textContent = '**********';
-        updateValidationStatus(customerPhoneInput, true);
-      } else {
-        maskedPhone.textContent = '';
-        updateValidationStatus(customerPhoneInput, false);
-      }
+      updateValidationStatus(customerPhoneInput, isPhoneValid);
+      maskedPhone.textContent = '**********';
+      
       const isOriginValid = origin && origin !== '';
-      if (isOriginValid) {
-        maskedOrigin.textContent = '**********';
-        updateValidationStatus(originSelect, true);
-      } else {
-        maskedOrigin.textContent = '';
-        updateValidationStatus(originSelect, false);
-      }
+      updateValidationStatus(originSelect, isOriginValid);
+      maskedOrigin.textContent = '**********';
+      
       const isDestinationValid = destination && destination !== '';
-      if (isDestinationValid) {
-        maskedDestination.textContent = '**********';
-        updateValidationStatus(destinationSelect, true);
-      } else {
-        maskedDestination.textContent = '';
-        updateValidationStatus(destinationSelect, false);
-      }
+      updateValidationStatus(destinationSelect, isDestinationValid);
+      maskedDestination.textContent = '**********';
     }
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
@@ -545,34 +582,42 @@
       const origin = originSelect.value;
       const destination = destinationSelect.value;
       const customerPhone = customerPhoneInput.value.trim();
-      const vehicleRadio = document.getElementById('mode-vehicle');
-      const motorbikeRadio = document.getElementById('mode-motorbike');
-      const extraLuggageRadio = document.querySelector('input[name="extraLuggage"]:checked');
-      const hasExtraLuggage = extraLuggageRadio ? extraLuggageRadio.value === 'yes' : null;
+      
+      const isVehicleSelected = modeVehicleRadio.checked;
+      const isMotorbikeSelected = modeMotorbikeRadio.checked;
+      const isExtraLuggageChecked = extraLuggageCheckbox.checked;
+      
       summaryTableContainer.innerHTML = '';
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
+      
       const isOriginValid = origin && origin !== '';
       const isDestinationValid = destination && destination !== '';
       const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
-      const isModeSelected = vehicleRadio.checked || motorbikeRadio.checked;
-      const isExtraLuggageSelected = extraLuggageRadio !== null;
-      maskInputValues(origin, destination, customerPhone, isModeSelected, isExtraLuggageSelected);
-      if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected || !isExtraLuggageSelected) {
+      const isModeSelected = isVehicleSelected || isMotorbikeSelected;
+      
+      maskInputValues(origin, destination, customerPhone);
+      
+      if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
           displayStatus('Please fill in all details correctly.', 'failed');
           return;
       }
-      const mode = vehicleRadio.checked ? 'Vehicle' : 'Motorbike';
+      
+      const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
+      const hasExtraLuggage = isExtraLuggageChecked;
       const distance = findShortestDistance(origin, destination, segments);
+      
       if (distance === null || isNaN(distance)) {
         displayStatus('A route could not be found between the selected places.', 'failed');
         return;
       }
+      
       const timeHours = distance / config.avgSpeed;
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
       let price = 0;
+      
       if (mode === 'Vehicle') {
         price = distance * config.vehiclePricePerKm;
         price = Math.max(price, config.vehicleMinPrice);
@@ -580,9 +625,11 @@
         price = distance * config.motorbikePricePerKm;
         price = Math.max(price, config.motorbikeMinPrice);
       }
+      
       if (hasExtraLuggage) {
         price = price * 1.25;
       }
+      
       price = Math.round(price);
       let timeText = '';
       if (wholeHours > 0) {
@@ -591,6 +638,7 @@
       } else {
         timeText += `${minutes} min`;
       }
+      
       const tableHTML = `
         <div class="table-responsive">
           <table class="summary-table">
@@ -660,6 +708,7 @@
       submitBtn.classList.remove('disabled');
       submitBtn.removeAttribute('disabled');
     }
+    
     function submitToGoogleSheet() {
       if (!summaryData) {
         displayStatus('No data to submit.', 'failed');
@@ -699,21 +748,31 @@
         console.error('Submission error:', error);
       });
     }
+    
     function displayStatus(message, type) {
       submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
       submitStatusDiv.className = `submit-status ${type}`;
     }
+    
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
+      
+      // Event listeners for radio and checkbox
+      modeVehicleRadio.addEventListener('change', updateSummaryTable);
+      modeMotorbikeRadio.addEventListener('change', updateSummaryTable);
+      extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
+      
+      // Add event listeners for other inputs
+      originSelect.addEventListener('change', updateSummaryTable);
+      destinationSelect.addEventListener('change', updateSummaryTable);
+      customerPhoneInput.addEventListener('input', updateSummaryTable);
     });
-    originSelect.addEventListener('change', updateSummaryTable);
-    destinationSelect.addEventListener('change', updateSummaryTable);
-    customerPhoneInput.addEventListener('input', updateSummaryTable);
-    modeGroup.addEventListener('change', updateSummaryTable);
-    document.getElementById('extra-luggage-group').addEventListener('change', updateSummaryTable);
+    
+    // Reset validation for masked values
     maskedPhone.addEventListener('click', resetValidation);
     maskedOrigin.addEventListener('click', resetValidation);
     maskedDestination.addEventListener('click', resetValidation);
+    
     submitBtn.addEventListener('click', (e) => {
       e.preventDefault();
       submitToGoogleSheet();
