@@ -29,7 +29,7 @@
       --border-color-light: #ccc;
       --border-color-blue: #2563eb;
       --box-shadow-light: 0 2px 5px rgba(0,0,0,0.1);
-      --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
+      --box-shadow-strong: 0 4-px 8-px rgba(0, 0, 0, 0.2);
       --font-color-dark: #333;
       --font-color-medium: #2d3a4a;
     }
@@ -66,7 +66,7 @@
     }
     .inputs-wrapper { display: flex; flex-direction: column; gap: 15px; margin: 15px 0; }
     .input-group {
-      position: relative; background: var(--bg-color-input); border-radius: 5-px;
+      position: relative; background: var(--bg-color-input); border-radius: 5px;
       padding: 10px 10px 10px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .input-group label {
@@ -245,12 +245,29 @@
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
-        align-items: center;
+        align-items: flex-start;
     }
     .radio-group, .checkbox-group {
       display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
+      flex-direction: column;
+      gap: 10px;
+      border: 1px solid var(--border-color-light);
+      border-radius: 5px;
+      padding: 10px;
+      background: #f9fbfd;
+      flex-grow: 1; /* Allow fieldsets to grow and take up space */
+      flex-basis: 0; /* Ensures they share space evenly */
+    }
+    .radio-group {
+      flex-direction: row;
+      gap: 20px;
+    }
+    .radio-group legend, .checkbox-group legend {
+      font-weight: bold;
+      color: var(--primary-color);
+      font-size: 0.95rem;
+      padding: 0 5px;
+      margin-bottom: 5px;
     }
     .radio-item, .checkbox-item {
       display: flex;
@@ -297,6 +314,20 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+    
+    /* Additional fix for horizontal alignment */
+    .option-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Make both fieldsets equal width on larger screens */
+    .radio-group,
+    .checkbox-group {
+        flex: 1; /* This is the key change to make them side-by-side and responsive */
+        min-width: 150px; /* Optional: ensures they don't get too small */
+    }
   </style>
 </head>
 <body>
@@ -319,9 +350,10 @@
         <div class="inputs-wrapper">
           <div class="input-group" id="service-wrapper">
             <span class="material-icons input-icon">commute</span>
-            <label>Preferred Transport Mode & Extras</label>
+            <label>Trip Customization</label>
             <div class="option-group">
-                <div class="radio-group">
+                <fieldset class="radio-group">
+                    <legend>Transport Mode</legend>
                     <div class="radio-item">
                         <input type="radio" id="mode-vehicle" name="mode" value="vehicle">
                         <label for="mode-vehicle">Vehicle 🚗</label>
@@ -330,13 +362,14 @@
                         <input type="radio" id="mode-motorbike" name="mode" value="motorbike">
                         <label for="mode-motorbike">Motorbike 🏍️</label>
                     </div>
-                </div>
-                <div class="checkbox-group">
+                </fieldset>
+                <fieldset class="checkbox-group">
+                    <legend>Extras</legend>
                     <div class="checkbox-item">
                         <input type="checkbox" id="extra-luggage-checkbox" name="extra-luggage" value="yes">
                         <label for="extra-luggage-checkbox">Luggage/Extra-persons🧳👤</label>
                     </div>
-                </div>
+                </fieldset>
             </div>
           </div>
           <div class="input-group" id="customer-phone-wrapper">
