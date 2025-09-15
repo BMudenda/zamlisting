@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Google Sheet Viewer — Filter & Share</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:18px; background:#f6f7fb}
+    .wrap{max-width:1200px;margin:0 auto}
+    h1{margin:6px 0 12px;font-size:20px}
+    #status{font-size:13px;color:#333;margin-bottom:8px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+    select,input[type="text"]{padding:8px;border-radius:6px;border:1px solid #ccc}
+    button{padding:8px 10px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer}
+    .tableWrap{overflow:auto;border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
+    th{background:#fafafa;position:sticky;top:0;cursor:pointer;user-select:none}
+    th .arrow{margin-left:6px;font-size:12px;color:#666;line-height:1}
+    tr:nth-child(even){background:#fbfbfb}
+    tr.selected{background:#d0ebff !important}
+    .small{font-size:12px;color:#666}
+    .shareBox{margin-top:10px;display:none;gap:10px}
+    @media (max-width:640px){ th,td{padding:8px} .controls{flex-direction:column} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Google Sheet Viewer — Filter & Share</h1>
+    <div id="status" class="small">Status: idle</div>
+
+    <div class="controls">
+      <input id="searchBox" type="text" placeholder="Search..." />
+      <div style="margin-left:auto" class="small">Rows: <span id="rowCount">0</span></div>
+    </div>
+
+    <div class="tableWrap" style="max-height:70vh;">
+      <table id="table" role="table" aria-label="Sheet data">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="shareBox" class="shareBox">
+      <button id="copyBtn">Copy Row</button>
+      <button id="smsBtn">Share via SMS</button>
+      <button id="waBtn">Share via WhatsApp</button>
+    </div>
+  </div>
+  
+  <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    (function(){
+      const defaultCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRQ6DOYBkE2Vbo6urPok9LqXctRh3EY8L-KXscsahWeDUW-Sj00NrDDcxl2IW5bN1K1rk-rbb2JhJ5J/pub?output=csv";
+      const statusEl = document.getElementById('status');
+      const searchBox = document.getElementById('searchBox');
+      const tableHead = document.querySelector('#table thead');
+      const tableBody = document.querySelector('#table tbody');
+      const rowCountEl = document.getElementById('rowCount');
+      const shareBox = document.getElementById('shareBox');
+      const copyBtn = document.getElementById('copyBtn');
+      const smsBtn = document.getElementById('smsBtn');
+      const waBtn = document.getElementById('waBtn');
+      const alertSound = document.getElementById('alertSound');
+
+      let useProxy = 'auto';
+      let headers = [];
+      let allData = [];
+      let currentSort = {col:null, dir:1};
+      let selectedRow = null;
+      let lastRowCount = 0;
+
+      function setStatus(msg, isError=false){
+        statusEl.textContent = 'Status: ' + msg;
+        statusEl.style.color = isError ? '#b00020' : '#333';
+        console.log('[SheetViewer]', msg);
+      }
+
+      async function fetchTextWithFallback(url){
+        try {
+          const r = await fetch(url, {cache:'no-cache'});
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return await r.text();
+        } catch (err) {
+          if (useProxy === false) throw err;
+          const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+          const r2 = await fetch(proxyUrl);
+          if(!r2.ok) throw new Error('Proxy failed: ' + r2.status);
+          return await r2.text();
+        }
+      }
+
+      function sanitizeText(s){ return (s == null) ? '' : String(s); }
+      
+      function renderTable(){
+        tableBody.innerHTML = '';
+        tableHead.innerHTML = '';
+        shareBox.style.display = "none";
+        selectedRow = null;
+
+        const trh = document.createElement('tr');
+        headers.forEach(h => {
+          const th = document.createElement('th');
+          th.textContent = h;
+          th.style.cursor = 'pointer';
+          th.addEventListener('click', ()=>{ toggleSort(h); });
+          if (h === currentSort.col) {
+            const arrow = document.createElement('span');
+            arrow.className = 'arrow';
+            arrow.textContent = currentSort.dir === 1 ? '▼' : '▲';
+            th.appendChild(arrow);
+          }
+          trh.appendChild(th);
+        });
+        tableHead.appendChild(trh);
+
+        let filtered = allData;
+        const searchTerm = searchBox.value.toLowerCase().trim();
+
+        if (searchTerm) {
+          filtered = filtered.filter(row =>
+            headers.some(h => sanitizeText(row[h]).toLowerCase().includes(searchTerm))
+          );
+        }
+
+        if (currentSort.col) {
+          const col = currentSort.col, dir = currentSort.dir;
+          filtered = filtered.slice().sort((a,b)=>{
+            const av = sanitizeText(a[col]);
+            const bv = sanitizeText(b[col]);
+            if (col.toLowerCase().includes('timestamp')) {
+              return (new Date(av) - new Date(bv)) * dir;
+            } else {
+              return av.localeCompare(bv) * dir;
+            }
+          });
+        }
+
+        const frag = document.createDocumentFragment();
+        for (const row of filtered) {
+          const tr = document.createElement('tr');
+          tr.addEventListener('click', () => selectRow(row, tr));
+          for (const h of headers) {
+            const td = document.createElement('td');
+            td.textContent = sanitizeText(row[h]);
+            tr.appendChild(td);
+          }
+          frag.appendChild(tr);
+        }
+        tableBody.innerHTML = '';
+        tableBody.appendChild(frag);
+        rowCountEl.textContent = filtered.length;
+      }
+
+      function toggleSort(col){
+        if (currentSort.col === col) currentSort.dir = -currentSort.dir;
+        else { currentSort.col = col; currentSort.dir = 1; }
+        renderTable();
+      }
+
+      function selectRow(row, tr){
+        tableBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+        tr.classList.add("selected");
+        selectedRow = row;
+        shareBox.style.display = "flex";
+      }
+
+      function getRowText(row){
+        return headers.map(h => `${h}: ${sanitizeText(row[h])}`).join("\n");
+      }
+
+      copyBtn.onclick = () => {
+        if (selectedRow) {
+          navigator.clipboard.writeText(getRowText(selectedRow));
+          alert("Row copied to clipboard!");
+        }
+      };
+
+      smsBtn.onclick = () => {
+        if (selectedRow) {
+          const msg = encodeURIComponent(getRowText(selectedRow));
+          window.location.href = `sms:?body=${msg}`;
+        }
+      };
+
+      waBtn.onclick = () => {
+        if (selectedRow) {
+          const msg = encodeURIComponent(getRowText(selectedRow));
+          window.open(`https://wa.me/?text=${msg}`, "_blank");
+        }
+      };
+
+      function debounce(func, delay) {
+          let timeout;
+          return function(...args) {
+              const context = this;
+              clearTimeout(timeout);
+              timeout = setTimeout(() => func.apply(context, args), delay);
+          };
+      }
+
+      async function loadAndRender(){
+        const url = defaultCsv;
+        setStatus('Loading CSV...');
+        try {
+          const text = await fetchTextWithFallback(url);
+          const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+          headers = parsed.meta.fields || [];
+          const newAllData = parsed.data || [];
+
+          if (newAllData.length > lastRowCount) {
+              alertSound.play();
+          }
+          lastRowCount = newAllData.length;
+          allData = newAllData;
+
+          if (!headers.length) { setStatus('No headers found', true); return; }
+
+          currentSort = {col: 'Timestamp', dir: -1};
+
+          renderTable();
+          setStatus('CSV loaded — ' + allData.length + ' rows');
+        } catch (err) {
+          setStatus('Load failed: ' + err.message, true);
+        }
+      }
+
+      searchBox.addEventListener('input', debounce(renderTable, 300));
+      window.addEventListener('load', loadAndRender);
+      
+      // Auto-reload data every 60 seconds
+      setInterval(loadAndRender, 60000);
+    })();
+  </script>
+</body>
+</html>
