@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Google Sheet Viewer — Filter & Share</title>
+  <title>Ride Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:18px; background:#f6f7fb}
     .wrap{max-width:1200px;margin:0 auto}
@@ -11,7 +12,7 @@
     #status{font-size:13px;color:#333;margin-bottom:8px}
     .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
     select,input[type="text"]{padding:8px;border-radius:6px;border:1px solid #ccc}
-    button{padding:8px 10px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer}
+    button{padding:8px 10px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer; display: flex; align-items: center; gap: 6px;}
     .tableWrap{overflow:auto;border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
     table{width:100%;border-collapse:collapse}
     th,td{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
@@ -26,7 +27,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Google Sheet Viewer — Filter & Share</h1>
+    <h1>Ride Tracker</h1>
     <div id="status" class="small">Status: idle</div>
 
     <div class="controls">
@@ -42,9 +43,9 @@
     </div>
 
     <div id="shareBox" class="shareBox">
-      <button id="copyBtn">Copy Row</button>
-      <button id="smsBtn">Share via SMS</button>
-      <button id="waBtn">Share via WhatsApp</button>
+      <button id="copyBtn"><i class="fas fa-clipboard"></i> Copy Row</button>
+      <button id="smsBtn"><i class="fas fa-sms"></i> Share via SMS</button>
+      <button id="waBtn"><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
     </div>
   </div>
   
@@ -53,7 +54,8 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     (function(){
-      const defaultCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRQ6DOYBkE2Vbo6urPok9LqXctRh3EY8L-KXscsahWeDUW-Sj00NrDDcxl2IW5bN1K1rk-rbb2JhJ5J/pub?output=csv";
+      // Note: This is the same public URL from your original code
+      const defaultCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRQ6DOYBkE2Vbo6urPok9LqXctRh3EY8L-KXscsahWeDUW-Sj00NrDDcxl2IW5bN1K1rk-rbb2JhJ5J/pub?output=csv";
       const statusEl = document.getElementById('status');
       const searchBox = document.getElementById('searchBox');
       const tableHead = document.querySelector('#table thead');
@@ -65,7 +67,6 @@
       const waBtn = document.getElementById('waBtn');
       const alertSound = document.getElementById('alertSound');
 
-      let useProxy = 'auto';
       let headers = [];
       let allData = [];
       let currentSort = {col:null, dir:1};
@@ -77,20 +78,44 @@
         statusEl.style.color = isError ? '#b00020' : '#333';
         console.log('[SheetViewer]', msg);
       }
-
-      async function fetchTextWithFallback(url){
-        try {
-          const r = await fetch(url, {cache:'no-cache'});
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return await r.text();
-        } catch (err) {
-          if (useProxy === false) throw err;
-          const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-          const r2 = await fetch(proxyUrl);
-          if(!r2.ok) throw new Error('Proxy failed: ' + r2.status);
-          return await r2.text();
-        }
+      
+      // Fetch function updated to avoid CORS issues with 'mode: no-cors'
+      // This is a more robust way to handle it for public CSV files.
+      async function fetchAndParseData(url) {
+          try {
+              const response = await fetch(url, { mode: 'cors' });
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const text = await response.text();
+              return Papa.parse(text, { header: true, skipEmptyLines: true });
+          } catch (error) {
+              // If CORS fails, try a direct fetch which may bypass the restriction
+              const response = await fetch(url, { mode: 'no-cors' });
+              // Note: 'no-cors' prevents reading the response content directly,
+              // which is why it's a problematic method for parsing CSVs.
+              // Reverting to the proxy method is a better fallback.
+              // Let's stick with a robust proxy.
+              throw new Error('CORS fetch failed, falling back to proxy.');
+          }
       }
+
+      // Reverting to a more robust proxy-based fetch function
+      // This is the most common and reliable solution for CORS with Google Sheets.
+      async function fetchWithProxy(url) {
+          const proxyUrl = 'https://api.allorigins.win/raw?url=';
+          const finalUrl = proxyUrl + encodeURIComponent(url);
+          try {
+              const response = await fetch(finalUrl);
+              if (!response.ok) {
+                  throw new Error(`Proxy error! Status: ${response.status}`);
+              }
+              return await response.text();
+          } catch (error) {
+              throw new Error('Failed to fetch data via proxy. It may be down.');
+          }
+      }
+
 
       function sanitizeText(s){ return (s == null) ? '' : String(s); }
       
@@ -202,28 +227,27 @@
       }
 
       async function loadAndRender(){
-        const url = defaultCsv;
         setStatus('Loading CSV...');
         try {
-          const text = await fetchTextWithFallback(url);
-          const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
-          headers = parsed.meta.fields || [];
-          const newAllData = parsed.data || [];
+            const text = await fetchWithProxy(defaultCsvUrl);
+            const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+            headers = parsed.meta.fields || [];
+            const newAllData = parsed.data || [];
 
-          if (newAllData.length > lastRowCount) {
-              alertSound.play();
-          }
-          lastRowCount = newAllData.length;
-          allData = newAllData;
+            if (newAllData.length > lastRowCount && lastRowCount !== 0) {
+                alertSound.play().catch(e => console.error("Sound playback failed:", e));
+            }
+            lastRowCount = newAllData.length;
+            allData = newAllData;
 
-          if (!headers.length) { setStatus('No headers found', true); return; }
+            if (!headers.length) { setStatus('No headers found', true); return; }
 
-          currentSort = {col: 'Timestamp', dir: -1};
+            currentSort = {col: 'Timestamp', dir: -1};
 
-          renderTable();
-          setStatus('CSV loaded — ' + allData.length + ' rows');
+            renderTable();
+            setStatus('CSV loaded — ' + allData.length + ' rows');
         } catch (err) {
-          setStatus('Load failed: ' + err.message, true);
+            setStatus('Load failed: ' + err.message, true);
         }
       }
 
