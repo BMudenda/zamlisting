@@ -220,6 +220,7 @@
     }
     .submit-status.success { color: var(--success-color); }
     .submit-status.failed { color: var(--fail-color); }
+    .submit-status.info { color: var(--primary-color); }
     .material-icons { font-size: 20px; vertical-align: middle; }
     .share-options {
       display: none;
@@ -321,12 +322,14 @@
         flex-wrap: wrap;
         gap: 20px;
     }
-
     /* Make both fieldsets equal width on larger screens */
     .radio-group,
     .checkbox-group {
         flex: 1; /* This is the key change to make them side-by-side and responsive */
         min-width: 150px; /* Optional: ensures they don't get too small */
+    }
+    .hidden-section {
+      display: none;
     }
   </style>
 </head>
@@ -398,7 +401,7 @@
             <span class="masked-value" id="masked-destination"></span>
           </div>
         </div>
-        <div class="summary-table-section">
+        <div class="summary-table-section hidden-section">
           <div class="section-title">
             <span class="material-icons">table_chart</span>
             Trip Summary
@@ -413,9 +416,9 @@
               <span class="button-label">Submit Trip</span>
             </div>
           </div>
-          <div id="submit-status" class="submit-status"></div>
-          <div id="loader" class="loader"></div>
         </div>
+        <div id="submit-status" class="submit-status">Please fill in all details correctly.</div>
+        <div id="loader" class="loader"></div>
       </div>
     </section>
   </main>
@@ -508,6 +511,7 @@
     const modeVehicleRadio = document.getElementById('mode-vehicle');
     const modeMotorbikeRadio = document.getElementById('mode-motorbike');
     const extraLuggageCheckbox = document.getElementById('extra-luggage-checkbox');
+    const summaryTableSection = document.querySelector('.summary-table-section');
     const summaryTableContainer = document.getElementById('summary-table-container');
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
@@ -602,7 +606,8 @@
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
-      displayStatus('Edit your details and click enter to re-calculate.', 'failed');
+      displayStatus('Please fill in all details correctly.', 'failed');
+      summaryTableSection.classList.add('hidden-section');
     }
     function reveal(eye) {
       document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
@@ -633,7 +638,8 @@
       maskInputValues(origin, destination, customerPhone);
       
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
-          displayStatus('Please fill in all details correctly.', 'failed');
+          summaryTableSection.classList.add('hidden-section');
+          displayStatus('Please fill in all details correctly.', 'info');
           return;
       }
       
@@ -642,6 +648,7 @@
       const distance = findShortestDistance(origin, destination, segments);
       
       if (distance === null || isNaN(distance)) {
+        summaryTableSection.classList.add('hidden-section');
         displayStatus('A route could not be found between the selected places.', 'failed');
         return;
       }
@@ -737,6 +744,7 @@
         estimatedTime: timeText,
         price: price
       };
+      summaryTableSection.classList.remove('hidden-section');
       displayStatus('Trip details calculated. Click submit to send your request.', 'success');
       submitBtn.classList.remove('disabled');
       submitBtn.removeAttribute('disabled');
