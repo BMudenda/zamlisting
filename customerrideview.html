@@ -73,7 +73,6 @@
       let lastRowCount = 0;
       let notificationPermission = 'default';
 
-      // Request notification permission on page load
       function requestNotificationPermission() {
           if ('Notification' in window) {
               Notification.requestPermission().then(permission => {
@@ -89,6 +88,7 @@
         console.log('[SheetViewer]', msg);
       }
 
+      // Updated fetch function to use a new, more reliable proxy service
       async function fetchWithProxy(url) {
           const proxyUrl = 'https://api.allorigins.win/raw?url=';
           const finalUrl = proxyUrl + encodeURIComponent(url);
@@ -221,10 +221,7 @@
             const newAllData = parsed.data || [];
 
             if (newAllData.length > lastRowCount && lastRowCount !== 0) {
-                // Play sound alert
                 alertSound.play().catch(e => console.error("Sound playback failed:", e));
-
-                // Show desktop notification if permission is granted
                 if (notificationPermission === 'granted') {
                     new Notification('New Ride Alert!', {
                         body: `A new ride has been added to the tracker.`,
@@ -252,7 +249,6 @@
           loadAndRender();
       });
       
-      // Auto-reload data every 60 seconds
       setInterval(loadAndRender, 60000);
     })();
   </script>
