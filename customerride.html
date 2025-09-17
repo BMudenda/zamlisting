@@ -48,7 +48,7 @@
     .company-info li { margin-bottom: 5px; font-size: 0.95rem; }
     .price-tag {
       font-size: 1.3rem; font-weight: bold; background: #e67e22;
-      padding: 8px 15px; border-radius: 5px; color: white;
+      padding: 8-px 15-px; border-radius: 5px; color: white;
     }
     .product-container {
       max-width: 1200px; margin: 30px auto; padding: 0 20px;
@@ -248,7 +248,7 @@
         gap: 20px;
         align-items: flex-start;
     }
-    .radio-group, .checkbox-group {
+    .radio-group, .checkbox-group, .locations-group {
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -256,14 +256,14 @@
       border-radius: 5px;
       padding: 10px;
       background: #f9fbfd;
-      flex-grow: 1; /* Allow fieldsets to grow and take up space */
-      flex-basis: 0; /* Ensures they share space evenly */
+      flex-grow: 1;
+      flex-basis: 0;
     }
     .radio-group {
       flex-direction: row;
       gap: 20px;
     }
-    .radio-group legend, .checkbox-group legend {
+    .radio-group legend, .checkbox-group legend, .locations-group legend {
       font-weight: bold;
       color: var(--primary-color);
       font-size: 0.95rem;
@@ -277,7 +277,7 @@
       gap: 10px;
       font-size: 1rem;
     }
-    .radio-item label, .checkbox-item label { /* New rule to make text smaller */
+    .radio-item label, .checkbox-item label {
         font-size: 0.85rem;
     }
     .radio-item input[type="radio"], .checkbox-item input[type="checkbox"] {
@@ -319,20 +319,30 @@
       transform: translate(-50%, -50%);
     }
     
-    /* Additional fix for horizontal alignment */
-    .option-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
     /* Make both fieldsets equal width on larger screens */
     .radio-group,
     .checkbox-group {
-        flex: 1; /* This is the key change to make them side-by-side and responsive */
-        min-width: 150px; /* Optional: ensures they don't get too small */
+        flex: 1;
+        min-width: 150px;
+    }
+    .locations-group {
+        flex: 1 1 100%;
     }
     .hidden-section {
       display: none;
+    }
+    .locations-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    @media (min-width: 500px) {
+        .locations-wrapper {
+            flex-direction: row;
+        }
+        .locations-wrapper .input-group {
+            flex-grow: 1;
+        }
     }
   </style>
 </head>
@@ -354,30 +364,6 @@
     <section class="booking-section">
       <div class="booking-container">
         <div class="inputs-wrapper">
-          <div class="input-group" id="service-wrapper">
-            <span class="material-icons input-icon">commute</span>
-            <label>Trip Customization</label>
-            <div class="option-group">
-                <fieldset class="radio-group">
-                    <legend>Transport Mode</legend>
-                    <div class="radio-item">
-                        <input type="radio" id="mode-vehicle" name="mode" value="vehicle">
-                        <label for="mode-vehicle">Vehicle 🚗</label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="mode-motorbike" name="mode" value="motorbike">
-                        <label for="mode-motorbike">Motorbike 🏍️</label>
-                    </div>
-                </fieldset>
-                <fieldset class="checkbox-group">
-                    <legend>Additions</legend>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="extra-luggage-checkbox" name="extra-luggage" value="yes">
-                        <label for="extra-luggage-checkbox">Luggage/Extra-Persons🧳👤</label>
-                    </div>
-                </fieldset>
-            </div>
-          </div>
           <div class="input-group" id="customer-phone-wrapper">
             <span class="material-icons input-icon">phone</span>
             <label for="customer-phone">Phone Number</label>
@@ -391,17 +377,51 @@
             >
             <span class="masked-value" id="masked-phone"></span>
           </div>
-          <div class="input-group">
-            <span class="material-icons input-icon">place</span>
-            <label for="gm-origin">From</label>
-            <select id="gm-origin"></select>
-            <span class="masked-value" id="masked-origin"></span>
-          </div>
-          <div class="input-group">
-            <span class="material-icons input-icon">flag</span>
-            <label for="gm-destination">To</label>
-            <select id="gm-destination"></select>
-            <span class="masked-value" id="masked-destination"></span>
+          <div id="trip-details" class="hidden-section">
+            <div class="input-group" id="service-wrapper">
+              <span class="material-icons input-icon">commute</span>
+              <label>Trip Customization</label>
+              <div class="option-group">
+                  <fieldset class="radio-group">
+                      <legend>Transport Mode</legend>
+                      <div class="radio-item">
+                          <input type="radio" id="mode-vehicle" name="mode" value="vehicle">
+                          <label for="mode-vehicle">Vehicle 🚗</label>
+                      </div>
+                      <div class="radio-item">
+                          <input type="radio" id="mode-motorbike" name="mode" value="motorbike">
+                          <label for="mode-motorbike">Motorbike 🏍️</label>
+                      </div>
+                  </fieldset>
+                  <fieldset class="checkbox-group">
+                      <legend>Additions</legend>
+                      <div class="checkbox-item">
+                          <input type="checkbox" id="extra-luggage-checkbox" name="extra-luggage" value="yes">
+                          <label for="extra-luggage-checkbox">Luggage/Extra-Persons🧳👤</label>
+                      </div>
+                  </fieldset>
+              </div>
+            </div>
+            <div class="input-group">
+              <span class="material-icons input-icon">location_on</span>
+              <fieldset class="locations-group">
+                  <legend>Trip Locations</legend>
+                  <div class="locations-wrapper">
+                    <div class="input-group">
+                      <span class="material-icons input-icon">place</span>
+                      <label for="gm-origin">From</label>
+                      <select id="gm-origin"></select>
+                      <span class="masked-value" id="masked-origin"></span>
+                    </div>
+                    <div class="input-group">
+                      <span class="material-icons input-icon">flag</span>
+                      <label for="gm-destination">To</label>
+                      <select id="gm-destination"></select>
+                      <span class="masked-value" id="masked-destination"></span>
+                    </div>
+                  </div>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div class="summary-table-section hidden-section">
@@ -522,6 +542,7 @@
     const maskedPhone = document.getElementById('masked-phone');
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
+    const tripDetails = document.getElementById('trip-details');
     let summaryData = null;
     function populateDropdowns() {
       const defaultOptionOrigin = document.createElement('option');
@@ -798,18 +819,32 @@
       submitStatusDiv.className = `submit-status ${type}`;
     }
     
+    function handlePhoneNumberInput() {
+        const customerPhone = customerPhoneInput.value.trim();
+        const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
+        
+        if (isPhoneValid) {
+            tripDetails.classList.remove('hidden-section');
+            updateSummaryTable();
+        } else {
+            tripDetails.classList.add('hidden-section');
+            summaryTableSection.classList.add('hidden-section');
+            displayStatus('Please fill in all details correctly.', 'info');
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
       
-      // Event listeners for radio and checkbox
+      // Event listener for phone number input
+      customerPhoneInput.addEventListener('input', handlePhoneNumberInput);
+      
+      // Event listeners for other inputs (only appear after phone is entered)
       modeVehicleRadio.addEventListener('change', updateSummaryTable);
       modeMotorbikeRadio.addEventListener('change', updateSummaryTable);
       extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
-      
-      // Add event listeners for other inputs
       originSelect.addEventListener('change', updateSummaryTable);
       destinationSelect.addEventListener('change', updateSummaryTable);
-      customerPhoneInput.addEventListener('input', updateSummaryTable);
     });
     
     // Reset validation for masked values
