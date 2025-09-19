@@ -1,1130 +1,1160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luangwa Delivery Platform - Transport Cart</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZamListing — Products</title>
   <style>
+    /* --- Basic page / header --- */
     :root {
-      --primary: #2e7d32;
-      --primary-dark: #1b5e20;
-      --primary-light: #81c784;
-      --accent: #ff9800;
-      --text: #222;
-      --text-light: #666;
-      --background: #f5f5f5;
-      --card-bg: white;
-      --border: #e0e0e0;
-      --shadow: 0 0 8px rgba(0,0,0,0.05);
-      --success: #e8f5e9;
-      --error: #ffebee;
-      --toast-bg: #333;
-      --toast-success: #43a047;
-      --toast-error: #c62828;
-      --danger: #c62828;
-      --whatsapp: #25D366;
-      --sms: #2196F3;
+      --green: #006400; /* Zambia green */
+      --black: #000;
+      --red: #ff0000;
+      --orange: #ff7f00;
+      --light-blue: #007bff; /* For SMS/Taxi button */
+      --whatsapp-green: #25D366; /* For WhatsApp button */
+      --dark-green: #004d00;
+      --yellow-taxi: #FFD700;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Roboto', sans-serif; color: var(--text); background-color: var(--background); line-height: 1.5; }
-    header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 2.2rem 1rem 1.6rem 1rem; text-align: center; box-shadow: 0 2px 7px rgba(0,0,0,0.09); }
-    header h1 { font-weight: bold; font-size: 2.1rem; letter-spacing: 0.02em; }
-    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-wrap: wrap; gap: 2rem; }
-    .slider-wrapper { position: relative; flex: 2; min-width: 300px; background: var(--card-bg); border-radius: 10px; padding: 1.7rem 1.5rem; box-shadow: var(--shadow); }
-    .section-title { font-size: 1.35rem; margin-bottom: 1.1rem; color: var(--primary-dark); display: flex; align-items: center; gap: 0.5rem; font-weight: 600;}
-    .section-title i { color: var(--primary); }
-    .thumbnail-slider { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 1.5rem; padding: 1rem 0; margin: 0 -0.5rem; }
-    .thumbnail-slider::-webkit-scrollbar { height: 6px; }
-    .thumbnail-slider::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .thumbnail-slider::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 10px; }
-    .product { flex: 0 0 160px; border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 0.7rem; text-align: center; background: var(--card-bg); transition: transform 0.2s, box-shadow 0.2s;}
-    .product:active, .product:hover { transform: translateY(-7px) scale(1.04); box-shadow: 0 7px 22px rgba(0,0,0,0.13); }
-    .product img { width: 100px; height: 100px; object-fit: cover; margin-bottom: 0.8rem; border-radius: 4px; border: 1px solid #eee;}
-    .product h4 { font-size: 1rem; margin-bottom: 0.53rem; color: var(--text); }
-    .product p { color: var(--primary-dark); font-weight: 600; margin-bottom: 0.8rem; }
-    .product button { border: none; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.2s; }
-    .product button:disabled,
-    .product .out-stock { background: #ccc !important; cursor: not-allowed; }
-    .product .out-stock { display: block; color: #b71c1c; font-size: 0.97em; font-weight: 600; margin-bottom: 0.7em; }
-    .slider-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2;}
-    .slider-button:hover { background: rgba(0,0,0,0.8); }
-    .slider-button.prev { left: 0; }
-    .slider-button.next { right: 0; }
-    .cart { border: 1px solid var(--border); padding: 1.7rem 1.3rem 2.1rem 1.3rem; border-radius: 10px; flex: 1; min-width: 300px; background: var(--card-bg); position: sticky; top: 1rem; box-shadow: var(--shadow);}
-    .cart-items { list-style: none; padding: 0; margin: 0 0 1.5rem; max-height: 320px; overflow-y: auto; }
-    .cart-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.2em; animation: fadein 0.33s; min-height: 54px;}
-    .cart-items li:last-child { border-bottom: none; }
-    .cart-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle; border: 1.5px solid #e5e7eb;}
-    .cart-item-info { display: flex; align-items: center; flex: 1; min-width: 0;}
-    .cart-item-title { font-weight: 500; font-size: 1.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-    .cart-item-qty { width: 44px; font-size: 1em; margin: 0 6px; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd; text-align: center;}
-    .cart-price-block { display: flex; align-items: center; gap: 4px;}
-    .quantity-controls { display: flex; align-items: center; gap: 2px;}
-    .quantity-btn, .remove-btn { border: none; background: none; color: var(--primary-dark); font-size: 1.1em; margin: 0 2px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s;}
-    .quantity-btn:active, .remove-btn:active { background: #f1f1f1;}
-    .remove-btn { color: var(--danger);}
-    .undo-toast { background: var(--accent); color: #222; padding: 8px 20px; border-radius: 7px; position: fixed; left: 50%; bottom: 25px; transform: translateX(-50%); z-index: 999; font-size: 1.05em;}
-    .undo-btn { background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: 500;}
-    .cart-total { margin: 1rem 0; padding-top: 1rem; border-top: 1px solid var(--border);}
-    .cart-total p { margin: 0.5rem 0; }
-    .address-input, .phone-input { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 5px; font-family: inherit; font-size: 0.93rem; transition: border 0.2s;}
-    .address-input:focus, .phone-input:focus { outline: none; border-color: var(--primary); }
-    .btn { border: none; background: var(--primary); color: white; padding: 0.8rem 1.2rem; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: 500; width: 100%; transition: background 0.2s;}
-    .btn:hover { background: var(--primary-dark);}
-    .btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
-    .btn-accent { background: var(--accent);}
-    .btn-accent:hover { background: #e68a00; }
-    .btn-secondary { background: var(--primary-light); margin-top: 0.5rem; color: var(--primary-dark);}
-    .btn-secondary:hover { background: var(--primary); color: #fff;}
-    .btn-success { background: var(--primary-dark);}
-    .status-message {
-      display: none;
-      margin: 1.1rem 0 1.3rem 0;
-      padding: 0.75rem;
-      border-radius: 4px;
-      text-align: center;
-      font-weight: 500;
-      font-size: 1.08em;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #f4f6f8;
+      color: #222;
     }
-    .status-message.success { background: var(--success); color: var(--primary-dark); }
-    .status-message.error { background: var(--error); color: #c62828; }
-    #searchBox {
-      width: 100%;
-      padding: 0.6rem;
-      margin-bottom: 1.1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 1.06rem;
-      box-sizing: border-box;
-    }
-    .hidden-input { opacity: 0; position: absolute; pointer-events: none; height: 0; width: 0; }
-    .autocomplete-suggestions {
-      border: 1px solid #ccc;
-      background: #fff;
-      max-height: 130px;
-      overflow-y: auto;
-      position: absolute;
-      width: 100%;
-      z-index: 999;
-      border-radius: 0 0 7px 7px;
-      left: 0;
-      top: 100%;
-      margin-top: -5px;
-      font-size: 1em;
-      display: none;
-    }
-    .autocomplete-suggestion {
-      padding: 8px 14px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-    }
-    .autocomplete-suggestion:last-child { border-bottom: none; }
-    .autocomplete-suggestion:hover, .autocomplete-selected {
-      background: #e5efff;
-    }
-    .cart-inputs-flex {
+
+    header {
+      background: var(--green);
+      color: #fff;
       display: flex;
-      gap: 12px;
-      align-items: flex-end;
-      margin-bottom: 1.2em;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
     }
-    .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container {
-      min-width: 160px;
-      flex: 1 1 160px;
-      margin-bottom: 0 !important;
+
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
-    .cart-inputs-flex .mode-container {
-      flex: 0 0 62px;
-      min-width: 56px;
-      max-width: 70px;
+    .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
+    .logo .listing { color: var(--orange); }
+
+    /* cart icon in header */
+    .header-controls {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      position: relative; /* contains dropdown */
+    }
+
+    .cart-icon {
+      cursor: pointer;
+      position: relative;
+      font-size: 20px;
+      user-select: none;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: red;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* cart dropdown */
+    .cart-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 320px;
+      background: #fff;
+      color: #111;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10,10,10,0.15);
+      padding: 12px;
+      z-index: 40;
+    }
+    .cart-dropdown.open { display: block; }
+
+    .cart-dropdown h3 { margin: 0 0 10px 0; font-size: 16px; }
+    .cart-items { max-height: 220px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+    .cart-items li {
+      display:flex;
+      justify-content: space-between;
+      gap:8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      align-items:center;
+      font-size: 14px;
+    }
+    .cart-items .left { display:flex; gap:8px; align-items:center; }
+    .cart-items .name { font-weight:600; }
+    .cart-items .meta { font-size: 12px; color:#555; }
+
+    .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+    .cart-total { font-weight:700; }
+    .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
+    
+    .cart-share {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .btn-share {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-sms { background: var(--light-blue); }
+    .btn-whatsapp { background: var(--whatsapp-green); }
+
+
+    /* --- filters and search --- */
+    .filters-search {
+      padding: 12px 20px;
+      background: #e9ecef;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 0;
-      background: none;
-      box-shadow: none;
-      margin: 0;
+      gap: 12px;
+      border-bottom: 1px solid #dee2e6;
     }
-    .cart-inputs-flex .mode-container label {
-      font-size: 13px;
-      margin-bottom: 2px;
-      margin-top: 5px;
-      color: #2563eb;
-      font-weight: 500;
-      letter-spacing: .1em;
-      margin-left: 3px;
-    }
-    .cart-inputs-flex .mode-group {
+    .filters-search .filters {
       display: flex;
-      align-items: center;
-      gap: 0;
-      margin: 0;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .cart-inputs-flex .mode-radio {
-      border: 1.5px solid #e5e7eb !important;
-      background: #f8fafc !important;
-      color: #2563eb;
+    .filters-search .filter-btn {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background: #fff;
       cursor: pointer;
-      font-size: 16px;
-      transition: border 0.2s;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .filters-search .filter-btn:hover {
+        background: #f0f0f0;
+    }
+    .filters-search .filter-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .filters-search .search-box {
       display: flex;
-      align-items: center;
-      gap: 2px;
-      font-weight: 500;
-      min-width: 0 !important;
-      padding: 6px 8px 6px 6px !important;
-      border-radius: 5px 0 0 5px !important;
-      border-right: 0;
-      box-shadow: none;
-      margin: 0;
-    }
-    .cart-inputs-flex .mode-radio.selected {
-      border: 2px solid #2563eb !important;
-      background: #f0f6ff !important;
-      z-index: 1;
-    }
-    .cart-inputs-flex .mode-radio:last-child {
-      border-radius: 0 5px 5px 0 !important;
-      border-right: 1.5px solid #e5e7eb !important;
-      margin-left: -1px;
-    }
-    .cart-inputs-flex .mode-radio input[type="radio"] {
-      accent-color: #2563eb;
-      margin-right: 1px;
-      margin-left: 0;
-      width: 16px;
-      height: 16px;
-    }
-    .cart-inputs-flex .mode-radio span.material-icons {
-      font-size: 20px !important;
-      margin: 0 2px 0 0;
-      vertical-align: middle;
-    }
-    .transport-checkbox-container {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1rem;
       gap: 8px;
     }
-    .transport-checkbox-container label {
-      font-size: 0.95rem;
-      color: var(--text);
-      font-weight: 500;
+    .filters-search .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 14px;
     }
-    .submit-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 1rem;
-    }
-    .submit-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
+    .filters-search .search-box button {
+      padding: 8px 12px;
+      border-radius: 20px;
       border: none;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .filters-search .search-box button:hover {
+        background: var(--dark-green);
+    }
+
+    /* --- taxi booking section --- */
+    .taxi-promo {
+      background: linear-gradient(135deg, var(--green) 0%, var(--dark-green) 100%);
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin: 25px auto;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.5rem;
-      color: white;
-      transition: transform 0.2s, background 0.2s;
+      justify-content: space-between;
+      padding: 20px 25px;
+      max-width: 1000px;
+      transition: transform 0.3s ease;
     }
-    .submit-btn:hover {
-      transform: scale(1.1);
+    .taxi-promo:hover {
+        transform: translateY(-5px);
     }
-    .whatsapp-btn {
-      background: var(--whatsapp);
+    .taxi-promo a {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
     }
-    .sms-btn {
-      background: var(--sms);
+    .taxi-promo .taxi-content {
+      flex: 1;
     }
-    @media (max-width: 900px) {
-      .cart-inputs-flex { flex-wrap: wrap; gap: 6px;}
-      .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { min-width: 130px; flex: 1 1 130px; }
+    .taxi-promo .taxi-content h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--yellow-taxi);
     }
-    @media (max-width: 650px) {
-      .cart-inputs-flex { flex-direction: column; gap: 0.2em; align-items: stretch; }
-      .cart-inputs-flex .input-group, .cart-inputs-flex .mode-container { max-width: unset; min-width: 0; flex: unset; }
-      .cart { position: static; }
-      .sticky-checkout { position: fixed !important; left: 0; right: 0; bottom: 0; width: 100vw; border-radius: 0; margin: 0; z-index: 999;}
-      .submit-buttons { position: fixed; bottom: 60px; left: 0; right: 0; justify-content: center; z-index: 999; }
+    .taxi-promo .taxi-content p {
+      margin: 0 0 15px 0;
+      font-size: 1.1rem;
+      line-height: 1.5;
     }
-    .map-btn-row { display: flex; justify-content: flex-end; margin-bottom: 0.5em; margin-top: -8px;}
-    #google-map-frame { width: 100%; height: 250px; border: none; border-radius: 10px; box-shadow: 0 2px 12px rgba(66,133,244,0.10); background: #f1f5f9; margin: 10px 0 18px 0; display: none;}
-    .toast {
-      position: fixed;
-      left: 50%;
-      top: 24px;
-      transform: translateX(-50%);
-      min-width: 190px;
-      z-index: 9999;
-      background: var(--toast-bg);
-      color: #fff;
-      padding: 13px 24px;
-      border-radius: 7px;
-      box-shadow: 0 2px 16px #0003;
-      font-weight: 500;
-      font-size: 1.07em;
-      animation: fadein 0.2s;
+    .taxi-promo .taxi-image {
+        flex-shrink: 0;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    .toast.success { background: var(--toast-success);}
-    .toast.error { background: var(--toast-error);}
-    @keyframes fadein {
-      from { opacity: 0; transform: scale(0.95);}
-      to   { opacity: 1; transform: scale(1);}
+    .taxi-promo .taxi-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: pointer;
+    .btn-taxi {
+        display: inline-block;
+        background: var(--yellow-taxi);
+        color: var(--dark-green);
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
     }
-    .tooltip .tooltiptext {
-      visibility: hidden;
-      width: 170px;
-      background: #222c;
-      color: #fff;
-      text-align: left;
-      border-radius: 4px;
-      padding: 8px 11px;
-      position: absolute;
-      z-index: 1001;
-      bottom: 120%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.2s;
-      font-size: 0.97em;
+    .btn-taxi:hover {
+        background: #ffc400;
+        transform: translateY(-2px);
     }
-    .tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
+
+    /* --- products grid --- */
+    main { padding: 18px; max-width: 1100px; margin: 0 auto; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+    .product-card {
+      background:#fff;
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(10,10,10,0.06);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
+    .slides { display:flex; transition:transform .45s ease; height:100%; }
+    .slides img { 
+      width:100%; 
+      height:180px; 
+      object-fit:contain; /* The change is here! */
+      flex-shrink:0; 
+    }
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
+    .slider .prev{ left:8px } .slider .next{ right:8px }
+    .product-details { padding:12px; flex:1; display:flex; flex-direction:column; }
+    .product-details h4 { margin:0 0 6px 0; font-size:16px; }
+    .price { color:green; font-weight:700; margin-bottom:6px; }
+    .location { color:#666; font-size:13px; margin-bottom:8px; }
+    .controls { margin-top:auto; display:flex; gap:8px; }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; }
+    .btn-primary { background:#28a745; color:#fff; }
+    .btn-accent { background:#ff9800; color:#fff; }
+    .btn-secondary { background:var(--light-blue); color:#fff; }
+    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-section .phone-input { width: calc(100% - 150px); }
+    .success { color:green; font-size:13px; display:none; margin-top:8px; }
+    .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; text-decoration: none; color: #fff; }
+    .bid-btn-sms { background: var(--light-blue); }
+    .bid-btn-whatsapp { background: var(--whatsapp-green); }
+    @media (max-width:768px){
+        .taxi-promo a {
+            flex-direction: column;
+            text-align: center;
+        }
+        .taxi-promo .taxi-image {
+            margin-bottom: 15px;
+        }
+    }
+    @media (max-width:520px){
+      .cart-dropdown { right: 8px; left: 8px; width: auto; }
+      .bid-section input { width: 100%; }
+      .bid-btn-social { width: 48%; justify-content: center; }
+      .filters-search .search-box button { padding: 8px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1 aria-label="Luangwa Delivery Platform"><i class="fas fa-truck"></i> Luangwa Delivery Platform (Transport Cart)</h1>
-  </header>
-  <div class="container">
-    <div class="slider-wrapper" aria-label="Available Products">
-      <h2 class="section-title"><i class="fas fa-store"></i> Available Products</h2>
-      <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
-        <label for="categoryFilter" style="font-weight: 500;">Filter by Category:</label>
-        <select id="categoryFilter" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-          <option value="all">All</option>
-          <option value="plumbing">Plumbing</option>
-        </select>
-      </div>
-      <input type="text" id="searchBox" placeholder="Search products..." aria-label="Search products">
-      <button class="slider-button prev" id="prevBtn" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>
-      <div id="product-list" class="thumbnail-slider"></div>
-      <button class="slider-button next" id="nextBtn" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>
+    <div class="logo">
+      <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
     </div>
-    <div class="cart" aria-label="Your Cart">
-      <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Your Order</h2>
-      <ul id="cart-items" class="cart-items"></ul>
-      <div id="empty-cart" class="empty-cart" aria-live="polite">
-        <i class="fas fa-cart-arrow-down"></i>
-        <p>Your cart is empty.</p>
-        <p>Add items to get started.</p>
-      </div>
-      <div id="cart-total" class="cart-total" style="display:none;">
-        <p>Products Total: ZK <span id="products-total">0.00</span></p>
-        <p id="transportation-line" style="display:none;">
-          Transportation: <span id="transport-icon">🚗</span>
-          <span id="transportation-cost">0.00</span>
-          <span id="distance-info" style="color:#2563eb;font-size:0.87em;"></span>
-        </p>
-        <p><strong>Total: ZK <span id="grand-total">0.00</span></strong></p>
-      </div>
-      <input id="pickup" type="text" class="hidden-input" value="Luangwa Bus station" readonly>
-      <div class="transport-checkbox-container">
-        <input type="checkbox" id="transport-required" checked>
-        <label for="transport-required">Require Transportation</label>
-      </div>
-      <div id="transport-inputs" class="cart-inputs-flex">
-        <div class="mode-container">
-          <label for="mode-of-transport">Mode</label>
-          <div class="mode-group" id="mode-group">
-            <label class="mode-radio" id="radio-vehicle">
-              <input type="radio" name="mode" value="vehicle" id="mode-vehicle">
-              <span class="material-icons">directions_car</span>
-            </label>
-            <label class="mode-radio" id="radio-motorbike">
-              <input type="radio" name="mode" value="motorbike" id="mode-motorbike">
-              <span class="material-icons">two_wheeler</span>
-            </label>
+    <div class="header-controls" id="header-controls">
+      <div class="cart-icon" id="cart-icon" title="View cart">
+        🛒
+        <span class="cart-count" id="cart-count">0</span>
+        <div class="cart-dropdown" id="cart-dropdown" aria-hidden="true">
+          <h3>Your Cart</h3>
+          <ul class="cart-items" id="cart-items"></ul>
+          <div class="cart-actions">
+            <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+            <button class="cart-clear" id="cart-clear">Clear</button>
+          </div>
+          <div class="cart-share">
+            <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon" width="20" height="20" style="vertical-align: middle;">
+              WhatsApp
+            </button>
+            <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Sms_icon.svg" alt="SMS Icon" width="20" height="20" style="vertical-align: middle;">
+              SMS
+            </button>
           </div>
         </div>
-        <div class="input-group">
-          <span class="material-icons input-icon">place</span>
-          <label for="gm-origin">From</label>
-          <div style="position:relative;">
-            <input type="text" id="gm-origin" class="address-input" autocomplete="off" placeholder="Enter starting point">
-            <div id="gm-origin-list" class="autocomplete-suggestions"></div>
-          </div>
-        </div>
-        <div class="input-group">
-          <span class="material-icons input-icon">flag</span>
-          <label for="gm-destination">To</label>
-          <div style="position:relative;">
-            <input type="text" id="gm-destination" class="address-input" autocomplete="off" placeholder="Enter destination">
-            <div id="gm-destination-list" class="autocomplete-suggestions"></div>
-          </div>
-        </div>
-        <div class="input-group" id="customer-phone-wrapper-flex" style="display:none;">
-          <span class="material-icons input-icon">phone</span>
-          <label for="customer-phone">Phone</label>
-          <input
-            type="tel"
-            id="customer-phone"
-            maxlength="10"
-            pattern="^0[0-9]{9}$"
-            placeholder="e.g. 0966423229"
-            autocomplete="off"
-            inputmode="numeric"
-            aria-label="Your phone number"
-          >
-        </div>
       </div>
-      <div class="map-btn-row">
-        <button type="button" id="toggle-map-btn" class="btn btn-secondary" style="width: auto; min-width: 100px;">
-          <span class="material-icons">map</span> <span id="map-btn-text">Show Map</span>
-        </button>
-      </div>
-      <iframe id="google-map-frame" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <div class="input-group" id="customer-phone-wrapper" style="display:none;">
-        <span class="material-icons input-icon">phone</span>
-        <label for="customer-phone">Phone Number</label>
-        <input type="tel" id="customer-phone-dummy" style="display:none">
-      </div>
-      <button id="checkout-btn" class="btn btn-accent sticky-checkout" style="margin-top: 1rem; display:none;">
-        <i class="fas fa-credit-card"></i> Proceed to Checkout
-      </button>
-      <div id="submit-buttons" class="submit-buttons" style="display:none;">
-        <button id="whatsapp-btn" class="submit-btn whatsapp-btn" title="Send via WhatsApp">
-          <i class="fab fa-whatsapp"></i>
-        </button>
-        <button id="sms-btn" class="submit-btn sms-btn" title="Send via SMS">
-          <i class="fas fa-sms"></i>
-        </button>
-      </div>
-      <div id="checkout-status" class="status-message"></div>
-      <div id="loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Processing...</div>
-      <div id="statusMessage" class="status-message"></div>
+    </div>
+  </header>
+
+  <div class="filters-search">
+    <div class="filters" id="category-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="electronics">Electronics</button>
+      <button class="filter-btn" data-filter="furniture">Furniture</button>
+      <button class="filter-btn" data-filter="groceries">Groceries</button>
+      <button class="filter-btn" data-filter="vehicles">Vehicles</button>
+      <button class="filter-btn" data-filter="beverages">Beverages</button>
+      <button class="filter-btn" data-filter="amasampo">Amasampo</button>
+      
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products..." />
+      <button id="search-btn">Search</button>
     </div>
   </div>
-  <div id="toast-container"></div>
+
+  <div class="taxi-promo">
+    <a href="https://zamlisting.com/customerride" target="_blank">
+      <div class="taxi-content">
+        <h3>Book a Taxi with ZamListing 🚕</h3>
+        <p>Your ride is just a tap away! Book a taxi in **Luangwa, Zambia** for a safe and convenient trip.</p>
+        <div class="controls">
+            <span class="btn-taxi">Book Now</span>
+        </div>
+      </div>
+      <div class="taxi-image">
+           <img src="vi1.png" alt="Toyota Vitz Front View">
+      </div>
+    </a>
+  </div>
+
+  <main>
+    <div class="products" id="product-list">
+
+      <article class="product-card"
+        data-id="p_template"             data-name="Product Name"      data-price="0000"       data-category="category_name">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Product+Image+1" alt="Description of Product Image 1">
+            <img src="https://via.placeholder.com/600x300?text=Product+Image+2" alt="Description of Product Image 2">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Product Name</h4>
+          <div class="price">ZMK 0000</div>
+          <div class="location">Location, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics">
+        <div class="slider">
+          <div class="slides">
+            <img src="S241.webp" alt="Samsung Galaxy S23 Front">
+            <img src="S242.webp" alt="Samsung Galaxy S23 Front">
+            <img src="S243.webp" alt="Samsung Galaxy S23 Front">
+            <img src="S244.webp" alt="Samsung Galaxy S23 Front">
+            <img src="S245.webp" alt="Samsung Galaxy S23 Front">
+            <img src="S246.webp" alt="Samsung Galaxy S23 Front">
+           </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Samsung Galaxy S23</h4>
+          <div class="price">ZMK 12,000</div>
+          <div class="location">Lusaka, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p2" data-name="Office Chair" data-price="2500" data-category="furniture">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Chair+1" alt="Office Chair Front">
+            <img src="https://via.placeholder.com/600x300?text=Chair+2" alt="Office Chair Side">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Office Chair</h4>
+          <div class="price">ZMK 2,500</div>
+          <div class="location">Ndola, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p3" data-name="Maize Meal" data-price="150" data-category="groceries">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Maize+Meal" alt="Bag of Maize Meal">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Maize Meal</h4>
+          <div class="price">ZMK 150</div>
+          <div class="location">Lusaka, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+      <article class="product-card" data-id="p1" data-name="Mosi Beer" data-price="25" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="M.jpeg" alt="Mosi Beer bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Mosi Beer</h4>
+    <div class="price">ZMK 25</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p2" data-name="Castle Lager" data-price="24" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="CC.jpeg" alt="Castle Lager bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Castle Lager</h4>
+    <div class="price">ZMK 24</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p3" data-name="Castle Light Dumpy" data-price="25" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="CLD.jpeg" alt="Castle Light Dumpy bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Castle Light Dumpy</h4>
+    <div class="price">ZMK 25</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p4" data-name="Black Label" data-price="20" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="BL.webp" alt="Black Label bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Black Label</h4>
+    <div class="price">ZMK 20</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p5" data-name="Coca-Cola bottled" data-price="12" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="MC.jpg" alt="Coca-Cola bottled">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Coca-Cola bottled</h4>
+    <div class="price">ZMK 12</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p6" data-name="Fanta" data-price="12" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="F.jpeg" alt="Fanta bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Fanta</h4>
+    <div class="price">ZMK 12</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p7" data-name="Disposable Fanta" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="DD.jpg" alt="Disposable Fanta bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Disposable Fanta</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p8" data-name="Disposable Coke" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="DD.jpg" alt="Disposable Coke bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Disposable Coke</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p9" data-name="Disposable Sprite" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="DD.jpg" alt="Disposable Sprite bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Disposable Sprite</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p10" data-name="Fresh_Up" data-price="15.9" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Freshup.png" alt="Fresh_Up drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Fresh_Up</h4>
+    <div class="price">ZMK 15.90</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p11" data-name="Black Label Cained" data-price="30" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="BL.webp" alt="Black Label can">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Black Label Cained</h4>
+    <div class="price">ZMK 30</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p12" data-name="Fruitcana" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Fruitc.webp" alt="Fruitcana drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Fruitcana</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p13" data-name="Kunfu" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Konfu.png" alt="Kunfu energy drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Kunfu</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p14" data-name="Mojo" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Mojo.png" alt="Mojo drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Mojo</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p15" data-name="Red Rock" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="RR.png" alt="Red Rock drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Red Rock</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p16" data-name="Rasta" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Rasta.png" alt="Rasta drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Rasta</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p17" data-name="Life Shots" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Shots.webp" alt="Life Shots drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Life Shots</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p18" data-name="Fruitcana Red Smoothie" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Smoothy.png" alt="Fruitcana Red Smoothie bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Fruitcana Red Smoothie</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p19" data-name="Sun Dance" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Sund.png" alt="Sun Dance drink">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Sun Dance</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p20" data-name="Tonic Water Brothers" data-price="15" data-category="beverages">
+  <div class="slider">
+    <div class="slides">
+      <img src="Tonic.png" alt="Tonic Water Brothers bottle">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Tonic Water Brothers</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+    </div>
+  </div>
+</article>
+
+
+      <article class="product-card" data-id="p4" data-name="Toyota Vitz 2018" data-price="85000" data-category="vehicles">
+        <div class="slider">
+          <div class="slides">
+            <img src="vi1.png" alt="Toyota Vitz Front View">
+            <img src="vi2.jpg" alt="Toyota Vitz Front View">
+            <img src="vi3.jpg" alt="Toyota Vitz Front View">
+            <img src="vi4.jpg" alt="Toyota Vitz Front View">
+            <img src="vi5.jpg" alt="Toyota Vitz Front View">
+            <img src="vi6.jpg" alt="Toyota Vitz Front View">
+         
+            
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Toyota Vitz 2018</h4>
+          <div class="price">ZMK 85,000</div>
+          <div class="location">Kitwe, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
   <script>
-    // --- PRODUCTS DATA ---
-    const PRODUCTS = [
-      { id: 1, name: "Mosi Beer", price: 25, image: "M.jpeg", category: "beverages" },
-      { id: 2, name: "Castle Lager", price: 24, image: "CC.jpeg", category: "beverages" },
-      { id: 3, name: "Castle Light Dumpy", price: 25, image: "CLD.jpeg", category: "beverages" },
-      { id: 4, name: "Black Label", price: 20, image: "BL.webp", category: "beverages" },
-      { id: 5, name: "Coca-Cola bottled", price: 12, image: "MC.jpg", category: "beverages" },
-      { id: 6, name: "Fanta", price: 12, image: "F.jpeg", category: "beverages" },
-      { id: 7, name: "Disposable Fanta", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 8, name: "Disposable Coke", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 9, name: "Disposable Sprite", price: 15, image: "DD.jpg", category: "beverages" },
-      { id: 10, name: "Fresh_Up", price: 15.9, image: "Freshup.png", category: "beverages" },
-      { id: 11, name: "Black Label Cained", price: 30, image: "BL.webp", category: "beverages" },
-      { id: 12, name: "Fruitcana", price: 15, image: "Fruitc.webp", category: "beverages" },
-      { id: 13, name: "Kunfu", price: 15, image: "Konfu.png", category: "beverages" },
-      { id: 14, name: "Mojo", price: 15, image: "Mojo.png", category: "beverages" },
-      { id: 15, name: "Red Rock", price: 15, image: "RR.png", category: "beverages" },
-      { id: 16, name: "Rasta", price: 15, image: "Rasta.png", category: "beverages" },
-      { id: 17, name: "Life Shots", price: 15, image: "Shots.webp", category: "beverages" },
-      { id: 18, name: "Fruitcana Red Smoothie", price: 15, image: "Smoothy.png", category: "beverages" },
-      { id: 19, name: "Sun Dance", price: 15, image: "Sund.png", category: "beverages" },
-      { id: 20, name: "Tonic Water Brothers", price: 15, image: "Tonic.png", category: "beverages" },
-      { id: 21, name: "Vatra", price: 15, image: "Vatra.png", category: "beverages" },
-      { id: 22, name: "Wild Cat", price: 15, image: "Wildcat.png", category: "beverages" },
-      { id: 23, name: "Fruit-up", price: 15, image: "Fruitup.png", category: "beverages" },
-      { id: 24, name: "DP", price: 0, image: "D1.jpeg", category: "beverages" },
-      { id: 25, name: "DP", price: 0, image: "D2.png", category: "beverages" },
-      { id: 26, name: "DP", price: 0, image: "D3.jpeg", category: "beverages" },
-      { id: 27, name: "DP", price: 0, image: "D4.jpeg", category: "beverages" },
-      { id: 28, name: "DP", price: 0, image: "D5.jpeg", category: "beverages" },
-      { id: 29, name: "DP", price: 0, image: "D6.jpeg", category: "beverages" },
-      { id: 30, name: "DP", price: 0, image: "D7.jpeg", category: "beverages" },
-      { id: 31, name: "DP", price: 0, image: "D8.jpeg", category: "beverages" },
-      { id: 32, name: "o1", price: 0, image: "O1.jpeg", category: "beverages" },
-      { id: 33, name: "o2", price: 0, image: "O2.jpeg", category: "beverages" },
-      { id: 34, name: "o3", price: 0, image: "O3.jpeg", category: "beverages" },
-      { id: 35, name: "o4", price: 0, image: "O4.jpg", category: "beverages" },
-      { id: 36, name: "o5", price: 0, image: "O5.jpeg", category: "beverages" },
-      { id: 37, name: "o6", price: 0, image: "O6.jpeg", category: "beverages" },
-      { id: 38, name: "o7", price: 0, image: "O7.jpeg", category: "beverages" },
-      { id: 39, name: "o8", price: 0, image: "O8.jpg", category: "beverages" },
-      { id: 40, name: "o9", price: 0, image: "O9.jpeg", category: "beverages" },
-      { id: 41, name: "10", price: 0, image: "010.jpeg", category: "beverages" },
-      { id: 42, name: "11", price: 0, image: "O11.png", category: "beverages" },
-      { id: 43, name: "12", price: 0, image: "012.jpeg", category: "beverages" },
-      { id: 44, name: "13", price: 0, image: "O13.jpeg", category: "beverages" },
-      { id: 45, name: "N1", price: 0, image: "N1.jpg", category: "beverages" },
-      { id: 46, name: "N2", price: 0, image: "N2.jpeg", category: "beverages" },
-      { id: 47, name: "N3", price: 0, image: "N3.jpeg", category: "beverages" },
-      { id: 48, name: "N4", price: 0, image: "N4.jpeg", category: "beverages" },
-      { id: 49, name: "N5", price: 0, image: "N5.jpeg", category: "beverages" },
-      { id: 50, name: "N6", price: 0, image: "N6.jpeg", category: "beverages" },
-      { id: 51, name: "N7", price: 0, image: "N7.jpeg", category: "beverages" },
-      { id: 52, name: "N8", price: 0, image: "N8.jpeg", category: "beverages" },
-      { id: 53, name: "N9", price: 0, image: "N9.jpeg", category: "beverages" },
-      { id: 54, name: "N10", price: 0, image: "N10.jpeg", category: "beverages" },
-      { id: 55, name: "N11", price: 0, image: "N11.jpeg", category: "beverages" },
-      { id: 56, name: "N12", price: 0, image: "N12.jpeg", category: "beverages" },
-      { id: 57, name: "N13", price: 0, image: "N13.jpeg", category: "beverages" },
-      { id: 58, name: "N14", price: 0, image: "N14.jpeg", category: "beverages" },
-      { id: 59, name: "N15", price: 0, image: "N15.jpeg", category: "beverages" },
-      { id: 60, name: "N16", price: 0, image: "N16.jpeg", category: "beverages" },
-      { id: 61, name: "N17", price: 0, image: "N17.jpeg", category: "beverages" },
-      { id: 62, name: "N18", price: 0, image: "N18.jpeg", category: "beverages" },
-      { id: 63, name: "N18", price: 0, image: "N18.jpeg", category: "beverages" },
-      { id: 64, name: "N19", price: 0, image: "N19.jpeg", category: "beverages" },
-      { id: 65, name: "N20", price: 0, image: "N20.jpeg", category: "beverages" },
-      { id: 66, name: "N21", price: 0, image: "N21.jpeg", category: "beverages" },
-      { id: 67, name: "N22", price: 0, image: "N22.jpeg", category: "beverages" },
-      { id: 68, name: "N23", price: 0, image: "N23.jpeg", category: "beverages" },
-      { id: 69, name: "N24", price: 0, image: "N24.jpeg", category: "beverages" },
-      { id: 70, name: "N25", price: 0, image: "N25.jpeg", category: "beverages" },
-      { id: 71, name: "N26", price: 0, image: "N26.jpeg", category: "beverages" },
-      { id: 72, name: "N27", price: 0, image: "N27.webp", category: "beverages" },
-      { id: 73, name: "N28", price: 0, image: "N28.webp", category: "beverages" },
-      { id: 74, name: "N29", price: 0, image: "N29.jpeg", category: "beverages" },
-      { id: 75, name: "N30", price: 0, image: "N30.jpeg", category: "beverages" },
-      { id: 76, name: "N31", price: 0, image: "N31.jpeg", category: "beverages" },
-      { id: 77, name: "N32", price: 0, image: "N32.jpeg", category: "beverages" },
-      { id: 78, name: "N33", price: 0, image: "N33.jpeg", category: "beverages" },
-      { id: 79, name: "N34", price: 0, image: "N34.jpeg", category: "beverages" },
-      { id: 80, name: "N35", price: 0, image: "N35.jpeg", category: "beverages" },
-      { id: 81, name: "N36", price: 0, image: "N36.jpeg", category: "beverages" },
-      { id: 82, name: "N37", price: 0, image: "N37.jpeg", category: "beverages" },
-      { id: 83, name: "N38", price: 0, image: "N38.jpeg", category: "beverages" },
-      { id: 84, name: "N39", price: 0, image: "N39.jpeg", category: "beverages" },
-      { id: 85, name: "N40", price: 0, image: "N40.jpeg", category: "beverages" },
-      { id: 86, name: "N41", price: 0, image: "N41.jpeg", category: "beverages" },
-      { id: 87, name: "N42", price: 0, image: "N42.jpeg", category: "beverages" },
-      { id: 88, name: "N43", price: 0, image: "N43.jpeg", category: "beverages" },
-      { id: 89, name: "N44", price: 0, image: "N44.jpeg", category: "beverages" },
-      { id: 90, name: "N45", price: 0, image: "N45.jpeg", category: "beverages" },
-      { id: 91, name: "N46", price: 0, image: "N46.jpeg", category: "beverages" },
-      { id: 92, name: "N47", price: 0, image: "N47.jpeg", category: "beverages" },
-      { id: 93, name: "N48", price: 0, image: "N48.jpeg", category: "beverages" },
-      { id: 94, name: "N49", price: 0, image: "N49.jpeg", category: "beverages" },
-      { id: 95, name: "N50", price: 0, image: "N50.jpeg", category: "beverages" },
-      { id: 96, name: "N51", price: 0, image: "N51.jpeg", category: "beverages" },
-      { id: 97, name: "N52", price: 0, image: "N52.jpeg", category: "beverages" },
-      { id: 98, name: "N53", price: 0, image: "N53.jpeg", category: "beverages" },
-      { id: 99, name: "N54", price: 0, image: "N54.jpeg", category: "beverages" },
-      { id: 100, name: "Calculator Casio GX-14", price: 230, image: "GX.jpg", category: "stationary" },
-      { id: 101, name: "Big Clear Sellotape", price: 40, image: "sello.webp", category: "stationary" },
-      { id: 102, name: "Blue Pen", price: 3, image: "pen2.png", category: "stationary" },
-      { id: 103, name: "Red Pen", price: 3, image: "pen.png", category: "stationary" },
-      { id: 104, name: "Blue Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 105, name: "Red Permanent Maker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 106, name: "Black Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 107, name: "Green Permanent Marker", price: 6, image: "makers.jpeg", category: "stationary" },
-      { id: 108, name: "A4 Brown Envelope", price: 3, image: "envelope.jpg", category: "stationary" },
-      { id: 109, name: "Ball Stick n tack", price: 15, image: "tack.jpg", category: "stationary" },
-      { id: 110, name: "Ream of Paper", price: 80, image: "ream.jpeg", category: "stationary" },
-      { id: 111, name: "Stepler", price: 20, image: "stepp.jpg", category: "stationary" },
-      { id: 112, name: "File folder A4", price: 15, image: "dfolder2.jpg", category: "stationary" },
-      { id: 113, name: "Perforator Kangaro", price: 20, image: "perfo.jpg", category: "stationary" },
-      { id: 114, name: "Ink Pad", price: 15, image: "inkpad.jpg", category: "stationary" },
-      { id: 115, name: "Metal File Fastner ", price: 3, image: "ffast.webp", category: "stationary" },
-      { id: 116, name: "Ruller 30cm", price: 10, image: "ruller.jpeg", category: "stationary" },
-      { id: 117, name: "Disk Lock", price: 30, image: "lock.png", category: "general" },
-      { id: 118, name: "KENKO Electronic Calculator", price: 200, image: "EC1.jpg", category: "stationary" },
-      { id: 119, name: "Ream of Paper", price: 80, image: "ream2.png", category: "stationary" },
-      { id: 120, name: "File folder A4", price: 15, image: "dfolder.jpg", category: "stationary" },
-      { id: 121, name: "pencils", price: 3, image: "pencil.jpg", category: "stationary" },
-      { id: 122, name: "Heavy Duty Steppler", price: 100, image: "stepp2.jpg", category: "stationary" },
-      { id: 123, name: "Ruller 30cm", price: 10, image: "ruller2.jpg", category: "stationary" },
-      { id: 200, name: "Black Label Big", price: 30, image: "BL.webp", category: "beverages" }
-    ];
-    const luangwaPlaces = [
-      "Luangwa (Feira)","Chitope","Luangwa Market","Kasinsa","Kapoche","Kakaro Primary School","Makichilo Lodge","Gerasmos Safari Lodge","Justifeli Lodge","Feira Kindom Hall","Luangwa main sda churh","Pentocostal Assembly of God Joshua Assembly","UCZ","JB THREE BOARDERS MALL","yellow shop","Anglican Church","Big 2 Zambezi Water Front Resort & Safari","Luangwa Secondary School","Luangwa District Hospital","Kavalamanja","Luangwa Police Station","Zambia Electricity Supply Corporation","Luangwa Post Office","Luangwa Basic School","Luangwa Habour","Luangwa Indeco","Luangwa District Comission office","Luangwa District Education Board Offices","Luangwa Council lodge","Yangoma Hotel","Luangwa Filling Station","Dzalo Skills Training Centre kambolozo","Boma Clinic","BM residence","Luangwa Feira Day Secondary School","Katondwe Mission Hospital","Mwavi Secondary School","Luangwa Bridge","Luangwa Bridge Market"
-    ];
-    const segments = [
-      { from: "Luangwa (Feira)", to: "Kapoche", distance: 28 },
-      { from: "Luangwa (Feira)", to: "Katondwe Mission Hospital", distance: 52 },
-      { from: "Luangwa (Feira)",  to: "Luangwa Market", distance: 0.1 },
-      { from: "Luangwa Market", to: "Luangwa (Feira)", distance: 0.1 },
-      { from: "Luangwa (Feira)", to: "Luangwa District Hospital", distance: 4.6 },
-      { from: "Luangwa (Feira)", to: "Kakaro Primary School", distance: 12},
-      { from: "Luangwa District Hospital", to: "Kavalamanja", distance: 23 },
-      { from: "Katondwe Mission Hospital", to: "Kasinsa", distance: 16 },
-      { from: "Chitope", to: "Kasinsa", distance: 10 },
-      { from: "Luangwa (Feira)", to: "Luangwa Police Station", distance: 0.55 },
-      { from: "Luangwa (Feira)", to: "Makichilo Lodge", distance: 0.40 },
-      { from: "Luangwa (Feira)", to: "Anglican Church", distance: 0.75},
-      { from: "Luangwa (Feira)", to: "Feira Kingdom Hall", distance: 0.7 },
-      { from: "Luangwa (Feira)", to: "UCZ", distance: 0.5 },
-      { from: "Luangwa (Feira)", to: "Pentocostal Assembly of God Joshua Assembly", distance: 0.6 },
-      { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
-      { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0 },
-      { from: "Luangwa Market", to: "Luangwa Basic School", distance: 0.45 },
-      { from: "Luangwa Market", to: "Luangwa Habour", distance: 0.5 },
-      { from: "Luangwa (Feira)", to: "Luangwa Indeco", distance: 0.9 },
-      { from: "Luangwa Indeco", to: "Luangwa Council lodge", distance: 0.25 },
-      { from: "Luangwa Council lodge", to: "Yangoma Hotel", distance: 0.15 },
-      { from: "Yangoma Hotel", to: "Luangwa Filling Station", distance: 0.7 },
-      { from: "Luangwa Filling Station", to: "Dzalo Skills Training Centre kambolozo", distance: 0.3 },
-      { from: "Dzalo Skills Training Centre kambolozo", to: "Boma Clinic", distance: 0.2 },
-      { from: "Boma Clinic", to: "BM residence", distance: 0.6 },
-      { from: "BM residence", to: "Luangwa Feira Day Secondary School", distance: 1.1 },
-      { from: "Gerasmos Safari Lodge", to: "Luangwa Feira Day Secondary School", distance: 3.1 },
-      { from: "Luangwa Feira Day Secondary School", to: "Justifeli Lodge", distance: 2.2 },
-      { from: "Luangwa main sda church", to: "Justifeli Lodge", distance: 0.9 },
-      { from: "Luangwa District Education Board Offices", to: "Justifeli Lodge", distance: 2.0 },
-      { from: "Luangwa Feira Day Secondary School", to: "yellow shop", distance: 3.3 },
-      { from: "Luangwa Feira Day Secondary School", to: "Zambia Electricity Supply Corporation", distance: 2.0 },
-      { from: "Luangwa Feira Day Secondary School", to: "JB THREE BOARDERS MALL", distance: 3.7 },
-      { from: "Luangwa Feira Day Secondary School", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 4.0 },
-      { from: "Luangwa Feira Day Secondary School", to: "Katondwe Mission Hospital", distance: 48 },
-      { from: "Katondwe Mission Hospital", to: "Mwavi Secondary School", distance: 7.2 },
-      { from: "Mwavi Secondary School", to: "Luangwa Bridge Market", distance: 27.3 },
-      { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
-      { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
-      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 12.7 }
-    ];
-
-    // --- DOM Elements ---
-    const productListEl = document.getElementById('product-list');
-    const cartItemsEl = document.getElementById('cart-items');
-    const emptyCartEl = document.getElementById('empty-cart');
-    const cartTotalEl = document.getElementById('cart-total');
-    const productsTotalEl = document.getElementById('products-total');
-    const transportationCostEl = document.getElementById('transportation-cost');
-    const transportLineEl = document.getElementById('transportation-line');
-    const transportIconEl = document.getElementById('transport-icon');
-    const grandTotalEl = document.getElementById('grand-total');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    const searchBox = document.getElementById('searchBox');
-    const gmOriginEl = document.getElementById('gm-origin');
-    const gmDestinationEl = document.getElementById('gm-destination');
-    const mapBtn = document.getElementById('toggle-map-btn');
-    const mapBtnText = document.getElementById('map-btn-text');
-    const googleMapFrame = document.getElementById('google-map-frame');
-    const modeVehicle = document.getElementById('mode-vehicle');
-    const modeMotorbike = document.getElementById('mode-motorbike');
-    const radioVehicle = document.getElementById('radio-vehicle');
-    const radioMotorbike = document.getElementById('radio-motorbike');
-    const customerPhoneWrapperFlex = document.getElementById('customer-phone-wrapper-flex');
-    const customerPhoneInput = document.getElementById('customer-phone');
-    const toastContainer = document.getElementById('toast-container');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const distanceInfoEl = document.getElementById('distance-info');
-    const transportRequired = document.getElementById('transport-required');
-    const transportInputs = document.getElementById('transport-inputs');
-    const submitButtons = document.getElementById('submit-buttons');
-    const whatsappBtn = document.getElementById('whatsapp-btn');
-    const smsBtn = document.getElementById('sms-btn');
-
-    // --- State ---
+    /**********************
+     * Utilities
+     **********************/
+    const FMT = (v) => {
+      // format number with thousands separators, no decimal places
+      return Number(v).toLocaleString();
+    };
+    const safeNumber = (str) => {
+      if (str === undefined || str === null) return 0;
+      return Number(String(str).replace(/,/g, '').trim()) || 0;
+    };
+    const cartPhoneNumber = '0978167546'; // Default number for cart messages
+    
+    /**********************
+     * Cart data & helpers
+     **********************/
     let cart = [];
-    let transportationCost = 0;
-    let transportMode = 'vehicle';
-    let selectedDistance = 0;
-    let selectedDistanceFound = false;
-    let transportNeeded = true;
-    const TRANSPORT_COST_PER3KM = { vehicle: 20, motorbike: 10 };
-    const TRANSPORT_ICON = { vehicle: "🚗", motorbike: "🏍️" };
-    let filteredProducts = PRODUCTS.slice();
-    let undoTimeout = null, lastRemoved = null;
-
-    // --- Autocomplete ---
-    function setupAutocomplete(inputId, suggestionsId, sourceList) {
-      const input = document.getElementById(inputId);
-      const suggestionsBox = document.getElementById(suggestionsId);
-
-      input.addEventListener("input", function() {
-        const query = input.value.trim().toLowerCase();
-        suggestionsBox.innerHTML = "";
-        if (!query) { suggestionsBox.style.display = "none"; return; }
-        const matches = sourceList.filter(
-          name => name.toLowerCase().includes(query)
-        ).slice(0, 10);
-        if (matches.length === 0) { suggestionsBox.style.display = "none"; return; }
-        matches.forEach(name => {
-          const div = document.createElement("div");
-          div.className = "autocomplete-suggestion";
-          div.innerText = name;
-          div.onclick = function() {
-            input.value = name;
-            suggestionsBox.innerHTML = "";
-            suggestionsBox.style.display = "none";
-            updateCart();
-            autoFillDistance();
-          };
-          suggestionsBox.appendChild(div);
-        });
-        suggestionsBox.style.display = "block";
-      });
-
-      input.addEventListener("blur", function() {
-        setTimeout(() => { suggestionsBox.style.display = "none"; }, 150);
-      });
-      input.addEventListener("focus", function() {
-        if (input.value.trim()) input.dispatchEvent(new Event("input"));
-      });
-    }
-    setupAutocomplete("gm-origin", "gm-origin-list", luangwaPlaces);
-    setupAutocomplete("gm-destination", "gm-destination-list", luangwaPlaces);
-
-    // --- Category Filter ---
-    const categories = Array.from(new Set(PRODUCTS.map(p => p.category).filter(Boolean)));
-    categories.forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-      categoryFilter.appendChild(option);
-    });
-
-    // --- Product Rendering ---
-    function renderProducts() {
-      productListEl.innerHTML = '';
-      filteredProducts.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'product';
-        div.tabIndex = 0;
-        div.setAttribute('aria-label', p.name + ", ZK " + p.price.toFixed(2));
-        let outStock = (p.price <= 0);
-        div.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/100?text=Error';">
-          <h4>${p.name}</h4>
-          <p>ZK ${p.price.toFixed(2)}</p>
-          ${outStock?'<span class="out-stock">Out of Stock</span>':''}
-          <button data-id="${p.id}" ${outStock?'disabled':''}>
-            <i class="fas fa-plus"></i> Add
-          </button>
-        `;
-        // --- Add button handler ---
-        const btn = div.querySelector('button[data-id]');
-        if (btn && !outStock) {
-          btn.addEventListener("click", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            addToCart(p.id);
-          });
-        }
-        productListEl.appendChild(div);
-      });
-    }
-    categoryFilter.addEventListener('change', filterProducts);
-    searchBox.addEventListener('input', filterProducts);
-
-    function filterProducts() {
-      const selectedCategory = categoryFilter.value;
-      const query = searchBox.value.trim().toLowerCase();
-      filteredProducts = PRODUCTS.filter(p => {
-        const matchCategory = selectedCategory === 'all' || p.category === selectedCategory;
-        const matchQuery = p.name.toLowerCase().includes(query) ||
-          (p.category && p.category.toLowerCase().includes(query));
-        return matchCategory && matchQuery;
-      });
-      renderProducts();
-    }
-
-    // --- Slider Buttons ---
-    document.getElementById('prevBtn').onclick = () => productListEl.scrollBy({ left: -200, behavior: 'smooth' });
-    document.getElementById('nextBtn').onclick = () => productListEl.scrollBy({ left: 200, behavior: 'smooth' });
-
-    // --- Cart logic ---
-    function addToCart(id) {
-      const product = PRODUCTS.find(x => x.id === id);
-      if (product) {
-        const cartItem = cart.find(item => item.product.id === id);
-        if (cartItem) { cartItem.quantity += 1; }
-        else { cart.push({ product, quantity: 1 }); }
-        updateCart();
-        showToast(product.name + ' added to cart.', "success");
-      } else { showMessage('Product not found.'); }
-    }
-
-    cartItemsEl.addEventListener('click', e => {
-      const button = e.target.closest('button');
-      if (!button) return;
-      const index = parseInt(button.dataset.index, 10);
-      if (button.classList.contains('remove-btn')) {
-        let removed = cart.splice(index, 1)[0];
-        updateCart();
-        showUndoToast(removed, index);
-      }
-      else if (button.classList.contains('increase')) { cart[index].quantity += 1; updateCart(); }
-      else if (button.classList.contains('decrease')) {
-        cart[index].quantity -= 1;
-        if (cart[index].quantity === 0) {
-          let removed = cart.splice(index, 1)[0];
-          updateCart();
-          showUndoToast(removed, index);
-        } else updateCart();
-      }
-    });
-    cartItemsEl.addEventListener('change', e => {
-      const input = e.target;
-      if(input.classList.contains('cart-item-qty')){
-        let idx = parseInt(input.dataset.index, 10);
-        let qty = parseInt(input.value, 10);
-        if(!isNaN(qty) && qty >= 1) {
-          cart[idx].quantity = qty;
-          updateCart();
-        } else {
-          input.value = cart[idx].quantity;
-        }
-      }
-    });
-
-    function showUndoToast(item, idx) {
-      if (undoTimeout) clearTimeout(undoTimeout);
-      lastRemoved = {item, idx};
-      let toast = document.createElement('div');
-      toast.className = "undo-toast";
-      toast.innerHTML = `<span>Removed <b>${item.product.name}</b></span>
-        <button class="undo-btn" id="undo-btn">Undo</button>`;
-      toastContainer.appendChild(toast);
-      document.getElementById('undo-btn').onclick = function() {
-        cart.splice(idx, 0, item);
-        updateCart();
-        toast.remove();
-        lastRemoved = null;
-      };
-      undoTimeout = setTimeout(() => { toast.remove(); lastRemoved = null; }, 4500);
-    }
-
-    // --- Transport logic ---
-    function buildGraph(segments) {
-      const graph = {};
-      segments.forEach(seg => {
-        if (!graph[seg.from]) graph[seg.from] = [];
-        if (!graph[seg.to]) graph[seg.to] = [];
-        graph[seg.from].push({ place: seg.to, distance: seg.distance });
-        graph[seg.to].push({ place: seg.from, distance: seg.distance });
-      });
-      return graph;
-    }
-    function findShortestDistance(from, to, segments) {
-      const graph = buildGraph(segments);
-      if (!graph[from] || !graph[to]) return null;
-      const distances = {};
-      const visited = new Set();
-      luangwaPlaces.forEach(place => distances[place] = Infinity);
-      distances[from] = 0;
-      let queue = [{ place: from, dist: 0 }];
-      while (queue.length > 0) {
-        queue.sort((a, b) => a.dist - b.dist);
-        const { place, dist } = queue.shift();
-        if (place === to) return dist;
-        if (visited.has(place)) continue;
-        visited.add(place);
-        for (let neighbor of (graph[place] || [])) {
-          if (dist + neighbor.distance < distances[neighbor.place]) {
-            distances[neighbor.place] = dist + neighbor.distance;
-            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
-          }
-        }
-      }
-      return null;
-    }
-
-    function autoFillDistance() {
-      if (!transportNeeded) {
-        selectedDistance = 0;
-        selectedDistanceFound = false;
-        distanceInfoEl.textContent = "";
-        updateCart();
-        return;
-      }
-      const from = gmOriginEl.value.trim();
-      const to = gmDestinationEl.value.trim();
-      selectedDistance = 0;
-      selectedDistanceFound = false;
-      distanceInfoEl.textContent = "";
-      if (from && to) {
-        let dist = findShortestDistance(from, to, segments);
-        if (dist != null && !isNaN(dist)) {
-          selectedDistance = Math.round(dist * 100) / 100;
-          selectedDistanceFound = true;
-          distanceInfoEl.textContent = `(Distance: ${selectedDistance} km)`;
-        } else {
-          selectedDistance = 0;
-          selectedDistanceFound = false;
-          distanceInfoEl.textContent = `(No route found)`;
-        }
-        updateCart();
+    const findCartItem = (id) => cart.find(i => i.id === id);
+    function addToCart(productId, productName, productPrice, qty = 1) {
+      const existing = findCartItem(productId);
+      if (existing) {
+        existing.qty += qty;
       } else {
-        selectedDistance = 0;
-        selectedDistanceFound = false;
-        distanceInfoEl.textContent = "";
-        updateCart();
+        cart.push({ id: productId, name: productName, price: productPrice, qty });
       }
+      renderCart();
     }
-    gmOriginEl.addEventListener('change', autoFillDistance);
-    gmDestinationEl.addEventListener('change', autoFillDistance);
-    gmOriginEl.addEventListener('blur', autoFillDistance);
-    gmDestinationEl.addEventListener('blur', autoFillDistance);
-    gmOriginEl.addEventListener('input', autoFillDistance);
-    gmDestinationEl.addEventListener('input', autoFillDistance);
-
-    function calcTransportationCost() {
-      if (transportNeeded && selectedDistanceFound && selectedDistance > 0) {
-        const rate = TRANSPORT_COST_PER3KM[transportMode];
-        return Math.ceil(selectedDistance / 3) * rate;
-      }
-      return 0;
+    function removeFromCart(productId) {
+      cart = cart.filter(i => i.id !== productId);
+      renderCart();
     }
-
-    function handleModeChange() {
-      const v = modeVehicle.checked;
-      const m = modeMotorbike.checked;
-      radioVehicle.classList.toggle('selected', v);
-      radioMotorbike.classList.toggle('selected', m);
-      transportMode = v ? 'vehicle' : (m ? 'motorbike' : 'vehicle');
-      updateCart();
-      handleCustomerPhoneInput();
+    function clearCart() {
+      cart = [];
+      renderCart();
     }
-    function handleCustomerPhoneInput() {
-      if (!transportNeeded) {
-        customerPhoneWrapperFlex.style.display = "none";
-        customerPhoneInput.value = "";
-        return;
-      }
-      const v = modeVehicle.checked;
-      const m = modeMotorbike.checked;
-      if (v || m) { customerPhoneWrapperFlex.style.display = ""; }
-      else { customerPhoneWrapperFlex.style.display = "none"; customerPhoneInput.value = ""; }
+    function cartTotalAmount() {
+      return cart.reduce((s, it) => s + (safeNumber(it.price) * it.qty), 0);
     }
-    modeVehicle.addEventListener('change', handleModeChange);
-    modeMotorbike.addEventListener('change', handleModeChange);
-
-    // --- Transport Required Toggle ---
-    function handleTransportRequired() {
-      transportNeeded = transportRequired.checked;
-      transportInputs.style.display = transportNeeded ? '' : 'none';
-      mapBtn.style.display = transportNeeded ? '' : 'none';
-      googleMapFrame.style.display = 'none';
-      mapBtnText.textContent = "Show Map";
-      if (!transportNeeded) {
-        gmOriginEl.value = '';
-        gmDestinationEl.value = '';
-        modeVehicle.checked = true;
-        modeMotorbike.checked = false;
-        customerPhoneInput.value = '';
-      }
-      handleModeChange();
-      autoFillDistance();
-      updateCart();
+    function cartTotalQty() {
+      return cart.reduce((s, it) => s + it.qty, 0);
     }
-    transportRequired.addEventListener('change', handleTransportRequired);
-
-    // --- Update Cart Display ---
-    function updateCart() {
-      transportationCost = calcTransportationCost();
+    /**********************
+     * DOM render functions
+     **********************/
+    function renderCart() {
+      const listEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      const countEl = document.getElementById('cart-count');
+      listEl.innerHTML = '';
       if (cart.length === 0) {
-        cartItemsEl.innerHTML = '';
-        emptyCartEl.style.display = 'block';
-        cartTotalEl.style.display = 'none';
-        checkoutBtn.style.display = 'none';
-        submitButtons.style.display = 'none';
+        const li = document.createElement('li');
+        li.textContent = 'No items in cart';
+        li.style.padding = '8px 0';
+        listEl.appendChild(li);
       } else {
-        emptyCartEl.style.display = 'none';
-        cartTotalEl.style.display = 'block';
-        checkoutBtn.style.display = 'block';
-        submitButtons.style.display = 'none';
-        cartItemsEl.innerHTML = '';
-        cart.forEach((item, index) => {
+        cart.forEach(item => {
           const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="cart-item-info">
-              <img src="${item.product.image}" alt="${item.product.name}" class="cart-thumb" onerror="this.src='https://via.placeholder.com/36?text=Err';">
-              <span class="cart-item-title">${item.product.name}</span>
-            </div>
-            <div class="cart-price-block">
-              <span style="min-width:60px;">ZK ${(item.product.price * item.quantity).toFixed(2)}</span>
-              <div class="quantity-controls">
-                <button class="quantity-btn decrease" data-index="${index}" aria-label="Decrease quantity">-</button>
-                <input type="number" min="1" class="cart-item-qty" data-index="${index}" value="${item.quantity}" aria-label="Quantity for ${item.product.name}">
-                <button class="quantity-btn increase" data-index="${index}" aria-label="Increase quantity">+</button>
-                <button class="remove-btn" data-index="${index}" aria-label="Remove item"><i class="fas fa-times"></i></button>
-              </div>
-            </div>
-          `;
-          cartItemsEl.appendChild(li);
+          const left = document.createElement('div');
+          left.className = 'left';
+          const name = document.createElement('div');
+          name.className = 'name';
+          name.textContent = item.name;
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${item.qty} x ZMK ${FMT(item.price)} `;
+          left.appendChild(name);
+          left.appendChild(meta);
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.flexDirection = 'column';
+          right.style.alignItems = 'flex-end';
+          right.style.gap = '6px';
+          const lineTotal = document.createElement('div');
+          lineTotal.textContent = `ZMK ${FMT(item.price * item.qty)}`;
+          const rm = document.createElement('button');
+          rm.textContent = 'Remove';
+          rm.style.padding = '4px 6px';
+          rm.style.fontSize = '12px';
+          rm.style.border = '0';
+          rm.style.borderRadius = '6px';
+          rm.style.background = '#eee';
+          rm.style.cursor = 'pointer';
+          rm.onclick = () => removeFromCart(item.id);
+          right.appendChild(lineTotal);
+          right.appendChild(rm);
+          li.appendChild(left);
+          li.appendChild(right);
+          listEl.appendChild(li);
         });
-        const productsTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-        productsTotalEl.textContent = productsTotal.toFixed(2);
-        const grandTotal = productsTotal + transportationCost;
-        grandTotalEl.textContent = grandTotal.toFixed(2);
-        if (transportNeeded && selectedDistanceFound && transportationCost > 0) {
-          transportationCostEl.textContent = transportationCost.toFixed(2);
-          transportLineEl.style.display = 'block';
-        } else {
-          transportLineEl.style.display = 'none';
-        }
-        transportIconEl.textContent = TRANSPORT_ICON[transportMode];
       }
+      const total = cartTotalAmount();
+      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
+      countEl.textContent = String(cartTotalQty());
     }
-
-    // --- Toasts and Message ---
-    function showToast(message, type = "success") {
-      const div = document.createElement('div');
-      div.className = `toast ${type}`;
-      div.textContent = message;
-      toastContainer.appendChild(div);
-      setTimeout(() => { div.style.opacity=0; setTimeout(()=>div.remove(),300); }, 3000);
-    }
-    function showMessage(message, type = "error") {
-      const s = document.getElementById("statusMessage");
-      s.textContent = message;
-      s.className = `status-message ${type}`;
-      s.style.display = "block";
-      setTimeout(() => s.style.display = "none", 5000);
-    }
-
-    // --- Map button ---
-    mapBtn.addEventListener('click', function() {
-      const from = gmOriginEl.value.trim();
-      const to = gmDestinationEl.value.trim();
-      if (!from || !to) {
-        showToast("Please enter both origin (From) and destination (To).", "error");
-        return;
+    
+    /**********************
+     * Cart Sharing Functions
+     **********************/
+    function getCartMessage() {
+      let message = "Hello ZamListing, I would like to order the following items:\n\n";
+      if (cart.length === 0) {
+        return "I am interested in your products. Please contact me.";
       }
-      if (googleMapFrame.style.display === "block") {
-        googleMapFrame.style.display = "none";
-        mapBtnText.textContent = "Show Map";
-      } else {
-        const embedUrl = "https://www.google.com/maps?q=" +
-          encodeURIComponent(from + " to " + to) +
-          "&output=embed";
-        googleMapFrame.src = embedUrl;
-        googleMapFrame.style.display = "block";
-        googleMapFrame.scrollIntoView({behavior:"smooth"});
-        mapBtnText.textContent = "Hide Map";
-      }
-    });
+      
+      cart.forEach(item => {
+        message += `${item.name} (${item.qty} pcs) - ZMK ${FMT(item.price * item.qty)}\n`;
+      });
 
-    // --- Checkout logic ---
-    function validatePhone(phone) {
-      return /^0[0-9]{9}$/.test(phone);
-    }
-    customerPhoneInput.addEventListener('input', function(){
-      if(!validatePhone(this.value) && this.value.length>=10)
-        this.style.borderColor = "var(--danger)";
-      else this.style.borderColor = "";
-    });
-
-    function generateOrderMessage() {
-      const productsTotal = parseFloat(productsTotalEl.textContent);
-      const grandTotal = parseFloat(grandTotalEl.textContent);
-      const items = cart.map(item => `${item.product.name} x${item.quantity}`).join(", ");
-      let message = `New Order:\nItems: ${items}\nProducts Total: ZK ${productsTotal.toFixed(2)}`;
-      if (transportNeeded) {
-        const from = gmOriginEl.value.trim();
-        const to = gmDestinationEl.value.trim();
-        const phone = customerPhoneInput.value.trim();
-        const transportModeText = modeVehicle.checked ? "Vehicle" : "Motorbike";
-        message += `\nTransport: ${transportModeText}\nFrom: ${from}\nTo: ${to}\nDistance: ${selectedDistance} km\nTransport Cost: ZK ${transportationCost.toFixed(2)}\nPhone: ${phone}`;
-      } else {
-        message += `\nTransport: Not required`;
-      }
-      message += `\nGrand Total: ZK ${grandTotal.toFixed(2)}`;
+      message += `\nTotal: ZMK ${FMT(cartTotalAmount())}\n`;
+      message += `\nThank you!`;
+      
       return message;
     }
 
-    function resetOrder() {
-      cart = [];
-      updateCart();
-      customerPhoneInput.value = '';
-      gmOriginEl.value = '';
-      gmDestinationEl.value = '';
-      selectedDistance = 0;
-      selectedDistanceFound = false;
-      distanceInfoEl.textContent = '';
-      googleMapFrame.style.display = "none";
-      mapBtnText.textContent = "Show Map";
-      transportRequired.checked = true;
-      handleTransportRequired();
-      submitButtons.style.display = 'none';
+    function sendCartViaSMS() {
+      const message = getCartMessage();
+      window.location.href = `sms:${cartPhoneNumber}?body=${encodeURIComponent(message)}`;
     }
 
-    function submitOrder() {
-      if (cart.length === 0) {
-        showToast('Your cart is empty. Please add items before checkout.', "error");
+    function sendCartViaWhatsApp() {
+      const message = getCartMessage();
+      const waNumber = '260' + cartPhoneNumber.substring(1);
+      window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    }
+
+    /**********************
+     * UI bindings
+     **********************/
+    function addToCartBtn(button) {
+      const card = button.closest('.product-card');
+      if (!card) return;
+      const id = card.dataset.id || card.dataset.name;
+      const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
+      const price = safeNumber(card.dataset.price || '');
+      addToCart(id, name, price, 1);
+      openCartDropdown();
+    }
+    document.getElementById('cart-clear').addEventListener('click', () => {
+      clearCart();
+    });
+    const cartIcon = document.getElementById('cart-icon');
+    const cartDropdown = document.getElementById('cart-dropdown');
+    function openCartDropdown() {
+      cartDropdown.classList.add('open');
+      cartDropdown.setAttribute('aria-hidden', 'false');
+    }
+    function closeCartDropdown() {
+      cartDropdown.classList.remove('open');
+      cartDropdown.setAttribute('aria-hidden', 'true');
+    }
+    function toggleCart() {
+      cartDropdown.classList.toggle('open');
+      const open = cartDropdown.classList.contains('open');
+      cartDropdown.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+    cartIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleCart();
+    });
+    document.addEventListener('click', (ev) => {
+      const target = ev.target;
+      const headerControls = document.getElementById('header-controls');
+      if (!headerControls.contains(target)) {
+        closeCartDropdown();
+      }
+    });
+    function toggleBid(button) {
+      const details = button.closest('.product-details');
+      const bid = details.querySelector('.bid-section');
+      if (bid) bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
+    }
+    
+    function submitBid(button, type) {
+      const bidSection = button.closest('.bid-section');
+      const bidAmountInput = bidSection.querySelector('input[type="number"]');
+      const card = button.closest('.product-card');
+      const itemName = card.dataset.name;
+      
+      const bidAmount = bidAmountInput.value;
+      
+      const bidPhoneNumber = card.dataset.phonenumber;
+
+      // Fallback to a default number if no phone number is provided in the input field.
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
         return;
       }
-      if (transportNeeded) {
-        const from = gmOriginEl.value.trim();
-        const to = gmDestinationEl.value.trim();
-        if (!from || !to) {
-          showToast('Please enter both origin (From) and destination (To) before checkout.', "error");
-          return;
-        }
-        if (!selectedDistanceFound) {
-          showToast('No known route found between selected locations. Cannot proceed.', "error");
-          return;
-        }
-        const v = modeVehicle.checked;
-        const m = modeMotorbike.checked;
-        if (!v && !m) {
-          showToast('Please select a mode of transport.', "error");
-          return;
-        }
-        const phone = customerPhoneInput.value.trim();
-        if (!validatePhone(phone)) {
-          showToast('Please enter a valid phone number (e.g., 0978167546).', "error");
-          customerPhoneInput.focus();
-          return;
-        }
+
+      const formattedBid = `ZMK ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
       }
-      checkoutBtn.style.display = 'none';
-      submitButtons.style.display = 'flex';
-      showToast('Please choose submission method: WhatsApp or SMS.', "success");
     }
-
-    whatsappBtn.addEventListener('click', function() {
-      const message = encodeURIComponent(generateOrderMessage());
-      const whatsappUrl = `https://wa.me/260978167546?text=${message}`;
-      window.open(whatsappUrl, '_blank');
-      showToast('Order sent via WhatsApp!', "success");
-      resetOrder();
-    });
-
-    smsBtn.addEventListener('click', function() {
-      const message = encodeURIComponent(generateOrderMessage());
-      const smsUrl = `sms:+260978167546?body=${message}`;
-      window.open(smsUrl, '_self');
-      showToast('Order sent via SMS!', "success");
-      resetOrder();
-    });
-
-    checkoutBtn.onclick = submitOrder;
-
-    // --- INIT ---
-    document.addEventListener('DOMContentLoaded', () => {
-      modeVehicle.checked = true;
-      handleModeChange();
-      handleTransportRequired();
-      renderProducts();
-      updateCart();
-      function updateStickyCheckout() {
-        if(window.innerWidth<680) {
-          checkoutBtn.classList.add('sticky-checkout');
-          submitButtons.classList.add('sticky-checkout');
-        } else {
-          checkoutBtn.classList.remove('sticky-checkout');
-          submitButtons.classList.remove('sticky-checkout');
-        }
+    
+    document.querySelectorAll('.product-card').forEach(card => {
+      const slider = card.querySelector('.slider');
+      if (slider) {
+          const slides = slider.querySelector('.slides');
+          const imgs = slides.querySelectorAll('img');
+          let idx = 0;
+          const nextBtn = slider.querySelector('.next');
+          const prevBtn = slider.querySelector('.prev');
+          
+          if (imgs.length <= 1) {
+              if (nextBtn) nextBtn.style.display = 'none';
+              if (prevBtn) prevBtn.style.display = 'none';
+          } else {
+              const move = (i) => {
+                  idx = ((i % imgs.length) + imgs.length) % imgs.length;
+                  slides.style.transform = `translateX(-${idx * 100}%)`;
+              };
+              if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
+              if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
+          }
       }
-      updateStickyCheckout();
-      window.addEventListener('resize', updateStickyCheckout);
+    });
+
+    renderCart();
+    
+    /**********************
+     * New Filter & Search Logic
+     **********************/
+    const allProducts = document.querySelectorAll('.product-card');
+    const productList = document.getElementById('product-list');
+    const categoryFilters = document.getElementById('category-filters');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    function filterProducts(category) {
+      allProducts.forEach(product => {
+        if (category === 'all' || product.dataset.category === category) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+    function searchProducts(query) {
+      const lowerCaseQuery = query.toLowerCase();
+      // Remove all active filters when searching
+      categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+      allProducts.forEach(product => {
+        const name = product.dataset.name.toLowerCase();
+        if (name.includes(lowerCaseQuery)) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+    categoryFilters.addEventListener('click', (e) => {
+      const button = e.target;
+      if (button.classList.contains('filter-btn')) {
+        categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        filterProducts(button.dataset.filter);
+        searchInput.value = '';
+      }
+    });
+    searchBtn.addEventListener('click', () => {
+      const query = searchInput.value.trim();
+      searchProducts(query);
+    });
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value.trim();
+        searchProducts(query);
+      }
     });
   </script>
 </body>
 </html>
+
+
+
+
+
