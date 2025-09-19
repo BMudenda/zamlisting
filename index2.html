@@ -1,480 +1,778 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZamListing</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZamListing — Products</title>
   <style>
+    /* --- Basic page / header --- */
+    :root {
+      --green: #006400; /* Zambia green */
+      --black: #000;
+      --red: #ff0000;
+      --orange: #ff7f00;
+      --light-blue: #007bff; /* For SMS/Taxi button */
+      --whatsapp-green: #25D366; /* For WhatsApp button */
+      --dark-green: #004d00;
+      --yellow-taxi: #FFD700;
+    }
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
       margin: 0;
-      padding: 20px;
-      text-align: center;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #f4f6f8;
+      color: #222;
     }
 
-    .brand-title {
-      font-size: 38px;
-      font-weight: bold;
-      color: #333;
-      text-transform: uppercase;
-    }
-
-    .brand-title .highlight {
-      color: #0077cc;
-    }
-
-    .tagline {
-      font-size: 24px;
-      color: #444;
-      margin: 5px 0;
-    }
-
-    .subtitle {
-      font-size: 16px;
-      color: #777;
-    }
-
-    .search-filter-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 20px auto;
-    }
-
-    #searchInput, #typeFilter {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    #searchInput {
-      width: 60%;
-      max-width: 300px;
-    }
-
-    #typeFilter {
-      width: 160px;
-    }
-
-    #resultCount {
-      margin: 10px;
-      font-weight: bold;
-      color: #0077cc;
-    }
-
-    .slider-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      padding: 20px;
-      max-width: 810px;
-      margin: 0 auto;
-      justify-items: center;
-      align-items: stretch;
-    }
-
-    .vehicle {
-      width: 250px;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-decoration: none;
-      color: #000;
-      transition: transform 0.2s;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-height: 340px;
-    }
-
-    .vehicle:hover {
-      transform: scale(1.03);
-    }
-
-    .vehicle img {
-      margin-top: 16px;
-      width: 100%;
-      max-width: 220px;
-      height: 120px;
-      object-fit: contain;
-      border-radius: 8px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      background: #f5f5f5;
-      padding: 8px;
-      border: 1px solid #ddd;
-      flex-shrink: 0;
-    }
-
-    .emoji-animated {
-      margin-top: 16px;
-      width: 100%;
-      max-width: 220px;
-      height: 120px;
-      border-radius: 8px;
+    header {
+      background: var(--green);
+      color: #fff;
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin-left: auto;
-      margin-right: auto;
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      padding: 8px;
-      flex-shrink: 0;
-      animation: emojiBounce 1.5s infinite ease-in-out;
-      overflow: hidden; /* Ensure content stays within bounds */
+      justify-content: space-between;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
     }
 
-    .emoji-animated img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 8px;
-      background: transparent;
-      border: none;
-      padding: 0;
-      display: block;
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
+    .logo .listing { color: var(--orange); }
+
+    /* cart icon in header */
+    .header-controls {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      position: relative; /* contains dropdown */
     }
 
-    .emoji-animated::before {
-      content: "Image Missing";
-      display: none; /* Hidden unless image fails to load */
-      color: #f00;
-      font-size: 14px;
+    .cart-icon {
+      cursor: pointer;
+      position: relative;
+      font-size: 20px;
+      user-select: none;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: red;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      min-width: 20px;
       text-align: center;
     }
 
-    .emoji-animated img:empty + ::before,
-    .emoji-animated img[style*="display: none"] + ::before {
-      display: block; /* Show fallback if image is missing or hidden */
-    }
-
-    @keyframes emojiBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .card-body {
+    /* cart dropdown */
+    .cart-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 320px;
+      background: #fff;
+      color: #111;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10,10,10,0.15);
       padding: 12px;
-      text-align: left;
+      z-index: 40;
+    }
+    .cart-dropdown.open { display: block; }
+
+    .cart-dropdown h3 { margin: 0 0 10px 0; font-size: 16px; }
+    .cart-items { max-height: 220px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+    .cart-items li {
+      display:flex;
+      justify-content: space-between;
+      gap:8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      align-items:center;
+      font-size: 14px;
+    }
+    .cart-items .left { display:flex; gap:8px; align-items:center; }
+    .cart-items .name { font-weight:600; }
+    .cart-items .meta { font-size: 12px; color:#555; }
+
+    .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+    .cart-total { font-weight:700; }
+    .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
+    
+    .cart-share {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .btn-share {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-sms { background: var(--light-blue); }
+    .btn-whatsapp { background: var(--whatsapp-green); }
+
+
+    /* --- filters and search --- */
+    .filters-search {
+      padding: 12px 20px;
+      background: #e9ecef;
       display: flex;
       flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .filters-search .filters {
+      display: flex;
       gap: 8px;
-      flex: 1 1 auto;
+      flex-wrap: wrap;
     }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: bold;
-      color: #0077cc;
-      margin-bottom: 0;
-    }
-
-    .card-details {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
+    .filters-search .filter-btn {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
       font-size: 14px;
-      color: #444;
+      transition: all 0.2s ease;
+    }
+    .filters-search .filter-btn:hover {
+        background: #f0f0f0;
+    }
+    .filters-search .filter-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .filters-search .search-box {
+      display: flex;
+      gap: 8px;
+    }
+    .filters-search .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .filters-search .search-box button {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: none;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .filters-search .search-box button:hover {
+        background: var(--dark-green);
     }
 
-    .card-details li {
-      margin-bottom: 4px;
+    /* --- taxi booking section --- */
+    .taxi-promo {
+      background: linear-gradient(135deg, var(--green) 0%, var(--dark-green) 100%);
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin: 25px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 25px;
+      max-width: 1000px;
+      transition: transform 0.3s ease;
     }
-
-    .card-details li strong {
-      color: #0077cc;
+    .taxi-promo:hover {
+        transform: translateY(-5px);
     }
-
-    .footer-links {
-      margin: 20px 0;
-    }
-
-    .footer-link {
-      margin: 0 10px;
-      text-decoration: none;
-      color: #555;
-      font-weight: bold;
-    }
-
-    .footer-link:hover { color: #000; }
-
-    .fa {
-      padding: 10px;
-      font-size: 20px;
-      width: 40px;
-      text-align: center;
-      text-decoration: none;
-      margin: 5px 5px;
-      border-radius: 50%;
-      color: white;
-    }
-
-    .fa-facebook { background: #3b5998; }
-    .fa-twitter { background: #55acee; }
-    .fa-google { background: #dd4b39; }
-    .fa-linkedin { background: #007bb5; }
-    .fa-youtube { background: #bb0000; }
-    .fa-instagram { background: #e4405f; }
-
-    hr { margin: 20px 0; }
-
-    @media (max-width: 600px) {
-      .brand-title { font-size: 28px; }
-      .slider-container {
-        grid-template-columns: 1fr;
-        max-width: 250px;
-      }
-      .vehicle {
-        width: 200px;
-        min-height: 280px;
-      }
-      .vehicle img, .emoji-animated {
-        max-width: 170px;
-        height: 100px;
-        padding: 6px;
-      }
-      #searchInput { width: 90%; }
-      .search-filter-row {
-        flex-direction: column;
+    .taxi-promo a {
+        display: flex;
         align-items: center;
-      }
-      .card-title { font-size: 15px; }
-      .card-details { font-size: 12px; }
+        gap: 25px;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+    }
+    .taxi-promo .taxi-content {
+      flex: 1;
+    }
+    .taxi-promo .taxi-content h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--yellow-taxi);
+    }
+    .taxi-promo .taxi-content p {
+      margin: 0 0 15px 0;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    .taxi-promo .taxi-image {
+        flex-shrink: 0;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .taxi-promo .taxi-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .btn-taxi {
+        display: inline-block;
+        background: var(--yellow-taxi);
+        color: var(--dark-green);
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-taxi:hover {
+        background: #ffc400;
+        transform: translateY(-2px);
     }
 
-    @media (min-width: 601px) and (max-width: 900px) {
-      .slider-container {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 540px;
-      }
+    /* --- products grid --- */
+    main { padding: 18px; max-width: 1100px; margin: 0 auto; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+    .product-card {
+      background:#fff;
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(10,10,10,0.06);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
+    .slides { display:flex; transition:transform .45s ease; height:100%; }
+    .slides img { width:100%; height:180px; object-fit:cover; flex-shrink:0; }
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
+    .slider .prev{ left:8px } .slider .next{ right:8px }
+    .product-details { padding:12px; flex:1; display:flex; flex-direction:column; }
+    .product-details h4 { margin:0 0 6px 0; font-size:16px; }
+    .price { color:green; font-weight:700; margin-bottom:6px; }
+    .location { color:#666; font-size:13px; margin-bottom:8px; }
+    .controls { margin-top:auto; display:flex; gap:8px; }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; }
+    .btn-primary { background:#28a745; color:#fff; }
+    .btn-accent { background:#ff9800; color:#fff; }
+    .btn-secondary { background:var(--light-blue); color:#fff; }
+    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-section .phone-input { width: calc(100% - 150px); }
+    .success { color:green; font-size:13px; display:none; margin-top:8px; }
+    .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; text-decoration: none; color: #fff; }
+    .bid-btn-sms { background: var(--light-blue); }
+    .bid-btn-whatsapp { background: var(--whatsapp-green); }
+    @media (max-width:768px){
+        .taxi-promo a {
+            flex-direction: column;
+            text-align: center;
+        }
+        .taxi-promo .taxi-image {
+            margin-bottom: 15px;
+        }
+    }
+    @media (max-width:520px){
+      .cart-dropdown { right: 8px; left: 8px; width: auto; }
+      .bid-section input { width: 100%; }
+      .bid-btn-social { width: 48%; justify-content: center; }
+      .filters-search .search-box button { padding: 8px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="brand-title">Zam<span class="highlight">Listing</span></div>
-    <h2 class="tagline">Get your Service</h2>
-    <p class="subtitle">Click on a service below to proceed</p>
+    <div class="logo">
+      <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
+    </div>
+    <div class="header-controls" id="header-controls">
+      <div class="cart-icon" id="cart-icon" title="View cart">
+        🛒
+        <span class="cart-count" id="cart-count">0</span>
+        <div class="cart-dropdown" id="cart-dropdown" aria-hidden="true">
+          <h3>Your Cart</h3>
+          <ul class="cart-items" id="cart-items"></ul>
+          <div class="cart-actions">
+            <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+            <button class="cart-clear" id="cart-clear">Clear</button>
+          </div>
+          <div class="cart-share">
+            <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon" width="20" height="20" style="vertical-align: middle;">
+              WhatsApp
+            </button>
+            <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Sms_icon.svg" alt="SMS Icon" width="20" height="20" style="vertical-align: middle;">
+              SMS
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </header>
 
-  <div class="search-filter-row">
-    <input type="text" id="searchInput" placeholder="Search services...">
-    <select id="typeFilter">
-      <option value="all">All Categories</option>
-      <option value="taxi">Book Ride</option>
-      <option value="bike">Bike</option>
-      <option value="item">e-shop</option>
-      <option value="contractor">Contractor</option>
-      <option value="vehicle">Vehicle</option>
-      <option value="laptop">Laptop</option>
-      <option value="phone">Phone</option>
-      <option value="calculator">Calculator</option>
-    </select>
+  <div class="filters-search">
+    <div class="filters" id="category-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="electronics">Electronics</button>
+      <button class="filter-btn" data-filter="furniture">Furniture</button>
+      <button class="filter-btn" data-filter="groceries">Groceries</button>
+      <button class="filter-btn" data-filter="vehicles">Vehicles</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products..." />
+      <button id="search-btn">Search</button>
+    </div>
   </div>
 
-  <div id="resultCount">Showing results</div>
-
-  <div class="slider-container" id="vehicleContainer">
-    <a href="edit.html" class="vehicle" data-name="Sell Vitz Ndola" data-type="vehicle">
-      <img src="V1.jpg" alt="Vitz Ndola">
-      <div class="card-body">
-        <div class="card-title">Vitz - For Sale</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 90,000</li>
-          <li><strong>Location</strong>: Ndola</li>
-        </ul>
+  <div class="taxi-promo">
+    <a href="https://zamlisting.com/customerride" target="_blank">
+      <div class="taxi-content">
+        <h3>Book a Taxi with ZamListing 🚕</h3>
+        <p>Your ride is just a tap away! Book a taxi in **Luangwa, Zambia** for a safe and convenient trip.</p>
+        <div class="controls">
+            <span class="btn-taxi">Book Now</span>
+        </div>
       </div>
-    </a>
-
-    <a href="laptop2.html" class="vehicle" data-name="Sell Laptop Lusaka" data-type="laptop">
-      <img src="L1.jpeg" alt="Laptop">
-      <div class="card-body">
-        <div class="card-title">Laptop - For Sale</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 1,200</li>
-          <li><strong>Location</strong>: Lusaka</li>
-          <li><strong>Specs</strong>: 11.6-inch, 4 GB RAM</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="sumsungs24.html" class="vehicle" data-name="Sell Samsung S24 Lusaka" data-type="phone">
-      <img src="S241.webp" alt="Samsung S24">
-      <div class="card-body">
-        <div class="card-title">Samsung S24 - For Sale - Negotiable</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 26,000</li>
-          <li><strong>Location</strong>: Lusaka</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="V20.html" class="vehicle" data-name="Sell Villaon V20 SE Lusaka" data-type="phone">
-      <img src="V201.jpeg" alt="Villaon V20 SE">
-      <div class="card-body">
-        <div class="card-title">Villaon V20 SE - For Sale - Negotiable</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 600</li>
-          <li><strong>Location</strong>: Lusaka</li>
-          <li><strong>Specs</strong>: 6.3-inch LCD, 2 GB RAM</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="customerride.html" class="vehicle" data-name="Taxi Hire Luangwa" data-type="taxi">
-      <div class="emoji-animated">
-        <img src="Uber.png" alt="Taxi Icon" />
-      </div>
-      <div class="card-body">
-        <div class="card-title">Taxi & Bike Hire</div> 
-        <ul class="card-details">
-          <li><strong>Location</strong>: Luangwa</li>
-          <li><strong>Service</strong>: Uber-style App</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="istorev0.html" class="vehicle" data-name="Assorted Items for sell-Luangwa" data-type="item">
-      <div class="emoji-animated">
-        <img src="Eco1.png" alt="Delivery Icon" />
-      </div>
-      <div class="card-body">
-        <div class="card-title">Delivery App</div>
-        <ul class="card-details">
-          <li><strong>Location</strong>: Luangwa e-shop</li>
-          <li><strong>Services</strong>: Assorted Items</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="calculator.html" class="vehicle" data-name="Calculator GX-14 Luangwa" data-type="calculator">
-      <img src="GX.jpg" alt="calculator">
-      <div class="card-body">
-        <div class="card-title">CASIO GX-14 Calculator Brand New - For Sale - Negotiable</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 230</li>
-          <li><strong>Location</strong>: Luangwa</li>
-          <li><strong>Specs</strong>: 14 Digits</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="markx.html" class="vehicle" data-name="Sell Mark x Ndola" data-type="vehicle">
-      <img src="mx.jpg" alt="markx Ndola">
-      <div class="card-body">
-        <div class="card-title">Mark X - For Sale</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 68,000</li>
-          <li><strong>Location</strong>: Ndola</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="calculator2.html" class="vehicle" data-name="Calculator GX-14 Luangwa" data-type="calculator">
-      <img src="EC1.jpg" alt="calculator">
-      <div class="card-body">
-        <div class="card-title">KENKO 8585-12 Calculator</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 200</li>
-          <li><strong>Location</strong>: Luangwa</li>
-          <li><strong>Specs</strong>: 12 Digits - Negotiable - Brand New Boxed</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="contractor.html" class="vehicle" data-name="Contractor Services" data-type="contractor">
-      <div class="emoji-animated">
-        <img src="Con.png" alt="Contractor Icon">
-      </div>
-      <div class="card-body">
-        <div class="card-title">Contractor Services</div>
-        <ul class="card-details">
-          <li><strong>Plumbing</strong>: Leaks, Installations</li>
-          <li><strong>Electrician</strong>: Wiring, Repairs</li>
-          <li><strong>Construction</strong>: Building & Renovation, Tiles & Ceiling Installation</li>
-          <li><strong>Location</strong>: Luangwa</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="laptop3.html" class="vehicle" data-name="Sell Laptop Lusaka" data-type="laptop">
-      <img src="L1.jpeg" alt="Laptop">
-      <div class="card-body">
-        <div class="card-title">Laptop - For Sale</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 400</li>
-          <li><strong>Location</strong>: Luangwa</li>
-          <li><strong>Specs</strong>: 11.6-inch, 4 GB RAM</li>
-          <li><strong>Pressure</strong>: Dead Battery</li>
-        </ul>
-      </div>
-    </a>
-
-    <a href="vits2.html" class="vehicle" data-name="Sell vits Lusaka" data-type="vehicle">
-      <img src="vi1.png" alt="vits Lusaka">
-      <div class="card-body">
-        <div class="card-title">Toyota Vits - For Sale</div>
-        <ul class="card-details">
-          <li><strong>Price</strong>: ZMW 98,000</li>
-          <li><strong>Location</strong>: Lusaka</li>
-        </ul>
+      <div class="taxi-image">
+        <img src="https://via.placeholder.com/150?text=Taxi" alt="Image of a taxi">
       </div>
     </a>
   </div>
 
-  <div class="footer-links">
-    <a href="about.html" class="footer-link">About</a>
-    <a href="index.html" class="footer-link">Home</a>
-  </div>
+  <main>
+    <div class="products" id="product-list">
 
-  <hr />
+      <article class="product-card"
+        data-id="p_template"             data-name="Product Name"      data-price="0000"       data-category="category_name">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Product+Image+1" alt="Description of Product Image 1">
+            <img src="https://via.placeholder.com/600x300?text=Product+Image+2" alt="Description of Product Image 2">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Product Name</h4>
+          <div class="price">ZMK 0000</div>
+          <div class="location">Location, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
 
-  <div>
-    <a href="#" class="fa fa-facebook" title="Facebook"></a>
-    <a href="#" class="fa fa-twitter" title="Twitter"></a>
-    <a href="#" class="fa fa-google" title="Google"></a>
-    <a href="#" class="fa fa-linkedin" title="LinkedIn"></a>
-    <a href="#" class="fa fa-youtube" title="YouTube"></a>
-    <a href="#" class="fa fa-instagram" title="Instagram"></a>
-    <a href="admin.html" title="Admin Access">*</a>
-  </div>
+      <article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Galaxy+1" alt="Samsung Galaxy S23 Front">
+            <img src="https://via.placeholder.com/600x300?text=Galaxy+2" alt="Samsung Galaxy S23 Side">
+            <img src="https://via.placeholder.com/600x300?text=Galaxy+3" alt="Samsung Galaxy S23 Back">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Samsung Galaxy S23</h4>
+          <div class="price">ZMK 12,000</div>
+          <div class="location">Lusaka, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p2" data-name="Office Chair" data-price="2500" data-category="furniture">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Chair+1" alt="Office Chair Front">
+            <img src="https://via.placeholder.com/600x300?text=Chair+2" alt="Office Chair Side">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Office Chair</h4>
+          <div class="price">ZMK 2,500</div>
+          <div class="location">Ndola, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p3" data-name="Maize Meal" data-price="150" data-category="groceries">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Maize+Meal" alt="Bag of Maize Meal">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Maize Meal</h4>
+          <div class="price">ZMK 150</div>
+          <div class="location">Lusaka, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p4" data-name="Toyota Vitz 2018" data-price="85000" data-category="vehicles">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://via.placeholder.com/600x300?text=Vitz+1" alt="Toyota Vitz Front View">
+            <img src="https://via.placeholder.com/600x300?text=Vitz+2" alt="Toyota Vitz Interior">
+          </div>
+          <button class="prev" aria-label="prev">&#10094;</button>
+          <button class="next" aria-label="next">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Toyota Vitz 2018</h4>
+          <div class="price">ZMK 85,000</div>
+          <div class="location">Kitwe, Zambia</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+          </div>
+          <div class="bid-section">
+            <input type="number" placeholder="Your bid (ZMK)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
 
   <script>
-    const searchInput = document.getElementById("searchInput");
-    const typeFilter = document.getElementById("typeFilter");
-    const vehicleContainer = document.getElementById("vehicleContainer");
-    const vehicles = vehicleContainer.getElementsByClassName("vehicle");
-    const resultCount = document.getElementById("resultCount");
-
-    function filterVehicles() {
-      const searchValue = searchInput.value.toLowerCase();
-      const selectedType = typeFilter.value;
-      let count = 0;
-
-      Array.from(vehicles).forEach(vehicle => {
-        const name = vehicle.getAttribute("data-name").toLowerCase();
-        const type = vehicle.getAttribute("data-type");
-        const matchesSearch = name.includes(searchValue);
-        const matchesType = selectedType === "all" || type === selectedType;
-        const show = matchesSearch && matchesType;
-        vehicle.style.display = show ? "flex" : "none";
-        if (show) count++;
+    /**********************
+     * Utilities
+     **********************/
+    const FMT = (v) => {
+      // format number with thousands separators, no decimal places
+      return Number(v).toLocaleString();
+    };
+    const safeNumber = (str) => {
+      if (str === undefined || str === null) return 0;
+      return Number(String(str).replace(/,/g, '').trim()) || 0;
+    };
+    const cartPhoneNumber = '0978167546'; // Default number for cart messages
+    
+    /**********************
+     * Cart data & helpers
+     **********************/
+    let cart = [];
+    const findCartItem = (id) => cart.find(i => i.id === id);
+    function addToCart(productId, productName, productPrice, qty = 1) {
+      const existing = findCartItem(productId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id: productId, name: productName, price: productPrice, qty });
+      }
+      renderCart();
+    }
+    function removeFromCart(productId) {
+      cart = cart.filter(i => i.id !== productId);
+      renderCart();
+    }
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+    function cartTotalAmount() {
+      return cart.reduce((s, it) => s + (safeNumber(it.price) * it.qty), 0);
+    }
+    function cartTotalQty() {
+      return cart.reduce((s, it) => s + it.qty, 0);
+    }
+    /**********************
+     * DOM render functions
+     **********************/
+    function renderCart() {
+      const listEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      const countEl = document.getElementById('cart-count');
+      listEl.innerHTML = '';
+      if (cart.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No items in cart';
+        li.style.padding = '8px 0';
+        listEl.appendChild(li);
+      } else {
+        cart.forEach(item => {
+          const li = document.createElement('li');
+          const left = document.createElement('div');
+          left.className = 'left';
+          const name = document.createElement('div');
+          name.className = 'name';
+          name.textContent = item.name;
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${item.qty} x ZMK ${FMT(item.price)} `;
+          left.appendChild(name);
+          left.appendChild(meta);
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.flexDirection = 'column';
+          right.style.alignItems = 'flex-end';
+          right.style.gap = '6px';
+          const lineTotal = document.createElement('div');
+          lineTotal.textContent = `ZMK ${FMT(item.price * item.qty)}`;
+          const rm = document.createElement('button');
+          rm.textContent = 'Remove';
+          rm.style.padding = '4px 6px';
+          rm.style.fontSize = '12px';
+          rm.style.border = '0';
+          rm.style.borderRadius = '6px';
+          rm.style.background = '#eee';
+          rm.style.cursor = 'pointer';
+          rm.onclick = () => removeFromCart(item.id);
+          right.appendChild(lineTotal);
+          right.appendChild(rm);
+          li.appendChild(left);
+          li.appendChild(right);
+          listEl.appendChild(li);
+        });
+      }
+      const total = cartTotalAmount();
+      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
+      countEl.textContent = String(cartTotalQty());
+    }
+    
+    /**********************
+     * Cart Sharing Functions
+     **********************/
+    function getCartMessage() {
+      let message = "Hello ZamListing, I would like to order the following items:\n\n";
+      if (cart.length === 0) {
+        return "I am interested in your products. Please contact me.";
+      }
+      
+      cart.forEach(item => {
+        message += `${item.name} (${item.qty} pcs) - ZMK ${FMT(item.price * item.qty)}\n`;
       });
 
-      resultCount.textContent = `Showing ${count} result${count !== 1 ? 's' : ''}`;
+      message += `\nTotal: ZMK ${FMT(cartTotalAmount())}\n`;
+      message += `\nThank you!`;
+      
+      return message;
     }
 
-    searchInput.addEventListener("input", filterVehicles);
-    typeFilter.addEventListener("change", filterVehicles);
-    filterVehicles();
+    function sendCartViaSMS() {
+      const message = getCartMessage();
+      window.location.href = `sms:${cartPhoneNumber}?body=${encodeURIComponent(message)}`;
+    }
+
+    function sendCartViaWhatsApp() {
+      const message = getCartMessage();
+      const waNumber = '260' + cartPhoneNumber.substring(1);
+      window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    }
+
+    /**********************
+     * UI bindings
+     **********************/
+    function addToCartBtn(button) {
+      const card = button.closest('.product-card');
+      if (!card) return;
+      const id = card.dataset.id || card.dataset.name;
+      const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
+      const price = safeNumber(card.dataset.price || '');
+      addToCart(id, name, price, 1);
+      openCartDropdown();
+    }
+    document.getElementById('cart-clear').addEventListener('click', () => {
+      clearCart();
+    });
+    const cartIcon = document.getElementById('cart-icon');
+    const cartDropdown = document.getElementById('cart-dropdown');
+    function openCartDropdown() {
+      cartDropdown.classList.add('open');
+      cartDropdown.setAttribute('aria-hidden', 'false');
+    }
+    function closeCartDropdown() {
+      cartDropdown.classList.remove('open');
+      cartDropdown.setAttribute('aria-hidden', 'true');
+    }
+    function toggleCart() {
+      cartDropdown.classList.toggle('open');
+      const open = cartDropdown.classList.contains('open');
+      cartDropdown.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+    cartIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleCart();
+    });
+    document.addEventListener('click', (ev) => {
+      const target = ev.target;
+      const headerControls = document.getElementById('header-controls');
+      if (!headerControls.contains(target)) {
+        closeCartDropdown();
+      }
+    });
+    function toggleBid(button) {
+      const details = button.closest('.product-details');
+      const bid = details.querySelector('.bid-section');
+      if (bid) bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
+    }
+    
+    function submitBid(button, type) {
+      const bidSection = button.closest('.bid-section');
+      const bidAmountInput = bidSection.querySelector('input[type="number"]');
+      const card = button.closest('.product-card');
+      const itemName = card.dataset.name;
+      
+      const bidAmount = bidAmountInput.value;
+      
+      const bidPhoneNumber = card.dataset.phonenumber;
+
+      // Fallback to a default number if no phone number is provided in the input field.
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
+        return;
+      }
+
+      const formattedBid = `ZMK ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      }
+    }
+    
+    document.querySelectorAll('.product-card').forEach(card => {
+      const slider = card.querySelector('.slider');
+      if (slider) {
+          const slides = slider.querySelector('.slides');
+          const imgs = slides.querySelectorAll('img');
+          let idx = 0;
+          const nextBtn = slider.querySelector('.next');
+          const prevBtn = slider.querySelector('.prev');
+          
+          if (imgs.length <= 1) {
+              if (nextBtn) nextBtn.style.display = 'none';
+              if (prevBtn) prevBtn.style.display = 'none';
+          } else {
+              const move = (i) => {
+                  idx = ((i % imgs.length) + imgs.length) % imgs.length;
+                  slides.style.transform = `translateX(-${idx * 100}%)`;
+              };
+              if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
+              if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
+          }
+      }
+    });
+
+    renderCart();
+    
+    /**********************
+     * New Filter & Search Logic
+     **********************/
+    const allProducts = document.querySelectorAll('.product-card');
+    const productList = document.getElementById('product-list');
+    const categoryFilters = document.getElementById('category-filters');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    function filterProducts(category) {
+      allProducts.forEach(product => {
+        if (category === 'all' || product.dataset.category === category) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+    function searchProducts(query) {
+      const lowerCaseQuery = query.toLowerCase();
+      // Remove all active filters when searching
+      categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+      allProducts.forEach(product => {
+        const name = product.dataset.name.toLowerCase();
+        if (name.includes(lowerCaseQuery)) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+    categoryFilters.addEventListener('click', (e) => {
+      const button = e.target;
+      if (button.classList.contains('filter-btn')) {
+        categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        filterProducts(button.dataset.filter);
+        searchInput.value = '';
+      }
+    });
+    searchBtn.addEventListener('click', () => {
+      const query = searchInput.value.trim();
+      searchProducts(query);
+    });
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value.trim();
+        searchProducts(query);
+      }
+    });
   </script>
 </body>
-  </html>
+</html>
