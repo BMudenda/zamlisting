@@ -283,7 +283,19 @@
       height:160px; /* Reduced height */
       object-fit:contain;
       flex-shrink:0; 
+      /* Added for zoom functionality */
+      touch-action: pan-y;
+      cursor: zoom-in;
     }
+
+    /* New CSS for zoom */
+    .slides img.zoomed {
+      object-fit: contain;
+      transform: scale(1.8);
+      cursor: zoom-out;
+      transform-origin: center center;
+    }
+
     .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:4px 6px; border-radius:50%; cursor:pointer; } /* Reduced button size */
     .slider .prev{ left:6px } .slider .next{ right:6px }
     .product-details { padding:10px; flex:1; display:flex; flex-direction:column; } /* Reduced padding */
@@ -1215,7 +1227,22 @@
       }
     });
 
+    /**********************
+     * Double-Tap Zoom Logic
+     **********************/
+    document.querySelectorAll('.slides img').forEach(img => {
+        let lastTap = 0;
+        img.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                this.classList.toggle('zoomed');
+                e.preventDefault(); // Prevent the default browser zoom behavior
+            }
+            lastTap = currentTime;
+        });
+    });
+
   </script>
 </body>
 </html>
-
