@@ -27,7 +27,6 @@
     }
 
     header {
-      /* Changed to a solid blue background */
       background: var(--eshop-blue);
       color: #fff;
       display: flex;
@@ -56,7 +55,6 @@
     .logo .m { color: var(--red); }
     .logo .listing { color: var(--orange); }
 
-    /* New subtitle style */
     .header-subtitle {
         font-size: 14px;
         font-weight: 400;
@@ -64,7 +62,6 @@
         color: rgba(255, 255, 255, 0.85);
     }
 
-    /* cart icon in header */
     .header-controls {
       display:flex;
       align-items:center;
@@ -91,7 +88,6 @@
       text-align: center;
     }
 
-    /* cart dropdown */
     .cart-dropdown {
       display: none;
       position: absolute;
@@ -321,10 +317,10 @@
         overflow: hidden;
         border: 4px solid rgba(255,255,255,0.3);
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        display: flex; /* Added to center possible content */
-        align-items: center; /* Added to center possible content */
-        justify-content: center; /* Added to center possible content */
-        font-size: 5rem; /* Make emojis larger if you put them here */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5rem;
     }
     .shop-promo .shop-image img {
       width: 100%;
@@ -368,43 +364,44 @@
       overflow:hidden;
       display:flex;
       flex-direction:column;
+      cursor: pointer;
     }
     .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
     .slides { display:flex; transition:transform .45s ease; height:100%; }
     .slides img { 
       width:100%; 
       height:180px; 
-      object-fit:contain; /* The change is here! */
+      object-fit:contain;
       flex-shrink:0; 
-      /* Added for zoom functionality */
       transition: transform 0.3s ease-in-out;
-      cursor: zoom-in;
-    }
-
-    /* New CSS for zoom */
-    .slides img.zoomed {
-      transform: scale(1.8);
-      cursor: zoom-out;
-      transform-origin: center center;
-    }
-    
-    /* Initially hide the buttons */
-    .product-card .controls {
-      display: none;
-    }
-
-    /* Unhide buttons on tap */
-    .product-card.tapped .controls {
-      display: flex;
+      cursor: pointer;
     }
     
     .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
     .slider .prev{ left:8px } .slider .next{ right:8px }
-    .product-details { padding:12px; flex:1; display:flex; flex-direction:column; }
+    
+    .product-details {
+      padding: 12px;
+    }
     .product-details h4 { margin:0 0 6px 0; font-size:16px; }
     .price { color:green; font-weight:700; margin-bottom:6px; }
     .location { color:#666; font-size:13px; margin-bottom:8px; }
-    .controls { margin-top:auto; display:flex; gap:8px; }
+    
+    /* The part that is hidden by default */
+    .product-details .tappable-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    }
+
+    /* Show the hidden part when the 'tapped' class is on the card */
+    .product-card.tapped .tappable-content {
+      max-height: 500px; /* A value larger than the max possible height */
+      opacity: 1;
+    }
+
+    .controls { display:flex; gap:8px; margin-top:10px; }
     .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; }
     .btn-primary { background:#28a745; color:#fff; }
     .btn-accent { background:#ff9800; color:#fff; }
@@ -417,11 +414,6 @@
     .bid-btn-sms { background: var(--light-blue); }
     .bid-btn-whatsapp { background: var(--whatsapp-green); }
     
-    /* New details section styles */
-    .product-card .product-details .btn-details {
-        background: #007bff;
-        color: #fff;
-    }
     .details-section {
         margin-top: 10px;
         padding-top: 10px;
@@ -439,7 +431,164 @@
         color: #888;
         margin-top: 4px;
     }
+    
+    /* --- Modal CSS --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
 
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close:hover,
+    .modal-close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden;
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #ddd;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s ease;
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: zoom-in;
+    }
+    .modal-slides img.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+        transform-origin: center center;
+    }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 6px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .modal-price {
+      color: green;
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 8px;
+    }
+    .modal-location {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .modal-description {
+      margin-top: 15px;
+    }
+    .modal-description p {
+      margin: 0;
+      line-height: 1.6;
+    }
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .modal-controls .btn {
+      flex: 1;
+      font-size: 16px;
+    }
+    .modal-bid-section {
+      display:none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-bid-section input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .modal-bid-section .bid-btn-social {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .modal-content { max-height: 95vh; }
+      .modal-bid-section .bid-btn-social { width: 48%; }
+    }
     @media (max-width:520px){
       .cart-dropdown { right: 8px; left: 8px; width: auto; }
       .bid-section input { width: 100%; }
@@ -490,7 +639,6 @@
       <button class="filter-btn" data-filter="groceries">Groceries</button>
       <button class="filter-btn" data-filter="vehicles">Vehicles</button>
       <button class="filter-btn" data-filter="amasampo">Amasampo</button>
-      
     </div>
     <div class="search-box">
       <input type="text" id="search-input" placeholder="Search for products..." />
@@ -523,7 +671,6 @@
   data-phonenumber="0978167546"
   data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350, 4GB RAM, 64GB eMMC, Touchscreen, Windows 10"
   data-listed-date="2025-09-17T08:30:00Z">
-
   <div class="slider">
     <div class="slides">
       <img src="L1.jpeg" alt="Trekstor 11.6 Laptop Image 1">
@@ -536,85 +683,29 @@
     <button class="prev" aria-label="prev">&#10094;</button>
     <button class="next" aria-label="next">&#10095;</button>
   </div>
-
   <div class="product-details">
     <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
     <div class="price">ZMW 1,200 (Negotiable)</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <div class="controls">
-      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-      <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-    </div>
-
-    <div class="bid-section">
-      <input type="number" placeholder="Your bid (ZMW)" min="0" />
-      <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-      <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-    </div>
-
-    <div class="details-section" style="display: none;">
-      <h5>Product Description:</h5>
-      <p>
-        The Trekstor 11.6-inch 2-in-1 Laptop comes with a Full HD IPS touchscreen, 
-        Intel Celeron N3350 processor, 4GB RAM, and 64GB eMMC storage (expandable via SSD or microSD). 
-        It features 360° hinges, a fingerprint sensor, USB-C, and runs on Windows 10 Home. 
-        The laptop is lightweight, in good working condition, and offers a reliable battery. 
-        Available in Luangwa, Zambia at ZMW 1,200 (negotiable).
-      </p>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
     </div>
   </div>
 </article>
-<article class="product-card" 
-  data-id="p_trekstor116" 
-  data-name="Trekstor - 11.6-inch 2-in-1 Laptop" 
-  data-price="1200" 
-  data-category="laptop" 
-  data-phonenumber="0978167546"
-  data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350, 4GB RAM, 64GB eMMC, Touchscreen, Windows 10"
-  data-listed-date="2025-09-17T08:30:00Z">
 
-  <div class="slider">
-    <div class="slides">
-      <img src="L1.jpeg" alt="Trekstor 11.6 Laptop Image 1">
-      <img src="L2.jpeg" alt="Trekstor 11.6 Laptop Image 2">
-      <img src="L3.jpeg" alt="Trekstor 11.6 Laptop Image 3">
-      <img src="L4.jpeg" alt="Trekstor 11.6 Laptop Image 4">
-      <img src="L5.jpeg" alt="Trekstor 11.6 Laptop Image 5">
-      <img src="L6.jpg" alt="Trekstor 11.6 Laptop Image 6">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-
-  <div class="product-details">
-    <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
-    <div class="price">ZMW 800 (Negotiable)</div>
-    <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <div class="controls">
-      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-      <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-    </div>
-
-    <div class="bid-section">
-      <input type="number" placeholder="Your bid (ZMW)" min="0" />
-      <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-      <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-    </div>
-
-    <div class="details-section" style="display: none;">
-      <h5>Product Description:</h5>
-      <p>
-        The Trekstor 11.6-inch 2-in-1 Laptop comes with a Full HD IPS touchscreen, 
-        Intel Celeron N3350 processor, 4GB RAM, and 64GB eMMC storage (expandable via SSD or microSD). 
-        It features 360° hinges, a fingerprint sensor, USB-C, and runs on Windows 10 Home. 
-        The laptop is lightweight, in good working condition, and offers a reliable battery. 
-        Available in Luangwa, battery is dead needs to be replaced.
-      </p>
-    </div>
-  </div>
-</article>
 <article class="product-card" 
   data-id="p_casio_gx" 
   data-name="Casio Standard Calculator" 
@@ -623,7 +714,6 @@
   data-phonenumber="0978167546"
   data-details="Casio Standard Calculator with 14 digits, solar & battery power, extra large display, regular percentage calculations, durable plastic keys."
   data-listed-date="2025-09-20T10:00:00Z">
-
   <div class="slider">
     <div class="slides">
       <img src="GX.jpg" alt="Casio Calculator Image 1">
@@ -636,44 +726,37 @@
     <button class="prev" aria-label="prev">&#10094;</button>
     <button class="next" aria-label="next">&#10095;</button>
   </div>
-
   <div class="product-details">
     <h4>Casio Standard Calculator</h4>
     <div class="price">ZMW 250</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <div class="controls">
-      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-      <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-    </div>
-
-    <div class="bid-section">
-      <input type="number" placeholder="Your bid (ZMW)" min="0" />
-      <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-      <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-    </div>
-
-    <div class="details-section" style="display: none;">
-      <h5>Product Description:</h5>
-      <p>
-        The Casio Standard Calculator features 14 digits, regular percentage calculations, and a dual solar & battery power system. 
-        It has key rollover to ensure fast input is never lost, an extra-large display for easier reading, and durable plastic keys for smooth operation. 
-        This calculator includes all mark-up capabilities for simplified cost and profit calculations. 
-        Specifications: Brand Casio, 2 memories, 14 digits, 0 variables, 1-line display, plastic buttons, weighs 245 g, dimensions 207.5 × 159 × 34.3 mm, and special features include regular percentage calculations and extra-large display.
-      </p>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
     </div>
   </div>
-  </article>
+</article>
 
-      <article class="product-card" 
+<article class="product-card" 
   data-id="p_kenko_8585" 
   data-name="KENKO Electronic Calculator KK-8585-12" 
   data-price="300" 
   data-category="electronics" 
   data-phonenumber="0978167546"
-  data-details="KENKO Electronic Calculator KK-8585-12, standard function, business use, solar powered, large 12-digit display, durable ABS design"
+  data-details="KENKO Electronic Calculator KK-8585-12, standard function, business use, solar powered, large 12-digit display, durable ABS design."
   data-listed-date="2025-09-20T10:30:00Z">
-
   <div class="slider">
     <div class="slides">
       <img src="EC1.jpg" alt="KENKO Calculator Image 1">
@@ -683,254 +766,213 @@
     <button class="prev" aria-label="prev">&#10094;</button>
     <button class="next" aria-label="next">&#10095;</button>
   </div>
-
   <div class="product-details">
     <h4>KENKO Electronic Calculator KK-8585-12</h4>
     <div class="price">ZMW 300</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <div class="controls">
-      <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-      <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-    </div>
-
-    <div class="bid-section">
-      <input type="number" placeholder="Your bid (ZMW)" min="0" />
-      <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-      <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-    </div>
-
-    <div class="details-section" style="display: none;">
-      <h5>Product Description:</h5>
-      <p>
-        The KENKO Electronic Calculator KK-8585-12 is a boxed, brand new, black standard-function calculator ideal for business, office, school, or home use. 
-        It features a 12-digit large display, big and sensitive keys, functional keys including +, −, ÷, ×, =, GT, M+, M-, MU, MRC, and supports percent and square root calculations. 
-        Built with durable ABS material, it uses solar power for eco-friendly operation and battery backup for low-light situations. 
-        Additional features include soft-touch 00 key, HD display, and support for up to 112-step calculations.Four brand new and Boxed are available 
-      </p>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
     </div>
   </div>
 </article>
 
-      
-      <article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics" data-phonenumber="0978167546" 
-      data-details="" data-listed-date="2025-09-19T14:00:00Z">
-        <div class="slider">
-          <div class="slides">
-            <img src="S241.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S242.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S243.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S244.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S245.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S246.webp" alt="Samsung Galaxy S23 Front">
-           </div>
-          <button class="prev" aria-label="prev">&#10094;</button>
-          <button class="next" aria-label="next">&#10095;</button>
-        </div>
-        <div class="product-details">
-          <h4>Trekstor Laptop</h4>
-          <div class="price">ZMK 1,200</div>
-          <div class="location">Luangwa, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-            <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-          </div>
-          <div class="bid-section">
-            <input type="number" placeholder="Your bid (ZMK)" min="0" />
-            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-          </div>
-          <div class="details-section" style="display: none;">
-            <h5>Product Description:</h5>
-            <p class="product-description"></p>
-          </div>
-        </div>
-      </article>
-      <article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics" data-phonenumber="0978167546" 
-      data-details="" data-listed-date="2025-09-12T11:00:00Z">
-        <div class="slider">
-          <div class="slides">
-            <img src="S241.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S242.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S243.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S244.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S245.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S246.webp" alt="Samsung Galaxy S23 Front">
-           </div>
-          <button class="prev" aria-label="prev">&#10094;</button>
-          <button class="next" aria-label="next">&#10095;</button>
-        </div>
-        <div class="product-details">
-          <h4>Calculator</h4>
-          <div class="price">ZMK 600</div>
-          <div class="location">Lusaka, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-            <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-          </div>
-          <div class="bid-section">
-            <input type="number" placeholder="Your bid (ZMK)" min="0" />
-            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-          </div>
-          <div class="details-section" style="display: none;">
-            <h5>Product Description:</h5>
-            <p class="product-description"></p>
-          </div>
-        </div>
-      </article>
+<article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics" data-phonenumber="0978167546" 
+      data-details="Used Samsung Galaxy S23, 128GB, in excellent condition. Comes with original box and charger." data-listed-date="2025-09-19T14:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="S241.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S242.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S243.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S244.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S245.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S246.webp" alt="Samsung Galaxy S23 Front">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Samsung Galaxy S23</h4>
+    <div class="price">ZMK 12,000</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
 
-      
-      <article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics" data-phonenumber="0978167546" 
-      data-details="" data-listed-date="2025-09-01T09:00:00Z">
-        <div class="slider">
-          <div class="slides">
-            <img src="S241.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S242.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S243.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S244.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S245.webp" alt="Samsung Galaxy S23 Front">
-            <img src="S246.webp" alt="Samsung Galaxy S23 Front">
-           </div>
-          <button class="prev" aria-label="prev">&#10094;</button>
-          <button class="next" aria-label="next">&#10095;</button>
-        </div>
-        <div class="product-details">
-          <h4>Calculator</h4>
-          <div class="price">ZMK 600</div>
-          <div class="location">Luangwa, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-            <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-          </div>
-          <div class="bid-section">
-            <input type="number" placeholder="Your bid (ZMK)" min="0" />
-            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-          </div>
-          <div class="details-section" style="display: none;">
-            <h5>Product Description:</h5>
-            <p class="product-description"></p>
-          </div>
-        </div>
-      </article>
+<article class="product-card" data-id="p2" data-name="Office Chair" data-price="2500" data-category="furniture" data-phonenumber="0978167546" 
+      data-details="Comfortable ergonomic office chair with adjustable height and lumbar support. Perfect for a home office." data-listed-date="2025-09-05T12:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="https://via.placeholder.com/600x300?text=Chair+1" alt="Office Chair Front">
+      <img src="https://via.placeholder.com/600x300?text=Chair+2" alt="Office Chair Side">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Office Chair</h4>
+    <div class="price">ZMK 2,500</div>
+    <div class="location">Ndola, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
 
-      <article class="product-card" data-id="p2" data-name="Office Chair" data-price="2500" data-category="furniture" data-phonenumber="0978167546" 
-      data-details="" data-listed-date="2025-09-05T12:00:00Z">
-        <div class="slider">
-          <div class="slides">
-            <img src="https://via.placeholder.com/600x300?text=Chair+1" alt="Office Chair Front">
-            <img src="https://via.placeholder.com/600x300?text=Chair+2" alt="Office Chair Side">
-          </div>
-          <button class="prev" aria-label="prev">&#10094;</button>
-          <button class="next" aria-label="next">&#10095;</button>
-        </div>
-        <div class="product-details">
-          <h4>Office Chair</h4>
-          <div class="price">ZMK 2,500</div>
-          <div class="location">Ndola, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-            <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-          </div>
-          <div class="bid-section">
-            <input type="number" placeholder="Your bid (ZMK)" min="0" />
-            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-          </div>
-          <div class="details-section" style="display: none;">
-            <h5>Product Description:</h5>
-            <p class="product-description"></p>
-          </div>
-        </div>
-      </article>
+<article class="product-card" data-id="p3" data-name="Maize Meal" data-price="150" data-category="groceries" 
+      data-details="25kg bag of high-quality maize meal, ideal for making nshima. Freshly milled." data-listed-date="2025-09-19T10:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="https://via.placeholder.com/600x300?text=Maize+Meal" alt="Bag of Maize Meal">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Maize Meal</h4>
+    <div class="price">ZMK 150</div>
+    <div class="location">Lusaka, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
 
-      <article class="product-card" data-id="p3" data-name="Maize Meal" data-price="150" data-category="groceries" 
-      data-details="" data-listed-date="2025-09-19T10:00:00Z">
-        <div class="slider">
-          <div class="slides">
-            <img src="https://via.placeholder.com/600x300?text=Maize+Meal" alt="Bag of Maize Meal">
-          </div>
-          <button class="prev" aria-label="prev">&#10094;</button>
-          <button class="next" aria-label="next">&#10095;</button>
-        </div>
-        <div class="product-details">
-          <h4>Maize Meal</h4>
-          <div class="price">ZMK 150</div>
-          <div class="location">Lusaka, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-          </div>
-          <div class="details-section" style="display: none;">
-            <h5>Product Description:</h5>
-            <p class="product-description"></p>
-          </div>
-        </div>
-      </article>
-
-      <article class="product-card" data-id="p4" data-name="Toyota Vitz 2018" data-price="85000" data-category="vehicles" data-phonenumber="0978167546" 
-      data-details="" data-listed-date="2025-08-25T15:00:00Z">
-        <div class="slider">
-          <div class="slides">
-            <img src="vi1.png" alt="Toyota Vitz Front View">
-            <img src="vi2.jpg" alt="Toyota Vitz Front View">
-            <img src="vi3.jpg" alt="Toyota Vitz Front View">
-            <img src="vi4.jpg" alt="Toyota Vitz Front View">
-            <img src="vi5.jpg" alt="Toyota Vitz Front View">
-            <img src="vi6.jpg" alt="Toyota Vitz Front View">
-         
-            
-          </div>
-          <button class="prev" aria-label="prev">&#10094;</button>
-          <button class="next" aria-label="next">&#10095;</button>
-        </div>
-        <div class="product-details">
-          <h4>Toyota Vitz 2018</h4>
-          <div class="price">ZMK 85,000</div>
-          <div class="location">Kitwe, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-            <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-            <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
-          </div>
-          <div class="bid-section">
-            <input type="number" placeholder="Your bid (ZMK)" min="0" />
-            <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-            <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-          </div>
-          <div class="details-section" style="display: none;">
-            <h5>Product Description:</h5>
-            <p class="product-description"></p>
-          </div>
-        </div>
-      </article>
+<article class="product-card" data-id="p4" data-name="Toyota Vitz 2018" data-price="85000" data-category="vehicles" data-phonenumber="0978167546" 
+      data-details="2018 Toyota Vitz, automatic transmission, low mileage. Well-maintained and in excellent driving condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="vi1.png" alt="Toyota Vitz Front View">
+      <img src="vi2.jpg" alt="Toyota Vitz Front View">
+      <img src="vi3.jpg" alt="Toyota Vitz Front View">
+      <img src="vi4.jpg" alt="Toyota Vitz Front View">
+      <img src="vi5.jpg" alt="Toyota Vitz Front View">
+      <img src="vi6.jpg" alt="Toyota Vitz Front View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Toyota Vitz 2018</h4>
+    <div class="price">ZMK 85,000</div>
+    <div class="location">Kitwe, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
 
     </div>
   </main>
+
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <div class="modal-body">
+        <div class="modal-slider-container">
+          <div class="modal-slider">
+            <div class="modal-slides"></div>
+            <button class="prev" aria-label="Previous image">&#10094;</button>
+            <button class="next" aria-label="Next image">&#10095;</button>
+          </div>
+        </div>
+        <div class="modal-details">
+          <h4 id="modalProductName"></h4>
+          <div class="modal-price" id="modalProductPrice"></div>
+          <div class="modal-location" id="modalProductLocation"></div>
+          
+          <div class="modal-description">
+            <h5>Product Description:</h5>
+            <p id="modalProductDescription"></p>
+          </div>
+          
+          <div class="modal-controls">
+            <button class="btn btn-primary" id="modalAddToCart">Add to Cart</button>
+            <button class="btn btn-accent" id="modalMakeOffer">Make an Offer</button>
+          </div>
+          
+          <div class="modal-bid-section">
+            <input type="number" id="modalBidInput" placeholder="Your bid (ZMW)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" id="modalBidWhatsApp" href="#" onclick="event.preventDefault(); submitModalBid('whatsapp');">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" id="modalBidSMS" href="#" onclick="event.preventDefault(); submitModalBid('sms');">📱 SMS</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     /**********************
      * Utilities
      **********************/
     const FMT = (v) => {
-      // format number with thousands separators, no decimal places
       return Number(v).toLocaleString();
     };
     const safeNumber = (str) => {
       if (str === undefined || str === null) return 0;
       return Number(String(str).replace(/,/g, '').trim()) || 0;
     };
-    const cartPhoneNumber = '0978167546'; // Default number for cart messages
+    const cartPhoneNumber = '0978167546';
     
     /**********************
      * Cart data & helpers
@@ -1053,6 +1095,7 @@
       const id = card.dataset.id || card.dataset.name;
       const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
       const price = safeNumber(card.dataset.price || '');
+
       addToCart(id, name, price, 1);
       openCartDropdown();
     }
@@ -1086,26 +1129,9 @@
       }
     });
     function toggleBid(button) {
-      const details = button.closest('.product-details');
+      const details = button.closest('.tappable-content');
       const bid = details.querySelector('.bid-section');
       if (bid) bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    function toggleDetails(button) {
-      const detailsSection = button.closest('.product-details').querySelector('.details-section');
-      const productCard = button.closest('.product-card');
-      const description = productCard.dataset.details;
-      
-      const isVisible = detailsSection.style.display !== 'none';
-      
-      if (isVisible) {
-          detailsSection.style.display = 'none';
-          button.textContent = 'Details 👇';
-      } else {
-          detailsSection.querySelector('p').textContent = description; // Correctly set description here
-          detailsSection.style.display = 'block';
-          button.textContent = 'Hide Details 👆';
-      }
     }
     
     function submitBid(button, type) {
@@ -1115,10 +1141,8 @@
       const itemName = card.dataset.name;
       
       const bidAmount = bidAmountInput.value;
-      
       const bidPhoneNumber = card.dataset.phonenumber;
 
-      // Fallback to a default number if no phone number is provided in the input field.
       if (!bidPhoneNumber) {
           alert("Error: A phone number for bidding on this item has not been set.");
           return;
@@ -1129,7 +1153,7 @@
         return;
       }
 
-      const formattedBid = `ZMK ${FMT(bidAmount)}`;
+      const formattedBid = `ZMW ${FMT(bidAmount)}`;
       const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
       
       if (type === 'sms') {
@@ -1169,7 +1193,6 @@
      * New Filter & Search Logic
      **********************/
     const allProducts = document.querySelectorAll('.product-card');
-    const productList = document.getElementById('product-list');
     const categoryFilters = document.getElementById('category-filters');
     const searchInput = document.getElementById('search-input');
     
@@ -1185,7 +1208,6 @@
 
     function searchProducts(query) {
       const lowerCaseQuery = query.toLowerCase();
-      // Remove all active filters when searching
       categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
 
       allProducts.forEach(product => {
@@ -1208,68 +1230,18 @@
       }
     });
     
-    // Instant search on input
     searchInput.addEventListener('input', () => {
       const query = searchInput.value.trim();
       searchProducts(query);
     });
 
-    // The search button is no longer needed but kept for style
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.style.display = 'none';
     }
 
-    // Set initial state
     filterProducts('all');
     
-    /**********************
-     * Tap to Show/Hide Controls
-     **********************/
-    document.querySelectorAll('.product-card').forEach(card => {
-        let timer = null;
-        card.addEventListener('click', (e) => {
-            // Check if the click was on a button or an input, if so, don't toggle the class
-            if (e.target.closest('.controls')) {
-                return;
-            }
-            // Toggle the 'tapped' class to show/hide the controls
-            card.classList.toggle('tapped');
-            
-            // Clear any previous timer
-            clearTimeout(timer);
-
-            // Set a new timer to hide controls after a short delay
-            if (card.classList.contains('tapped')) {
-                 timer = setTimeout(() => {
-                    card.classList.remove('tapped');
-                }, 5000); // 5 seconds
-            }
-        });
-    });
-
-    /**********************
-     * Double-tap Zoom
-     **********************/
-    document.querySelectorAll('.slides img').forEach(img => {
-        let lastTap = 0;
-        img.addEventListener('touchend', (e) => {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            // Check if it's a double-tap (within 300ms)
-            if (tapLength < 300 && tapLength > 0) {
-                e.preventDefault(); 
-                img.classList.toggle('zoomed'); 
-            }
-            lastTap = currentTime;
-        });
-
-        img.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-            img.classList.toggle('zoomed');
-        });
-    });
-
     /**********************
      * New Listing Time Counter
      **********************/
@@ -1280,15 +1252,15 @@
         if (!listedDateStr) return;
 
         const listedDate = new Date(listedDateStr);
-        const timeDiff = now - listedDate; // difference in milliseconds
+        const timeDiff = now - listedDate;
 
         const seconds = Math.floor(timeDiff / 1000);
         const minutes = Math.floor(seconds / 60);
         const hours = Math.floor(minutes / 60);
         const days = Math.floor(hours / 24);
         const weeks = Math.floor(days / 7);
-        const months = Math.floor(days / 30.44); // Average days in a month
-        const years = Math.floor(days / 365.25); // Average days in a year
+        const months = Math.floor(days / 30.44);
+        const years = Math.floor(days / 365.25);
 
         let timeText = '';
         if (years > 0) {
@@ -1314,9 +1286,196 @@
       });
     }
 
-    // Run once on page load and then every 30 seconds
     updateListingTime();
-    setInterval(updateListingTime, 30000); // 30 seconds
+    setInterval(updateListingTime, 30000);
+
+    /**********************
+     * Card Tap Logic
+     **********************/
+    document.querySelectorAll('.product-card').forEach(card => {
+        // Populate the description for each card from the data attribute
+        const descriptionEl = card.querySelector('.product-description');
+        if (descriptionEl) {
+          descriptionEl.textContent = card.dataset.details || 'No description available.';
+        }
+        
+        // Add click listener for showing/hiding details
+        card.addEventListener('click', (e) => {
+            // Do not toggle if a button or an image is clicked
+            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.tagName.toLowerCase() === 'img') {
+                return;
+            }
+            card.classList.toggle('tapped');
+        });
+    });
+
+    /**********************
+     * Image Zoom Logic
+     **********************/
+    document.querySelectorAll('.product-card .slider img').forEach(img => {
+      // Double click for desktop
+      img.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        img.classList.toggle('zoomed');
+      });
+
+      // Double tap for mobile
+      let lastTap = 0;
+      img.addEventListener('touchend', (e) => {
+          const currentTime = new Date().getTime();
+          const tapLength = currentTime - lastTap;
+          if (tapLength < 300 && tapLength > 0) {
+              e.preventDefault(); 
+              img.classList.toggle('zoomed'); 
+          }
+          lastTap = currentTime;
+      });
+    });
+
+    /**********************
+     * Modal Logic
+     **********************/
+    const modal = document.getElementById('productModal');
+    const modalClose = document.querySelector('.modal-close');
+    let currentCard = null;
+
+    function showModal(card) {
+      currentCard = card;
+      const id = card.dataset.id || card.dataset.name;
+      const name = card.dataset.name || card.querySelector('h4').textContent;
+      const price = card.dataset.price || 'N/A';
+      const location = card.querySelector('.location')?.textContent || '';
+      const description = card.dataset.details || 'No description available.';
+      const hasOffer = card.querySelector('.btn-accent') !== null;
+      
+      document.getElementById('modalProductName').textContent = name;
+      document.getElementById('modalProductPrice').textContent = `ZMW ${FMT(price)}`;
+      document.getElementById('modalProductLocation').textContent = location;
+      document.getElementById('modalProductDescription').textContent = description;
+      
+      const offerButton = document.getElementById('modalMakeOffer');
+      const bidSection = document.querySelector('.modal-bid-section');
+      
+      if (hasOffer) {
+          offerButton.style.display = 'inline-block';
+      } else {
+          offerButton.style.display = 'none';
+      }
+      
+      bidSection.style.display = 'none';
+
+      const modalSlidesContainer = modal.querySelector('.modal-slides');
+      modalSlidesContainer.innerHTML = '';
+      const originalImages = card.querySelectorAll('.slider img');
+      originalImages.forEach(img => {
+          const newImg = img.cloneNode();
+          modalSlidesContainer.appendChild(newImg);
+      });
+      
+      initModalSlider();
+      initModalZoom();
+
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        currentCard = null;
+    }
+    
+    modalClose.addEventListener('click', hideModal);
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        hideModal();
+      }
+    });
+
+    document.getElementById('modalAddToCart').addEventListener('click', () => {
+      if (currentCard) {
+        const id = currentCard.dataset.id || currentCard.dataset.name;
+        const name = currentCard.dataset.name || currentCard.querySelector('h4').textContent;
+        const price = safeNumber(currentCard.dataset.price || '');
+        addToCart(id, name, price);
+        hideModal();
+      }
+    });
+    
+    document.getElementById('modalMakeOffer').addEventListener('click', () => {
+        const bidSection = document.querySelector('.modal-bid-section');
+        bidSection.style.display = 'flex';
+    });
+
+    function submitModalBid(type) {
+      if (!currentCard) return;
+      const bidAmountInput = document.getElementById('modalBidInput');
+      const bidAmount = bidAmountInput.value;
+      const itemName = currentCard.dataset.name;
+      const bidPhoneNumber = currentCard.dataset.phonenumber;
+
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
+        return;
+      }
+      
+      const formattedBid = `ZMW ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      }
+    }
+    
+    function initModalSlider() {
+      const slider = modal.querySelector('.modal-slider');
+      const slides = slider.querySelector('.modal-slides');
+      const imgs = slides.querySelectorAll('img');
+      let idx = 0;
+      const nextBtn = slider.querySelector('.next');
+      const prevBtn = slider.querySelector('.prev');
+      
+      if (imgs.length <= 1) {
+          nextBtn.style.display = 'none';
+          prevBtn.style.display = 'none';
+      } else {
+          nextBtn.style.display = 'block';
+          prevBtn.style.display = 'block';
+          const move = (i) => {
+              idx = ((i % imgs.length) + imgs.length) % imgs.length;
+              slides.style.transform = `translateX(-${idx * 100}%)`;
+          };
+          nextBtn.onclick = (e) => { e.stopPropagation(); move(idx + 1); };
+          prevBtn.onclick = (e) => { e.stopPropagation(); move(idx - 1); };
+      }
+    }
+
+    function initModalZoom() {
+        modal.querySelectorAll('.modal-slides img').forEach(img => {
+            img.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                img.classList.toggle('zoomed');
+            });
+            let lastTap = 0;
+            img.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault(); 
+                    img.classList.toggle('zoomed'); 
+                }
+                lastTap = currentTime;
+            });
+        });
+    }
+
   </script>
 </body>
 </html>
