@@ -362,7 +362,18 @@
       height:180px; 
       object-fit:contain; /* The change is here! */
       flex-shrink:0; 
+      /* Added for zoom functionality */
+      transition: transform 0.3s ease-in-out;
+      cursor: zoom-in;
     }
+
+    /* New CSS for zoom */
+    .slides img.zoomed {
+      transform: scale(1.8);
+      cursor: zoom-out;
+      transform-origin: center center;
+    }
+
     .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
     .slider .prev{ left:8px } .slider .next{ right:8px }
     .product-details { padding:12px; flex:1; display:flex; flex-direction:column; }
@@ -1065,11 +1076,16 @@
 
     // Set initial state
     filterProducts('all');
+    
+    /**********************
+     * Double-tap Zoom
+     **********************/
+    document.querySelectorAll('.slides img').forEach(img => {
+      img.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        img.classList.toggle('zoomed');
+      });
+    });
   </script>
 </body>
 </html>
-
-
-
-
-
