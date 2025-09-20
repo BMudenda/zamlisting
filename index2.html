@@ -406,47 +406,6 @@
       .filters-search .search-box button { padding: 8px; }
     }
 
-    /* Popup/Modal Styles */
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
-    .popup-content {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 90%;
-      width: 500px;
-      position: relative;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .popup-close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #888;
-    }
-    #popup-details h4 {
-      margin-top: 0;
-      font-size: 1.5em;
-    }
-    #popup-details p {
-      line-height: 1.6;
-    }
   </style>
 </head>
 <body>
@@ -553,7 +512,7 @@
           </div>
           <div class="details-section" style="display: none;">
             <h5>Product Description:</h5>
-            <p class="product-description">BUY 1 GET TWO </p>
+            <p class="product-description"></p>
           </div>
         </div>
       </article>
@@ -784,14 +743,6 @@
     </div>
   </main>
 
-  <div id="details-popup-overlay" class="popup-overlay" style="display: none;">
-    <div id="details-popup-content" class="popup-content">
-      <button id="popup-close-btn" class="popup-close-btn">&times;</button>
-      <div id="popup-details">
-        </div>
-    </div>
-  </div>
-
   <script>
     /**********************
      * Utilities
@@ -964,47 +915,24 @@
       const bid = details.querySelector('.bid-section');
       if (bid) bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
     }
-    
+
     function toggleDetails(button) {
-      const card = button.closest('.product-card');
-      const details = card.dataset.details || "No additional details are available for this item.";
-      const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
-      const price = safeNumber(card.dataset.price || '');
-      const location = card.querySelector('.location')?.textContent;
-
-      const popupDetailsEl = document.getElementById('popup-details');
-      const detailsPopupOverlay = document.getElementById('details-popup-overlay');
-
-      // Clear previous content
-      popupDetailsEl.innerHTML = '';
-
-      // Create and append the new content
-      const detailsHTML = `
-        <h4>${name}</h4>
-        <p><strong>Price:</strong> ${price ? `ZMK ${FMT(price)}` : 'Not specified'}</p>
-        <p><strong>Location:</strong> ${location ? location : 'Not specified'}</p>
-        <p><strong>Description:</strong> ${details}</p>
-      `;
-      popupDetailsEl.innerHTML = detailsHTML;
-
-      // Show the popup
-      detailsPopupOverlay.style.display = 'flex';
-    }
-
-    // Function to close the popup
-    function closeDetailsPopup() {
-      const detailsPopupOverlay = document.getElementById('details-popup-overlay');
-      detailsPopupOverlay.style.display = 'none';
-    }
-
-    // Add event listeners to the close button and the overlay
-    document.getElementById('popup-close-btn').addEventListener('click', closeDetailsPopup);
-    document.getElementById('details-popup-overlay').addEventListener('click', (e) => {
-      if (e.target.id === 'details-popup-overlay') {
-        closeDetailsPopup();
+      const detailsSection = button.closest('.product-details').querySelector('.details-section');
+      const productCard = button.closest('.product-card');
+      const description = productCard.dataset.details;
+      
+      const isVisible = detailsSection.style.display !== 'none';
+      
+      if (isVisible) {
+          detailsSection.style.display = 'none';
+          button.textContent = 'Details 👇';
+      } else {
+          detailsSection.querySelector('.product-description').innerHTML = description;
+          detailsSection.style.display = 'block';
+          button.textContent = 'Hide Details 👆';
       }
-    });
-
+    }
+    
     function submitBid(button, type) {
       const bidSection = button.closest('.bid-section');
       const bidAmountInput = bidSection.querySelector('input[type="number"]');
