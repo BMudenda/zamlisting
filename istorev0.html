@@ -387,7 +387,17 @@
       cursor: zoom-out;
       transform-origin: center center;
     }
+    
+    /* Initially hide the buttons */
+    .product-card .controls {
+      display: none;
+    }
 
+    /* Unhide buttons on tap */
+    .product-card.tapped .controls {
+      display: flex;
+    }
+    
     .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
     .slider .prev{ left:8px } .slider .next{ right:8px }
     .product-details { padding:12px; flex:1; display:flex; flex-direction:column; }
@@ -436,7 +446,6 @@
       .bid-btn-social { width: 48%; justify-content: center; }
       .filters-search .search-box button { padding: 8px; }
     }
-
   </style>
 </head>
 <body>
@@ -532,9 +541,7 @@
     <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
     <div class="price">ZMW 1,200 (Negotiable)</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <!-- Listed date will be injected here -->
-
-    <div class="controls">
+    <div class="listing-time"></div> <div class="controls">
       <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
       <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
       <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
@@ -584,9 +591,7 @@
     <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
     <div class="price">ZMW 800 (Negotiable)</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <!-- Listed date will be injected here -->
-
-    <div class="controls">
+    <div class="listing-time"></div> <div class="controls">
       <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
       <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
       <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
@@ -636,9 +641,7 @@
     <h4>Casio Standard Calculator</h4>
     <div class="price">ZMW 250</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <!-- Listed date will be injected here -->
-
-    <div class="controls">
+    <div class="listing-time"></div> <div class="controls">
       <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
       <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
       <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
@@ -685,9 +688,7 @@
     <h4>KENKO Electronic Calculator KK-8585-12</h4>
     <div class="price">ZMW 300</div>
     <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div> <!-- Listed date will appear here -->
-
-    <div class="controls">
+    <div class="listing-time"></div> <div class="controls">
       <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
       <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
       <button class="btn btn-secondary btn-details" onclick="toggleDetails(this)">Details 👇</button>
@@ -1101,7 +1102,7 @@
           detailsSection.style.display = 'none';
           button.textContent = 'Details 👇';
       } else {
-          detailsSection.querySelector('.product-description').innerHTML = description;
+          detailsSection.querySelector('p').textContent = description; // Correctly set description here
           detailsSection.style.display = 'block';
           button.textContent = 'Hide Details 👆';
       }
@@ -1223,13 +1224,50 @@
     filterProducts('all');
     
     /**********************
+     * Tap to Show/Hide Controls
+     **********************/
+    document.querySelectorAll('.product-card').forEach(card => {
+        let timer = null;
+        card.addEventListener('click', (e) => {
+            // Check if the click was on a button or an input, if so, don't toggle the class
+            if (e.target.closest('.controls')) {
+                return;
+            }
+            // Toggle the 'tapped' class to show/hide the controls
+            card.classList.toggle('tapped');
+            
+            // Clear any previous timer
+            clearTimeout(timer);
+
+            // Set a new timer to hide controls after a short delay
+            if (card.classList.contains('tapped')) {
+                 timer = setTimeout(() => {
+                    card.classList.remove('tapped');
+                }, 5000); // 5 seconds
+            }
+        });
+    });
+
+    /**********************
      * Double-tap Zoom
      **********************/
     document.querySelectorAll('.slides img').forEach(img => {
-      img.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        img.classList.toggle('zoomed');
-      });
+        let lastTap = 0;
+        img.addEventListener('touchend', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            // Check if it's a double-tap (within 300ms)
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault(); 
+                img.classList.toggle('zoomed'); 
+            }
+            lastTap = currentTime;
+        });
+
+        img.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            img.classList.toggle('zoomed');
+        });
     });
 
     /**********************
@@ -1282,8 +1320,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
