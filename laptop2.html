@@ -1,295 +1,1456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZamListing | laptop</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2307696013791007"
-     crossorigin="anonymous"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZamListing — Products</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background-color: #f5f5f5; color: #333; }
+    /* --- Basic page / header --- */
+    :root {
+      --green: #006400; /* Zambia green */
+      --black: #000;
+      --red: #ff0000;
+      --orange: #ff7f00;
+      --light-blue: #007bff; /* For SMS/Taxi button */
+      --whatsapp-green: #25D366; /* For WhatsApp button */
+      --dark-green: #004d00;
+      --yellow-taxi: #FFD700;
+      --eshop-blue: #0056b3;
+      --eshop-dark-blue: #003366;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #f4f6f8;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
     header {
-      background: #333; color: white; padding: 20px; text-align: left;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background: var(--eshop-blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
     }
+
     .header-content {
-      max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap;
-      justify-content: space-between; align-items: center; gap: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
-    .seller-info { flex: 1 1 60%; }
-    .seller-info h2 { font-size: 1.4rem; color: #ff9900; }
-    .seller-info ul { list-style: none; margin-top: 8px; }
-    .seller-info li { margin-bottom: 5px; font-size: 0.95rem; }
-    .price-tag {
-      font-size: 1.3rem; font-weight: bold; background: #e67e22;
-      padding: 8px 15px; border-radius: 5px; color: white;
+    .logo-and-subtitle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
-    .time-listed { font-size: 0.85rem; color: #ccc; margin-top: 5px; }
-    .product-container {
-      max-width: 1200px; margin: 30px auto; padding: 0 20px;
-      display: flex; flex-wrap: wrap; gap: 30px;
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
-    .gallery-section { flex: 1 1 60%; min-width: 300px; }
-    .details-section { flex: 1 1 35%; min-width: 300px; }
-    .gallery-container {
-      background: white; border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;
+    .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
+    .logo .listing { color: var(--orange); }
+
+    .header-subtitle {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.85);
     }
-    .main-slide {
-      position: relative; height: 500px;
-      display: flex; align-items: center; justify-content: center;
-      background: #f9f9f9;
+    
+    .header-controls {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      position: relative; /* contains dropdown */
     }
-    .main-slide img {
-      max-width: 100%; max-height: 100%; object-fit: contain;
+
+    .cart-icon {
+      cursor: pointer;
+      position: relative;
+      font-size: 20px;
+      user-select: none;
     }
-    .slide-nav {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 40px; height: 40px; background: rgba(0,0,0,0.5);
-      color: white; border: none; border-radius: 50%;
-      font-size: 20px; cursor: pointer;
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: red;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      min-width: 20px;
+      text-align: center;
     }
-    .prev-slide { left: 15px; }
-    .next-slide { right: 15px; }
-    .thumbnail-container {
-      display: grid; grid-template-columns: repeat(6, 1fr);
-      gap: 8px; padding: 15px;
-    }
-    .thumbnail {
-      cursor: pointer; border: 2px solid transparent;
-      transition: 0.3s ease; height: 80px; object-fit: cover; border-radius: 4px;
-    }
-    .thumbnail:hover, .thumbnail.active {
-      border-color: #ff9900; opacity: 0.9;
-    }
-    .des { padding: 10px; }
-    .card {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px; background: white; border-radius: 8px;
-    }
-    .toggle-offer-btn {
-      background: #2980b9; color: white; padding: 10px 20px;
-      border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
-      margin-bottom: 10px;
-      transition: background 0.2s;
-    }
-    .toggle-offer-btn:hover {
-      background: #176099;
-    }
-    .offer-section { display: none; margin-top: 15px; }
-    .form-group {
-      margin-bottom: 10px;
-    }
-    .form-group label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
-    .bid-input {
-      width: 100%; padding: 10px;
-      font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;
-    }
-    .amount-input {
-      width: 60%; padding: 10px;
-      font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;
-    }
-    .offer-actions button {
-      margin: 5px 10px 0 0; padding: 10px 15px;
-      border: none; border-radius: 5px; font-weight: bold;
-      cursor: pointer; font-size: 0.95rem;
-    }
-    .whatsapp-btn { background-color: #25d366; color: white; }
-    .text-btn { background-color: #2980b9; color: white; }
-    .call-btn { background-color: #e74c3c; color: white; }
-    /* More Details section */
-    .more-details-section {
+
+    /* === UPDATED CSS for dynamic positioning === */
+    .cart-dropdown {
       display: none;
+      position: fixed; 
+      background: #fff;
+      color: #111;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(10,10,10,0.15);
+      padding: 12px;
+      z-index: 40;
+      /* Default styles for mobile */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 400px;
+      width: 90%;
+    }
+    .cart-dropdown.open { display: block; }
+
+    /* Media query to remove centering on desktop */
+    @media (min-width: 768px) {
+      .cart-dropdown {
+        top: auto;
+        left: auto;
+        transform: none;
+      }
+    }
+    /* ========================================= */
+
+    .cart-dropdown h3 { margin: 0 0 10px 0; font-size: 16px; }
+    .cart-items { max-height: 220px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+    .cart-items li {
+      display:flex;
+      justify-content: space-between;
+      gap:8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      align-items:center;
+      font-size: 14px;
+    }
+    .cart-items .left { display:flex; gap:8px; align-items:center; }
+    .cart-items .name { font-weight:600; }
+    .cart-items .meta { font-size: 12px; color:#555; }
+
+    .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+    .cart-total { font-weight:700; }
+    .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
+    
+    .cart-share {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .btn-share {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-sms { background: var(--light-blue); }
+    .btn-whatsapp { background: var(--whatsapp-green); }
+
+
+    /* --- filters and search --- */
+    .filters-search {
+      padding: 12px 20px;
+      background: #e9ecef;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .filters-search .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filters-search .filter-btn {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .filters-search .filter-btn:hover {
+        background: #f0f0f0;
+    }
+    .filters-search .filter-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .filters-search .search-box {
+      display: flex;
+      gap: 8px;
+    }
+    .filters-search .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .filters-search .search-box button {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: none;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .filters-search .search-box button:hover {
+        background: var(--dark-green);
+    }
+
+    /* --- taxi booking section --- */
+    .taxi-promo {
+      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin: 25px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 25px;
+      max-width: 1000px;
+      transition: transform 0.3s ease;
+    }
+    .taxi-promo:hover {
+        transform: translateY(-5px);
+    }
+    .taxi-promo a {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+    }
+    .taxi-promo .taxi-content {
+      flex: 1;
+    }
+    .taxi-promo .taxi-content h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #FFD700;
+    }
+    .taxi-promo .taxi-content p {
+      margin: 0 0 15px 0;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    .taxi-promo .taxi-image {
+        flex-shrink: 0;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .taxi-promo .taxi-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .btn-taxi {
+        display: inline-block;
+        background: #FFD700;
+        color: #1a1a1a;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-taxi:hover {
+        background: #ffc400;
+        transform: translateY(-2px);
+    }
+
+    /* --- e-shop promo card --- */
+    .shop-promo {
+      background: linear-gradient(135deg, var(--eshop-blue) 0%, var(--eshop-dark-blue) 100%);
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin: 25px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 25px;
+      max-width: 1000px;
+      transition: transform 0.3s ease;
+    }
+    .shop-promo:hover {
+        transform: translateY(-5px);
+    }
+    .shop-promo a {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+    }
+    .shop-promo .shop-content {
+      flex: 1;
+    }
+    .shop-promo .shop-content h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .shop-promo .shop-content p {
+      margin: 0 0 15px 0;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    .shop-promo .shop-image {
+        flex-shrink: 0;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5rem;
+    }
+    .shop-promo .shop-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .btn-shop {
+        display: inline-block;
+        background: #fff;
+        color: var(--eshop-dark-blue);
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-shop:hover {
+        background: #f0f0f0;
+        transform: translateY(-2px);
+    }
+    @media (max-width:768px){
+        .taxi-promo a, .shop-promo a {
+            flex-direction: column;
+            text-align: center;
+        }
+        .taxi-promo .taxi-image, .shop-promo .shop-image {
+            margin-bottom: 15px;
+        }
+    }
+
+
+    /* --- products grid --- */
+    main { flex: 1; padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+    .product-card {
+      background:#fff;
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(10,10,10,0.06);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      cursor: pointer;
+    }
+    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
+    .slides { display:flex; transition:transform .45s ease; height:100%; }
+    .slides img { 
+      width:100%; 
+      height:180px; 
+      object-fit:contain;
+      flex-shrink:0; 
+      transition: transform 0.3s ease-in-out;
+      cursor: zoom-in;
+    }
+    .slides img.zoomed {
+      transform: scale(2);
+      cursor: zoom-out;
+    }
+    
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
+    .slider .prev{ left:8px } .slider .next{ right:8px }
+    
+    .product-details {
+      padding: 12px;
+    }
+    .product-details h4 { margin:0 0 6px 0; font-size:16px; }
+    .price { color:green; font-weight:700; margin-bottom:6px; }
+    .location { color:#666; font-size:13px; margin-bottom:8px; }
+    
+    /* The part that is hidden by default */
+    .product-details .tappable-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    }
+
+    /* Show the hidden part when the 'tapped' class is on the card */
+    .product-card.tapped .tappable-content {
+      max-height: 500px; /* A value larger than the max possible height */
+      opacity: 1;
+    }
+
+    .controls { display:flex; gap:8px; margin-top:10px; }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; }
+    .btn-primary { background:#28a745; color:#fff; }
+    .btn-accent { background:#ff9800; color:#fff; }
+    .btn-secondary { background:var(--light-blue); color:#fff; }
+    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-section .phone-input { width: calc(100% - 150px); }
+    .success { color:green; font-size:13px; display:none; margin-top:8px; }
+    .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; text-decoration: none; color: #fff; }
+    .bid-btn-sms { background: var(--light-blue); }
+    .bid-btn-whatsapp { background: var(--whatsapp-green); }
+    
+    .details-section {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .details-section h5 {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+    }
+    
+    .listing-time {
+        font-size: 12px;
+        color: #888;
+        margin-top: 4px;
+    }
+    
+    /* --- Modal CSS --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close:hover,
+    .modal-close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden;
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #ddd;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s ease;
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: zoom-in;
+    }
+    .modal-slides img.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+        transform-origin: center center;
+    }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 6px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .modal-price {
+      color: green;
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 8px;
+    }
+    .modal-location {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .modal-description {
       margin-top: 15px;
-      padding: 15px;
-      background: #f8f8f8;
-      border-radius: 6px;
-      border: 1px solid #e0e0e0;
-      animation: fadeIn 0.4s;
     }
-    .more-details-section ul {
-      list-style: disc inside;
-      color: #444;
-      margin-left: 10px;
+    .modal-description p {
+      margin: 0;
+      line-height: 1.6;
     }
-    .more-details-section li {
-      margin-bottom: 8px;
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
     }
-    @keyframes fadeIn {
-      from { opacity: 0;}
-      to { opacity: 1;}
+    .modal-controls .btn {
+      flex: 1;
+      font-size: 16px;
     }
+    .modal-bid-section {
+      display:none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-bid-section input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .modal-bid-section .bid-btn-social {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .modal-content { max-height: 95vh; }
+      .modal-bid-section .bid-btn-social { width: 48%; }
+    }
+    @media (max-width:520px){
+      .cart-dropdown { right: 8px; left: 8px; width: auto; }
+      .bid-section input { width: 100%; }
+      .bid-btn-social { width: 48%; justify-content: center; }
+      .filters-search .search-box button { padding: 8px; }
+    }
+    
+    /* --- Footer Styles --- */
+    .footer {
+        background: var(--eshop-blue);
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .footer-links {
+        display: flex;
+        gap: 20px;
+    }
+    .footer-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    .footer-button:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+    .footer-button.facebook {
+        background-color: #3b5998;
+    }
+    .footer-button.facebook:hover {
+        background-color: #2d4373;
+    }
+    .footer-button.whatsapp {
+        background-color: var(--whatsapp-green);
+    }
+    .footer-button.whatsapp:hover {
+        background-color: #128c7e;
+    }
+    .footer-button.about {
+        background-color: var(--orange);
+    }
+    .footer-button.about:hover {
+        background-color: #cc6600;
+    }
+
   </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <div class="seller-info">
-        <h2>SecondTrekstor - 11.6-inch 2-in-1 Laptop</h2>
-        <ul>
-          <li><strong>Seller:</strong> Brian -</li>
-          <li><strong>Address:</strong> Luangwa</li>
-          <li><strong>Delivery:</strong> Nationwide (fee applicable)</li>
-        </ul>
+      <div class="logo-and-subtitle">
+          <div class="logo">
+            <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
+          </div>
+          <h2 class="header-subtitle">e-Shop Luangwa</h2>
       </div>
-      <div>
-        <div class="price-tag">ZMW 1200</div>
-        <div class="time-listed" id="timeListed">Listed just now</div>
+    </div>
+    <div class="header-controls" id="header-controls">
+      <div class="cart-icon" id="cart-icon" title="View cart">
+        🛒
+        <span class="cart-count" id="cart-count">0</span>
+        <div class="cart-dropdown" id="cart-dropdown" aria-hidden="true">
+          <h3>Your Cart</h3>
+          <ul class="cart-items" id="cart-items"></ul>
+          <div class="cart-actions">
+            <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+            <button class="cart-clear" id="cart-clear">Clear</button>
+          </div>
+          <div class="cart-share">
+            <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+              💬 WhatsApp
+            </button>
+            <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+              📱 SMS
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="product-container">
-    <section class="gallery-section">
-      <div class="gallery-container">
-        <div class="main-slide">
-          <img src="V1.jpg" id="mainImage" alt="Item Image" />
-          <button class="slide-nav prev-slide" onclick="navigateSlide(-1)">❮</button>
-          <button class="slide-nav next-slide" onclick="navigateSlide(1)">❯</button>
-        </div>
-        <div class="thumbnail-container" id="thumbnailContainer"></div>
-      </div>
-    </section>
+  <div class="filters-search">
+    <div class="filters" id="category-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="electronics">Electronics</button>
+      <button class="filter-btn" data-filter="furniture">Furniture</button>
+      <button class="filter-btn" data-filter="groceries">Groceries</button>
+      <button class="filter-btn" data-filter="vehicles">Vehicles</button>
+      <button class="filter-btn" data-filter="stationary">Stationary</button>
+      <button class="filter-btn" data-filter="plumbing">Plumbing</button>
+      <button class="filter-btn" data-filter="amasampo">Amasampo</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products..." />
+    </div>
+  </div>
 
-    <section class="details-section">
-      <div class="des">
-        <div class="card">
-          <button class="toggle-offer-btn" onclick="toggleOfferSection()">Make an Offer</button>
-          <div class="offer-section" id="offerSection">
-            <div class="form-group">
-              <label for="itemName">Item</label>
-              <input id="itemName" class="bid-input" type="text" placeholder="laptop required" />
-            </div>
-            <div class="form-group">
-              <label for="bid">Amount (ZMW)</label>
-              <input id="bid" class="amount-input" type="number" placeholder="1200" required />
-            </div>
-            <div class="offer-actions">
-              <button class="whatsapp-btn" onclick="submitOffer('whatsapp')">WhatsApp</button>
-              <button class="text-btn" onclick="submitOffer('sms')">Text</button>
-              <button class="call-btn" onclick="window.location.href='tel:+260978167546'">Call</button>
-            </div>
-          </div>
-          <!-- More Details Toggle Button and Section -->
-          <button id="toggleDetailsBtn" class="toggle-offer-btn" style="margin-top:15px;" onclick="toggleDetails()">Show More Details</button>
-          <div id="moreDetails" class="more-details-section">
-            <h3 style="margin-bottom:10px;">Product Specifications</h3>
-            <ul class="card-details">
-  <li><strong>Model</strong>: Trekstor - 11.6-inch 2-in-1 Laptop</li>
-  <li><strong>Price</strong>: ZMW 1200 (Negotiable)</li>
-  <li><strong>Location</strong>: Luangwa, Zambia</li>
-  <li><strong>Display</strong>: 11.6-inch Full HD IPS Touchscreen (1920x1080)</li>
-  <li><strong>Processor</strong>: Intel Celeron N3350 (Dual-Core, up to 2.4 GHz)</li>
-  <li><strong>Memory</strong>: 4 GB RAM</li>
-  <li><strong>Storage</strong>: 64 GB eMMC (Expandable via M.2 SSD or microSD)</li>
-  <li><strong>Features</strong>: 360° Hinges, Fingerprint Sensor, USB-C, Windows 10 Home</li>
-  <li><strong>Battery</strong>: Good</li>
-  <li><strong>Condition</strong>: working Good</li>
-</ul>
-          </div>
+  <div class="taxi-promo" id="taxi-promo-card">
+    <a href="https://zamlisting.com/customerride" target="_blank">
+      <div class="taxi-content">
+        <h3>Book a Taxi with ZamListing  🏍️🚗</h3>
+        <p>Your ride is just a tap away! Book a taxi in **Luangwa, Zambia** for a safe and convenient trip.</p>
+        <div class="controls">
+            <span class="btn-taxi">Book Now</span>
         </div>
       </div>
-    </section>
+      <div class="taxi-image">
+           <img src="vi1.png" alt="Toyota Vitz Front View">
+      </div>
+    </a>
+  </div>
+  
+  <main>
+    <div class="products" id="product-list">
+
+<article class="product-card" 
+  data-id="p_trekstor116" 
+  data-name="Trekstor - 11.6-inch 2-in-1 Laptop" 
+  data-price="1200" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350, 4GB RAM, 64GB eMMC, Touchscreen, Windows 10.Two available, one is has a dead battery and the starting price ZMK800"
+  data-listed-date="2025-09-17T08:30:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="L1.jpeg" alt="Trekstor 11.6 Laptop Image 1">
+      <img src="L2.jpeg" alt="Trekstor 11.6 Laptop Image 2">
+      <img src="L3.jpeg" alt="Trekstor 11.6 Laptop Image 3">
+      <img src="L4.jpeg" alt="Trekstor 11.6 Laptop Image 4">
+      <img src="L5.jpeg" alt="Trekstor 11.6 Laptop Image 5">
+      <img src="L6.jpg" alt="Trekstor 11.6 Laptop Image 6">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
+    <div class="price">ZMW 1,200 (Negotiable)</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" 
+  data-id="p_casio_gx" 
+  data-name="Casio Standard Calculator" 
+  data-price="250" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details="Casio Standard Calculator with 14 digits, solar & battery power, extra large display, regular percentage calculations, durable plastic keys."
+  data-listed-date="2025-09-20T10:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="GX.jpg" alt="Casio Calculator Image 1">
+      <img src="GX2.jpg" alt="Casio Calculator Image 2">
+      <img src="GX.jpg" alt="Casio Calculator Image 3">
+      <img src="GX2.jpg" alt="Casio Calculator Image 4">
+      <img src="GX.jpg" alt="Casio Calculator Image 5">
+      <img src="GX2.jpg" alt="Casio Calculator Image 6">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Casio Standard Calculator</h4>
+    <div class="price">ZMW 250</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+    </div>
   </main>
 
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <div class="modal-body">
+        <div class="modal-slider-container">
+          <div class="modal-slider">
+            <div class="modal-slides"></div>
+            <button class="prev" aria-label="Previous image">&#10094;</button>
+            <button class="next" aria-label="Next image">&#10095;</button>
+          </div>
+        </div>
+        <div class="modal-details">
+          <h4 id="modalProductName"></h4>
+          <div class="modal-price" id="modalProductPrice"></div>
+          <div class="modal-location" id="modalProductLocation"></div>
+          
+          <div class="modal-description">
+            <h5>Product Description:</h5>
+            <p id="modalProductDescription"></p>
+          </div>
+          
+          <div class="modal-controls">
+            <button class="btn btn-primary" id="modalAddToCart">Add to Cart</button>
+            <button class="btn btn-accent" id="modalMakeOffer">Make an Offer</button>
+          </div>
+          
+          <div class="modal-bid-section">
+            <input type="number" id="modalBidInput" placeholder="Your bid (ZMW)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" id="modalBidWhatsApp" href="#" onclick="event.preventDefault(); submitModalBid('whatsapp');">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" id="modalBidSMS" href="#" onclick="event.preventDefault(); submitModalBid('sms');">📱 SMS</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2024 ZamListing</p>
+    <div class="footer-links">
+        <a href="https://wa.me/260978167546?text=Hello%20ZamListing%2C%20I%20have%20a%20question." target="_blank" class="footer-button whatsapp" aria-label="Contact via WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2.1c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95l-1.12 4.12 4.21-1.1c1.45.79 3.08 1.25 4.9 1.25 5.46 0 9.91-4.45 9.91-9.91-.01-5.46-4.46-9.91-9.91-9.91zm0 18c-1.63 0-3.19-.48-4.52-1.3l-.32-.19-3.32.88.9-3.23-.21-.33c-.88-1.44-1.36-3.12-1.36-4.88 0-4.54 3.7-8.24 8.24-8.24 2.22 0 4.31.87 5.89 2.45 1.58 1.58 2.45 3.67 2.45 5.89.01 4.54-3.7 8.24-8.24 8.24zm3.99-6.99c-.19-.09-1.15-.57-1.32-.63-.16-.07-.3-.09-.43.08-.14.17-.54.63-.66.76-.13.12-.25.14-.44.05-.18-.09-.76-.28-1.46-.91-.54-.48-.91-1.07-1.01-1.25-.09-.17 0-.16.12-.28.1-.11.23-.27.34-.41.11-.14.15-.24.22-.38.07-.15.03-.27-.03-.38-.06-.11-.43-1.03-.59-1.41-.15-.38-.3-.32-.4-.33-.09-.01-.2-.01-.43-.01- .23 0-.6.08-.91.43-.3.35-1.15 1.12-1.15 2.73 0 1.61 1.18 3.16 1.34 3.38.16.22 2.33 3.76 5.61 5.17 3.28 1.4 3.96 1.21 4.68 1.13.72-.08 2.22-.91 2.53-1.78.3-.87.3-1.61.22-1.78-.09-.17-.34-.27-.7-.44z"/></svg>
+        </a>
+        
+        <a href="https://zamlisting.com/about.html" target="_blank" class="footer-button about" aria-label="Learn about ZamListing">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.43 12.33 13 13 13 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-.75-.6-1.35-1.35-1.35s-1.35.6-1.35 1.35H8v-.5c0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.1-.45 2.1-1.17 2.83z"/></svg>
+        </a>
+        
+        <a href="https://www.facebook.com/zamlisting" target="_blank" class="footer-button facebook" aria-label="Visit us on Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.324 2h-1.676v6h-3v-6h-2v-2h2v-1.723c0-2.007 1.155-3.277 3.33-3.277h2.67v3z"/></svg>
+        </a>
+    </div>
+  </footer>
+
   <script>
-    // Gallery logic
-    const thumbnails = ["L1.jpeg", "L2.jpeg", "L3.jpeg", "L4.jpeg", "L5.jpeg", "L6.jpg"];
-    let currentSlide = 0;
-
-    const mainImage = document.getElementById("mainImage");
-    const thumbnailContainer = document.getElementById("thumbnailContainer");
-
-    function renderThumbnails() {
-      thumbnails.forEach((src, index) => {
-        const thumb = document.createElement("img");
-        thumb.src = src;
-        thumb.className = "thumbnail";
-        if (index === currentSlide) thumb.classList.add("active");
-        thumb.onclick = () => {
-          currentSlide = index;
-          updateSlide();
-        };
-        thumbnailContainer.appendChild(thumb);
-      });
-    }
-
-    function updateSlide() {
-      mainImage.src = thumbnails[currentSlide];
-      document.querySelectorAll(".thumbnail").forEach((thumb, i) => {
-        thumb.classList.toggle("active", i === currentSlide);
-      });
-    }
-
-    function navigateSlide(direction) {
-      currentSlide = (currentSlide + direction + thumbnails.length) % thumbnails.length;
-      updateSlide();
-    }
-
-    // Offer section toggle
-    function toggleOfferSection() {
-      const section = document.getElementById("offerSection");
-      section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
-    }
-
-    // Offer submission
-    function submitOffer(type) {
-      const name = document.getElementById("itemName").value;
-      const bid = document.getElementById("bid").value;
-      const message = `Offer for ${name}:\nOffer: ZMW ${bid}`;
-      if (!name || !bid) return alert("Please enter both item name and offer amount.");
-
-      if (type === 'whatsapp') {
-        window.open(`https://wa.me/260978167546?text=${encodeURIComponent(message)}`);
-      } else if (type === 'sms') {
-        window.open(`sms:+260978167546?body=${encodeURIComponent(message)}`);
-      }
-    }
-
-    // Time since listing
-    function updateTimeListed() {
-      const listedTime = new Date("2025-06-27T12:00:00Z");
-      const now = new Date();
-      const diffMs = now - listedTime;
-      const diffMins = Math.floor(diffMs / 60000);
-      const diffHours = Math.floor(diffMins / 60);
-      const diffDays = Math.floor(diffHours / 24);
-
-      let timeText;
-      if (diffMins < 1) timeText = "Listed just now";
-      else if (diffMins < 60) timeText = `Listed ${diffMins} minute(s) ago`;
-      else if (diffHours < 24) timeText = `Listed ${diffHours} hour(s) ago`;
-      else timeText = `Listed ${diffDays} day(s) ago`;
-
-      document.getElementById("timeListed").textContent = timeText;
-    }
-
-    // More Details toggle
-    function toggleDetails() {
-      const detailsDiv = document.getElementById("moreDetails");
-      const btn = document.getElementById("toggleDetailsBtn");
-      if (detailsDiv.style.display === "none" || detailsDiv.style.display === "") {
-        detailsDiv.style.display = "block";
-        btn.textContent = "Hide Details";
+    /**********************
+     * Utilities
+     **********************/
+    const FMT = (v) => {
+      return Number(v).toLocaleString();
+    };
+    const safeNumber = (str) => {
+      if (str === undefined || str === null) return 0;
+      return Number(String(str).replace(/,/g, '').trim()) || 0;
+    };
+    const cartPhoneNumber = '0978167546';
+    
+    /**********************
+     * Cart data & helpers
+     **********************/
+    let cart = [];
+    const findCartItem = (id) => cart.find(i => i.id === id);
+    function addToCart(productId, productName, productPrice, qty = 1) {
+      const existing = findCartItem(productId);
+      if (existing) {
+        existing.qty += qty;
       } else {
-        detailsDiv.style.display = "none";
-        btn.textContent = "Show More Details";
+        cart.push({ id: productId, name: productName, price: productPrice, qty });
+      }
+      renderCart();
+    }
+    function removeFromCart(productId) {
+      cart = cart.filter(i => i.id !== productId);
+      renderCart();
+    }
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+    function cartTotalAmount() {
+      return cart.reduce((s, it) => s + (safeNumber(it.price) * it.qty), 0);
+    }
+    function cartTotalQty() {
+      return cart.reduce((s, it) => s + it.qty, 0);
+    }
+    /**********************
+     * DOM render functions
+     **********************/
+    function renderCart() {
+      const listEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      const countEl = document.getElementById('cart-count');
+      listEl.innerHTML = '';
+      if (cart.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No items in cart';
+        li.style.padding = '8px 0';
+        listEl.appendChild(li);
+      } else {
+        cart.forEach(item => {
+          const li = document.createElement('li');
+          const left = document.createElement('div');
+          left.className = 'left';
+          const name = document.createElement('div');
+          name.className = 'name';
+          name.textContent = item.name;
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${item.qty} x ZMK ${FMT(item.price)} `;
+          left.appendChild(name);
+          left.appendChild(meta);
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.flexDirection = 'column';
+          right.style.alignItems = 'flex-end';
+          right.style.gap = '6px';
+          const lineTotal = document.createElement('div');
+          lineTotal.textContent = `ZMK ${FMT(item.price * item.qty)}`;
+          const rm = document.createElement('button');
+          rm.textContent = 'Remove';
+          rm.style.padding = '4px 6px';
+          rm.style.fontSize = '12px';
+          rm.style.border = '0';
+          rm.style.borderRadius = '6px';
+          rm.style.background = '#eee';
+          rm.style.cursor = 'pointer';
+          rm.onclick = () => removeFromCart(item.id);
+          right.appendChild(lineTotal);
+          right.appendChild(rm);
+          li.appendChild(left);
+          li.appendChild(right);
+          listEl.appendChild(li);
+        });
+      }
+      const total = cartTotalAmount();
+      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
+      countEl.textContent = String(cartTotalQty());
+    }
+    
+    /**********************
+     * Cart Sharing Functions
+     **********************/
+    function getCartMessage() {
+      let message = "Hello ZamListing, I would like to order the following items:\n\n";
+      if (cart.length === 0) {
+        return "I am interested in your products. Please contact me.";
+      }
+      
+      cart.forEach(item => {
+        message += `${item.name} (${item.qty} pcs) - ZMK ${FMT(item.price * item.qty)}\n`;
+      });
+
+      message += `\nTotal: ZMK ${FMT(cartTotalAmount())}\n`;
+      message += `\nThank you!`;
+      
+      return message;
+    }
+
+    function sendCartViaSMS() {
+      const message = getCartMessage();
+      window.location.href = `sms:${cartPhoneNumber}?body=${encodeURIComponent(message)}`;
+    }
+
+    function sendCartViaWhatsApp() {
+      const message = getCartMessage();
+      const waNumber = '260' + cartPhoneNumber.substring(1);
+      window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    }
+
+    /**********************
+     * UI bindings
+     **********************/
+    function addToCartBtn(button) {
+      const card = button.closest('.product-card');
+      if (!card) return;
+      const id = card.dataset.id || card.dataset.name;
+      const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
+      const price = safeNumber(card.dataset.price || '');
+
+      addToCart(id, name, price, 1);
+      openCartDropdown();
+    }
+    document.getElementById('cart-clear').addEventListener('click', () => {
+      clearCart();
+    });
+    const cartIcon = document.getElementById('cart-icon');
+    const cartDropdown = document.getElementById('cart-dropdown');
+    
+    // NEW: Function to position the cart dropdown
+    function positionCartDropdown() {
+      const isDesktop = window.innerWidth >= 768;
+      if (!isDesktop) {
+        // Fallback to CSS centering on mobile
+        cartDropdown.style.top = '50%';
+        cartDropdown.style.left = '50%';
+        cartDropdown.style.transform = 'translate(-50%, -50%)';
+        return;
+      }
+      
+      // Get the bounding box of the taxi promo card
+      const promoCard = document.getElementById('taxi-promo-card');
+      if (!promoCard) return;
+      const promoRect = promoCard.getBoundingClientRect();
+      const dropdownRect = cartDropdown.getBoundingClientRect();
+
+      // Calculate new position
+      const newTop = promoRect.top - dropdownRect.height - 20; // 20px padding
+      const newLeft = promoRect.left + (promoRect.width / 2) - (dropdownRect.width / 2);
+      
+      // Apply the new position
+      cartDropdown.style.top = `${newTop}px`;
+      cartDropdown.style.left = `${newLeft}px`;
+      cartDropdown.style.transform = 'none';
+    }
+    
+    function openCartDropdown() {
+      cartDropdown.classList.add('open');
+      cartDropdown.setAttribute('aria-hidden', 'false');
+      // Position the dropdown when it opens
+      positionCartDropdown();
+    }
+    function closeCartDropdown() {
+      cartDropdown.classList.remove('open');
+      cartDropdown.setAttribute('aria-hidden', 'true');
+    }
+    function toggleCart() {
+      cartDropdown.classList.toggle('open');
+      const open = cartDropdown.classList.contains('open');
+      cartDropdown.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open) {
+        positionCartDropdown();
+      }
+    }
+    cartIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleCart();
+    });
+    document.addEventListener('click', (ev) => {
+      const target = ev.target;
+      const headerControls = document.getElementById('header-controls');
+      if (headerControls && !headerControls.contains(target)) {
+        closeCartDropdown();
+      }
+    });
+
+    // NEW: Reposition the dropdown on window resize
+    window.addEventListener('resize', () => {
+        if (cartDropdown.classList.contains('open')) {
+            positionCartDropdown();
+        }
+    });
+    
+    function toggleBid(button) {
+      const details = button.closest('.tappable-content');
+      const bid = details.querySelector('.bid-section');
+      if (bid) bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
+    }
+    
+    function submitBid(button, type) {
+      const bidSection = button.closest('.bid-section');
+      const bidAmountInput = bidSection.querySelector('input[type="number"]');
+      const card = button.closest('.product-card');
+      const itemName = card.dataset.name;
+      
+      const bidAmount = bidAmountInput.value;
+      const bidPhoneNumber = card.dataset.phonenumber;
+
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
+        return;
+      }
+
+      const formattedBid = `ZMW ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      }
+    }
+    
+    document.querySelectorAll('.product-card').forEach(card => {
+      const slider = card.querySelector('.slider');
+      if (slider) {
+          const slides = slider.querySelector('.slides');
+          const imgs = slides.querySelectorAll('img');
+          let idx = 0;
+          const nextBtn = slider.querySelector('.next');
+          const prevBtn = slider.querySelector('.prev');
+          
+          if (imgs.length <= 1) {
+              if (nextBtn) nextBtn.style.display = 'none';
+              if (prevBtn) prevBtn.style.display = 'none';
+          } else {
+              const move = (i) => {
+                  idx = ((i % imgs.length) + imgs.length) % imgs.length;
+                  slides.style.transform = `translateX(-${idx * 100}%)`;
+              };
+              if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
+              if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
+          }
+      }
+    });
+
+    renderCart();
+    
+    /**********************
+     * New Filter & Search Logic
+     **********************/
+    const allProducts = document.querySelectorAll('.product-card');
+    const categoryFilters = document.getElementById('category-filters');
+    const searchInput = document.getElementById('search-input');
+    
+    function filterProducts(category) {
+      allProducts.forEach(product => {
+        if (category === 'all' || product.dataset.category === category) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+
+    function searchProducts(query) {
+      const lowerCaseQuery = query.toLowerCase();
+      categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+      allProducts.forEach(product => {
+        const name = (product.dataset.name || '').toLowerCase();
+        const category = (product.dataset.category || '').toLowerCase();
+        const details = (product.dataset.details || '').toLowerCase();
+        if (name.includes(lowerCaseQuery) || category.includes(lowerCaseQuery) || details.includes(lowerCaseQuery)) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+    
+    categoryFilters.addEventListener('click', (e) => {
+      const button = e.target;
+      if (button.classList.contains('filter-btn')) {
+        categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        filterProducts(button.dataset.filter);
+        searchInput.value = '';
+      }
+    });
+    
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+      searchProducts(query);
+    });
+
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.style.display = 'none';
+    }
+
+    filterProducts('all');
+    
+    /**********************
+     * New Listing Time Counter
+     **********************/
+    function updateListingTime() {
+      const now = new Date();
+      document.querySelectorAll('.product-card').forEach(card => {
+        const listedDateStr = card.dataset.listedDate;
+        if (!listedDateStr) return;
+
+        const listedDate = new Date(listedDateStr);
+        const timeDiff = now - listedDate;
+
+        const seconds = Math.floor(timeDiff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(minutes / 60 / 24);
+        const weeks = Math.floor(minutes / 60 / 24 / 7);
+        const months = Math.floor(minutes / 60 / 24 / 30.44);
+        const years = Math.floor(minutes / 60 / 24 / 365.25);
+
+        let timeText = '';
+        if (years > 0) {
+            timeText = `Listed ${years} year${years > 1 ? 's' : ''} ago`;
+        } else if (months > 0) {
+            timeText = `Listed ${months} month${months > 1 ? 's' : ''} ago`;
+        } else if (weeks > 0) {
+            timeText = `Listed ${weeks} week${weeks > 1 ? 's' : ''} ago`;
+        } else if (days > 0) {
+            timeText = `Listed ${days} day${days > 1 ? 's' : ''} ago`;
+        } else if (hours > 0) {
+            timeText = `Listed ${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else if (minutes > 0) {
+            timeText = `Listed ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        } else {
+            timeText = 'Listed just now';
+        }
+
+        const timeEl = card.querySelector('.listing-time');
+        if (timeEl) {
+            timeEl.textContent = timeText;
+        }
+      });
+    }
+
+    updateListingTime();
+    setInterval(updateListingTime, 30000);
+
+    /**********************
+     * Card Tap Logic
+     **********************/
+    document.querySelectorAll('.product-card').forEach(card => {
+        // Populate the description for each card from the data attribute
+        const descriptionEl = card.querySelector('.product-description');
+        if (descriptionEl) {
+          descriptionEl.textContent = card.dataset.details || 'No description available.';
+        }
+        
+        // Add click listener for showing/hiding details
+        card.addEventListener('click', (e) => {
+            // Do not toggle if a button or an image is clicked
+            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.tagName.toLowerCase() === 'img' || e.target.tagName.toLowerCase() === 'input') {
+                return;
+            }
+            card.classList.toggle('tapped');
+        });
+    });
+
+    /**********************
+     * Image Zoom Logic
+     **********************/
+    document.querySelectorAll('.product-card .slider img').forEach(img => {
+      // Double click for desktop
+      img.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        img.classList.toggle('zoomed');
+      });
+
+      // Double tap for mobile
+      let lastTap = 0;
+      img.addEventListener('touchend', (e) => {
+          const currentTime = new Date().getTime();
+          const tapLength = currentTime - lastTap;
+          if (tapLength < 300 && tapLength > 0) {
+              e.preventDefault(); 
+              img.classList.toggle('zoomed'); 
+          }
+          lastTap = currentTime;
+      });
+    });
+
+    /**********************
+     * Modal Logic
+     **********************/
+    const modal = document.getElementById('productModal');
+    const modalClose = document.querySelector('.modal-close');
+    let currentCard = null;
+
+    function showModal(card) {
+      currentCard = card;
+      const id = card.dataset.id || card.dataset.name;
+      const name = card.dataset.name || card.querySelector('h4').textContent;
+      const price = card.dataset.price || 'N/A';
+      const location = card.querySelector('.location')?.textContent || '';
+      const description = card.dataset.details || 'No description available.';
+      const hasOffer = card.querySelector('.btn-accent') !== null;
+      
+      document.getElementById('modalProductName').textContent = name;
+      document.getElementById('modalProductPrice').textContent = `ZMW ${FMT(price)}`;
+      document.getElementById('modalProductLocation').textContent = location;
+      document.getElementById('modalProductDescription').textContent = description;
+      
+      const offerButton = document.getElementById('modalMakeOffer');
+      const bidSection = document.querySelector('.modal-bid-section');
+      
+      if (hasOffer) {
+          offerButton.style.display = 'inline-block';
+      } else {
+          offerButton.style.display = 'none';
+      }
+      
+      bidSection.style.display = 'none';
+
+      const modalSlidesContainer = modal.querySelector('.modal-slides');
+      modalSlidesContainer.innerHTML = '';
+      const originalImages = card.querySelectorAll('.slider img');
+      originalImages.forEach(img => {
+          const newImg = img.cloneNode();
+          modalSlidesContainer.appendChild(newImg);
+      });
+      
+      initModalSlider();
+      initModalZoom();
+
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        currentCard = null;
+    }
+    
+    modalClose.addEventListener('click', hideModal);
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        hideModal();
+      }
+    });
+
+    document.getElementById('modalAddToCart').addEventListener('click', () => {
+      if (currentCard) {
+        const id = currentCard.dataset.id || currentCard.dataset.name;
+        const name = currentCard.dataset.name || currentCard.querySelector('h4').textContent;
+        const price = safeNumber(currentCard.dataset.price || '');
+        addToCart(id, name, price);
+        hideModal();
+      }
+    });
+    
+    document.getElementById('modalMakeOffer').addEventListener('click', () => {
+        const bidSection = document.querySelector('.modal-bid-section');
+        bidSection.style.display = 'flex';
+    });
+
+    function submitModalBid(type) {
+      if (!currentCard) return;
+      const bidAmountInput = document.getElementById('modalBidInput');
+      const bidAmount = bidAmountInput.value;
+      const itemName = currentCard.dataset.name;
+      const bidPhoneNumber = currentCard.dataset.phonenumber;
+
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
+        return;
+      }
+      
+      const formattedBid = `ZMW ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      }
+    }
+    
+    function initModalSlider() {
+      const slider = modal.querySelector('.modal-slider');
+      const slides = slider.querySelector('.modal-slides');
+      const imgs = slides.querySelectorAll('img');
+      let idx = 0;
+      const nextBtn = slider.querySelector('.next');
+      const prevBtn = slider.querySelector('.prev');
+      
+      if (imgs.length <= 1) {
+          nextBtn.style.display = 'none';
+          prevBtn.style.display = 'none';
+      } else {
+          nextBtn.style.display = 'block';
+          prevBtn.style.display = 'block';
+          const move = (i) => {
+              idx = ((i % imgs.length) + imgs.length) % imgs.length;
+              slides.style.transform = `translateX(-${idx * 100}%)`;
+          };
+          nextBtn.onclick = (e) => { e.stopPropagation(); move(idx + 1); };
+          prevBtn.onclick = (e) => { e.stopPropagation(); move(idx - 1); };
       }
     }
 
-    // Initial load
-    renderThumbnails();
-    updateSlide();
-    updateTimeListed();
-    setInterval(updateTimeListed, 60000);
-    // Ensure more details is hidden on load
-    document.getElementById("moreDetails").style.display = "none";
+    function initModalZoom() {
+        modal.querySelectorAll('.modal-slides img').forEach(img => {
+            img.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                img.classList.toggle('zoomed');
+            });
+            let lastTap = 0;
+            img.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault(); 
+                    img.classList.toggle('zoomed'); 
+                }
+                lastTap = currentTime;
+            });
+        });
+    }
+    
+    // New logic to handle tapping anywhere on the card to open modal
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const isButton = e.target.closest('button, a, input');
+            if (!isButton) {
+                showModal(card);
+            }
+        });
+    });
+
   </script>
 </body>
 </html>
