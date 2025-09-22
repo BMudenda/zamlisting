@@ -95,77 +95,224 @@
       min-width: 20px;
       text-align: center;
     }
-
-    /* === UPDATED CSS for dynamic positioning === */
-    .cart-dropdown {
-      display: none;
-      position: fixed; 
-      background: #fff;
-      color: #111;
-      border-radius: 10px;
-      box-shadow: 0 8px 28px rgba(10,10,10,0.15);
-      padding: 12px;
-      z-index: 40;
-      /* Default styles for mobile */
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 400px;
-      width: 90%;
-    }
-    .cart-dropdown.open { display: block; }
-
-    /* Media query to remove centering on desktop */
-    @media (min-width: 768px) {
-      .cart-dropdown {
-        top: auto;
-        left: auto;
-        transform: none;
-      }
-    }
-    /* ========================================= */
-
-    .cart-dropdown h3 { margin: 0 0 10px 0; font-size: 16px; }
-    .cart-items { max-height: 220px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
-    .cart-items li {
-      display:flex;
-      justify-content: space-between;
-      gap:8px;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-      align-items:center;
-      font-size: 14px;
-    }
-    .cart-items .left { display:flex; gap:8px; align-items:center; }
-    .cart-items .name { font-weight:600; }
-    .cart-items .meta { font-size: 12px; color:#555; }
-
-    .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
-    .cart-total { font-weight:700; }
-    .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
     
-    .cart-share {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
+    /* --- Modal CSS (for Cart and Product Detail) --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
     }
-
-    .btn-share {
+    .modal.show {
+        display: flex;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close:hover,
+    .modal-close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden;
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #ddd;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s ease;
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: zoom-in;
+    }
+    .modal-slides img.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+        transform-origin: center center;
+    }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 6px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .modal-price {
+      color: green;
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 8px;
+    }
+    .modal-location {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .modal-description {
+      margin-top: 15px;
+    }
+    .modal-description p {
+      margin: 0;
+      line-height: 1.6;
+    }
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .modal-controls .btn {
+      flex: 1;
+      font-size: 16px;
+    }
+    .modal-bid-section {
+      display:none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-bid-section input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .modal-bid-section .bid-btn-social {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .modal-content { max-height: 95vh; }
+      .modal-bid-section .bid-btn-social { width: 48%; }
+    }
+    @media (max-width:520px){
+      .bid-section input { width: 100%; }
+      .bid-btn-social { width: 48%; justify-content: center; }
+      .filters-search .search-box button { padding: 8px; }
+    }
+    
+    /* --- Cart Modal Specific CSS --- */
+    #cartModal .modal-content {
+      max-width: 500px;
+      padding: 30px;
+    }
+    #cartModal .modal-body {
+        flex-direction: column;
+        padding: 0;
+    }
+    #cartModal h3 { 
+        margin: 0 0 15px 0; 
+        font-size: 24px;
+        text-align: center;
+    }
+    #cartModal .cart-items { 
+        max-height: 300px; 
+        overflow-y: auto; 
+        padding: 0; 
+        margin: 0; 
+        list-style: none;
+    }
+    #cartModal .cart-items li {
+        display:flex;
+        justify-content: space-between;
+        gap:8px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        align-items:center;
+        font-size: 16px;
+    }
+    #cartModal .cart-items .left { display:flex; gap:12px; align-items:center; }
+    #cartModal .cart-items .name { font-weight:600; }
+    #cartModal .cart-items .meta { font-size: 14px; color:#555; }
+    #cartModal .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+    #cartModal .cart-total { font-weight:700; font-size: 18px; }
+    #cartModal .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #cartModal .cart-share {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    #cartModal .btn-share {
         flex: 1;
-        padding: 8px 12px;
+        padding: 12px 18px;
         border-radius: 8px;
         border: none;
         color: #fff;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 8px;
+        font-weight: 600;
     }
-    .btn-sms { background: var(--light-blue); }
-    .btn-whatsapp { background: var(--whatsapp-green); }
-
+    #cartModal .btn-sms { background: var(--light-blue); }
+    #cartModal .btn-whatsapp { background: var(--whatsapp-green); }
 
     /* --- filters and search --- */
     .filters-search {
@@ -458,170 +605,6 @@
         margin-top: 4px;
     }
     
-    /* --- Modal CSS --- */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 50;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.75);
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .modal.show {
-        display: flex;
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 900px;
-        width: 100%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        max-height: 90vh;
-    }
-    .modal-close {
-        color: #aaa;
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 30px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .modal-close:hover,
-    .modal-close:focus {
-        color: #000;
-        text-decoration: none;
-    }
-    .modal-body {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        overflow-y: auto;
-        padding-top: 20px;
-    }
-    .modal-slider-container {
-      position: relative;
-      flex: 1 1 400px;
-      min-height: 250px;
-      overflow: hidden;
-    }
-    .modal-slider {
-      position: relative;
-      height: 100%;
-      background: #ddd;
-    }
-    .modal-slides {
-        display: flex;
-        transition: transform 0.45s ease;
-        height: 100%;
-    }
-    .modal-slides img {
-        width: 100%;
-        object-fit: contain;
-        flex-shrink: 0;
-        height: auto;
-        transition: transform 0.3s ease-in-out;
-        cursor: zoom-in;
-    }
-    .modal-slides img.zoomed {
-        transform: scale(1.8);
-        cursor: zoom-out;
-        transform-origin: center center;
-    }
-    .modal-slider .prev, .modal-slider .next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,.45);
-        color: #fff;
-        border: 0;
-        padding: 6px 8px;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 2;
-    }
-    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
-    
-    .modal-details {
-      flex: 1 1 300px;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-details h4 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .modal-price {
-      color: green;
-      font-weight: 700;
-      font-size: 20px;
-      margin-top: 8px;
-    }
-    .modal-location {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-    .modal-description {
-      margin-top: 15px;
-    }
-    .modal-description p {
-      margin: 0;
-      line-height: 1.6;
-    }
-    .modal-controls {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-    .modal-controls .btn {
-      flex: 1;
-      font-size: 16px;
-    }
-    .modal-bid-section {
-      display:none;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .modal-bid-section input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 100%;
-    }
-    .modal-bid-section .bid-btn-social {
-      width: 100%;
-      text-align: center;
-      padding: 10px;
-      font-size: 1rem;
-    }
-    @media (max-width:768px){
-      .modal-body { flex-direction: column; }
-      .modal-content { max-height: 95vh; }
-      .modal-bid-section .bid-btn-social { width: 48%; }
-    }
-    @media (max-width:520px){
-      .cart-dropdown { right: 8px; left: 8px; width: auto; }
-      .bid-section input { width: 100%; }
-      .bid-btn-social { width: 48%; justify-content: center; }
-      .filters-search .search-box button { padding: 8px; }
-    }
-    
     /* --- Footer Styles --- */
     .footer {
         background: var(--eshop-blue);
@@ -688,22 +671,6 @@
       <div class="cart-icon" id="cart-icon" title="View cart">
         🛒
         <span class="cart-count" id="cart-count">0</span>
-        <div class="cart-dropdown" id="cart-dropdown" aria-hidden="true">
-          <h3>Your Cart</h3>
-          <ul class="cart-items" id="cart-items"></ul>
-          <div class="cart-actions">
-            <div class="cart-total" id="cart-total">Total: ZMK 0</div>
-            <button class="cart-clear" id="cart-clear">Clear</button>
-          </div>
-          <div class="cart-share">
-            <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
-              💬 WhatsApp
-            </button>
-            <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
-              📱 SMS
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </header>
@@ -724,6 +691,8 @@
     </div>
   </div>
 
+  
+  
   <div class="taxi-promo" id="taxi-promo-card">
     <a href="https://zamlisting.com/customerride" target="_blank">
       <div class="taxi-content">
@@ -734,7 +703,7 @@
         </div>
       </div>
       <div class="taxi-image">
-           <img src="vi1.png" alt="Toyota Vitz Front View">
+           <img src="https://i.ibb.co/18r6M4y/vi1.png" alt="Toyota Vitz Front View">
       </div>
     </a>
   </div>
@@ -752,12 +721,12 @@
   data-listed-date="2025-09-17T08:30:00Z">
   <div class="slider">
     <div class="slides">
-      <img src="L1.jpeg" alt="Trekstor 11.6 Laptop Image 1">
-      <img src="L2.jpeg" alt="Trekstor 11.6 Laptop Image 2">
-      <img src="L3.jpeg" alt="Trekstor 11.6 Laptop Image 3">
-      <img src="L4.jpeg" alt="Trekstor 11.6 Laptop Image 4">
-      <img src="L5.jpeg" alt="Trekstor 11.6 Laptop Image 5">
-      <img src="L6.jpg" alt="Trekstor 11.6 Laptop Image 6">
+      <img src="https://i.ibb.co/7xYd30m/L1.jpg" alt="Trekstor 11.6 Laptop Image 1">
+      <img src="https://i.ibb.co/d7z709J/L2.jpg" alt="Trekstor 11.6 Laptop Image 2">
+      <img src="https://i.ibb.co/Wc6q7wY/L3.jpg" alt="Trekstor 11.6 Laptop Image 3">
+      <img src="https://i.ibb.co/tPB0v2k/L4.jpg" alt="Trekstor 11.6 Laptop Image 4">
+      <img src="https://i.ibb.co/m0d6h8n/L5.jpg" alt="Trekstor 11.6 Laptop Image 5">
+      <img src="https://i.ibb.co/RzM8Q7G/L6.jpg" alt="Trekstor 11.6 Laptop Image 6">
     </div>
     <button class="prev" aria-label="prev">&#10094;</button>
     <button class="next" aria-label="next">&#10095;</button>
@@ -795,12 +764,12 @@
   data-listed-date="2025-09-20T10:00:00Z">
   <div class="slider">
     <div class="slides">
-      <img src="GX.jpg" alt="Casio Calculator Image 1">
-      <img src="GX2.jpg" alt="Casio Calculator Image 2">
-      <img src="GX.jpg" alt="Casio Calculator Image 3">
-      <img src="GX2.jpg" alt="Casio Calculator Image 4">
-      <img src="GX.jpg" alt="Casio Calculator Image 5">
-      <img src="GX2.jpg" alt="Casio Calculator Image 6">
+      <img src="https://i.ibb.co/Mh5w340/GX.jpg" alt="Casio Calculator Image 1">
+      <img src="https://i.ibb.co/zX52YQk/GX2.jpg" alt="Casio Calculator Image 2">
+      <img src="https://i.ibb.co/Mh5w340/GX.jpg" alt="Casio Calculator Image 3">
+      <img src="https://i.ibb.co/zX52YQk/GX2.jpg" alt="Casio Calculator Image 4">
+      <img src="https://i.ibb.co/Mh5w340/GX.jpg" alt="Casio Calculator Image 5">
+      <img src="https://i.ibb.co/zX52YQk/GX2.jpg" alt="Casio Calculator Image 6">
     </div>
     <button class="prev" aria-label="prev">&#10094;</button>
     <button class="next" aria-label="next">&#10095;</button>
@@ -827,814 +796,6 @@
     </div>
   </div>
 </article>
-    <article class="product-card" 
-  data-id="p_casio_gx" 
-  data-name="Casio Standard Calculator" 
-  data-price="250" 
-  data-category="electronics" 
-  data-phonenumber="0978167546"
-  data-details="Casio Standard Calculator with 14 digits, solar & battery power, extra large display, regular percentage calculations, durable plastic keys."
-  data-listed-date="2025-09-20T10:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="GX.jpg" alt="Casio Calculator Image 1">
-      <img src="GX2.jpg" alt="Casio Calculator Image 2">
-      <img src="GX.jpg" alt="Casio Calculator Image 3">
-      <img src="GX2.jpg" alt="Casio Calculator Image 4">
-      <img src="GX.jpg" alt="Casio Calculator Image 5">
-      <img src="GX2.jpg" alt="Casio Calculator Image 6">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Casio Standard Calculator</h4>
-    <div class="price">ZMW 250</div>
-    <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMW)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-
-<article class="product-card" 
-  data-id="p_kenko_8585" 
-  data-name="KENKO Electronic Calculator KK-8585-12" 
-  data-price="300" 
-  data-category="electronics" 
-  data-phonenumber="0978167546"
-  data-details="KENKO Electronic Calculator KK-8585-12, standard function, business use, solar powered, large 12-digit display, durable ABS design."
-  data-listed-date="2025-09-20T10:30:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="EC1.jpg" alt="KENKO Calculator Image 1">
-      <img src="EC2.jpeg" alt="KENKO Calculator Image 2">
-      <img src="EC3.jpeg" alt="KENKO Calculator Image 3">
-      <img src="EC4.jpg" alt="KENKO Calculator Image 3">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>KENKO Electronic Calculator KK-8585-12</h4>
-    <div class="price">ZMW 300</div>
-    <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMW)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-
-<article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics" data-phonenumber="0979359159" 
-      data-details="Used Samsung Galaxy S23, 128GB, in excellent condition. Comes with original box and charger." data-listed-date="2025-09-19T14:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="S241.webp" alt="Samsung Galaxy S23 Front">
-      <img src="S242.webp" alt="Samsung Galaxy S23 Front">
-      <img src="S243.webp" alt="Samsung Galaxy S23 Front">
-      <img src="S244.webp" alt="Samsung Galaxy S23 Front">
-      <img src="S245.webp" alt="Samsung Galaxy S23 Front">
-      <img src="S246.webp" alt="Samsung Galaxy S23 Front">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Samsung Galaxy S23</h4>
-    <div class="price">ZMK 20,000</div>
-    <div class="location">Luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-
-<article class="product-card" data-id="p2" data-name="universal mifi" data-price="150" data-category="electronics" data-phonenumber="0777293229" 
-      data-details="
-  Unlock your Routers and MiFis quickly with our-fast online remote unlocking service-. 
-  We frequently add support for newer models, and you can now unlock directly from home or office 
-  using just a Windows PC and good internet connection. 
-  -Pricing:ZMW 100 for MiFis, ZMW 125 for Routers. 
-  Supported models include Huawei B310, B315, E5573 series, MTN MB310, Vodafone M028T, Zamtel MF6/MF8/R10B, 
-  ZedMobile MiFi, multiple ZLT models (M30, S10, S20, S25, T30), and ZTE MF927U.
-  " data-listed-date="2025-09-05T12:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="router1.jpg" alt="view">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Make your Mifi,routers and modern universal </h4>
-    <div class="price">ZMK 150</div>
-    <div class="location">Chipata and online service, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-<article class="product-card" data-id="p4" data-name="mtn 4g router" data-price="400" data-category="electronics" data-phonenumber="0978167546" 
-      data-details="MTN 4g router. Well-maintained and in excellent condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="mtn4gr.jpg" alt=" View">
-      <img src="mtn4gr1.jpg" alt=" View">
-      <img src="mtn4gr2.jpg" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>MTN 4g Router</h4>
-    <div class="price">ZMK 400</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-<article class="product-card" data-id="p4" data-name="Linksys Double Antena Router" data-price="400" data-category="electronics" data-phonenumber="0978167546" 
-      data-details="Linksys WRT54GL 54 Mbps Wireless-G WiFi Router. Well-maintained and in excellent condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="Lr1.webp" alt=" View">
-      <img src="Lr2.webp" alt=" View">
-      <img src="Lr3.webp" alt=" View">
-      <img src="Lr4.webp" alt=" View">
-      <img src="Lr5.webp" alt=" View">
-      <img src="Lr6.webp" alt=" View">
-      <img src="Lr7.webp" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Linksys Router</h4>
-    <div class="price">ZMK 400</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-  <article class="product-card" data-id="p4" data-name="DX-250 - Greenpacket - 802.16e WiMAX Modem" data-price="500" data-category="electronics" data-phonenumber="0978167546" 
-      data-details=".DX-250 - Greenpacket - 802.16e WiMAX Modem, 12V 2A Well-maintained and in excellent condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="gp1.webp" alt=" View">
-      <img src="gp2.webp" alt=" View">
-      <img src="gp3.webp" alt=" View">
-      <img src="gp4.webp" alt=" View">
-      <img src="gp5.webp" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>DX-250-Greenpacket Modem</h4>
-    <div class="price">ZMK 500</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-
-<article class="product-card" data-id="p4" data-name="mtn 4g Mifi" data-price="400" data-category="electronics" data-phonenumber="0978167546" 
-      data-details="MTN 4g Mifi. Well-maintained and in excellent  condition.The MTN MiFi MF927U is labelled as “Cat 4”, which in theory, means that it supports uplink data rates (or upload speeds) up to 50Mbps and downlink data rates (or download speeds) up to 150Mbps.
-
-On one side of the device, you will find a micro USB charging port while on the very top are two round buttons — A power button and a WPS button. On the other side, you will find the SIM Card slot containing the micro SIM card tray and right beside it is a pin-hole that can be used to reset the MiFi." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="Mi1.jpeg" alt=" View">
-      <img src="Mi2.jpeg" alt=" View">
-      <img src="Mi3.jpeg" alt=" View">
-      <img src="Mi4.jpeg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>MTN 4g Mifi</h4>
-    <div class="price">ZMK 400</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-      
-<article class="product-card" data-id="p4" data-name="Giant Steppler" data-price="130" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Giant Steppler. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="stepp2.jpg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Steppler</h4>
-    <div class="price">ZMK 130</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-      
-  <article class="product-card" data-id="p4" data-name="Steppler" data-price="35" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Giant Steppler. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="stepp.jpg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Steppler</h4>
-    <div class="price">ZMK 35</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-
-  <article class="product-card" data-id="p4" data-name="Giant Perforator" data-price="40" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Giant Perforator. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="perfo.jpeg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Giant Perforator</h4>
-    <div class="price">ZMK 40</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-
-  <article class="product-card" data-id="p4" data-name="Perforator" data-price="20" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Perforator. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="perfo.jpg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Perforator</h4>
-    <div class="price">ZMK 20</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
- <article class="product-card" data-id="p4" data-name="Big Sellotape" data-price="20" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Transperent Sello Tape. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="sello.webp" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Big Sello Tape</h4>
-    <div class="price">ZMK 20</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
- </article>
-
-      
-  <article class="product-card" data-id="p4" data-name="Ruler" data-price="15" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Transperent Ruler. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="ruller2.jpg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>30cm Ruler</h4>
-    <div class="price">ZMK 15</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-      
-    <article class="product-card" data-id="p4" data-name="pens" data-price="3" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Blue,Black,Red. Brand New Pens. available." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="pen.png" alt=" View">
-      <img src="pen2.png" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Assorted Pens</h4>
-    <div class="price">ZMK 3</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-    </article>
-      
-  <article class="product-card" data-id="p4" data-name="Ream Paper" data-price="150" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Rotatrim,Typek." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="ream.jpeg" alt=" View">
-      <img src="ream2.png" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Assorted Reams of Paper</h4>
-    <div class="price">ZMK 150</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-
-    <article class="product-card" data-id="p4" data-name="Permanent Markers" data-price="5" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Blue,Green,Red,Black" data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="makers.jpeg" alt=" View">
-      <img src="makers.jpeg" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Assorted Perment Markers</h4>
-    <div class="price">ZMK 5</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-      
-<article class="product-card" data-id="p4" data-name="A4 Envelopes" data-price="1" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Blown A4 Envelope" data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="envelope.jpg" alt=" View">
-      <img src="envelope.jpg" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>A4 Envelope</h4>
-    <div class="price">ZMK 1</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
-
-    <article class="product-card" data-id="p4" data-name="Pepar Fastner" data-price="3" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="metalic paper Fastner" data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="ffast.webp" alt=" View">
-      <img src="ffast.webp" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Paper Fastner</h4>
-    <div class="price">ZMK 3</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-</article>
-<article class="product-card" data-id="p4" data-name="Plastic Elegant Folders" data-price="10" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Transperent Elegant A4 Folder" data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="dfolder.jpg" alt=" View">
-      <img src="dfolder2.jpg" alt=" View">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Plastic E Folder</h4>
-    <div class="price">ZMK 10</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
- <article class="product-card" data-id="p4" data-name="Supper Stick" data-price="12" data-category="stationary" data-phonenumber="0978167546" 
-      data-details="Supper Stick Easy,Master Plus. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="ste.png" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Supper Stick</h4>
-    <div class="price">ZMK 12</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-    </article>
-
-<article class="product-card" data-id="p4" data-name="Silicone Sealant" data-price="60" data-category="plumbing" data-phonenumber="0978167546" 
-      data-details="Silicone Sealant Clear. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="sil.jpg" alt=" View">
-      
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4>Silicone Sealant</h4>
-    <div class="price">ZMK 60</div>
-    <div class="location">luangwa, Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
-      </div>
-      <div class="bid-section">
-        <input type="number" placeholder="Your bid (ZMK)" min="0" />
-        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
-        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-    </article>
-
-      
-  <article class="product-card" data-id="p3" data-name="Steppler" data-price="130" data-category="stationary" 
-      data-details="Steppler." data-listed-date="2025-09-19T10:00:00Z">
-  <div class="slider">
-    <div class="slides">
-      <img src="stepp2.jpg" alt="view">
-    </div>
-    <button class="prev" aria-label="prev">&#10094;</button>
-    <button class="next" aria-label="next">&#10095;</button>
-  </div>
-  <div class="product-details">
-    <h4> Giant Steppler</h4>
-    <div class="price">ZMK 130</div>
-    <div class="location">Luangwa , Zambia</div>
-    <div class="listing-time"></div>
-    <div class="tappable-content">
-      <div class="controls">
-        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
-      </div>
-      <div class="details-section">
-        <h5>Product Description:</h5>
-        <p class="product-description"></p>
-      </div>
-    </div>
-  </div>
-  </article>
     </div>
   </main>
 
@@ -1672,6 +833,28 @@ On one side of the device, you will find a micro USB charging port while on the 
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="cartModal" class="modal">
+      <div class="modal-content">
+          <span class="modal-close">&times;</span>
+          <h3>Your Cart</h3>
+          <div class="modal-body">
+              <ul class="cart-items" id="cart-items"></ul>
+              <div class="cart-actions">
+                  <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+                  <button class="cart-clear" id="cart-clear">Clear</button>
+              </div>
+              <div class="cart-share">
+                  <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+                      💬 WhatsApp
+                  </button>
+                  <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+                      📱 SMS
+                  </button>
+              </div>
+          </div>
+      </div>
   </div>
 
   <footer class="footer">
@@ -1827,76 +1010,10 @@ On one side of the device, you will find a micro USB charging port while on the 
       const price = safeNumber(card.dataset.price || '');
 
       addToCart(id, name, price, 1);
-      openCartDropdown();
+      openCartModal();
     }
     document.getElementById('cart-clear').addEventListener('click', () => {
       clearCart();
-    });
-    const cartIcon = document.getElementById('cart-icon');
-    const cartDropdown = document.getElementById('cart-dropdown');
-    
-    // NEW: Function to position the cart dropdown
-    function positionCartDropdown() {
-      const isDesktop = window.innerWidth >= 768;
-      if (!isDesktop) {
-        // Fallback to CSS centering on mobile
-        cartDropdown.style.top = '50%';
-        cartDropdown.style.left = '50%';
-        cartDropdown.style.transform = 'translate(-50%, -50%)';
-        return;
-      }
-      
-      // Get the bounding box of the taxi promo card
-      const promoCard = document.getElementById('taxi-promo-card');
-      if (!promoCard) return;
-      const promoRect = promoCard.getBoundingClientRect();
-      const dropdownRect = cartDropdown.getBoundingClientRect();
-
-      // Calculate new position
-      const newTop = promoRect.top - dropdownRect.height - 20; // 20px padding
-      const newLeft = promoRect.left + (promoRect.width / 2) - (dropdownRect.width / 2);
-      
-      // Apply the new position
-      cartDropdown.style.top = `${newTop}px`;
-      cartDropdown.style.left = `${newLeft}px`;
-      cartDropdown.style.transform = 'none';
-    }
-    
-    function openCartDropdown() {
-      cartDropdown.classList.add('open');
-      cartDropdown.setAttribute('aria-hidden', 'false');
-      // Position the dropdown when it opens
-      positionCartDropdown();
-    }
-    function closeCartDropdown() {
-      cartDropdown.classList.remove('open');
-      cartDropdown.setAttribute('aria-hidden', 'true');
-    }
-    function toggleCart() {
-      cartDropdown.classList.toggle('open');
-      const open = cartDropdown.classList.contains('open');
-      cartDropdown.setAttribute('aria-hidden', open ? 'false' : 'true');
-      if (open) {
-        positionCartDropdown();
-      }
-    }
-    cartIcon.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleCart();
-    });
-    document.addEventListener('click', (ev) => {
-      const target = ev.target;
-      const headerControls = document.getElementById('header-controls');
-      if (headerControls && !headerControls.contains(target)) {
-        closeCartDropdown();
-      }
-    });
-
-    // NEW: Reposition the dropdown on window resize
-    window.addEventListener('resize', () => {
-        if (cartDropdown.classList.contains('open')) {
-            positionCartDropdown();
-        }
     });
     
     function toggleBid(button) {
@@ -2106,15 +1223,42 @@ On one side of the device, you will find a micro USB charging port while on the 
     });
 
     /**********************
-     * Modal Logic
+     * Modals Logic
      **********************/
-    const modal = document.getElementById('productModal');
-    const modalClose = document.querySelector('.modal-close');
+    const productModal = document.getElementById('productModal');
+    const cartModal = document.getElementById('cartModal');
     let currentCard = null;
 
-    function showModal(card) {
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Bindings for closing modals
+    document.querySelectorAll('.modal .modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeModal(btn.closest('.modal').id);
+        });
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target.id);
+        }
+    });
+
+    // Open cart modal
+    document.getElementById('cart-icon').addEventListener('click', () => {
+        openModal('cartModal');
+    });
+
+    // Product Modal Details
+    function showProductModal(card) {
       currentCard = card;
-      const id = card.dataset.id || card.dataset.name;
       const name = card.dataset.name || card.querySelector('h4').textContent;
       const price = card.dataset.price || 'N/A';
       const location = card.querySelector('.location')?.textContent || '';
@@ -2127,7 +1271,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       document.getElementById('modalProductDescription').textContent = description;
       
       const offerButton = document.getElementById('modalMakeOffer');
-      const bidSection = document.querySelector('.modal-bid-section');
+      const bidSection = document.querySelector('#productModal .modal-bid-section');
       
       if (hasOffer) {
           offerButton.style.display = 'inline-block';
@@ -2137,7 +1281,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       
       bidSection.style.display = 'none';
 
-      const modalSlidesContainer = modal.querySelector('.modal-slides');
+      const modalSlidesContainer = productModal.querySelector('.modal-slides');
       modalSlidesContainer.innerHTML = '';
       const originalImages = card.querySelectorAll('.slider img');
       originalImages.forEach(img => {
@@ -2147,36 +1291,21 @@ On one side of the device, you will find a micro USB charging port while on the 
       
       initModalSlider();
       initModalZoom();
-
-      modal.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function hideModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-        currentCard = null;
+      openModal('productModal');
     }
     
-    modalClose.addEventListener('click', hideModal);
-    window.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        hideModal();
-      }
-    });
-
     document.getElementById('modalAddToCart').addEventListener('click', () => {
       if (currentCard) {
         const id = currentCard.dataset.id || currentCard.dataset.name;
         const name = currentCard.dataset.name || currentCard.querySelector('h4').textContent;
         const price = safeNumber(currentCard.dataset.price || '');
         addToCart(id, name, price);
-        hideModal();
+        closeModal('productModal');
       }
     });
     
     document.getElementById('modalMakeOffer').addEventListener('click', () => {
-        const bidSection = document.querySelector('.modal-bid-section');
+        const bidSection = document.querySelector('#productModal .modal-bid-section');
         bidSection.style.display = 'flex';
     });
 
@@ -2208,7 +1337,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     }
     
     function initModalSlider() {
-      const slider = modal.querySelector('.modal-slider');
+      const slider = productModal.querySelector('.modal-slider');
       const slides = slider.querySelector('.modal-slides');
       const imgs = slides.querySelectorAll('img');
       let idx = 0;
@@ -2231,7 +1360,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     }
 
     function initModalZoom() {
-        modal.querySelectorAll('.modal-slides img').forEach(img => {
+        productModal.querySelectorAll('.modal-slides img').forEach(img => {
             img.addEventListener('dblclick', (e) => {
                 e.stopPropagation();
                 img.classList.toggle('zoomed');
@@ -2254,7 +1383,7 @@ On one side of the device, you will find a micro USB charging port while on the 
         card.addEventListener('click', (e) => {
             const isButton = e.target.closest('button, a, input');
             if (!isButton) {
-                showModal(card);
+                showProductModal(card);
             }
         });
     });
