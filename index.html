@@ -1,239 +1,567 @@
-(<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZamListing</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZamListing — Products</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
+    /* --- Basic page / header --- */
+    :root {
+      --green: #006400; /* Zambia green */
+      --black: #000;
+      --red: #ff0000;
+      --orange: #ff7f00;
+      --light-blue: #007bff; /* For SMS/Taxi button */
+      --whatsapp-green: #25D366; /* For WhatsApp button */
+      --dark-green: #004d00;
+      --yellow-taxi: #FFD700;
+      --eshop-blue: #0056b3;
+      --eshop-dark-blue: #003366;
+    }
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
       margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .brand-title {
-      font-size: 38px;
-      font-weight: bold;
-      color: #333;
-      text-transform: uppercase;
-    }
-
-    .brand-title .highlight {
-      color: #0077cc;
-    }
-
-    .tagline {
-      font-size: 24px;
-      color: #444;
-      margin: 5px 0;
-    }
-
-    .subtitle {
-      font-size: 16px;
-      color: #777;
-    }
-
-    .search-filter-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 20px auto;
-    }
-
-    #searchInput, #typeFilter {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    #searchInput {
-      width: 60%;
-      max-width: 300px;
-    }
-
-    #typeFilter {
-      width: 160px;
-    }
-
-    #resultCount {
-      margin: 10px;
-      font-weight: bold;
-      color: #0077cc;
-    }
-
-    .slider-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); /* Three cards per row */
-      gap: 20px;
-      padding: 20px; /* Consistent padding */
-      max-width: 810px; /* 3 * (250px + 20px) - 20px */
-      margin: 0 auto;
-      justify-items: center;
-      align-items: stretch; /* Ensure cards stretch to equal height */
-    }
-
-    .vehicle {
-      width: 250px;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-decoration: none;
-      color: #000;
-      transition: transform 0.2s;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #f4f6f8;
+      color: #222;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      min-height: 340px; /* Increased for consistent height with lists */
+      min-height: 100vh;
     }
 
-    .vehicle:hover {
-      transform: scale(1.03);
-    }
-
-    .vehicle img {
-      margin-top: 16px;
-      width: 100%; /* Fill card width */
-      max-width: 220px;
-      height: 120px;
-      object-fit: contain;
-      border-radius: 8px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      background: #f5f5f5;
-      padding: 8px;
-      border: 1px solid #ddd;
-      flex-shrink: 0;
-    }
-
-    .vehicle img[src=""], .vehicle img:not([src]) {
-      background: #f5f5f5 url('fallback-image.png') center/contain no-repeat;
-    }
-
-    /* Beautified card body: less space between name and details */
-    .card-body {
-      padding: 12px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 8px; /* Small gap between title and details */
-      min-height: unset; /* Remove forced spacing */
-      flex: 1 1 auto;
-    }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: bold;
-      color: #0077cc;
-      margin-bottom: 0;
-    }
-
-    .card-details {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      font-size: 14px;
-      color: #444;
-    }
-
-    .card-details li {
-      margin-bottom: 4px;
-    }
-
-    .card-details li strong {
-      color: #0077cc;
-    }
-
-    .card-action {
-      margin-top: 8px;
+    header {
+      background: var(--eshop-blue);
       color: #fff;
-      background: #0077cc;
-      display: inline-block;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.2s;
-      text-align: center;
-      align-self: flex-start;
-      text-decoration: none;
-    }
-
-    .card-action:hover {
-      background: #005fa3;
-    }
-
-    .emoji-animated {
-      font-size: 80px;
-      margin-top: 16px;
-      animation: emojiBounce 1.5s infinite ease-in-out;
-      height: 120px; /* Match image height */
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: #f5f5f5;
-      border: 1px solid #ddd;
+      justify-content: space-between;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .logo-and-subtitle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
+    .logo .listing { color: var(--orange); }
+
+    .header-subtitle {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .header-controls {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      position: relative; /* contains dropdown */
+    }
+
+    .cart-icon {
+      cursor: pointer;
+      position: relative;
+      font-size: 20px;
+      user-select: none;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: red;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      min-width: 20px;
+      text-align: center;
+    }
+    
+    /* --- Modal CSS (for Cart and Product Detail) --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal.show {
+        display: flex;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close:hover,
+    .modal-close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden;
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #ddd;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s ease;
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: zoom-in;
+    }
+    .modal-slides img.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+        transform-origin: center center;
+    }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 6px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .modal-price {
+      color: green;
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 8px;
+    }
+    .modal-location {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .modal-description {
+      margin-top: 15px;
+    }
+    .modal-description p {
+      margin: 0;
+      line-height: 1.6;
+    }
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .modal-controls .btn {
+      flex: 1;
+      font-size: 16px;
+    }
+    .modal-bid-section {
+      display:none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-bid-section input {
+      padding: 10px;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      flex-shrink: 0;
+      width: 100%;
+    }
+    .modal-bid-section .bid-btn-social {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .modal-content { max-height: 95vh; }
+      .modal-bid-section .bid-btn-social { width: 48%; }
+    }
+    @media (max-width:520px){
+      .bid-section input { width: 100%; }
+      .bid-btn-social { width: 48%; justify-content: center; }
+      .filters-search .search-box button { padding: 8px; }
+    }
+    
+    /* --- Cart Modal Specific CSS --- */
+    #cartModal .modal-content {
+      max-width: 500px;
+      padding: 30px;
+    }
+    #cartModal .modal-body {
+        flex-direction: column;
+        padding: 0;
+    }
+    #cartModal h3 { 
+        margin: 0 0 15px 0; 
+        font-size: 24px;
+        text-align: center;
+    }
+    #cartModal .cart-items { 
+        max-height: 300px; 
+        overflow-y: auto; 
+        padding: 0; 
+        margin: 0; 
+        list-style: none;
+    }
+    #cartModal .cart-items li {
+        display:flex;
+        justify-content: space-between;
+        gap:8px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        align-items:center;
+        font-size: 16px;
+    }
+    #cartModal .cart-items .left { display:flex; gap:12px; align-items:center; }
+    #cartModal .cart-items .name { font-weight:600; }
+    #cartModal .cart-items .meta { font-size: 14px; color:#555; }
+    #cartModal .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+    #cartModal .cart-total { font-weight:700; font-size: 18px; }
+    #cartModal .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #cartModal .cart-share {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    #cartModal .btn-share {
+        flex: 1;
+        padding: 12px 18px;
+        border-radius: 8px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 600;
+    }
+    #cartModal .btn-sms { background: var(--light-blue); }
+    #cartModal .btn-whatsapp { background: var(--whatsapp-green); }
+
+    /* --- filters and search --- */
+    .filters-search {
+      padding: 12px 20px;
+      background: #e9ecef;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .filters-search .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filters-search .filter-btn {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .filters-search .filter-btn:hover {
+        background: #f0f0f0;
+    }
+    .filters-search .filter-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .filters-search .search-box {
+      display: flex;
+      gap: 8px;
+    }
+    .filters-search .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .filters-search .search-box button {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: none;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .filters-search .search-box button:hover {
+        background: var(--dark-green);
     }
 
-    @keyframes emojiBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    /* --- taxi booking section --- */
+    .taxi-promo {
+      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin: 25px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 25px;
+      max-width: 1000px;
+      transition: transform 0.3s ease;
+    }
+    .taxi-promo:hover {
+        transform: translateY(-5px);
+    }
+    .taxi-promo a {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+    }
+    .taxi-promo .taxi-content {
+      flex: 1;
+    }
+    .taxi-promo .taxi-content h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #FFD700;
+    }
+    .taxi-promo .taxi-content p {
+      margin: 0 0 15px 0;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    .taxi-promo .taxi-image {
+        flex-shrink: 0;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .taxi-promo .taxi-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .btn-taxi {
+        display: inline-block;
+        background: #FFD700;
+        color: #1a1a1a;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-taxi:hover {
+        background: #ffc400;
+        transform: translateY(-2px);
+    }
+    @media (max-width:768px){
+        .taxi-promo a, .shop-promo a {
+            flex-direction: column;
+            text-align: center;
+        }
+        .taxi-promo .taxi-image, .shop-promo .shop-image {
+            margin-bottom: 15px;
+        }
+    }
+    @media (max-width:768px){
+        .taxi-promo a {
+            flex-direction: column;
+            text-align: center;
+        }
+        .taxi-promo .taxi-image {
+            margin-bottom: 15px;
+        }
     }
 
-    @media (max-width: 600px) {
-      .brand-title { font-size: 28px; }
-      .slider-container {
-        grid-template-columns: 1fr;
-        max-width: 250px;
-      }
-      .vehicle {
-        width: 200px;
-        min-height: 280px;
-      }
-      .vehicle img, .emoji-animated {
-        max-width: 170px;
-        height: 100px;
-        padding: 6px;
-      }
-      .emoji-animated { font-size: 60px; }
-      #searchInput { width: 90%; }
-      .search-filter-row {
+    /* --- products grid --- */
+    main { flex: 1; padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+    .product-card {
+      background:#fff;
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(10,10,10,0.06);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      cursor: pointer;
+    }
+    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
+    .slides { display:flex; transition:transform .45s ease; height:100%; }
+    .slides img { 
+      width:100%; 
+      height:180px; 
+      object-fit:contain;
+      flex-shrink:0; 
+      transition: transform 0.3s ease-in-out;
+      cursor: zoom-in;
+    }
+    .slides img.zoomed {
+      transform: scale(2);
+      cursor: zoom-out;
+    }
+    
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
+    .slider .prev{ left:8px } .slider .next{ right:8px }
+    
+    .product-details {
+      padding: 12px;
+    }
+    .product-details h4 { margin:0 0 6px 0; font-size:16px; }
+    .price { color:green; font-weight:700; margin-bottom:6px; }
+    .location { color:#666; font-size:13px; margin-bottom:8px; }
+    
+    /* The part that is hidden by default */
+    .product-details .tappable-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    }
+
+    /* Show the hidden part when the 'tapped' class is on the card */
+    .product-card.tapped .tappable-content {
+      max-height: 500px; /* A value larger than the max possible height */
+      opacity: 1;
+    }
+
+    .controls { display:flex; gap:8px; margin-top:10px; }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; }
+    .btn-primary { background:#28a745; color:#fff; }
+    .btn-accent { background:#ff9800; color:#fff; }
+    .btn-secondary { background:var(--light-blue); color:#fff; }
+    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-section .phone-input { width: calc(100% - 150px); }
+    .success { color:green; font-size:13px; display:none; margin-top:8px; }
+    .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; text-decoration: none; color: #fff; }
+    .bid-btn-sms { background: var(--light-blue); }
+    .bid-btn-whatsapp { background: var(--whatsapp-green); }
+    
+    .details-section {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .details-section h5 {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+    }
+    
+    .listing-time {
+        font-size: 12px;
+        color: #888;
+        margin-top: 4px;
+    }
+    
+    /* --- Footer Styles --- */
+    .footer {
+        background: #f4f6f8; /* Match body background */
+        color: #555;
+        padding: 20px;
+        text-align: center;
+        display: flex;
         flex-direction: column;
         align-items: center;
-      }
-      .card-title { font-size: 15px; }
-      .card-details { font-size: 12px; }
+        gap: 15px;
+        margin-top: 20px;
     }
-
-    @media (min-width: 601px) and (max-width: 900px) {
-      .slider-container {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 540px; /* 2 * (250px + 20px) - 20px */
-      }
-    }
-
     .footer-links {
       margin: 20px 0;
     }
-
     .footer-link {
       margin: 0 10px;
       text-decoration: none;
       color: #555;
       font-weight: bold;
     }
-
     .footer-link:hover { color: #000; }
-
     .fa {
       padding: 10px;
       font-size: 20px;
@@ -244,98 +572,1561 @@
       border-radius: 50%;
       color: white;
     }
-
     .fa-facebook { background: #3b5998; }
     .fa-twitter { background: #55acee; }
-    .fa-google { background: #dd4b39; }
+    .fa-envelope { background: #dd4b39; }
     .fa-linkedin { background: #007bb5; }
     .fa-youtube { background: #bb0000; }
     .fa-instagram { background: #e4405f; }
-
-    hr { margin: 20px 0; }
   </style>
 </head>
 <body>
   <header>
-    <div class="brand-title">Zam<span class="highlight">Listing</span></div>
-    <h2 class="tagline">Get your Service</h2>
-    <p class="subtitle">Click on a service below to proceed</p>
+    <div class="header-content">
+      <div class="logo-and-subtitle">
+          <div class="logo">
+            <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
+          </div>
+          <h2 class="header-subtitle">e-Shop Luangwa</h2>
+      </div>
+    </div>
+    <div class="header-controls" id="header-controls">
+      <div class="cart-icon" id="cart-icon" title="View cart">
+        🛒
+        <span class="cart-count" id="cart-count">0</span>
+      </div>
+    </div>
   </header>
 
-  <div class="search-filter-row">
-    <input type="text" id="searchInput" placeholder="Search services...">
-    <select id="typeFilter">
-      <option value="all">All Categories</option>
-      <option value="taxi">Book Ride</option>
-      <option value="bike">Bike</option>
-      <option value="item">e-shop</option>
-      
-    </select>
+  <div class="filters-search">
+    <div class="filters" id="category-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="electronics">Electronics</button>
+      <button class="filter-btn" data-filter="furniture">Furniture</button>
+      <button class="filter-btn" data-filter="groceries">Groceries</button>
+      <button class="filter-btn" data-filter="vehicles">Vehicles</button>
+      <button class="filter-btn" data-filter="stationary">Stationary</button>
+      <button class="filter-btn" data-filter="plumbing">Plumbing</button>
+      <button class="filter-btn" data-filter="amasampo">Amasampo</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products..." />
+    </div>
   </div>
+  
+  <div class="taxi-promo" id="taxi-promo-card">
+    <a href="https://zamlisting.com/customerride" target="_blank">
+      <div class="taxi-content">
+        <h3>Book a Taxi with ZamListing  🏍️🚗</h3>
+        <p>Your ride is just a tap away! Book a taxi in **Luangwa, Zambia** for a safe and convenient trip.</p>
+        <div class="controls">
+            <span class="btn-taxi">Book Now</span>
+        </div>
+      </div>
+      <div class="taxi-image">
+           <img src="vi1.png" alt="Toyota Vitz Front View">
+      </div>
+    </a>
+  </div>
+  
+  <main>
+<div class="products" id="product-list">
+<article class="product-card" 
+  data-id="p_trekstor116" 
+  data-name="Trekstor - 11.6-inch 2-in-1 Laptop" 
+  data-price="1200" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350, 4GB RAM, 64GB eMMC, Touchscreen, Windows 10.Two available, one is has a dead battery and the starting price ZMK800"
+  data-listed-date="2025-09-17T08:30:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="L1.jpeg" alt="Trekstor 11.6 Laptop Image 1">
+      <img src="L2.jpeg" alt="Trekstor 11.6 Laptop Image 2">
+      <img src="L3.jpeg" alt="Trekstor 11.6 Laptop Image 3">
+      <img src="L4.jpeg" alt="Trekstor 11.6 Laptop Image 4">
+      <img src="L5.jpeg" alt="Trekstor 11.6 Laptop Image 5">
+      <img src="L6.jpg" alt="Trekstor 11.6 Laptop Image 6">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
+    <div class="price">ZMW 1,200 (Negotiable)</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+  
+<article class="product-card" 
+  data-id="p_hisenseTv" 
+  data-name="Hisense 55inch smartTV" 
+  data-price="2300" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details=" UHD Smart TV
+55A6KTUK
+Screen diagonal size (inch) : 55 in
+Screen diagonal size (cm) : 139 cm
+Type : UHD Smart TV
+Resolution max. : 4K Ultra HD 3840x2160
+DTS Virtual X
+User interface : VIDAA Smart OS
+Series : A6K . Note the TV doesn't function it needs screen replacement and the starting price ZMK2300"
+  data-listed-date="2025-09-17T08:30:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="Hi1.png" alt=" Image 1">
+      <img src="Hi2.png" alt=" Image 2">
+      <img src="Hi3.png" alt="Image 3">
+      <img src="Hi4.png" alt=" Image 4">
+      <img src="Hi5.png" alt="Image 5">
+      <img src="Hi6.png" alt="Image 6">
+      <img src="Hi7.png" alt="Image 6">
+      <img src="Hi8.png" alt="Image 6">
+      <img src="Hi9.png" alt="Image 6">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Hisense 55" smart TV</h4>
+    <div class="price">ZMW 2,300 (Negotiable)</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
 
-  <div id="resultCount">Showing results</div>
-  <div class="slider-container" id="vehicleContainer">
-   
+<article class="product-card" 
+  data-id="p_casio_gx" 
+  data-name="Casio Standard Calculator" 
+  data-price="250" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details="Casio Standard Calculator with 14 digits, solar & battery power, extra large display, regular percentage calculations, durable plastic keys."
+  data-listed-date="2025-09-20T10:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="GX.jpg" alt="Casio Calculator Image 1">
+      <img src="GX2.jpg" alt="Casio Calculator Image 2">
+      <img src="GX.jpg" alt="Casio Calculator Image 3">
+      <img src="GX2.jpg" alt="Casio Calculator Image 4">
+      <img src="GX.jpg" alt="Casio Calculator Image 5">
+      <img src="GX2.jpg" alt="Casio Calculator Image 6">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Casio Standard Calculator</h4>
+    <div class="price">ZMW 250</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" 
+  data-id="p_kenko_8585" 
+  data-name="KENKO Electronic Calculator KK-8585-12" 
+  data-price="300" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details="KENKO Electronic Calculator KK-8585-12, standard function, business use, solar powered, large 12-digit display, durable ABS design."
+  data-listed-date="2025-09-20T10:30:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="EC1.jpg" alt="KENKO Calculator Image 1">
+      <img src="EC2.jpeg" alt="KENKO Calculator Image 2">
+      <img src="EC3.jpeg" alt="KENKO Calculator Image 3">
+      <img src="EC4.jpg" alt="KENKO Calculator Image 3">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>KENKO Electronic Calculator KK-8585-12</h4>
+    <div class="price">ZMW 300</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p1" data-name="Samsung Galaxy S23" data-price="12000" data-category="electronics" data-phonenumber="0979359159" 
+      data-details="Used Samsung Galaxy S23, 128GB, in excellent condition. Comes with original box and charger." data-listed-date="2025-09-19T14:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="S241.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S242.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S243.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S244.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S245.webp" alt="Samsung Galaxy S23 Front">
+      <img src="S246.webp" alt="Samsung Galaxy S23 Front">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Samsung Galaxy S23</h4>
+    <div class="price">ZMK 20,000</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+
+<article class="product-card" data-id="p2" data-name="universal mifi" data-price="150" data-category="electronics" data-phonenumber="0777293229" 
+      data-details="
+  Unlock your Routers and MiFis quickly with our-fast online remote unlocking service-. 
+  We frequently add support for newer models, and you can now unlock directly from home or office 
+  using just a Windows PC and good internet connection. 
+  -Pricing:ZMW 100 for MiFis, ZMW 125 for Routers. 
+  Supported models include Huawei B310, B315, E5573 series, MTN MB310, Vodafone M028T, Zamtel MF6/MF8/R10B, 
+  ZedMobile MiFi, multiple ZLT models (M30, S10, S20, S25, T30), and ZTE MF927U.
+  " data-listed-date="2025-09-05T12:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="router1.jpg" alt="view">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Make your Mifi,routers and modern universal </h4>
+    <div class="price">ZMK 150</div>
+    <div class="location">Chipata and online service, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+<article class="product-card" data-id="p4" data-name="mtn 4g router" data-price="400" data-category="electronics" data-phonenumber="0978167546" 
+      data-details="MTN 4g router. Well-maintained and in excellent condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="mtn4gr.jpg" alt=" View">
+      <img src="mtn4gr1.jpg" alt=" View">
+      <img src="mtn4gr2.jpg" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>MTN 4g Router</h4>
+    <div class="price">ZMK 400</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
         
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+<article class="product-card" data-id="p4" data-name="Linksys Double Antena Router" data-price="400" data-category="electronics" data-phonenumber="0978167546" 
+      data-details="Linksys WRT54GL 54 Mbps Wireless-G WiFi Router. Well-maintained and in excellent condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="Lr1.webp" alt=" View">
+      <img src="Lr2.webp" alt=" View">
+      <img src="Lr3.webp" alt=" View">
+      <img src="Lr4.webp" alt=" View">
+      <img src="Lr5.webp" alt=" View">
+      <img src="Lr6.webp" alt=" View">
+      <img src="Lr7.webp" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Linksys Router</h4>
+    <div class="price">ZMK 400</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+  <article class="product-card" data-id="p4" data-name="DX-250 - Greenpacket - 802.16e WiMAX Modem" data-price="500" data-category="electronics" data-phonenumber="0978167546" 
+      data-details=".DX-250 - Greenpacket - 802.16e WiMAX Modem, 12V 2A Well-maintained and in excellent condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="gp1.webp" alt=" View">
+      <img src="gp2.webp" alt=" View">
+      <img src="gp3.webp" alt=" View">
+      <img src="gp4.webp" alt=" View">
+      <img src="gp5.webp" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>DX-250-Greenpacket Modem</h4>
+    <div class="price">ZMK 500</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
 
-    
+<article class="product-card" data-id="p4" data-name="mtn 4g Mifi" data-price="400" data-category="electronics" data-phonenumber="0978167546" 
+      data-details="MTN 4g Mifi. Well-maintained and in excellent  condition.The MTN MiFi MF927U is labelled as “Cat 4”, which in theory, means that it supports uplink data rates (or upload speeds) up to 50Mbps and downlink data rates (or download speeds) up to 150Mbps.
 
-    
+On one side of the device, you will find a micro USB charging port while on the very top are two round buttons — A power button and a WPS button. On the other side, you will find the SIM Card slot containing the micro SIM card tray and right beside it is a pin-hole that can be used to reset the MiFi." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="Mi1.jpeg" alt=" View">
+      <img src="Mi2.jpeg" alt=" View">
+      <img src="Mi3.jpeg" alt=" View">
+      <img src="Mi4.jpeg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>MTN 4g Mifi</h4>
+    <div class="price">ZMK 400</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+      
+<article class="product-card" data-id="p4" data-name="Giant Steppler" data-price="130" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Giant Steppler. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="stepp2.jpg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Steppler</h4>
+    <div class="price">ZMK 130</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+      
+  <article class="product-card" data-id="p4" data-name="Steppler" data-price="35" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Giant Steppler. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="stepp.jpg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Steppler</h4>
+    <div class="price">ZMK 35</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
 
-    
+  <article class="product-card" data-id="p4" data-name="Giant Perforator" data-price="40" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Giant Perforator. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="perfo.jpeg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Giant Perforator</h4>
+    <div class="price">ZMK 40</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
 
+  <article class="product-card" data-id="p4" data-name="Perforator" data-price="20" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Perforator. Well-maintained and in excellent  condition." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="perfo.jpg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Perforator</h4>
+    <div class="price">ZMK 20</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+ <article class="product-card" data-id="p4" data-name="Big Sellotape" data-price="20" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Transperent Sello Tape. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="sello.webp" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Big Sello Tape</h4>
+    <div class="price">ZMK 20</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+ </article>
 
-    <!-- Placeholder comment for adding more cards -->
-    <!-- Paste new cards here -->
+      
+  <article class="product-card" data-id="p4" data-name="Ruler" data-price="15" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Transperent Ruler. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="ruller2.jpg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>30cm Ruler</h4>
+    <div class="price">ZMK 15</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+      
+    <article class="product-card" data-id="p4" data-name="pens" data-price="3" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Blue,Black,Red. Brand New Pens. available." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="pen.png" alt=" View">
+      <img src="pen2.png" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Assorted Pens</h4>
+    <div class="price">ZMK 3</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+    </article>
+      
+  <article class="product-card" data-id="p4" data-name="Ream Paper" data-price="150" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Rotatrim,Typek." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="ream.jpeg" alt=" View">
+      <img src="ream2.png" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Assorted Reams of Paper</h4>
+    <div class="price">ZMK 150</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+
+    <article class="product-card" data-id="p4" data-name="Permanent Markers" data-price="5" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Blue,Green,Red,Black" data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="makers.jpeg" alt=" View">
+      <img src="makers.jpeg" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Assorted Perment Markers</h4>
+    <div class="price">ZMK 5</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+      
+<article class="product-card" data-id="p4" data-name="A4 Envelopes" data-price="1" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Blown A4 Envelope" data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="envelope.jpg" alt=" View">
+      <img src="envelope.jpg" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>A4 Envelope</h4>
+    <div class="price">ZMK 1</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+
+    <article class="product-card" data-id="p4" data-name="Pepar Fastner" data-price="3" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="metalic paper Fastner" data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="ffast.webp" alt=" View">
+      <img src="ffast.webp" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Paper Fastner</h4>
+    <div class="price">ZMK 3</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+<article class="product-card" data-id="p4" data-name="Plastic Elegant Folders" data-price="10" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Transperent Elegant A4 Folder" data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="dfolder.jpg" alt=" View">
+      <img src="dfolder2.jpg" alt=" View">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Plastic E Folder</h4>
+    <div class="price">ZMK 10</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+ <article class="product-card" data-id="p4" data-name="Supper Stick" data-price="12" data-category="stationary" data-phonenumber="0978167546" 
+      data-details="Supper Stick Easy,Master Plus. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="ste.png" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Supper Stick</h4>
+    <div class="price">ZMK 12</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+    </article>
+
+<article class="product-card" data-id="p4" data-name="Silicone Sealant" data-price="60" data-category="plumbing" data-phonenumber="0978167546" 
+      data-details="Silicone Sealant Clear. Brand New. 30 available." data-listed-date="2025-08-25T15:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="sil.jpg" alt=" View">
+      
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Silicone Sealant</h4>
+    <div class="price">ZMK 60</div>
+    <div class="location">luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMK)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+    </article>
+
+      
+  <article class="product-card" data-id="p3" data-name="Steppler" data-price="130" data-category="stationary" 
+      data-details="Steppler." data-listed-date="2025-09-19T10:00:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="stepp2.jpg" alt="view">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4> Giant Steppler</h4>
+    <div class="price">ZMK 130</div>
+    <div class="location">Luangwa , Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+  </article>
+    </div>
+  </main>
+
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <div class="modal-body">
+        <div class="modal-slider-container">
+          <div class="modal-slider">
+            <div class="modal-slides"></div>
+            <button class="prev" aria-label="Previous image">&#10094;</button>
+            <button class="next" aria-label="Next image">&#10095;</button>
+          </div>
+        </div>
+        <div class="modal-details">
+          <h4 id="modalProductName"></h4>
+          <div class="modal-price" id="modalProductPrice"></div>
+          <div class="modal-location" id="modalProductLocation"></div>
+          
+          <div class="modal-description">
+            <h5>Product Description:</h5>
+            <p id="modalProductDescription"></p>
+          </div>
+          
+          <div class="modal-controls">
+            <button class="btn btn-primary" id="modalAddToCart">Add to Cart</button>
+            <button class="btn btn-accent" id="modalMakeOffer">Make an Offer</button>
+          </div>
+          
+          <div class="modal-bid-section">
+            <input type="number" id="modalBidInput" placeholder="Your bid (ZMW)" min="0" />
+            <a class="bid-btn-social bid-btn-whatsapp" id="modalBidWhatsApp" href="#" onclick="event.preventDefault(); submitModalBid('whatsapp');">💬 WhatsApp</a>
+            <a class="bid-btn-social bid-btn-sms" id="modalBidSMS" href="#" onclick="event.preventDefault(); submitModalBid('sms');">📱 SMS</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="footer-links">
-    <a href="about.html" class="footer-link">About</a>
-    <a href="index.html" class="footer-link">Home</a>
+  <div id="cartModal" class="modal">
+      <div class="modal-content">
+          <span class="modal-close">&times;</span>
+          <h3>Your Cart</h3>
+          <div class="modal-body">
+              <ul class="cart-items" id="cart-items"></ul>
+              <div class="cart-actions">
+                  <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+                  <button class="cart-clear" id="cart-clear">Clear</button>
+              </div>
+              <div class="cart-share">
+                  <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+                      💬 WhatsApp
+                  </button>
+                  <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+                      📱 SMS
+                  </button>
+              </div>
+          </div>
+      </div>
   </div>
 
-  <hr />
-
-  <div>
-    <a href="#" class="fa fa-facebook" title="Facebook"></a>
-    <a href="#" class="fa fa-twitter" title="Twitter"></a>
-    <a href="#" class="fa fa-google" title="Google"></a>
-    <a href="#" class="fa fa-linkedin" title="LinkedIn"></a>
-    <a href="#" class="fa fa-youtube" title="YouTube"></a>
-    <a href="#" class="fa fa-instagram" title="Instagram"></a>
-    <a href="admin.html" title="Admin Access">*</a>
-  </div>
+  <footer class="footer">
+    <div class="footer-links">
+        <a href="index.html" class="footer-link">Home</a>
+        <a href="about.html" class="footer-link">About</a>
+    </div>
+    <hr />
+    <div>
+        <a href="https://www.facebook.com/zamlisting" target="_blank" class="fa fa-facebook" title="Facebook"></a>
+        <a href="https://twitter.com/zamlisting" target="_blank" class="fa fa-twitter" title="Twitter"></a>
+        <a href="mailto:info@zamlisting.com" class="fa fa-envelope" title="Email"></a>
+        <a href="https://www.linkedin.com/company/zamlisting" target="_blank" class="fa fa-linkedin" title="LinkedIn"></a>
+        <a href="https://www.youtube.com/@zamlisting" target="_blank" class="fa fa-youtube" title="YouTube"></a>
+        <a href="https://www.instagram.com/zamlisting" target="_blank" class="fa fa-instagram" title="Instagram"></a>
+    </div>
+  </footer>
 
   <script>
-    const searchInput = document.getElementById("searchInput");
-    const typeFilter = document.getElementById("typeFilter");
-    const vehicleContainer = document.getElementById("vehicleContainer");
-    const vehicles = vehicleContainer.getElementsByClassName("vehicle");
-    const resultCount = document.getElementById("resultCount");
-
-    function filterVehicles() {
-      const searchValue = searchInput.value.toLowerCase();
-      const selectedType = typeFilter.value;
-      let count = 0;
-
-      Array.from(vehicles).forEach(vehicle => {
-        const name = vehicle.getAttribute("data-name").toLowerCase();
-        const type = vehicle.getAttribute("data-type");
-        const matchesSearch = name.includes(searchValue);
-        const matchesType = selectedType === "all" || type === selectedType;
-        const show = matchesSearch && matchesType;
-        vehicle.style.display = show ? "flex" : "none";
-        if (show) count++;
+    /**********************
+     * Utilities
+     **********************/
+    const FMT = (v) => {
+      return Number(v).toLocaleString();
+    };
+    const safeNumber = (str) => {
+      if (str === undefined || str === null) return 0;
+      return Number(String(str).replace(/,/g, '').trim()) || 0;
+    };
+    const cartPhoneNumber = '0978167546';
+    
+    /**********************
+     * Cart data & helpers
+     **********************/
+    let cart = [];
+    const findCartItem = (id) => cart.find(i => i.id === id);
+    function addToCart(productId, productName, productPrice, qty = 1) {
+      const existing = findCartItem(productId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id: productId, name: productName, price: productPrice, qty });
+      }
+      renderCart();
+    }
+    function removeFromCart(productId) {
+      cart = cart.filter(i => i.id !== productId);
+      renderCart();
+    }
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+    function cartTotalAmount() {
+      return cart.reduce((s, it) => s + (safeNumber(it.price) * it.qty), 0);
+    }
+    function cartTotalQty() {
+      return cart.reduce((s, it) => s + it.qty, 0);
+    }
+    /**********************
+     * DOM render functions
+     **********************/
+    function renderCart() {
+      const listEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      const countEl = document.getElementById('cart-count');
+      listEl.innerHTML = '';
+      if (cart.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No items in cart';
+        li.style.padding = '8px 0';
+        listEl.appendChild(li);
+      } else {
+        cart.forEach(item => {
+          const li = document.createElement('li');
+          const left = document.createElement('div');
+          left.className = 'left';
+          const name = document.createElement('div');
+          name.className = 'name';
+          name.textContent = item.name;
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${item.qty} x ZMK ${FMT(item.price)} `;
+          left.appendChild(name);
+          left.appendChild(meta);
+          const right = document.createElement('div');
+          right.style.display = 'flex';
+          right.style.flexDirection = 'column';
+          right.style.alignItems = 'flex-end';
+          right.style.gap = '6px';
+          const lineTotal = document.createElement('div');
+          lineTotal.textContent = `ZMK ${FMT(item.price * item.qty)}`;
+          const rm = document.createElement('button');
+          rm.textContent = 'Remove';
+          rm.style.padding = '4px 6px';
+          rm.style.fontSize = '12px';
+          rm.style.border = '0';
+          rm.style.borderRadius = '6px';
+          rm.style.background = '#eee';
+          rm.style.cursor = 'pointer';
+          rm.onclick = () => removeFromCart(item.id);
+          right.appendChild(lineTotal);
+          right.appendChild(rm);
+          li.appendChild(left);
+          li.appendChild(right);
+          listEl.appendChild(li);
+        });
+      }
+      const total = cartTotalAmount();
+      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
+      countEl.textContent = String(cartTotalQty());
+    }
+    
+    /**********************
+     * Cart Sharing Functions
+     **********************/
+    function getCartMessage() {
+      let message = "Hello ZamListing, I would like to order the following items:\n\n";
+      if (cart.length === 0) {
+        return "I am interested in your products. Please contact me.";
+      }
+      
+      cart.forEach(item => {
+        message += `${item.name} (${item.qty} pcs) - ZMK ${FMT(item.price * item.qty)}\n`;
       });
 
-      resultCount.textContent = `Showing ${count} result${count !== 1 ? 's' : ''}`;
+      message += `\nTotal: ZMK ${FMT(cartTotalAmount())}\n`;
+      message += `\nThank you!`;
+      
+      return message;
     }
 
-    searchInput.addEventListener("input", filterVehicles);
-    typeFilter.addEventListener("change", filterVehicles);
-    filterVehicles();
+    function sendCartViaSMS() {
+      const message = getCartMessage();
+      window.location.href = `sms:${cartPhoneNumber}?body=${encodeURIComponent(message)}`;
+    }
+
+    function sendCartViaWhatsApp() {
+      const message = getCartMessage();
+      const waNumber = '260' + cartPhoneNumber.substring(1);
+      window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    }
+
+    /**********************
+     * UI bindings
+     **********************/
+    function addToCartBtn(button) {
+      const card = button.closest('.product-card');
+      if (!card) return;
+      const id = card.dataset.id || card.dataset.name;
+      const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
+      const price = safeNumber(card.dataset.price || '');
+
+      addToCart(id, name, price, 1);
+      openCartModal();
+    }
+    document.getElementById('cart-clear').addEventListener('click', () => {
+      clearCart();
+    });
+    
+    function toggleBid(button) {
+      const details = button.closest('.tappable-content');
+      const bid = details.querySelector('.bid-section');
+      if (bid) bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
+    }
+    
+    function submitBid(button, type) {
+      const bidSection = button.closest('.bid-section');
+      const bidAmountInput = bidSection.querySelector('input[type="number"]');
+      const card = button.closest('.product-card');
+      const itemName = card.dataset.name;
+      
+      const bidAmount = bidAmountInput.value;
+      const bidPhoneNumber = card.dataset.phonenumber;
+
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
+        return;
+      }
+
+      const formattedBid = `ZMW ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      }
+    }
+    
+    document.querySelectorAll('.product-card').forEach(card => {
+      const slider = card.querySelector('.slider');
+      if (slider) {
+          const slides = slider.querySelector('.slides');
+          const imgs = slides.querySelectorAll('img');
+          let idx = 0;
+          const nextBtn = slider.querySelector('.next');
+          const prevBtn = slider.querySelector('.prev');
+          
+          if (imgs.length <= 1) {
+              if (nextBtn) nextBtn.style.display = 'none';
+              if (prevBtn) prevBtn.style.display = 'none';
+          } else {
+              const move = (i) => {
+                  idx = ((i % imgs.length) + imgs.length) % imgs.length;
+                  slides.style.transform = `translateX(-${idx * 100}%)`;
+              };
+              if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
+              if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
+          }
+      }
+    });
+
+    renderCart();
+    
+    /**********************
+     * New Filter & Search Logic
+     **********************/
+    const allProducts = document.querySelectorAll('.product-card');
+    const categoryFilters = document.getElementById('category-filters');
+    const searchInput = document.getElementById('search-input');
+    
+    function filterProducts(category) {
+      allProducts.forEach(product => {
+        if (category === 'all' || product.dataset.category === category) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+
+    function searchProducts(query) {
+      const lowerCaseQuery = query.toLowerCase();
+      categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+      allProducts.forEach(product => {
+        const name = (product.dataset.name || '').toLowerCase();
+        const category = (product.dataset.category || '').toLowerCase();
+        const details = (product.dataset.details || '').toLowerCase();
+        if (name.includes(lowerCaseQuery) || category.includes(lowerCaseQuery) || details.includes(lowerCaseQuery)) {
+          product.style.display = 'flex';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    }
+    
+    categoryFilters.addEventListener('click', (e) => {
+      const button = e.target;
+      if (button.classList.contains('filter-btn')) {
+        categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        filterProducts(button.dataset.filter);
+        searchInput.value = '';
+      }
+    });
+    
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+      searchProducts(query);
+    });
+
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.style.display = 'none';
+    }
+
+    filterProducts('all');
+    
+    /**********************
+     * New Listing Time Counter
+     **********************/
+    function updateListingTime() {
+      const now = new Date();
+      document.querySelectorAll('.product-card').forEach(card => {
+        const listedDateStr = card.dataset.listedDate;
+        if (!listedDateStr) return;
+
+        const listedDate = new Date(listedDateStr);
+        const timeDiff = now - listedDate;
+
+        const seconds = Math.floor(timeDiff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(minutes / 60 / 24);
+        const weeks = Math.floor(minutes / 60 / 24 / 7);
+        const months = Math.floor(minutes / 60 / 24 / 30.44);
+        const years = Math.floor(minutes / 60 / 24 / 365.25);
+
+        let timeText = '';
+        if (years > 0) {
+            timeText = `Listed ${years} year${years > 1 ? 's' : ''} ago`;
+        } else if (months > 0) {
+            timeText = `Listed ${months} month${months > 1 ? 's' : ''} ago`;
+        } else if (weeks > 0) {
+            timeText = `Listed ${weeks} week${weeks > 1 ? 's' : ''} ago`;
+        } else if (days > 0) {
+            timeText = `Listed ${days} day${days > 1 ? 's' : ''} ago`;
+        } else if (hours > 0) {
+            timeText = `Listed ${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else if (minutes > 0) {
+            timeText = `Listed ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        } else {
+            timeText = 'Listed just now';
+        }
+
+        const timeEl = card.querySelector('.listing-time');
+        if (timeEl) {
+            timeEl.textContent = timeText;
+        }
+      });
+    }
+
+    updateListingTime();
+    setInterval(updateListingTime, 30000);
+
+    /**********************
+     * Card Tap Logic
+     **********************/
+    document.querySelectorAll('.product-card').forEach(card => {
+        // Populate the description for each card from the data attribute
+        const descriptionEl = card.querySelector('.product-description');
+        if (descriptionEl) {
+          descriptionEl.textContent = card.dataset.details || 'No description available.';
+        }
+        
+        // Add click listener for showing/hiding details
+        card.addEventListener('click', (e) => {
+            // Do not toggle if a button or an image is clicked
+            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.tagName.toLowerCase() === 'img' || e.target.tagName.toLowerCase() === 'input') {
+                return;
+            }
+            card.classList.toggle('tapped');
+        });
+    });
+
+    /**********************
+     * Image Zoom Logic
+     **********************/
+    document.querySelectorAll('.product-card .slider img').forEach(img => {
+      // Double click for desktop
+      img.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        img.classList.toggle('zoomed');
+      });
+
+      // Double tap for mobile
+      let lastTap = 0;
+      img.addEventListener('touchend', (e) => {
+          const currentTime = new Date().getTime();
+          const tapLength = currentTime - lastTap;
+          if (tapLength < 300 && tapLength > 0) {
+              e.preventDefault(); 
+              img.classList.toggle('zoomed'); 
+          }
+          lastTap = currentTime;
+      });
+    });
+
+    /**********************
+     * Modals Logic
+     **********************/
+    const productModal = document.getElementById('productModal');
+    const cartModal = document.getElementById('cartModal');
+    let currentCard = null;
+
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Bindings for closing modals
+    document.querySelectorAll('.modal .modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeModal(btn.closest('.modal').id);
+        });
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target.id);
+        }
+    });
+
+    // Open cart modal
+    document.getElementById('cart-icon').addEventListener('click', () => {
+        openModal('cartModal');
+    });
+
+    // Product Modal Details
+    function showProductModal(card) {
+      currentCard = card;
+      const name = card.dataset.name || card.querySelector('h4').textContent;
+      const price = card.dataset.price || 'N/A';
+      const location = card.querySelector('.location')?.textContent || '';
+      const description = card.dataset.details || 'No description available.';
+      const hasOffer = card.querySelector('.btn-accent') !== null;
+      
+      document.getElementById('modalProductName').textContent = name;
+      document.getElementById('modalProductPrice').textContent = `ZMW ${FMT(price)}`;
+      document.getElementById('modalProductLocation').textContent = location;
+      document.getElementById('modalProductDescription').textContent = description;
+      
+      const offerButton = document.getElementById('modalMakeOffer');
+      const bidSection = document.querySelector('#productModal .modal-bid-section');
+      
+      if (hasOffer) {
+          offerButton.style.display = 'inline-block';
+      } else {
+          offerButton.style.display = 'none';
+      }
+      
+      bidSection.style.display = 'none';
+
+      const modalSlidesContainer = productModal.querySelector('.modal-slides');
+      modalSlidesContainer.innerHTML = '';
+      const originalImages = card.querySelectorAll('.slider img');
+      originalImages.forEach(img => {
+          const newImg = img.cloneNode();
+          modalSlidesContainer.appendChild(newImg);
+      });
+      
+      initModalSlider();
+      initModalZoom();
+      openModal('productModal');
+    }
+    
+    document.getElementById('modalAddToCart').addEventListener('click', () => {
+      if (currentCard) {
+        const id = currentCard.dataset.id || currentCard.dataset.name;
+        const name = currentCard.dataset.name || currentCard.querySelector('h4').textContent;
+        const price = safeNumber(currentCard.dataset.price || '');
+        addToCart(id, name, price);
+        closeModal('productModal');
+      }
+    });
+    
+    document.getElementById('modalMakeOffer').addEventListener('click', () => {
+        const bidSection = document.querySelector('#productModal .modal-bid-section');
+        bidSection.style.display = 'flex';
+    });
+
+    function submitModalBid(type) {
+      if (!currentCard) return;
+      const bidAmountInput = document.getElementById('modalBidInput');
+      const bidAmount = bidAmountInput.value;
+      const itemName = currentCard.dataset.name;
+      const bidPhoneNumber = currentCard.dataset.phonenumber;
+
+      if (!bidPhoneNumber) {
+          alert("Error: A phone number for bidding on this item has not been set.");
+          return;
+      }
+      if (!bidAmount) {
+        alert('Please enter your bid amount.');
+        return;
+      }
+      
+      const formattedBid = `ZMW ${FMT(bidAmount)}`;
+      const message = `I would like to bid on the ${itemName}. My offer is ${formattedBid}.`;
+      
+      if (type === 'sms') {
+        window.location.href = `sms:${bidPhoneNumber}?body=${encodeURIComponent(message)}`;
+      } else if (type === 'whatsapp') {
+        const waNumber = '260' + bidPhoneNumber.substring(1);
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      }
+    }
+    
+    function initModalSlider() {
+      const slider = productModal.querySelector('.modal-slider');
+      const slides = slider.querySelector('.modal-slides');
+      const imgs = slides.querySelectorAll('img');
+      let idx = 0;
+      const nextBtn = slider.querySelector('.next');
+      const prevBtn = slider.querySelector('.prev');
+      
+      if (imgs.length <= 1) {
+          nextBtn.style.display = 'none';
+          prevBtn.style.display = 'none';
+      } else {
+          nextBtn.style.display = 'block';
+          prevBtn.style.display = 'block';
+          const move = (i) => {
+              idx = ((i % imgs.length) + imgs.length) % imgs.length;
+              slides.style.transform = `translateX(-${idx * 100}%)`;
+          };
+          nextBtn.onclick = (e) => { e.stopPropagation(); move(idx + 1); };
+          prevBtn.onclick = (e) => { e.stopPropagation(); move(idx - 1); };
+      }
+    }
+
+    function initModalZoom() {
+        productModal.querySelectorAll('.modal-slides img').forEach(img => {
+            img.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                img.classList.toggle('zoomed');
+            });
+            let lastTap = 0;
+            img.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault(); 
+                    img.classList.toggle('zoomed'); 
+                }
+                lastTap = currentTime;
+            });
+        });
+    }
+    
+    // New logic to handle tapping anywhere on the card to open modal
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const isButton = e.target.closest('button, a, input');
+            if (!isButton) {
+                showProductModal(card);
+            }
+        });
+    });
+
   </script>
 </body>
 </html>
-
-
