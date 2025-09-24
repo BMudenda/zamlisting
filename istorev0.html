@@ -4,7 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ZamListing — Products</title>
-<style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    /* --- Basic page / header --- */
     :root {
       --green: #006400; /* Zambia green */
       --black: #000;
@@ -27,7 +29,7 @@
       flex-direction: column;
       min-height: 100vh;
     }
-    /* --- Basic page / header --- */
+
     header {
       background: var(--eshop-blue);
       color: #fff;
@@ -39,10 +41,16 @@
       top: 0;
       z-index: 30;
     }
+
     .header-content {
       display: flex;
       flex-direction: column;
       gap: 5px;
+    }
+    .logo-and-subtitle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
     .logo {
       font-weight: 700;
@@ -55,18 +63,21 @@
     .logo .a { color: var(--black); }
     .logo .m { color: var(--red); }
     .logo .listing { color: var(--orange); }
+
     .header-subtitle {
-      font-size: 14px;
-      font-weight: 400;
-      margin: 0;
-      color: rgba(255, 255, 255, 0.85);
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.85);
     }
+    
     .header-controls {
       display:flex;
       align-items:center;
       gap:16px;
-      position: relative;
+      position: relative; /* contains dropdown */
     }
+
     .cart-icon {
       cursor: pointer;
       position: relative;
@@ -85,63 +96,224 @@
       min-width: 20px;
       text-align: center;
     }
-    .cart-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: calc(100% + 10px);
-      width: 320px;
-      background: #fff;
-      color: #111;
-      border-radius: 10px;
-      box-shadow: 0 8px 28px rgba(10,10,10,0.15);
-      padding: 12px;
-      z-index: 40;
+    
+    /* --- Modal CSS (for Cart and Product Detail) --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal.show {
+        display: flex;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close:hover,
+    .modal-close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden;
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #ddd;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s ease;
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: zoom-in;
+    }
+    .modal-slides img.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+        transform-origin: center center;
+    }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 6px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .modal-price {
+      color: green;
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 8px;
+    }
+    .modal-location {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .modal-description {
+      margin-top: 15px;
+    }
+    .modal-description p {
+      margin: 0;
+      line-height: 1.6;
+    }
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .modal-controls .btn {
+      flex: 1;
+      font-size: 16px;
+    }
+    .modal-bid-section {
+      display:none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-bid-section input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .modal-bid-section .bid-btn-social {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .modal-content { max-height: 95vh; }
+      .modal-bid-section .bid-btn-social { width: 48%; }
     }
     @media (max-width:520px){
-      .cart-dropdown { right: 8px; left: 8px; width: auto; }
       .bid-section input { width: 100%; }
       .bid-btn-social { width: 48%; justify-content: center; }
       .filters-search .search-box button { padding: 8px; }
     }
-    .cart-dropdown.open { display: block; }
-    .cart-dropdown h3 { margin: 0 0 10px 0; font-size: 16px; }
-    .cart-items { max-height: 220px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
-    .cart-items li {
-      display:flex;
-      justify-content: space-between;
-      gap:8px;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-      align-items:center;
-      font-size: 14px;
+    
+    /* --- Cart Modal Specific CSS --- */
+    #cartModal .modal-content {
+      max-width: 500px;
+      padding: 30px;
     }
-    .cart-items .left { display:flex; gap:8px; align-items:center; }
-    .cart-items .name { font-weight:600; }
-    .cart-items .meta { font-size: 12px; color:#555; }
-    .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
-    .cart-total { font-weight:700; }
-    .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
-    .cart-share {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
+    #cartModal .modal-body {
+        flex-direction: column;
+        padding: 0;
     }
-    .btn-share {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    #cartModal h3 { 
+        margin: 0 0 15px 0; 
+        font-size: 24px;
+        text-align: center;
     }
-    .btn-sms { background: var(--light-blue); }
-    .btn-whatsapp { background: var(--whatsapp-green); }
+    #cartModal .cart-items { 
+        max-height: 300px; 
+        overflow-y: auto; 
+        padding: 0; 
+        margin: 0; 
+        list-style: none;
+    }
+    #cartModal .cart-items li {
+        display:flex;
+        justify-content: space-between;
+        gap:8px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        align-items:center;
+        font-size: 16px;
+    }
+    #cartModal .cart-items .left { display:flex; gap:12px; align-items:center; }
+    #cartModal .cart-items .name { font-weight:600; }
+    #cartModal .cart-items .meta { font-size: 14px; color:#555; }
+    #cartModal .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+    #cartModal .cart-total { font-weight:700; font-size: 18px; }
+    #cartModal .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #cartModal .cart-share {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    #cartModal .btn-share {
+        flex: 1;
+        padding: 12px 18px;
+        border-radius: 8px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 600;
+    }
+    #cartModal .btn-sms { background: var(--light-blue); }
+    #cartModal .btn-whatsapp { background: var(--whatsapp-green); }
 
     /* --- filters and search --- */
     .filters-search {
@@ -167,7 +339,7 @@
       transition: all 0.2s ease;
     }
     .filters-search .filter-btn:hover {
-      background: #f0f0f0;
+        background: #f0f0f0;
     }
     .filters-search .filter-btn.active {
       background: var(--green);
@@ -195,226 +367,136 @@
       transition: background 0.2s ease;
     }
     .filters-search .search-box button:hover {
-      background: var(--dark-green);
+        background: var(--dark-green);
     }
 
-    /* --- ENHANCED TAXI CARD STYLES --- */
+    /* --- taxi booking section (Animated and Elegant) --- */
+    @keyframes float {
+        0% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        50% { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        100% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    }
+    
     .taxi-promo {
-      /* Dynamic gradient background */
-      background: linear-gradient(120deg, #1a1a1a 0%, var(--yellow-taxi) 100%);
-      background-size: 200% 200%;
-      animation: taxiGradientMove 7s ease-in-out infinite;
-      
+      /* Elegant background with subtle gradient */
+      background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
       color: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
       margin: 25px auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 28px 32px;
+      padding: 25px 35px;
       max-width: 1000px;
       
-      /* Elegant hover animation */
-      transition: transform 0.3s cubic-bezier(0.4,1,0.7,1.2), box-shadow 0.2s;
-      position: relative;
-      overflow: hidden;
+      /* Enable 3D transform */
+      transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
     }
-    @keyframes taxiGradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+
     .taxi-promo:hover {
-      transform: translateY(-8px) scale(1.03);
-      box-shadow: 0 18px 45px rgba(0,0,0,0.24);
+        /* Subtle 3D tilt on hover */
+        transform: rotateY(2deg) rotateX(1deg) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
-    .animated-entry {
-      opacity: 0;
-      transform: translateY(40px) scale(0.98);
-      animation: taxiEntry 1.2s cubic-bezier(.61,.12,.36,1.19) 0.2s forwards;
-    }
-    @keyframes taxiEntry {
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
+    
     .taxi-promo a {
-      display: flex;
-      align-items: center;
-      gap: 30px;
-      text-decoration: none;
-      color: inherit;
-      width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
     }
-    .taxi-content {
+    
+    .taxi-promo .taxi-content {
       flex: 1;
     }
-    .taxi-content h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--yellow-taxi); /* Use variable for consistency */
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .taxi-content p {
-      margin: 0 0 15px 0;
-      font-size: 1.12rem;
-      line-height: 1.5;
-    }
-    .taxi-emoji {
-      display: inline-block;
-      animation: taxiEmojiMove 1.4s infinite alternate;
+    
+    .taxi-promo .taxi-content h3 {
+      margin: 0 0 10px 0;
       font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--yellow-taxi); /* Gold accent */
+      letter-spacing: 0.5px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     }
-    @keyframes taxiEmojiMove {
-      0% { transform: translateY(0) scale(1); }
-      60% { transform: translateY(-5px) scale(1.15); }
-      100% { transform: translateY(0) scale(1); }
+    
+    .taxi-promo .taxi-content p {
+      margin: 0 0 20px 0;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
     }
-    .taxi-image.taxi-bounce {
-      animation: bounce-taxi 2.2s infinite cubic-bezier(.7,0,.3,1);
-      flex-shrink: 0;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 4px solid rgba(255,255,255,0.3);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    
+    .taxi-promo .taxi-image {
+        flex-shrink: 0;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 5px solid var(--yellow-taxi); /* Gold border */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        
+        /* Apply floating animation */
+        animation: float 4s ease-in-out infinite;
     }
-    @keyframes bounce-taxi {
-      0%, 100% { transform: translateY(0) scale(1); }
-      40% { transform: translateY(-8px) scale(1.06); }
-      60% { transform: translateY(2px) scale(0.98);}
-    }
-    .taxi-image img {
+    
+    .taxi-promo .taxi-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      border-radius: 50%;
-    }
-    .btn-taxi.animated-btn {
-      display: inline-block;
-      background: var(--yellow-taxi);
-      color: #1a1a1a;
-      padding: 13px 36px;
-      border-radius: 36px;
-      font-weight: 700;
-      font-size: 1.18rem;
-      box-shadow: 0 2px 14px 0 rgba(255,215,0,0.19);
-      outline: none;
-      border: none;
-      animation: taxiBtnPulse 1.6s infinite;
-      transition: box-shadow 0.18s, background 0.28s, transform 0.17s;
-      cursor: pointer;
-    }
-    @keyframes taxiBtnPulse {
-      0%, 100% { box-shadow: 0 2px 14px 0 rgba(255,215,0,0.19);}
-      50% { box-shadow: 0 0 30px 8px rgba(255,215,0,0.38);}
-    }
-    .btn-taxi.animated-btn:hover {
-      background: #ffc400;
-      transform: scale(1.06) translateY(-2px);
-      box-shadow: 0 0 44px 10px rgba(255,215,0,0.26);
-    }
-    @media (max-width:768px){
-      .taxi-promo a {
-        flex-direction: column;
-        text-align: center;
-        gap: 12px;
-      }
-      .taxi-image.taxi-bounce { margin-bottom: 12px; }
-      .taxi-content h3 { font-size: 1.2rem;}
-    }
-
-    /* --- e-shop promo card --- */
-    .shop-promo {
-      background: linear-gradient(135deg, var(--eshop-blue) 0%, var(--eshop-dark-blue) 100%);
-      color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      margin: 25px auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 25px;
-      max-width: 1000px;
       transition: transform 0.3s ease;
     }
-    .shop-promo:hover {
-      transform: translateY(-5px);
+
+    .taxi-promo:hover .taxi-image img {
+        transform: scale(1.05); /* Slight zoom on image */
     }
-    .shop-promo a {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      text-decoration: none;
-      color: inherit;
-      width: 100%;
+
+    .btn-taxi {
+        display: inline-block;
+        background: var(--yellow-taxi);
+        color: #1a1a1a;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 215, 0, 0.4);
     }
-    .shop-promo .shop-content {
-      flex: 1;
+    
+    .btn-taxi:hover {
+        background: #ffc400;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 215, 0, 0.6);
     }
-    .shop-promo .shop-content h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #fff;
+
+    .btn-taxi:active {
+        /* Press effect */
+        transform: translateY(0px);
+        box-shadow: 0 2px 5px rgba(0, 215, 0, 0.4);
     }
-    .shop-promo .shop-content p {
-      margin: 0 0 15px 0;
-      font-size: 1.1rem;
-      line-height: 1.5;
-    }
-    .shop-promo .shop-image {
-      flex-shrink: 0;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 4px solid rgba(255,255,255,0.3);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 5rem;
-    }
-    .shop-promo .shop-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .btn-shop {
-      display: inline-block;
-      background: #fff;
-      color: var(--eshop-dark-blue);
-      padding: 10px 25px;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 1rem;
-      transition: background 0.3s ease, transform 0.2s ease;
-      text-decoration: none;
-    }
-    .btn-shop:hover {
-      background: #f0f0f0;
-      transform: translateY(-2px);
-    }
+    
     @media (max-width:768px){
-      .shop-promo a {
-        flex-direction: column;
-        text-align: center;
-      }
-      .shop-promo .shop-image {
-        margin-bottom: 15px;
-      }
+        .taxi-promo {
+             padding: 20px 25px;
+        }
+        .taxi-promo a {
+            flex-direction: column;
+            text-align: center;
+            gap: 20px;
+        }
+        .taxi-promo .taxi-image {
+            margin-bottom: 0;
+            width: 120px;
+            height: 120px;
+        }
+        .btn-taxi {
+            width: 100%;
+            text-align: center;
+            padding: 10px 25px;
+        }
     }
 
     /* --- products grid --- */
@@ -499,174 +581,10 @@
         margin-top: 4px;
     }
     
-    /* --- Modal CSS --- */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 50;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.75);
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .modal.show {
-        display: flex;
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 900px;
-        width: 100%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        max-height: 90vh;
-    }
-    .modal-close {
-        color: #aaa;
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 30px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .modal-close:hover,
-    .modal-close:focus {
-        color: #000;
-        text-decoration: none;
-    }
-    .modal-body {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        overflow-y: auto;
-        padding-top: 20px;
-    }
-    .modal-slider-container {
-      position: relative;
-      flex: 1 1 400px;
-      min-height: 250px;
-      overflow: hidden;
-    }
-    .modal-slider {
-      position: relative;
-      height: 100%;
-      background: #ddd;
-    }
-    .modal-slides {
-        display: flex;
-        transition: transform 0.45s ease;
-        height: 100%;
-    }
-    .modal-slides img {
-        width: 100%;
-        object-fit: contain;
-        flex-shrink: 0;
-        height: auto;
-        transition: transform 0.3s ease-in-out;
-        cursor: zoom-in;
-    }
-    .modal-slides img.zoomed {
-        transform: scale(1.8);
-        cursor: zoom-out;
-        transform-origin: center center;
-    }
-    .modal-slider .prev, .modal-slider .next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,.45);
-        color: #fff;
-        border: 0;
-        padding: 6px 8px;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 2;
-    }
-    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
-    
-    .modal-details {
-      flex: 1 1 300px;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-details h4 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .modal-price {
-      color: green;
-      font-weight: 700;
-      font-size: 20px;
-      margin-top: 8px;
-    }
-    .modal-location {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-    .modal-description {
-      margin-top: 15px;
-    }
-    .modal-description p {
-      margin: 0;
-      line-height: 1.6;
-    }
-    .modal-controls {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-    .modal-controls .btn {
-      flex: 1;
-      font-size: 16px;
-    }
-    .modal-bid-section {
-      display:none;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .modal-bid-section input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 100%;
-    }
-    .modal-bid-section .bid-btn-social {
-      width: 100%;
-      text-align: center;
-      padding: 10px;
-      font-size: 1rem;
-    }
-    @media (max-width:768px){
-      .modal-body { flex-direction: column; }
-      .modal-content { max-height: 95vh; }
-      .modal-bid-section .bid-btn-social { width: 48%; }
-    }
-    @media (max-width:520px){
-      .cart-dropdown { right: 8px; left: 8px; width: auto; }
-      .bid-section input { width: 100%; }
-      .bid-btn-social { width: 48%; justify-content: center; }
-      .filters-search .search-box button { padding: 8px; }
-    }
-    
     /* --- Footer Styles --- */
     .footer {
-        background: var(--eshop-blue);
-        color: #fff;
+        background: #f4f6f8; /* Match body background */
+        color: #555;
         padding: 20px;
         text-align: center;
         display: flex;
@@ -676,75 +594,47 @@
         margin-top: 20px;
     }
     .footer-links {
-        display: flex;
-        gap: 20px;
+      margin: 20px 0;
     }
-    .footer-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        text-decoration: none;
-        transition: background-color 0.3s ease;
+    .footer-link {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #555;
+      font-weight: bold;
     }
-    .footer-button:hover {
-        background-color: rgba(255, 255, 255, 0.4);
+    .footer-link:hover { color: #000; }
+    .fa {
+      padding: 10px;
+      font-size: 20px;
+      width: 40px;
+      text-align: center;
+      text-decoration: none;
+      margin: 5px 5px;
+      border-radius: 50%;
+      color: white;
     }
-    .footer-button.facebook {
-        background-color: #3b5998;
-    }
-    .footer-button.facebook:hover {
-        background-color: #2d4373;
-    }
-    .footer-button.whatsapp {
-        background-color: var(--whatsapp-green);
-    }
-    .footer-button.whatsapp:hover {
-        background-color: #128c7e;
-    }
-    .footer-button.about {
-        background-color: var(--orange);
-    }
-    .footer-button.about:hover {
-        background-color: #cc6600;
-    }
-    /* Note: The old simple taxi-card styles were removed as the ENHANCED style takes over */
-</style>
-
-    
+    .fa-facebook { background: #3b5998; }
+    .fa-twitter { background: #55acee; }
+    .fa-envelope { background: #dd4b39; }
+    .fa-linkedin { background: #007bb5; }
+    .fa-youtube { background: #bb0000; }
+    .fa-instagram { background: #e4405f; }
+  </style>
 </head>
 <body>
   <header>
     <div class="header-content">
-      <div class="logo">
-        <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
+      <div class="logo-and-subtitle">
+          <div class="logo">
+            <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
+          </div>
+          <h2 class="header-subtitle">e-Shop Luangwa</h2>
       </div>
-      <h2 class="header-subtitle">e-Shop Luangwa</h2>
     </div>
     <div class="header-controls" id="header-controls">
       <div class="cart-icon" id="cart-icon" title="View cart">
         🛒
         <span class="cart-count" id="cart-count">0</span>
-        <div class="cart-dropdown" id="cart-dropdown" aria-hidden="true">
-          <h3>Your Cart</h3>
-          <ul class="cart-items" id="cart-items"></ul>
-          <div class="cart-actions">
-            <div class="cart-total" id="cart-total">Total: ZMK 0</div>
-            <button class="cart-clear" id="cart-clear">Clear</button>
-          </div>
-          <div class="cart-share">
-            <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
-              💬 WhatsApp
-            </button>
-            <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
-              📱 SMS
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </header>
@@ -764,14 +654,14 @@
       <input type="text" id="search-input" placeholder="Search for products..." />
     </div>
   </div>
-
-  <div class="taxi-promo">
+  
+  <div class="taxi-promo" id="taxi-promo-card">
     <a href="https://zamlisting.com/customerride" target="_blank">
       <div class="taxi-content">
         <h3>Book a Taxi with ZamListing  🏍️🚗</h3>
         <p>Your ride is just a tap away! Book a taxi in **Luangwa, Zambia** for a safe and convenient trip.</p>
         <div class="controls">
-            <span class="btn-taxi">Click Here To Book</span>
+            <span class="btn-taxi">Click Here to Book</span>
         </div>
       </div>
       <div class="taxi-image">
@@ -781,8 +671,7 @@
   </div>
   
   <main>
-    <div class="products" id="product-list">
-
+<div class="products" id="product-list">
 <article class="product-card" 
   data-id="p_trekstor116" 
   data-name="Trekstor - 11.6-inch 2-in-1 Laptop" 
@@ -806,6 +695,60 @@
   <div class="product-details">
     <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
     <div class="price">ZMW 1,200 (Negotiable)</div>
+    <div class="location">Luangwa, Zambia</div>
+    <div class="listing-time"></div>
+    <div class="tappable-content">
+      <div class="controls">
+        <button class="btn btn-primary" onclick="addToCartBtn(this)">Add to Cart</button>
+        <button class="btn btn-accent" onclick="toggleBid(this)">Make an Offer</button>
+      </div>
+      <div class="bid-section">
+        <input type="number" placeholder="Your bid (ZMW)" min="0" />
+        <a class="bid-btn-social bid-btn-whatsapp" href="#" onclick="submitBid(this, 'whatsapp'); return false;">💬 WhatsApp</a>
+        <a class="bid-btn-social bid-btn-sms" href="#" onclick="submitBid(this, 'sms'); return false;">📱 SMS</a>
+      </div>
+      <div class="details-section">
+        <h5>Product Description:</h5>
+        <p class="product-description"></p>
+      </div>
+    </div>
+  </div>
+</article>
+  
+<article class="product-card" 
+  data-id="p_hisenseTv" 
+  data-name="Hisense 55inch smartTV" 
+  data-price="2300" 
+  data-category="electronics" 
+  data-phonenumber="0978167546"
+  data-details=" UHD Smart TV
+55A6KTUK
+Screen diagonal size (inch) : 55 in
+Screen diagonal size (cm) : 139 cm
+Type : UHD Smart TV
+Resolution max. : 4K Ultra HD 3840x2160
+DTS Virtual X
+User interface : VIDAA Smart OS
+Series : A6K . Note the TV doesn't function it needs screen replacement and the starting price ZMK2300"
+  data-listed-date="2025-09-17T08:30:00Z">
+  <div class="slider">
+    <div class="slides">
+      <img src="Hi1.png" alt=" Image 1">
+      <img src="Hi2.png" alt=" Image 2">
+      <img src="Hi3.png" alt="Image 3">
+      <img src="Hi4.png" alt=" Image 4">
+      <img src="Hi5.png" alt="Image 5">
+      <img src="Hi6.png" alt="Image 6">
+      <img src="Hi7.png" alt="Image 6">
+      <img src="Hi8.png" alt="Image 6">
+      <img src="Hi9.png" alt="Image 6">
+    </div>
+    <button class="prev" aria-label="prev">&#10094;</button>
+    <button class="next" aria-label="next">&#10095;</button>
+  </div>
+  <div class="product-details">
+    <h4>Hisense 55" smart TV</h4>
+    <div class="price">ZMW 2,300 (Negotiable)</div>
     <div class="location">Luangwa, Zambia</div>
     <div class="listing-time"></div>
     <div class="tappable-content">
@@ -1634,7 +1577,6 @@ On one side of the device, you will find a micro USB charging port while on the 
     </div>
   </div>
   </article>
-
     </div>
   </main>
 
@@ -1674,20 +1616,41 @@ On one side of the device, you will find a micro USB charging port while on the 
     </div>
   </div>
 
+  <div id="cartModal" class="modal">
+      <div class="modal-content">
+          <span class="modal-close">&times;</span>
+          <h3>Your Cart</h3>
+          <div class="modal-body">
+              <ul class="cart-items" id="cart-items"></ul>
+              <div class="cart-actions">
+                  <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+                  <button class="cart-clear" id="cart-clear">Clear</button>
+              </div>
+              <div class="cart-share">
+                  <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+                      💬 WhatsApp
+                  </button>
+                  <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+                      📱 SMS
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+
   <footer class="footer">
-    <p>&copy; 2024 ZamListing</p>
     <div class="footer-links">
-        <a href="https://wa.me/260978167546?text=Hello%20ZamListing%2C%20I%20have%20a%20question." target="_blank" class="footer-button whatsapp" aria-label="Contact via WhatsApp">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2.1c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95l-1.12 4.12 4.21-1.1c1.45.79 3.08 1.25 4.9 1.25 5.46 0 9.91-4.45 9.91-9.91-.01-5.46-4.46-9.91-9.91-9.91zm0 18c-1.63 0-3.19-.48-4.52-1.3l-.32-.19-3.32.88.9-3.23-.21-.33c-.88-1.44-1.36-3.12-1.36-4.88 0-4.54 3.7-8.24 8.24-8.24 2.22 0 4.31.87 5.89 2.45 1.58 1.58 2.45 3.67 2.45 5.89.01 4.54-3.7 8.24-8.24 8.24zm3.99-6.99c-.19-.09-1.15-.57-1.32-.63-.16-.07-.3-.09-.43.08-.14.17-.54.63-.66.76-.13.12-.25.14-.44.05-.18-.09-.76-.28-1.46-.91-.54-.48-.91-1.07-1.01-1.25-.09-.17 0-.16.12-.28.1-.11.23-.27.34-.41.11-.14.15-.24.22-.38.07-.15.03-.27-.03-.38-.06-.11-.43-1.03-.59-1.41-.15-.38-.3-.32-.4-.33-.09-.01-.2-.01-.43-.01- .23 0-.6.08-.91.43-.3.35-1.15 1.12-1.15 2.73 0 1.61 1.18 3.16 1.34 3.38.16.22 2.33 3.76 5.61 5.17 3.28 1.4 3.96 1.21 4.68 1.13.72-.08 2.22-.91 2.53-1.78.3-.87.3-1.61.22-1.78-.09-.17-.34-.27-.7-.44z"/></svg>
-        </a>
-        
-        <a href="https://zamlisting.com/about.html" target="_blank" class="footer-button about" aria-label="Learn about ZamListing">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.43 12.33 13 13 13 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-.75-.6-1.35-1.35-1.35s-1.35.6-1.35 1.35H8v-.5c0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.1-.45 2.1-1.17 2.83z"/></svg>
-        </a>
-        
-        <a href="https://www.facebook.com/zamlisting" target="_blank" class="footer-button facebook" aria-label="Visit us on Facebook">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.324 2h-1.676v6h-3v-6h-2v-2h2v-1.723c0-2.007 1.155-3.277 3.33-3.277h2.67v3z"/></svg>
-        </a>
+        <a href="index.html" class="footer-link">Home</a>
+        <a href="about.html" class="footer-link">About</a>
+    </div>
+    <hr />
+    <div>
+        <a href="https://www.facebook.com/zamlisting" target="_blank" class="fa fa-facebook" title="Facebook"></a>
+        <a href="https://twitter.com/zamlisting" target="_blank" class="fa fa-twitter" title="Twitter"></a>
+        <a href="mailto:info@zamlisting.com" class="fa fa-envelope" title="Email"></a>
+        <a href="https://www.linkedin.com/company/zamlisting" target="_blank" class="fa fa-linkedin" title="LinkedIn"></a>
+        <a href="https://www.youtube.com/@zamlisting" target="_blank" class="fa fa-youtube" title="YouTube"></a>
+        <a href="https://www.instagram.com/zamlisting" target="_blank" class="fa fa-instagram" title="Instagram"></a>
     </div>
   </footer>
 
@@ -1827,37 +1790,12 @@ On one side of the device, you will find a micro USB charging port while on the 
       const price = safeNumber(card.dataset.price || '');
 
       addToCart(id, name, price, 1);
-      openCartDropdown();
+      openModal('cartModal');
     }
     document.getElementById('cart-clear').addEventListener('click', () => {
       clearCart();
     });
-    const cartIcon = document.getElementById('cart-icon');
-    const cartDropdown = document.getElementById('cart-dropdown');
-    function openCartDropdown() {
-      cartDropdown.classList.add('open');
-      cartDropdown.setAttribute('aria-hidden', 'false');
-    }
-    function closeCartDropdown() {
-      cartDropdown.classList.remove('open');
-      cartDropdown.setAttribute('aria-hidden', 'true');
-    }
-    function toggleCart() {
-      cartDropdown.classList.toggle('open');
-      const open = cartDropdown.classList.contains('open');
-      cartDropdown.setAttribute('aria-hidden', open ? 'false' : 'true');
-    }
-    cartIcon.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleCart();
-    });
-    document.addEventListener('click', (ev) => {
-      const target = ev.target;
-      const headerControls = document.getElementById('header-controls');
-      if (!headerControls.contains(target)) {
-        closeCartDropdown();
-      }
-    });
+    
     function toggleBid(button) {
       const details = button.closest('.tappable-content');
       const bid = details.querySelector('.bid-section');
@@ -2065,15 +2003,42 @@ On one side of the device, you will find a micro USB charging port while on the 
     });
 
     /**********************
-     * Modal Logic
+     * Modals Logic
      **********************/
-    const modal = document.getElementById('productModal');
-    const modalClose = document.querySelector('.modal-close');
+    const productModal = document.getElementById('productModal');
+    const cartModal = document.getElementById('cartModal');
     let currentCard = null;
 
-    function showModal(card) {
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Bindings for closing modals
+    document.querySelectorAll('.modal .modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeModal(btn.closest('.modal').id);
+        });
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target.id);
+        }
+    });
+
+    // Open cart modal
+    document.getElementById('cart-icon').addEventListener('click', () => {
+        openModal('cartModal');
+    });
+
+    // Product Modal Details
+    function showProductModal(card) {
       currentCard = card;
-      const id = card.dataset.id || card.dataset.name;
       const name = card.dataset.name || card.querySelector('h4').textContent;
       const price = card.dataset.price || 'N/A';
       const location = card.querySelector('.location')?.textContent || '';
@@ -2086,7 +2051,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       document.getElementById('modalProductDescription').textContent = description;
       
       const offerButton = document.getElementById('modalMakeOffer');
-      const bidSection = document.querySelector('.modal-bid-section');
+      const bidSection = document.querySelector('#productModal .modal-bid-section');
       
       if (hasOffer) {
           offerButton.style.display = 'inline-block';
@@ -2096,7 +2061,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       
       bidSection.style.display = 'none';
 
-      const modalSlidesContainer = modal.querySelector('.modal-slides');
+      const modalSlidesContainer = productModal.querySelector('.modal-slides');
       modalSlidesContainer.innerHTML = '';
       const originalImages = card.querySelectorAll('.slider img');
       originalImages.forEach(img => {
@@ -2106,36 +2071,21 @@ On one side of the device, you will find a micro USB charging port while on the 
       
       initModalSlider();
       initModalZoom();
-
-      modal.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function hideModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-        currentCard = null;
+      openModal('productModal');
     }
     
-    modalClose.addEventListener('click', hideModal);
-    window.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        hideModal();
-      }
-    });
-
     document.getElementById('modalAddToCart').addEventListener('click', () => {
       if (currentCard) {
         const id = currentCard.dataset.id || currentCard.dataset.name;
         const name = currentCard.dataset.name || currentCard.querySelector('h4').textContent;
         const price = safeNumber(currentCard.dataset.price || '');
         addToCart(id, name, price);
-        hideModal();
+        closeModal('productModal');
       }
     });
     
     document.getElementById('modalMakeOffer').addEventListener('click', () => {
-        const bidSection = document.querySelector('.modal-bid-section');
+        const bidSection = document.querySelector('#productModal .modal-bid-section');
         bidSection.style.display = 'flex';
     });
 
@@ -2167,7 +2117,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     }
     
     function initModalSlider() {
-      const slider = modal.querySelector('.modal-slider');
+      const slider = productModal.querySelector('.modal-slider');
       const slides = slider.querySelector('.modal-slides');
       const imgs = slides.querySelectorAll('img');
       let idx = 0;
@@ -2190,7 +2140,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     }
 
     function initModalZoom() {
-        modal.querySelectorAll('.modal-slides img').forEach(img => {
+        productModal.querySelectorAll('.modal-slides img').forEach(img => {
             img.addEventListener('dblclick', (e) => {
                 e.stopPropagation();
                 img.classList.toggle('zoomed');
@@ -2207,29 +2157,17 @@ On one side of the device, you will find a micro USB charging port while on the 
             });
         });
     }
+    
+    // New logic to handle tapping anywhere on the card to open modal
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const isButton = e.target.closest('button, a, input');
+            if (!isButton) {
+                showProductModal(card);
+            }
+        });
+    });
 
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
