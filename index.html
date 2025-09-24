@@ -370,91 +370,132 @@
         background: var(--dark-green);
     }
 
-    /* --- taxi booking section --- */
+    /* --- taxi booking section (Animated and Elegant) --- */
+    @keyframes float {
+        0% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        50% { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        100% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    }
+    
     .taxi-promo {
-      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      /* Elegant background with subtle gradient */
+      background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
       color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
       margin: 25px auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 25px;
+      padding: 25px 35px;
       max-width: 1000px;
-      transition: transform 0.3s ease;
+      
+      /* Enable 3D transform */
+      transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
     }
+
     .taxi-promo:hover {
-        transform: translateY(-5px);
+        /* Subtle 3D tilt on hover */
+        transform: rotateY(2deg) rotateX(1deg) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
+    
     .taxi-promo a {
         display: flex;
         align-items: center;
-        gap: 25px;
+        gap: 30px;
         text-decoration: none;
         color: inherit;
         width: 100%;
     }
+    
     .taxi-promo .taxi-content {
       flex: 1;
     }
+    
     .taxi-promo .taxi-content h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #FFD700;
+      margin: 0 0 10px 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--yellow-taxi); /* Gold accent */
+      letter-spacing: 0.5px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     }
+    
     .taxi-promo .taxi-content p {
-      margin: 0 0 15px 0;
+      margin: 0 0 20px 0;
       font-size: 1.1rem;
-      line-height: 1.5;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
     }
+    
     .taxi-promo .taxi-image {
         flex-shrink: 0;
-        width: 150px;
-        height: 150px;
+        width: 160px;
+        height: 160px;
         border-radius: 50%;
         overflow: hidden;
-        border: 4px solid rgba(255,255,255,0.3);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border: 5px solid var(--yellow-taxi); /* Gold border */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        
+        /* Apply floating animation */
+        animation: float 4s ease-in-out infinite;
     }
+    
     .taxi-promo .taxi-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.3s ease;
     }
+
+    .taxi-promo:hover .taxi-image img {
+        transform: scale(1.05); /* Slight zoom on image */
+    }
+
     .btn-taxi {
         display: inline-block;
-        background: #FFD700;
+        background: var(--yellow-taxi);
         color: #1a1a1a;
-        padding: 10px 25px;
+        padding: 12px 30px;
         border-radius: 30px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.3s ease, transform 0.2s ease;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
         text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 215, 0, 0.4);
     }
+    
     .btn-taxi:hover {
         background: #ffc400;
-        transform: translateY(-2px);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 215, 0, 0.6);
     }
-    @media (max-width:768px){
-        .taxi-promo a, .shop-promo a {
-            flex-direction: column;
-            text-align: center;
-        }
-        .taxi-promo .taxi-image, .shop-promo .shop-image {
-            margin-bottom: 15px;
-        }
+
+    .btn-taxi:active {
+        /* Press effect */
+        transform: translateY(0px);
+        box-shadow: 0 2px 5px rgba(0, 215, 0, 0.4);
     }
+    
     @media (max-width:768px){
+        .taxi-promo {
+             padding: 20px 25px;
+        }
         .taxi-promo a {
             flex-direction: column;
             text-align: center;
+            gap: 20px;
         }
         .taxi-promo .taxi-image {
-            margin-bottom: 15px;
+            margin-bottom: 0;
+            width: 120px;
+            height: 120px;
+        }
+        .btn-taxi {
+            width: 100%;
+            text-align: center;
+            padding: 10px 25px;
         }
     }
 
@@ -1749,7 +1790,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       const price = safeNumber(card.dataset.price || '');
 
       addToCart(id, name, price, 1);
-      openCartModal();
+      openModal('cartModal');
     }
     document.getElementById('cart-clear').addEventListener('click', () => {
       clearCart();
