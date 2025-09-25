@@ -260,7 +260,6 @@
         overflow-y: auto;
         padding-top: 20px;
     }
-    /* (All other modal CSS remains the same for #productModal) */
     
     @media (max-width: 400px) {
         .cart-dropdown {
@@ -466,23 +465,73 @@
       flex-direction:column;
       cursor: pointer;
     }
-    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
-    .slides { display:flex; transition:transform .45s ease; height:100%; }
-    .slides img { 
+    
+    /* --- SLIDER/ZOOM CSS (Enhanced for Zoom and Pan) --- */
+    .slider, .modal-slider-container { 
+        position:relative; 
+        height:180px; 
+        overflow:hidden; 
+        background:#ddd; 
+    }
+    
+    .modal-slider-container {
+        flex: 1 1 50%;
+        min-width: 300px;
+        height: 450px; /* Larger size for modal */
+    }
+    .modal-slider {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* Hide modal overflow initially */
+    }
+    
+    .slides, .modal-slides { 
+        display:flex; 
+        transition:transform .45s ease; 
+        height:100%; 
+        width: 100%;
+    }
+    
+    .slides img, .modal-slides img { 
       width:100%; 
-      height:180px; 
+      height:100%; /* Changed from 180px to 100% for flexbox compatibility */
       object-fit:contain;
       flex-shrink:0; 
       transition: transform 0.3s ease-in-out;
       cursor: zoom-in;
-    }
-    .slides img.zoomed {
-      transform: scale(2);
-      cursor: zoom-out;
+      transform-origin: 50% 50%; /* Default origin */
     }
     
-    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
-    .slider .prev{ left:8px } .slider .next{ right:8px }
+    /* Active Zoomed State */
+    .slides img.zoomed, .modal-slides img.zoomed {
+      transform: scale(2); /* Zoom amount */
+      cursor: grab;
+      position: relative; /* Allows pan within the slider container */
+      object-fit: cover; /* Change to cover for zoom to look better */
+    }
+    
+    .slider button, .modal-slider button { 
+        position:absolute; 
+        top:50%; 
+        transform:translateY(-50%); 
+        background: rgba(0,0,0,.45); 
+        color:#fff; 
+        border:0; 
+        padding:6px 8px; 
+        border-radius:50%; 
+        cursor:pointer; 
+        z-index: 10; /* Ensure buttons are above images */
+    }
+    .slider .prev, .modal-slider .prev { left:8px } 
+    .slider .next, .modal-slider .next { right:8px }
+    
+    /* Hide slider buttons when zoomed (optional, but good UX) */
+    .slider:has(.zoomed) button,
+    .modal-slider:has(.zoomed) button {
+      display: none;
+    }
+    /* END SLIDER/ZOOM CSS */
     
     .product-details {
       padding: 12px;
@@ -510,8 +559,8 @@
     .btn-primary { background:#28a745; color:#fff; }
     .btn-accent { background:#ff9800; color:#fff; }
     .btn-secondary { background:var(--light-blue); color:#fff; }
-    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
-    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-section, .modal-bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input, .modal-bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
     .bid-section .phone-input { width: calc(100% - 150px); }
     .success { color:green; font-size:13px; display:none; margin-top:8px; }
     .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; text-decoration: none; color: #fff; }
@@ -574,6 +623,34 @@
     .fa-linkedin { background: #007bb5; }
     .fa-youtube { background: #bb0000; }
     .fa-instagram { background: #e4405f; }
+
+    /* Modal specific styles */
+    .modal-body {
+        /* Re-organize layout for modal */
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    }
+    .modal-details {
+        flex: 1 1 350px; /* Take remaining space, minimum width 350px */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .modal-controls {
+        display: flex;
+        gap: 10px;
+    }
+    @media (max-width: 768px) {
+      .modal-body {
+        flex-direction: column;
+      }
+      .modal-slider-container {
+        height: 300px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1792,7 +1869,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       });
 
       message += `\nTotal: ZMW ${FMT(cartTotalAmount())}\n`;
-      message += `\nThank you!`;
+      message += `\nThank Fyou!`;
       
       return message;
     }
@@ -1862,28 +1939,162 @@ On one side of the device, you will find a micro USB charging port while on the 
       }
     }
     
-    document.querySelectorAll('.product-card').forEach(card => {
-      const slider = card.querySelector('.slider');
-      if (slider) {
-          const slides = slider.querySelector('.slides');
-          const imgs = slides.querySelectorAll('img');
-          let idx = 0;
-          const nextBtn = slider.querySelector('.next');
-          const prevBtn = slider.querySelector('.prev');
-          
-          if (imgs.length <= 1) {
-              if (nextBtn) nextBtn.style.display = 'none';
-              if (prevBtn) prevBtn.style.display = 'none';
-          } else {
-              const move = (i) => {
-                  idx = ((i % imgs.length) + imgs.length) % imgs.length;
-                  slides.style.transform = `translateX(-${idx * 100}%)`;
-              };
-              if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
-              if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
-          }
-      }
-    });
+    /**********************
+     * Image Slider/Slide Logic (Consolidated and Enhanced)
+     **********************/
+    // This function initializes the slide logic for a given slider element
+    function initSlider(sliderEl) {
+        const slides = sliderEl.querySelector('.slides') || sliderEl.querySelector('.modal-slides');
+        const imgs = slides.querySelectorAll('img');
+        let idx = 0;
+        const nextBtn = sliderEl.querySelector('.next');
+        const prevBtn = sliderEl.querySelector('.prev');
+        
+        // Hide buttons if only one image exists
+        if (imgs.length <= 1) {
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (prevBtn) prevBtn.style.display = 'none';
+            return;
+        }
+
+        if (nextBtn) nextBtn.style.display = 'block';
+        if (prevBtn) prevBtn.style.display = 'block';
+
+        const move = (i) => {
+            idx = ((i % imgs.length) + imgs.length) % imgs.length;
+            slides.style.transform = `translateX(-${idx * 100}%)`;
+            // Reset zoom when sliding
+            imgs.forEach(img => {
+                img.classList.remove('zoomed');
+                img.style.transform = '';
+            });
+        };
+        
+        if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
+        if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
+        
+        // Initial move to set the first slide correctly
+        move(0);
+    }
+    
+    // Initialize sliders in all product cards
+    document.querySelectorAll('.product-card .slider').forEach(initSlider);
+
+    /**********************
+     * Image Zoom Logic (Consolidated and Enhanced with Pan)
+     **********************/
+    function initZoom(img) {
+        let isZoomed = false;
+        let isPanning = false;
+        let startX, startY, currentX = 0, currentY = 0;
+
+        // Function to update the image transform based on pan position
+        const updateTransform = () => {
+            img.style.transform = `scale(2) translate(${currentX}px, ${currentY}px)`;
+        };
+
+        // Zoom toggle function
+        const toggleZoom = (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            isZoomed = !isZoomed;
+            img.classList.toggle('zoomed', isZoomed);
+            
+            if (isZoomed) {
+                // Calculate position relative to click/tap
+                const rect = img.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches ? e.touches[0].clientX : rect.width / 2 + rect.left);
+                const clientY = e.clientY || (e.touches ? e.touches[0].clientY : rect.height / 2 + rect.top);
+
+                // Calculate where the origin should be (relative to the image container)
+                const originX = (clientX - rect.left) / rect.width * 100;
+                const originY = (clientY - rect.top) / rect.height * 100;
+
+                // Set origin to zoom into the clicked area
+                img.style.transformOrigin = `${originX}% ${originY}%`;
+                img.style.transform = 'scale(2)';
+
+                // Reset pan position
+                currentX = 0;
+                currentY = 0;
+            } else {
+                img.style.transform = '';
+                img.style.transformOrigin = '50% 50%';
+            }
+        };
+
+        // Pan start (mouse down or touch start)
+        const panStart = (e) => {
+            if (!isZoomed) return;
+            e.preventDefault();
+            isPanning = true;
+            img.style.cursor = 'grabbing';
+            startX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            startY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        };
+
+        // Pan move (mouse move or touch move)
+        const panMove = (e) => {
+            if (!isPanning || !isZoomed) return;
+            e.preventDefault();
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            // Update translation (move in opposite direction of mouse drag)
+            currentX += dx / 2;
+            currentY += dy / 2;
+
+            // Clamp pan values (optional, but prevents image from being dragged completely out)
+            const maxPanX = img.offsetWidth / 2;
+            const maxPanY = img.offsetHeight / 2;
+            currentX = Math.max(Math.min(currentX, maxPanX), -maxPanX);
+            currentY = Math.max(Math.min(currentY, maxPanY), -maxPanY);
+
+            updateTransform();
+
+            // Reset start coordinates for the next move
+            startX = clientX;
+            startY = clientY;
+        };
+
+        // Pan end (mouse up or touch end)
+        const panEnd = () => {
+            if (!isPanning) return;
+            isPanning = false;
+            img.style.cursor = 'grab';
+        };
+
+        // Double click for zoom toggle on desktop
+        img.addEventListener('dblclick', toggleZoom);
+
+        // Double tap for zoom toggle on mobile
+        let lastTap = 0;
+        img.addEventListener('touchend', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                toggleZoom(e); 
+            }
+            lastTap = currentTime;
+        });
+
+        // Mouse events for pan
+        img.addEventListener('mousedown', panStart);
+        document.addEventListener('mousemove', panMove);
+        document.addEventListener('mouseup', panEnd);
+
+        // Touch events for pan
+        img.addEventListener('touchstart', panStart);
+        document.addEventListener('touchmove', panMove);
+        document.addEventListener('touchend', panEnd);
+    }
+    
+    // Initialize zoom/pan for all images in the product cards
+    document.querySelectorAll('.product-card .slider img').forEach(initZoom);
 
     renderCart();
     
@@ -2001,37 +2212,18 @@ On one side of the device, you will find a micro USB charging port while on the 
         
         // Add click listener for showing/hiding details
         card.addEventListener('click', (e) => {
-            // Do not toggle if a button or an image is clicked
-            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.tagName.toLowerCase() === 'input') {
+            // Check if a button, link, input, or an image *with a zoomed class* was clicked
+            const isControl = e.target.closest('button, a, input');
+            const isZoomedImage = e.target.tagName.toLowerCase() === 'img' && e.target.classList.contains('zoomed');
+            
+            if (isControl || isZoomedImage) {
+                // If it's an image that's currently zoomed, we assume they are trying to pan, so don't open modal
                 return;
             }
-            // Use the modal logic for better detail view (as originally intended)
-            // card.classList.toggle('tapped');
+            
+            // If they clicked on a non-zoomed image or other part of the card (excluding controls), open modal
             showProductModal(card);
         });
-    });
-
-    /**********************
-     * Image Zoom Logic (Same as original)
-     **********************/
-    document.querySelectorAll('.product-card .slider img').forEach(img => {
-      // Double click for desktop
-      img.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        img.classList.toggle('zoomed');
-      });
-
-      // Double tap for mobile
-      let lastTap = 0;
-      img.addEventListener('touchend', (e) => {
-          const currentTime = new Date().getTime();
-          const tapLength = currentTime - lastTap;
-          if (tapLength < 300 && tapLength > 0) {
-              e.preventDefault(); 
-              img.classList.toggle('zoomed'); 
-          }
-          lastTap = currentTime;
-      });
     });
 
     /**********************
@@ -2048,6 +2240,12 @@ On one side of the device, you will find a micro USB charging port while on the 
     function closeModal(modalId) {
         document.getElementById(modalId).classList.remove('show');
         document.body.style.overflow = '';
+        // Clean up zoom on modal close
+        productModal.querySelectorAll('.modal-slides img').forEach(img => {
+            img.classList.remove('zoomed');
+            img.style.transform = '';
+            img.style.transformOrigin = '50% 50%';
+        });
     }
 
     // Bindings for closing modals
@@ -2086,17 +2284,25 @@ On one side of the device, you will find a micro USB charging port while on the 
       }
       
       bidSection.style.display = 'none';
-
+      
+      // Setup modal slides
+      const modalSliderEl = productModal.querySelector('.modal-slider');
       const modalSlidesContainer = productModal.querySelector('.modal-slides');
       modalSlidesContainer.innerHTML = '';
       const originalImages = card.querySelectorAll('.slider img');
       originalImages.forEach(img => {
           const newImg = img.cloneNode();
+          // Reset any lingering styles from the main card
+          newImg.classList.remove('zoomed');
+          newImg.style.transform = '';
+          newImg.style.transformOrigin = '50% 50%';
           modalSlidesContainer.appendChild(newImg);
       });
       
-      initModalSlider();
-      initModalZoom();
+      // Initialize slider and zoom functionality for the modal
+      initSlider(modalSliderEl);
+      productModal.querySelectorAll('.modal-slides img').forEach(initZoom);
+      
       openModal('productModal');
     }
     
@@ -2141,58 +2347,6 @@ On one side of the device, you will find a micro USB charging port while on the 
         window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
       }
     }
-    
-    function initModalSlider() {
-      const slider = productModal.querySelector('.modal-slider');
-      const slides = slider.querySelector('.modal-slides');
-      const imgs = slides.querySelectorAll('img');
-      let idx = 0;
-      const nextBtn = slider.querySelector('.next');
-      const prevBtn = slider.querySelector('.prev');
-      
-      if (imgs.length <= 1) {
-          nextBtn.style.display = 'none';
-          prevBtn.style.display = 'none';
-      } else {
-          nextBtn.style.display = 'block';
-          prevBtn.style.display = 'block';
-          const move = (i) => {
-              idx = ((i % imgs.length) + imgs.length) % imgs.length;
-              slides.style.transform = `translateX(-${idx * 100}%)`;
-          };
-          nextBtn.onclick = (e) => { e.stopPropagation(); move(idx + 1); };
-          prevBtn.onclick = (e) => { e.stopPropagation(); move(idx - 1); };
-      }
-    }
-
-    function initModalZoom() {
-        productModal.querySelectorAll('.modal-slides img').forEach(img => {
-            img.addEventListener('dblclick', (e) => {
-                e.stopPropagation();
-                img.classList.toggle('zoomed');
-            });
-            let lastTap = 0;
-            img.addEventListener('touchend', (e) => {
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTap;
-                if (tapLength < 300 && tapLength > 0) {
-                    e.preventDefault(); 
-                    img.classList.toggle('zoomed'); 
-                }
-                lastTap = currentTime;
-            });
-        });
-    }
-    
-    // New logic to handle tapping anywhere on the card to open modal
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            const isButton = e.target.closest('button, a, input');
-            if (!isButton) {
-                showProductModal(card);
-            }
-        });
-    });
 
   </script>
 </body>
