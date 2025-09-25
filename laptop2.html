@@ -135,6 +135,7 @@
         margin: 0; 
         list-style: none;
     }
+    /* EDITED: Styles for the new summarized list item structure */
     .cart-items li {
         display:flex;
         justify-content: space-between;
@@ -147,22 +148,42 @@
     .cart-items li:last-child {
         border-bottom: none;
     }
-    .cart-items .left { 
+    .cart-items .item-details { 
         display:flex; 
-        flex-direction: column;
-        gap: 2px; 
+        align-items: center;
+        gap: 8px;
+        max-width: 70%;
     }
-    .cart-items .name { 
+    .cart-items .item-name { 
         font-weight:600; 
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 150px;
     }
-    .cart-items .meta { 
-        font-size: 12px; 
-        color:#777; 
+    .cart-items .item-qty { 
+        font-size: 14px; 
+        color: #555;
+        font-weight: normal;
     }
+    .cart-items .item-price { 
+        font-weight:700; 
+        color: var(--green);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .cart-items .remove-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+        border: 0;
+        border-radius: 4px;
+        background: #ff4d4f;
+        color: #fff;
+        cursor: pointer;
+    }
+    /* END EDITED STYLES */
+
     .cart-actions { 
         display:flex; 
         justify-content:space-between; 
@@ -1699,7 +1720,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     /**********************
      * Cart data & helpers
      **********************/
-    let cart = [];
+    let cart = []; // Array of { id, name, price, qty, imageSrc }
     const findCartItem = (id) => cart.find(i => i.id === id);
     function addToCart(productId, productName, productPrice, qty = 1) {
       const existing = findCartItem(productId);
@@ -1718,7 +1739,17 @@ On one side of the device, you will find a micro USB charging port while on the 
       document.getElementById('cart-dropdown').classList.add('show');
     }
     function removeFromCart(productId) {
-      cart = cart.filter(i => i.id !== productId);
+      // Find the item to remove
+      const itemIndex = cart.findIndex(i => i.id === productId);
+      
+      if (itemIndex > -1) {
+          // Decrement quantity if > 1, otherwise remove the whole item
+          if (cart[itemIndex].qty > 1) {
+              cart[itemIndex].qty -= 1;
+          } else {
+              cart.splice(itemIndex, 1);
+          }
+      }
       renderCart();
     }
     function clearCart() {
@@ -1761,13 +1792,16 @@ On one side of the device, you will find a micro USB charging port while on the 
     /**********************
      * DOM render functions
      **********************/
+    // EDITED: Simplified renderCart to always use the summarized/grouped view
     function renderCart() {
       const listEl = document.getElementById('cart-items');
       const totalEl = document.getElementById('cart-total');
       const countEl = document.getElementById('cart-count');
       listEl.innerHTML = '';
       
-      if (cart.length === 0) {
+      const totalQty = cartTotalQty();
+
+      if (cart.length === 0 || totalQty === 0) {
         const li = document.createElement('li');
         li.textContent = 'No items in cart';
         li.style.padding = '8px 0';
@@ -1780,13 +1814,14 @@ On one side of the device, you will find a micro USB charging port while on the 
         cartDropdown.querySelector('h3').textContent = 'Your Cart (Empty)';
 
       } else {
+        // Render the summarized list (grouped by product ID)
         cart.forEach(item => {
           const li = document.createElement('li');
           
-          const left = document.createElement('div');
-          left.className = 'left';
+          const details = document.createElement('div');
+          details.className = 'item-details';
 
-          // Small thumbnail image (optional but nice for comprehensive list)
+          // Small thumbnail image (optional but nice)
           if (item.imageSrc) {
               const img = document.createElement('img');
               img.src = item.imageSrc;
@@ -1795,59 +1830,52 @@ On one side of the device, you will find a micro USB charging port while on the 
               img.style.height = '30px';
               img.style.objectFit = 'cover';
               img.style.borderRadius = '4px';
-              left.appendChild(img);
+              details.appendChild(img);
           }
 
-          const details = document.createElement('div');
-          const name = document.createElement('div');
-          name.className = 'name';
-          name.textContent = item.name;
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = `${item.qty} x ZMW ${FMT(item.price)}`;
-          details.appendChild(name);
-          details.appendChild(meta);
-          left.appendChild(details);
+          const nameAndQty = document.createElement('div');
+          nameAndQty.className = 'item-name';
+          nameAndQty.innerHTML = `${item.name} <span class="item-qty">x ${item.qty}</span>`;
+          details.appendChild(nameAndQty);
 
-          const right = document.createElement('div');
-          right.style.display = 'flex';
-          right.style.flexDirection = 'column';
-          right.style.alignItems = 'flex-end';
-          right.style.gap = '6px';
+          const priceAndRemove = document.createElement('div');
+          priceAndRemove.style.display = 'flex';
+          priceAndRemove.style.flexDirection = 'column';
+          priceAndRemove.style.alignItems = 'flex-end';
+          priceAndRemove.style.gap = '6px';
           
           const lineTotal = document.createElement('div');
-          lineTotal.textContent = `ZMW ${FMT(item.price * item.qty)}`;
-          lineTotal.style.fontWeight = 'bold';
-          lineTotal.style.color = varToCss('green');
+          lineTotal.className = 'item-price';
+          // Display the total price for this item group
+          lineTotal.textContent = `ZMW ${FMT(item.price * item.qty)}`; 
           
           const rm = document.createElement('button');
-          rm.textContent = 'Remove';
-          rm.style.padding = '4px 6px';
-          rm.style.fontSize = '11px';
-          rm.style.border = '0';
-          rm.style.borderRadius = '4px';
-          rm.style.background = '#ff4d4f';
-          rm.style.color = '#fff';
-          rm.style.cursor = 'pointer';
-          rm.onclick = (e) => { e.stopPropagation(); removeFromCart(item.id); }; // Stop prop to prevent closing dropdown
-
-          right.appendChild(lineTotal);
-          right.appendChild(rm);
+          rm.className = 'remove-btn';
+          rm.textContent = 'Remove One'; // Changed button text for clarity
           
-          li.appendChild(left);
-          li.appendChild(right);
+          // Use the original item ID for removal to decrement quantity
+          rm.onclick = (e) => { 
+              e.stopPropagation(); 
+              removeFromCart(item.id); // Decrements qty or removes item if qty is 1
+          }; 
+
+          priceAndRemove.appendChild(lineTotal);
+          priceAndRemove.appendChild(rm);
+          
+          li.appendChild(details);
+          li.appendChild(priceAndRemove);
           listEl.appendChild(li);
         });
         
         // Show total and share buttons when not empty
         document.querySelector('.cart-actions').style.display = 'flex';
         document.querySelector('.cart-share').style.display = 'flex';
-        cartDropdown.querySelector('h3').textContent = `Your Cart (${cart.length} Items)`;
+        cartDropdown.querySelector('h3').textContent = `Your Cart (${totalQty} Item${totalQty !== 1 ? 's' : ''})`;
       }
       
       const total = cartTotalAmount();
       totalEl.textContent = `Total: ZMW ${FMT(total)}`;
-      countEl.textContent = String(cartTotalQty());
+      countEl.textContent = String(totalQty);
     }
 
     // Helper to get CSS variable for JS (used in renderCart)
@@ -1860,16 +1888,19 @@ On one side of the device, you will find a micro USB charging port while on the 
      **********************/
     function getCartMessage() {
       let message = "Hello ZamListing, I would like to order the following items:\n\n";
-      if (cart.length === 0) {
+      const totalQty = cartTotalQty();
+      
+      if (totalQty === 0) {
         return "I am interested in your products. Please contact me.";
       }
-      
+
+      // Group by item name for a cleaner message
       cart.forEach(item => {
-        message += `${item.name} (${item.qty} pcs) - ZMW ${FMT(item.price * item.qty)}\n`;
+        message += `${item.name} x ${item.qty} pcs - ZMW ${FMT(item.price * item.qty)}\n`;
       });
 
       message += `\nTotal: ZMW ${FMT(cartTotalAmount())}\n`;
-      message += `\nThank Fyou!`;
+      message += `\nThank You!`;
       
       return message;
     }
@@ -1891,7 +1922,8 @@ On one side of the device, you will find a micro USB charging port while on the 
     function addToCartBtn(button) {
       const card = button.closest('.product-card');
       if (!card) return;
-      const id = card.dataset.id || card.dataset.name;
+      // Note: Using card.dataset.id or card.dataset.name as ID is fine for the summary (cart) array
+      const id = card.dataset.id || card.dataset.name; 
       const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
       const price = safeNumber(card.dataset.price || '');
 
