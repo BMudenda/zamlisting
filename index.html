@@ -75,7 +75,7 @@
       display:flex;
       align-items:center;
       gap:16px;
-      position: relative; /* contains dropdown */
+      position: relative; /* Essential for dropdown positioning */
     }
 
     .cart-icon {
@@ -83,6 +83,8 @@
       position: relative;
       font-size: 20px;
       user-select: none;
+      /* Ensure the icon itself is not a big click target for closing the dropdown */
+      z-index: 32; 
     }
     .cart-count {
       position: absolute;
@@ -95,9 +97,140 @@
       border-radius: 50%;
       min-width: 20px;
       text-align: center;
+      z-index: 33;
     }
     
-    /* --- Modal CSS (for Cart and Product Detail) --- */
+    /* --- NEW CART DROPDOWN STYLES --- */
+    .cart-dropdown {
+      position: absolute;
+      top: 100%; /* Position below the header */
+      right: 0;
+      width: 320px;
+      background-color: #fff;
+      color: #222;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      padding: 15px;
+      z-index: 31; /* Above main content, below sticky header */
+      display: none; /* Initially hidden */
+      margin-top: 10px; /* Spacing from header */
+      border-radius: 8px;
+    }
+    
+    .cart-dropdown.show {
+        display: block; /* Show on click/toggle */
+    }
+    
+    .cart-dropdown h3 { 
+        margin: 0 0 15px 0; 
+        font-size: 20px;
+        text-align: center;
+        color: var(--eshop-blue);
+    }
+    
+    .cart-items { 
+        max-height: 250px; 
+        overflow-y: auto; 
+        padding: 0; 
+        margin: 0; 
+        list-style: none;
+    }
+    /* EDITED: Styles for the new summarized list item structure */
+    .cart-items li {
+        display:flex;
+        justify-content: space-between;
+        gap:8px;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        align-items:center;
+        font-size: 14px;
+    }
+    .cart-items li:last-child {
+        border-bottom: none;
+    }
+    .cart-items .item-details { 
+        display:flex; 
+        align-items: center;
+        gap: 8px;
+        max-width: 70%;
+    }
+    .cart-items .item-name { 
+        font-weight:600; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+    .cart-items .item-qty { 
+        font-size: 14px; 
+        color: #555;
+        font-weight: normal;
+    }
+    .cart-items .item-price { 
+        font-weight:700; 
+        color: var(--green);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .cart-items .remove-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+        border: 0;
+        border-radius: 4px;
+        background: #ff4d4f;
+        color: #fff;
+        cursor: pointer;
+    }
+    /* END EDITED STYLES */
+
+    .cart-actions { 
+        display:flex; 
+        justify-content:space-between; 
+        align-items:center; 
+        margin-top:15px; 
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+    }
+    .cart-total { 
+        font-weight:700; 
+        font-size: 16px; 
+        color: var(--green);
+    }
+    .cart-clear { 
+        background:#ff4d4f; 
+        color:#fff; 
+        border:none; 
+        padding:6px 10px; 
+        border-radius:6px; 
+        cursor:pointer; 
+        font-size: 12px;
+    }
+    .cart-share {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+    .btn-share {
+        flex: 1;
+        padding: 10px 10px;
+        border-radius: 6px;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+    .btn-sms { background: var(--light-blue); }
+    .btn-whatsapp { background: var(--whatsapp-green); }
+
+    /* --- Modal CSS (for Product Detail only) --- */
     .modal {
         display: none;
         position: fixed;
@@ -148,172 +281,13 @@
         overflow-y: auto;
         padding-top: 20px;
     }
-    .modal-slider-container {
-      position: relative;
-      flex: 1 1 400px;
-      min-height: 250px;
-      overflow: hidden;
-    }
-    .modal-slider {
-      position: relative;
-      height: 100%;
-      background: #ddd;
-    }
-    .modal-slides {
-        display: flex;
-        transition: transform 0.45s ease;
-        height: 100%;
-    }
-    .modal-slides img {
-        width: 100%;
-        object-fit: contain;
-        flex-shrink: 0;
-        height: auto;
-        transition: transform 0.3s ease-in-out;
-        cursor: zoom-in;
-    }
-    .modal-slides img.zoomed {
-        transform: scale(1.8);
-        cursor: zoom-out;
-        transform-origin: center center;
-    }
-    .modal-slider .prev, .modal-slider .next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,.45);
-        color: #fff;
-        border: 0;
-        padding: 6px 8px;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 2;
-    }
-    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
-    .modal-details {
-      flex: 1 1 300px;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-details h4 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .modal-price {
-      color: green;
-      font-weight: 700;
-      font-size: 20px;
-      margin-top: 8px;
-    }
-    .modal-location {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-    .modal-description {
-      margin-top: 15px;
-    }
-    .modal-description p {
-      margin: 0;
-      line-height: 1.6;
-    }
-    .modal-controls {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-    .modal-controls .btn {
-      flex: 1;
-      font-size: 16px;
-    }
-    .modal-bid-section {
-      display:none;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .modal-bid-section input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 100%;
-    }
-    .modal-bid-section .bid-btn-social {
-      width: 100%;
-      text-align: center;
-      padding: 10px;
-      font-size: 1rem;
-    }
-    @media (max-width:768px){
-      .modal-body { flex-direction: column; }
-      .modal-content { max-height: 95vh; }
-      .modal-bid-section .bid-btn-social { width: 48%; }
-    }
-    @media (max-width:520px){
-      .bid-section input { width: 100%; }
-      .bid-btn-social { width: 48%; justify-content: center; }
-      .filters-search .search-box button { padding: 8px; }
-    }
     
-    /* --- Cart Modal Specific CSS --- */
-    #cartModal .modal-content {
-      max-width: 500px;
-      padding: 30px;
+    @media (max-width: 400px) {
+        .cart-dropdown {
+            width: 95vw;
+            right: 2.5vw;
+        }
     }
-    #cartModal .modal-body {
-        flex-direction: column;
-        padding: 0;
-    }
-    #cartModal h3 { 
-        margin: 0 0 15px 0; 
-        font-size: 24px;
-        text-align: center;
-    }
-    #cartModal .cart-items { 
-        max-height: 300px; 
-        overflow-y: auto; 
-        padding: 0; 
-        margin: 0; 
-        list-style: none;
-    }
-    #cartModal .cart-items li {
-        display:flex;
-        justify-content: space-between;
-        gap:8px;
-        padding: 12px 0;
-        border-bottom: 1px solid #eee;
-        align-items:center;
-        font-size: 16px;
-    }
-    #cartModal .cart-items .left { display:flex; gap:12px; align-items:center; }
-    #cartModal .cart-items .name { font-weight:600; }
-    #cartModal .cart-items .meta { font-size: 14px; color:#555; }
-    #cartModal .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
-    #cartModal .cart-total { font-weight:700; font-size: 18px; }
-    #cartModal .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-    #cartModal .cart-share {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-    #cartModal .btn-share {
-        flex: 1;
-        padding: 12px 18px;
-        border-radius: 8px;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-weight: 600;
-    }
-    #cartModal .btn-sms { background: var(--light-blue); }
-    #cartModal .btn-whatsapp { background: var(--whatsapp-green); }
 
     /* --- filters and search --- */
     .filters-search {
@@ -324,6 +298,7 @@
       gap: 12px;
       border-bottom: 1px solid #dee2e6;
     }
+    /* (Rest of CSS remains the same) */
     .filters-search .filters {
       display: flex;
       gap: 8px;
@@ -511,23 +486,73 @@
       flex-direction:column;
       cursor: pointer;
     }
-    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
-    .slides { display:flex; transition:transform .45s ease; height:100%; }
-    .slides img { 
+    
+    /* --- SLIDER/ZOOM CSS (Enhanced for Zoom and Pan) --- */
+    .slider, .modal-slider-container { 
+        position:relative; 
+        height:180px; 
+        overflow:hidden; 
+        background:#ddd; 
+    }
+    
+    .modal-slider-container {
+        flex: 1 1 50%;
+        min-width: 300px;
+        height: 450px; /* Larger size for modal */
+    }
+    .modal-slider {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* Hide modal overflow initially */
+    }
+    
+    .slides, .modal-slides { 
+        display:flex; 
+        transition:transform .45s ease; 
+        height:100%; 
+        width: 100%;
+    }
+    
+    .slides img, .modal-slides img { 
       width:100%; 
-      height:180px; 
+      height:100%; /* Changed from 180px to 100% for flexbox compatibility */
       object-fit:contain;
       flex-shrink:0; 
       transition: transform 0.3s ease-in-out;
       cursor: zoom-in;
-    }
-    .slides img.zoomed {
-      transform: scale(2);
-      cursor: zoom-out;
+      transform-origin: 50% 50%; /* Default origin */
     }
     
-    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
-    .slider .prev{ left:8px } .slider .next{ right:8px }
+    /* Active Zoomed State */
+    .slides img.zoomed, .modal-slides img.zoomed {
+      transform: scale(2); /* Zoom amount */
+      cursor: grab;
+      position: relative; /* Allows pan within the slider container */
+      object-fit: cover; /* Change to cover for zoom to look better */
+    }
+    
+    .slider button, .modal-slider button { 
+        position:absolute; 
+        top:50%; 
+        transform:translateY(-50%); 
+        background: rgba(0,0,0,.45); 
+        color:#fff; 
+        border:0; 
+        padding:6px 8px; 
+        border-radius:50%; 
+        cursor:pointer; 
+        z-index: 10; /* Ensure buttons are above images */
+    }
+    .slider .prev, .modal-slider .prev { left:8px } 
+    .slider .next, .modal-slider .next { right:8px }
+    
+    /* Hide slider buttons when zoomed (optional, but good UX) */
+    .slider:has(.zoomed) button,
+    .modal-slider:has(.zoomed) button {
+      display: none;
+    }
+    /* END SLIDER/ZOOM CSS */
     
     .product-details {
       padding: 12px;
@@ -555,8 +580,8 @@
     .btn-primary { background:#28a745; color:#fff; }
     .btn-accent { background:#ff9800; color:#fff; }
     .btn-secondary { background:var(--light-blue); color:#fff; }
-    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
-    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-section, .modal-bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input, .modal-bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
     .bid-section .phone-input { width: calc(100% - 150px); }
     .success { color:green; font-size:13px; display:none; margin-top:8px; }
     .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; text-decoration: none; color: #fff; }
@@ -619,6 +644,34 @@
     .fa-linkedin { background: #007bb5; }
     .fa-youtube { background: #bb0000; }
     .fa-instagram { background: #e4405f; }
+
+    /* Modal specific styles */
+    .modal-body {
+        /* Re-organize layout for modal */
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    }
+    .modal-details {
+        flex: 1 1 350px; /* Take remaining space, minimum width 350px */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .modal-controls {
+        display: flex;
+        gap: 10px;
+    }
+    @media (max-width: 768px) {
+      .modal-body {
+        flex-direction: column;
+      }
+      .modal-slider-container {
+        height: 300px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -636,7 +689,25 @@
         🛒
         <span class="cart-count" id="cart-count">0</span>
       </div>
-    </div>
+
+      <div class="cart-dropdown" id="cart-dropdown">
+          <h3>Your Cart</h3>
+          <ul class="cart-items" id="cart-items">
+              </ul>
+          <div class="cart-actions">
+              <div class="cart-total" id="cart-total">Total: ZMK 0</div>
+              <button class="cart-clear" id="cart-clear">Clear</button>
+          </div>
+          <div class="cart-share">
+              <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
+                  💬 WhatsApp
+              </button>
+              <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
+                  📱 SMS
+              </button>
+          </div>
+      </div>
+      </div>
   </header>
 
   <div class="filters-search">
@@ -825,7 +896,7 @@ Series : A6K . Note the TV doesn't function it needs screen replacement and the 
       <img src="EC1.jpg" alt="KENKO Calculator Image 1">
       <img src="EC2.jpeg" alt="KENKO Calculator Image 2">
       <img src="EC3.jpeg" alt="KENKO Calculator Image 3">
-      <img src="EC4.jpg" alt="KENKO Calculator Image 3">
+      <img src="EC4.jpg" alt="KENKO Calculator Image 4">
     </div>
     <button class="prev" aria-label="prev">&#10094;</button>
     <button class="next" aria-label="next">&#10095;</button>
@@ -1617,28 +1688,6 @@ On one side of the device, you will find a micro USB charging port while on the 
     </div>
   </div>
 
-  <div id="cartModal" class="modal">
-      <div class="modal-content">
-          <span class="modal-close">&times;</span>
-          <h3>Your Cart</h3>
-          <div class="modal-body">
-              <ul class="cart-items" id="cart-items"></ul>
-              <div class="cart-actions">
-                  <div class="cart-total" id="cart-total">Total: ZMK 0</div>
-                  <button class="cart-clear" id="cart-clear">Clear</button>
-              </div>
-              <div class="cart-share">
-                  <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">
-                      💬 WhatsApp
-                  </button>
-                  <button class="btn-share btn-sms" onclick="sendCartViaSMS()">
-                      📱 SMS
-                  </button>
-              </div>
-          </div>
-      </div>
-  </div>
-
   <footer class="footer">
     <div class="footer-links">
         <a href="index.html" class="footer-link">Home</a>
@@ -1671,19 +1720,36 @@ On one side of the device, you will find a micro USB charging port while on the 
     /**********************
      * Cart data & helpers
      **********************/
-    let cart = [];
+    let cart = []; // Array of { id, name, price, qty, imageSrc }
     const findCartItem = (id) => cart.find(i => i.id === id);
     function addToCart(productId, productName, productPrice, qty = 1) {
       const existing = findCartItem(productId);
       if (existing) {
         existing.qty += qty;
       } else {
-        cart.push({ id: productId, name: productName, price: productPrice, qty });
+        // Find the image URL from the product card for the cart item (optional but nice)
+        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`) || 
+                            document.querySelector(`.product-card[data-name="${productName}"]`);
+        const imageSrc = productCard?.querySelector('.slides img')?.src || '';
+
+        cart.push({ id: productId, name: productName, price: productPrice, qty, imageSrc });
       }
       renderCart();
+      // Keep dropdown visible briefly after adding item
+      document.getElementById('cart-dropdown').classList.add('show');
     }
     function removeFromCart(productId) {
-      cart = cart.filter(i => i.id !== productId);
+      // Find the item to remove
+      const itemIndex = cart.findIndex(i => i.id === productId);
+      
+      if (itemIndex > -1) {
+          // Decrement quantity if > 1, otherwise remove the whole item
+          if (cart[itemIndex].qty > 1) {
+              cart[itemIndex].qty -= 1;
+          } else {
+              cart.splice(itemIndex, 1);
+          }
+      }
       renderCart();
     }
     function clearCart() {
@@ -1696,58 +1762,125 @@ On one side of the device, you will find a micro USB charging port while on the 
     function cartTotalQty() {
       return cart.reduce((s, it) => s + it.qty, 0);
     }
+    
+    /**********************
+     * Cart Dropdown Logic
+     **********************/
+    const cartIcon = document.getElementById('cart-icon');
+    const cartDropdown = document.getElementById('cart-dropdown');
+
+    function toggleCartDropdown(event) {
+        // Prevent click from propagating to the window listener
+        if (event) event.stopPropagation();
+        cartDropdown.classList.toggle('show');
+    }
+
+    // Toggle dropdown visibility on cart icon click
+    cartIcon.addEventListener('click', toggleCartDropdown);
+
+    // Close dropdown when clicking outside of it
+    document.addEventListener('click', (event) => {
+        // Check if the click target is NOT the cart icon and NOT inside the dropdown
+        const isClickOnCartIcon = cartIcon.contains(event.target);
+        const isClickInsideDropdown = cartDropdown.contains(event.target);
+
+        if (cartDropdown.classList.contains('show') && !isClickOnCartIcon && !isClickInsideDropdown) {
+            cartDropdown.classList.remove('show');
+        }
+    });
+
     /**********************
      * DOM render functions
      **********************/
+    // EDITED: Simplified renderCart to always use the summarized/grouped view
     function renderCart() {
       const listEl = document.getElementById('cart-items');
       const totalEl = document.getElementById('cart-total');
       const countEl = document.getElementById('cart-count');
       listEl.innerHTML = '';
-      if (cart.length === 0) {
+      
+      const totalQty = cartTotalQty();
+
+      if (cart.length === 0 || totalQty === 0) {
         const li = document.createElement('li');
         li.textContent = 'No items in cart';
         li.style.padding = '8px 0';
+        li.style.justifyContent = 'center';
         listEl.appendChild(li);
+        
+        // Hide total and share buttons when empty
+        document.querySelector('.cart-actions').style.display = 'none';
+        document.querySelector('.cart-share').style.display = 'none';
+        cartDropdown.querySelector('h3').textContent = 'Your Cart (Empty)';
+
       } else {
+        // Render the summarized list (grouped by product ID)
         cart.forEach(item => {
           const li = document.createElement('li');
-          const left = document.createElement('div');
-          left.className = 'left';
-          const name = document.createElement('div');
-          name.className = 'name';
-          name.textContent = item.name;
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = `${item.qty} x ZMK ${FMT(item.price)} `;
-          left.appendChild(name);
-          left.appendChild(meta);
-          const right = document.createElement('div');
-          right.style.display = 'flex';
-          right.style.flexDirection = 'column';
-          right.style.alignItems = 'flex-end';
-          right.style.gap = '6px';
+          
+          const details = document.createElement('div');
+          details.className = 'item-details';
+
+          // Small thumbnail image (optional but nice)
+          if (item.imageSrc) {
+              const img = document.createElement('img');
+              img.src = item.imageSrc;
+              img.alt = item.name;
+              img.style.width = '30px';
+              img.style.height = '30px';
+              img.style.objectFit = 'cover';
+              img.style.borderRadius = '4px';
+              details.appendChild(img);
+          }
+
+          const nameAndQty = document.createElement('div');
+          nameAndQty.className = 'item-name';
+          nameAndQty.innerHTML = `${item.name} <span class="item-qty">x ${item.qty}</span>`;
+          details.appendChild(nameAndQty);
+
+          const priceAndRemove = document.createElement('div');
+          priceAndRemove.style.display = 'flex';
+          priceAndRemove.style.flexDirection = 'column';
+          priceAndRemove.style.alignItems = 'flex-end';
+          priceAndRemove.style.gap = '6px';
+          
           const lineTotal = document.createElement('div');
-          lineTotal.textContent = `ZMK ${FMT(item.price * item.qty)}`;
+          lineTotal.className = 'item-price';
+          // Display the total price for this item group
+          lineTotal.textContent = `ZMW ${FMT(item.price * item.qty)}`; 
+          
           const rm = document.createElement('button');
-          rm.textContent = 'Remove';
-          rm.style.padding = '4px 6px';
-          rm.style.fontSize = '12px';
-          rm.style.border = '0';
-          rm.style.borderRadius = '6px';
-          rm.style.background = '#eee';
-          rm.style.cursor = 'pointer';
-          rm.onclick = () => removeFromCart(item.id);
-          right.appendChild(lineTotal);
-          right.appendChild(rm);
-          li.appendChild(left);
-          li.appendChild(right);
+          rm.className = 'remove-btn';
+          rm.textContent = 'Remove One'; // Changed button text for clarity
+          
+          // Use the original item ID for removal to decrement quantity
+          rm.onclick = (e) => { 
+              e.stopPropagation(); 
+              removeFromCart(item.id); // Decrements qty or removes item if qty is 1
+          }; 
+
+          priceAndRemove.appendChild(lineTotal);
+          priceAndRemove.appendChild(rm);
+          
+          li.appendChild(details);
+          li.appendChild(priceAndRemove);
           listEl.appendChild(li);
         });
+        
+        // Show total and share buttons when not empty
+        document.querySelector('.cart-actions').style.display = 'flex';
+        document.querySelector('.cart-share').style.display = 'flex';
+        cartDropdown.querySelector('h3').textContent = `Your Cart (${totalQty} Item${totalQty !== 1 ? 's' : ''})`;
       }
+      
       const total = cartTotalAmount();
-      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
-      countEl.textContent = String(cartTotalQty());
+      totalEl.textContent = `Total: ZMW ${FMT(total)}`;
+      countEl.textContent = String(totalQty);
+    }
+
+    // Helper to get CSS variable for JS (used in renderCart)
+    function varToCss(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
     }
     
     /**********************
@@ -1755,16 +1888,19 @@ On one side of the device, you will find a micro USB charging port while on the 
      **********************/
     function getCartMessage() {
       let message = "Hello ZamListing, I would like to order the following items:\n\n";
-      if (cart.length === 0) {
+      const totalQty = cartTotalQty();
+      
+      if (totalQty === 0) {
         return "I am interested in your products. Please contact me.";
       }
-      
+
+      // Group by item name for a cleaner message
       cart.forEach(item => {
-        message += `${item.name} (${item.qty} pcs) - ZMK ${FMT(item.price * item.qty)}\n`;
+        message += `${item.name} x ${item.qty} pcs - ZMW ${FMT(item.price * item.qty)}\n`;
       });
 
-      message += `\nTotal: ZMK ${FMT(cartTotalAmount())}\n`;
-      message += `\nThank you!`;
+      message += `\nTotal: ZMW ${FMT(cartTotalAmount())}\n`;
+      message += `\nThank You!`;
       
       return message;
     }
@@ -1786,14 +1922,16 @@ On one side of the device, you will find a micro USB charging port while on the 
     function addToCartBtn(button) {
       const card = button.closest('.product-card');
       if (!card) return;
-      const id = card.dataset.id || card.dataset.name;
+      // Note: Using card.dataset.id or card.dataset.name as ID is fine for the summary (cart) array
+      const id = card.dataset.id || card.dataset.name; 
       const name = card.dataset.name || (card.querySelector('h4')?.textContent || 'Product');
       const price = safeNumber(card.dataset.price || '');
 
       addToCart(id, name, price, 1);
-      openModal('cartModal');
+      // Removed openModal('cartModal')
     }
-    document.getElementById('cart-clear').addEventListener('click', () => {
+    document.getElementById('cart-clear').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent dropdown from closing immediately
       clearCart();
     });
     
@@ -1833,33 +1971,167 @@ On one side of the device, you will find a micro USB charging port while on the 
       }
     }
     
-    document.querySelectorAll('.product-card').forEach(card => {
-      const slider = card.querySelector('.slider');
-      if (slider) {
-          const slides = slider.querySelector('.slides');
-          const imgs = slides.querySelectorAll('img');
-          let idx = 0;
-          const nextBtn = slider.querySelector('.next');
-          const prevBtn = slider.querySelector('.prev');
-          
-          if (imgs.length <= 1) {
-              if (nextBtn) nextBtn.style.display = 'none';
-              if (prevBtn) prevBtn.style.display = 'none';
-          } else {
-              const move = (i) => {
-                  idx = ((i % imgs.length) + imgs.length) % imgs.length;
-                  slides.style.transform = `translateX(-${idx * 100}%)`;
-              };
-              if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
-              if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
-          }
-      }
-    });
+    /**********************
+     * Image Slider/Slide Logic (Consolidated and Enhanced)
+     **********************/
+    // This function initializes the slide logic for a given slider element
+    function initSlider(sliderEl) {
+        const slides = sliderEl.querySelector('.slides') || sliderEl.querySelector('.modal-slides');
+        const imgs = slides.querySelectorAll('img');
+        let idx = 0;
+        const nextBtn = sliderEl.querySelector('.next');
+        const prevBtn = sliderEl.querySelector('.prev');
+        
+        // Hide buttons if only one image exists
+        if (imgs.length <= 1) {
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (prevBtn) prevBtn.style.display = 'none';
+            return;
+        }
+
+        if (nextBtn) nextBtn.style.display = 'block';
+        if (prevBtn) prevBtn.style.display = 'block';
+
+        const move = (i) => {
+            idx = ((i % imgs.length) + imgs.length) % imgs.length;
+            slides.style.transform = `translateX(-${idx * 100}%)`;
+            // Reset zoom when sliding
+            imgs.forEach(img => {
+                img.classList.remove('zoomed');
+                img.style.transform = '';
+            });
+        };
+        
+        if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx + 1); });
+        if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); move(idx - 1); });
+        
+        // Initial move to set the first slide correctly
+        move(0);
+    }
+    
+    // Initialize sliders in all product cards
+    document.querySelectorAll('.product-card .slider').forEach(initSlider);
+
+    /**********************
+     * Image Zoom Logic (Consolidated and Enhanced with Pan)
+     **********************/
+    function initZoom(img) {
+        let isZoomed = false;
+        let isPanning = false;
+        let startX, startY, currentX = 0, currentY = 0;
+
+        // Function to update the image transform based on pan position
+        const updateTransform = () => {
+            img.style.transform = `scale(2) translate(${currentX}px, ${currentY}px)`;
+        };
+
+        // Zoom toggle function
+        const toggleZoom = (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            isZoomed = !isZoomed;
+            img.classList.toggle('zoomed', isZoomed);
+            
+            if (isZoomed) {
+                // Calculate position relative to click/tap
+                const rect = img.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches ? e.touches[0].clientX : rect.width / 2 + rect.left);
+                const clientY = e.clientY || (e.touches ? e.touches[0].clientY : rect.height / 2 + rect.top);
+
+                // Calculate where the origin should be (relative to the image container)
+                const originX = (clientX - rect.left) / rect.width * 100;
+                const originY = (clientY - rect.top) / rect.height * 100;
+
+                // Set origin to zoom into the clicked area
+                img.style.transformOrigin = `${originX}% ${originY}%`;
+                img.style.transform = 'scale(2)';
+
+                // Reset pan position
+                currentX = 0;
+                currentY = 0;
+            } else {
+                img.style.transform = '';
+                img.style.transformOrigin = '50% 50%';
+            }
+        };
+
+        // Pan start (mouse down or touch start)
+        const panStart = (e) => {
+            if (!isZoomed) return;
+            e.preventDefault();
+            isPanning = true;
+            img.style.cursor = 'grabbing';
+            startX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            startY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        };
+
+        // Pan move (mouse move or touch move)
+        const panMove = (e) => {
+            if (!isPanning || !isZoomed) return;
+            e.preventDefault();
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            // Update translation (move in opposite direction of mouse drag)
+            currentX += dx / 2;
+            currentY += dy / 2;
+
+            // Clamp pan values (optional, but prevents image from being dragged completely out)
+            const maxPanX = img.offsetWidth / 2;
+            const maxPanY = img.offsetHeight / 2;
+            currentX = Math.max(Math.min(currentX, maxPanX), -maxPanX);
+            currentY = Math.max(Math.min(currentY, maxPanY), -maxPanY);
+
+            updateTransform();
+
+            // Reset start coordinates for the next move
+            startX = clientX;
+            startY = clientY;
+        };
+
+        // Pan end (mouse up or touch end)
+        const panEnd = () => {
+            if (!isPanning) return;
+            isPanning = false;
+            img.style.cursor = 'grab';
+        };
+
+        // Double click for zoom toggle on desktop
+        img.addEventListener('dblclick', toggleZoom);
+
+        // Double tap for zoom toggle on mobile
+        let lastTap = 0;
+        img.addEventListener('touchend', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                toggleZoom(e); 
+            }
+            lastTap = currentTime;
+        });
+
+        // Mouse events for pan
+        img.addEventListener('mousedown', panStart);
+        document.addEventListener('mousemove', panMove);
+        document.addEventListener('mouseup', panEnd);
+
+        // Touch events for pan
+        img.addEventListener('touchstart', panStart);
+        document.addEventListener('touchmove', panMove);
+        document.addEventListener('touchend', panEnd);
+    }
+    
+    // Initialize zoom/pan for all images in the product cards
+    document.querySelectorAll('.product-card .slider img').forEach(initZoom);
 
     renderCart();
     
     /**********************
-     * New Filter & Search Logic
+     * New Filter & Search Logic (Same as original)
      **********************/
     const allProducts = document.querySelectorAll('.product-card');
     const categoryFilters = document.getElementById('category-filters');
@@ -1914,7 +2186,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     filterProducts('all');
     
     /**********************
-     * New Listing Time Counter
+     * New Listing Time Counter (Same as original)
      **********************/
     function updateListingTime() {
       const now = new Date();
@@ -1961,7 +2233,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     setInterval(updateListingTime, 30000);
 
     /**********************
-     * Card Tap Logic
+     * Card Tap Logic (Same as original)
      **********************/
     document.querySelectorAll('.product-card').forEach(card => {
         // Populate the description for each card from the data attribute
@@ -1972,42 +2244,24 @@ On one side of the device, you will find a micro USB charging port while on the 
         
         // Add click listener for showing/hiding details
         card.addEventListener('click', (e) => {
-            // Do not toggle if a button or an image is clicked
-            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.tagName.toLowerCase() === 'img' || e.target.tagName.toLowerCase() === 'input') {
+            // Check if a button, link, input, or an image *with a zoomed class* was clicked
+            const isControl = e.target.closest('button, a, input');
+            const isZoomedImage = e.target.tagName.toLowerCase() === 'img' && e.target.classList.contains('zoomed');
+            
+            if (isControl || isZoomedImage) {
+                // If it's an image that's currently zoomed, we assume they are trying to pan, so don't open modal
                 return;
             }
-            card.classList.toggle('tapped');
+            
+            // If they clicked on a non-zoomed image or other part of the card (excluding controls), open modal
+            showProductModal(card);
         });
     });
 
     /**********************
-     * Image Zoom Logic
-     **********************/
-    document.querySelectorAll('.product-card .slider img').forEach(img => {
-      // Double click for desktop
-      img.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        img.classList.toggle('zoomed');
-      });
-
-      // Double tap for mobile
-      let lastTap = 0;
-      img.addEventListener('touchend', (e) => {
-          const currentTime = new Date().getTime();
-          const tapLength = currentTime - lastTap;
-          if (tapLength < 300 && tapLength > 0) {
-              e.preventDefault(); 
-              img.classList.toggle('zoomed'); 
-          }
-          lastTap = currentTime;
-      });
-    });
-
-    /**********************
-     * Modals Logic
+     * Product Modal Logic (Same as original, but kept separate from cart)
      **********************/
     const productModal = document.getElementById('productModal');
-    const cartModal = document.getElementById('cartModal');
     let currentCard = null;
 
     function openModal(modalId) {
@@ -2018,6 +2272,12 @@ On one side of the device, you will find a micro USB charging port while on the 
     function closeModal(modalId) {
         document.getElementById(modalId).classList.remove('show');
         document.body.style.overflow = '';
+        // Clean up zoom on modal close
+        productModal.querySelectorAll('.modal-slides img').forEach(img => {
+            img.classList.remove('zoomed');
+            img.style.transform = '';
+            img.style.transformOrigin = '50% 50%';
+        });
     }
 
     // Bindings for closing modals
@@ -2030,11 +2290,6 @@ On one side of the device, you will find a micro USB charging port while on the 
         if (e.target.classList.contains('modal')) {
             closeModal(e.target.id);
         }
-    });
-
-    // Open cart modal
-    document.getElementById('cart-icon').addEventListener('click', () => {
-        openModal('cartModal');
     });
 
     // Product Modal Details
@@ -2061,17 +2316,25 @@ On one side of the device, you will find a micro USB charging port while on the 
       }
       
       bidSection.style.display = 'none';
-
+      
+      // Setup modal slides
+      const modalSliderEl = productModal.querySelector('.modal-slider');
       const modalSlidesContainer = productModal.querySelector('.modal-slides');
       modalSlidesContainer.innerHTML = '';
       const originalImages = card.querySelectorAll('.slider img');
       originalImages.forEach(img => {
           const newImg = img.cloneNode();
+          // Reset any lingering styles from the main card
+          newImg.classList.remove('zoomed');
+          newImg.style.transform = '';
+          newImg.style.transformOrigin = '50% 50%';
           modalSlidesContainer.appendChild(newImg);
       });
       
-      initModalSlider();
-      initModalZoom();
+      // Initialize slider and zoom functionality for the modal
+      initSlider(modalSliderEl);
+      productModal.querySelectorAll('.modal-slides img').forEach(initZoom);
+      
       openModal('productModal');
     }
     
@@ -2116,62 +2379,7 @@ On one side of the device, you will find a micro USB charging port while on the 
         window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
       }
     }
-    
-    function initModalSlider() {
-      const slider = productModal.querySelector('.modal-slider');
-      const slides = slider.querySelector('.modal-slides');
-      const imgs = slides.querySelectorAll('img');
-      let idx = 0;
-      const nextBtn = slider.querySelector('.next');
-      const prevBtn = slider.querySelector('.prev');
-      
-      if (imgs.length <= 1) {
-          nextBtn.style.display = 'none';
-          prevBtn.style.display = 'none';
-      } else {
-          nextBtn.style.display = 'block';
-          prevBtn.style.display = 'block';
-          const move = (i) => {
-              idx = ((i % imgs.length) + imgs.length) % imgs.length;
-              slides.style.transform = `translateX(-${idx * 100}%)`;
-          };
-          nextBtn.onclick = (e) => { e.stopPropagation(); move(idx + 1); };
-          prevBtn.onclick = (e) => { e.stopPropagation(); move(idx - 1); };
-      }
-    }
-
-    function initModalZoom() {
-        productModal.querySelectorAll('.modal-slides img').forEach(img => {
-            img.addEventListener('dblclick', (e) => {
-                e.stopPropagation();
-                img.classList.toggle('zoomed');
-            });
-            let lastTap = 0;
-            img.addEventListener('touchend', (e) => {
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTap;
-                if (tapLength < 300 && tapLength > 0) {
-                    e.preventDefault(); 
-                    img.classList.toggle('zoomed'); 
-                }
-                lastTap = currentTime;
-            });
-        });
-    }
-    
-    // New logic to handle tapping anywhere on the card to open modal
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            const isButton = e.target.closest('button, a, input');
-            if (!isButton) {
-                showProductModal(card);
-            }
-        });
-    });
 
   </script>
 </body>
 </html>
-
-
-
