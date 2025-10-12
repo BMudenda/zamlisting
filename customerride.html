@@ -90,7 +90,7 @@
     .input-group.valid .validation-tick {
       opacity: 1;
     }
-    input, select {
+    input[type="text"], input[type="tel"], select { /* Added input[type="text"] */
       width: 100%; padding: 10px; font-size: 1rem; border-radius: 5px;
       border: 1px solid var(--border-color-light); transition: border 0.2s, box-shadow 0.2s;
       background-color: transparent;
@@ -123,8 +123,9 @@
     .mode-radio input[type="radio"]:checked + .heart-icon::before {
       content: "♥";
     }
-    .input-group.valid input,
-    .input-group.valid select {
+    .input-group.valid input[type="text"],
+    .input-group.valid select,
+    #customer-phone-wrapper.valid input[type="tel"] { /* Added phone input hiding */
       display: none;
     }
     .masked-value {
@@ -141,6 +142,8 @@
     }
     .input-group.valid .masked-value {
       display: block;
+      font-weight: bold; /* Make the ********** stand out */
+      letter-spacing: 2px; /* Spread ********** apart */
     }
     .summary-table-section {
       margin-top: 20px; padding: 15px; background: var(--bg-color-card);
@@ -345,6 +348,38 @@
         }
     }
     
+    /* Autocomplete Styles */
+    .autocomplete-wrapper {
+        position: relative;
+        width: 100%; /* Important for inputs inside a group */
+    }
+    .autocomplete-list {
+        position: absolute;
+        z-index: 100;
+        border: 1px solid var(--border-color-light);
+        border-top: none;
+        background-color: white;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: var(--box-shadow-light);
+        left: 0;
+        top: 100%; /* Position right under the input */
+    }
+    .suggestion {
+        padding: 10px;
+        cursor: pointer;
+        background-color: white;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+    }
+    .suggestion:hover {
+        background-color: #f1f1f1;
+    }
+    .input-group.valid .autocomplete-list {
+      display: none; /* Hide list when input is valid/masked */
+    }
+    
   </style>
 </head>
 <body>
@@ -411,16 +446,18 @@
               <fieldset class="locations-group">
                   <legend>Trip Locations</legend>
                   <div class="locations-wrapper">
-                    <div class="input-group">
+                    <div class="autocomplete-wrapper input-group" id="origin-input-group">
                       <span class="material-icons input-icon">place</span>
                       <label for="gm-origin">From</label>
-                      <select id="gm-origin"></select>
+                      <input type="text" id="gm-origin" placeholder="Type origin location..." autocomplete="off">
+                      <div id="originList" class="autocomplete-list"></div>
                       <span class="masked-value" id="masked-origin"></span>
                     </div>
-                    <div class="input-group">
+                    <div class="autocomplete-wrapper input-group" id="destination-input-group">
                       <span class="material-icons input-icon">flag</span>
                       <label for="gm-destination">To</label>
-                      <select id="gm-destination"></select>
+                      <input type="text" id="gm-destination" placeholder="Type destination location..." autocomplete="off">
+                      <div id="destinationList" class="autocomplete-list"></div>
                       <span class="masked-value" id="masked-destination"></span>
                     </div>
                   </div>
@@ -600,8 +637,10 @@
   { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
   { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0.25 }
 ];  
-    const originSelect = document.getElementById('gm-origin');
-    const destinationSelect = document.getElementById('gm-destination');
+    // Changed to input elements
+    const originInput = document.getElementById('gm-origin');
+    const destinationInput = document.getElementById('gm-destination');
+    
     const customerPhoneInput = document.getElementById('customer-phone');
     const modeVehicleRadio = document.getElementById('mode-vehicle');
     const modeMotorbikeRadio = document.getElementById('mode-motorbike');
@@ -616,31 +655,65 @@
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
     let summaryData = null;
-    function populateDropdowns() {
-      const defaultOptionOrigin = document.createElement('option');
-      defaultOptionOrigin.value = "";
-      defaultOptionOrigin.textContent = "Select...";
-      defaultOptionOrigin.disabled = true;
-      defaultOptionOrigin.selected = true;
-      originSelect.appendChild(defaultOptionOrigin);
-      const defaultOptionDestination = document.createElement('option');
-      defaultOptionDestination.value = "";
-      defaultOptionDestination.textContent = "Select...";
-      defaultOptionDestination.disabled = true;
-      defaultOptionDestination.selected = true;
-      destinationSelect.appendChild(defaultOptionDestination);
-      const sortedPlaces = places.slice().sort();
-      sortedPlaces.forEach(place => {
-        const option1 = document.createElement('option');
-        option1.value = place;
-        option1.textContent = place;
-        originSelect.appendChild(option1);
-        const option2 = document.createElement('option');
-        option2.value = place;
-        option2.textContent = place;
-        destinationSelect.appendChild(option2);
-      });
+    let selectedOrigin = ''; // Store the actual selected place
+    let selectedDestination = ''; // Store the actual selected place
+    
+    // Function to attach live autocomplete filtering
+    function setupAutocomplete(inputId, listId, inputElement) {
+        const input = inputElement; // Use the passed input element
+        const list = document.getElementById(listId);
+
+        input.addEventListener("input", () => {
+            // Force reset validation on typing
+            input.closest('.input-group').classList.remove('valid');
+            
+            const query = input.value.toLowerCase();
+            list.innerHTML = "";
+            
+            // Only show dropdown if there's a query and the input is not masked/valid
+            if (!query || input.closest('.input-group').classList.contains('valid')) {
+                return;
+            }
+
+            const filtered = places.filter(p => p.toLowerCase().includes(query)).sort(); // Added sort for alphabetical order
+            
+            filtered.forEach(place => {
+                const item = document.createElement("div");
+                item.textContent = place;
+                item.classList.add("suggestion");
+                item.addEventListener("click", () => {
+                    input.value = place;
+                    list.innerHTML = "";
+                    
+                    // Store the selected value
+                    if (inputId === 'gm-origin') {
+                        selectedOrigin = place;
+                    } else if (inputId === 'gm-destination') {
+                        selectedDestination = place;
+                    }
+                    
+                    updateSummaryTable(); // Trigger summary update after selection
+                });
+                list.appendChild(item);
+            });
+            
+            // If no results, clear the list
+            if (filtered.length === 0) {
+                 list.innerHTML = "";
+            }
+        });
+
+        // Hide list when clicking outside the input or dropdown
+        document.addEventListener("click", (e) => {
+            if (!list.contains(e.target) && e.target !== input) {
+                list.innerHTML = "";
+            }
+        });
+        
+        // Add event listener for calculating distance on focus change
+        input.addEventListener("change", updateSummaryTable);
     }
+    
     function buildGraph(segments) {
       const graph = {};
       segments.forEach(seg => {
@@ -687,17 +760,39 @@
       updateValidationStatus(customerPhoneInput, isPhoneValid);
       maskedPhone.textContent = '**********';
       
-      const isOriginValid = origin && origin !== '';
-      updateValidationStatus(originSelect, isOriginValid);
-      maskedOrigin.textContent = '**********';
+      // Validation check for autocomplete inputs: must be a place in the array
+      const isOriginValid = places.includes(origin);
+      updateValidationStatus(originInput, isOriginValid);
+      // ALWAYS display ********** for the masked element
+      maskedOrigin.textContent = '**********'; 
       
-      const isDestinationValid = destination && destination !== '';
-      updateValidationStatus(destinationSelect, isDestinationValid);
+      const isDestinationValid = places.includes(destination);
+      updateValidationStatus(destinationInput, isDestinationValid);
+      // ALWAYS display ********** for the masked element
       maskedDestination.textContent = '**********';
     }
+    
+    // Core function to reset the input on masked click
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
-      parentGroup.classList.remove('valid');
+      const input = parentGroup.querySelector('input');
+      
+      // If the clicked element is masked-phone, reset phone input
+      if (event.target === maskedPhone) {
+          input.value = ''; // Clear for re-entry
+          handlePhoneNumberInput(); // Run validation/hide check
+      } else {
+          // It's a place input (origin or destination)
+          // Set the value back to the actual selected place for editing
+          if (input === originInput) {
+              input.value = selectedOrigin;
+          } else if (input === destinationInput) {
+              input.value = selectedDestination;
+          }
+          parentGroup.classList.remove('valid');
+          // Important: Keep the input visible and editable
+      }
+
       summaryTableContainer.innerHTML = '';
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
@@ -705,6 +800,7 @@
       displayStatus('Please fill in all details correctly.', 'failed');
       summaryTableSection.classList.add('hidden-section');
     }
+    
     function reveal(eye) {
       document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
       document.querySelectorAll(".eye-btn").forEach(e => e.style.display = "inline");
@@ -712,9 +808,11 @@
       value.style.display = "inline";
       eye.style.display = "none";
     }
+    
     function updateSummaryTable() {
-      const origin = originSelect.value;
-      const destination = destinationSelect.value;
+      // Use the actual input value for calculation
+      const origin = originInput.value.trim();
+      const destination = destinationInput.value.trim();
       const customerPhone = customerPhoneInput.value.trim();
       
       const isVehicleSelected = modeVehicleRadio.checked;
@@ -726,11 +824,17 @@
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
       
-      const isOriginValid = origin && origin !== '';
-      const isDestinationValid = destination && destination !== '';
+      // Validation now checks if the typed/selected value is in the 'places' array
+      const isOriginValid = places.includes(origin);
+      const isDestinationValid = places.includes(destination);
       const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
       const isModeSelected = isVehicleSelected || isMotorbikeSelected;
       
+      // Ensure selected variables are updated if valid
+      if (isOriginValid) selectedOrigin = origin;
+      if (isDestinationValid) selectedDestination = destination;
+      
+      // Call maskInputValues to hide inputs and show masked values if valid
       maskInputValues(origin, destination, customerPhone);
       
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
@@ -895,6 +999,9 @@
         const customerPhone = customerPhoneInput.value.trim();
         const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
         
+        // This validation check runs on *every* input/change for the phone field
+        updateValidationStatus(customerPhoneInput, isPhoneValid);
+
         if (isPhoneValid) {
             tripDetails.classList.remove('hidden-section');
             updateSummaryTable();
@@ -906,7 +1013,9 @@
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      populateDropdowns();
+      // Initialize autocomplete for origin and destination inputs
+      setupAutocomplete("gm-origin", "originList", originInput);
+      setupAutocomplete("gm-destination", "destinationList", destinationInput);
       
       // Event listener for phone number input
       customerPhoneInput.addEventListener('input', handlePhoneNumberInput);
@@ -915,8 +1024,6 @@
       modeVehicleRadio.addEventListener('change', updateSummaryTable);
       modeMotorbikeRadio.addEventListener('change', updateSummaryTable);
       extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
-      originSelect.addEventListener('change', updateSummaryTable);
-      destinationSelect.addEventListener('change', updateSummaryTable);
     });
     
     // Reset validation for masked values
