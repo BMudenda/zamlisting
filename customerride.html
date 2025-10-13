@@ -495,177 +495,121 @@
       avgSpeed: 60,
     };
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzN_LoIE8sb7H9wuhzIz8kYNqNd-0aWCSS2t0duusBaLqC2DjcK3Affih3Q-3R3QhE/exec";
-    const places = [
-      "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "BM residence", "Boma Clinic","Chidada Ground", "Chitope", "Chilombwe Community School","Chiriwe Primary School",
-      "Dzalo Skills Training Centre kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "Hill View", "JB THREE BOARDERS MALL", "JB THREE BOARDERS CLUB", 
-      "Justifeli Lodge", "Kakaro Primary School", "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kasinsa","Katondwe Chapel","Katondwe Chaz Hotel","Katondwe Dam","Katondwe Girls Secondary", "Katondwe Primary School",
-      "Katondwe Mission Hospital", "Kavalamanja", "Luangwa (Feira)","Luangwa Airstrip", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market",
-      "Luangwa Council lodge", "Luangwa DC office", "Luangwa District Education Board Offices",
-      "Luangwa District Hospital","Luangwa High School Police post", "Boma Filling Station", "Luangwa Habour", "Indeco Building", "Luangwa Market",
-      "Luangwa main sda churh","Mburuma Local Court", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge",
-      "Mwavi Secondary School","Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentocostal Assembly of God Joshua Assembly", "UCZ","Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Hotel", "yellow shop",
-      "Zambia Electricity Supply Corporation"
-    ];
     
-      const segments = [
+
+// Data for Luangwa Town Routes
+
+const places = [
+  "Anglican Church", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic", "Chidada Ground", "Chitope", "Chilombwe Community School", "Chiriwe Primary School",
+  "Dzalo Skills Training Centre Kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", 
+  "Justifeli Lodge", "Kakaro Primary School", "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kasinsa", "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", 
+  "Katondwe Girls Secondary School", "Katondwe Primary School", "Katondwe Mission Hospital", "Kavalamanja", "Luangwa (Feira)", "Luangwa Airstrip", "Luangwa Basic School", "Luangwa Bridge", 
+  "Luangwa Bridge Market", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices", "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", 
+  "Luangwa Habour", "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Town Council", 
+  "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School", "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", 
+  "Pentecostal Assembly of God Joshua Assembly", "UCZ", "Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Lodge", "Yellow Shop",
+  "ZESCO" 
+];
+
+// ---
+
+const segments = [
 
 // Luangwa Town Straight-Line Route
+// NOTE: All distance properties are consistently named 'distance' and names are standardized.
 
   { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
   { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 },
-  { from: "Soweto Junction", to: "Zambia Electricity Supply Corporation", distance: 0.3 },
-  { from: "Zambia Electricity Supply Corporation", to: "Luangwa main sda churh", distance: 0.65 },
-  { from: "Luangwa main sda churh", to: "Indeco Building", distance: 0.7 },
-  { from: "Indeco Building", to: "JB THREE BOARDERS CLUB", distance: 0.1 },
-  { from: "JB THREE BOARDERS CLUB", to: "yellow shop", distance: 0.45 },
-  { from: "yellow shop", to: "Luangwa Bus Station", distance: 0.190 },
-  { from: "Luangwa Bus Station", to: "JB THREE BOARDERS MALL", distance: 0.24 },
-  { from: "JB THREE BOARDERS MALL", to: "Boma Filling Station", distance: 0.35 },
+  { from: "Soweto Junction", to: "ZESCO", distance: 0.3 },
+  { from: "ZESCO", to: "Luangwa Main SDA Church", distance: 0.65 },
+  { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 },
+  { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 },
+  { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 },
+  { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 },
+  { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 },
+  { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 },
   { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 },
   { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 },
-  { from: "Luangwa Council Lodge", to: " Luangwa DC Office", distance: 0.3 },
-  { from: "Luangwa DC office", to: "Luangwa Police Station", distance: 0.3 },
-  { from: "Luangwa Police Station", to: "Luangwa DEBS", distance: 0.1 },
-  { from: "Luangwa DEBS", to: "Yangoma Lodge", distance: 0.4 },
+  { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 },
+  { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 },
+  { from: "Luangwa Police Station", to: "Luangwa DEBS Offices", distance: 0.1 },
+  { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 },
   { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 },
 
-
-
-        
-  // Anglican Church cluster
-  { from: "Anglican Church", to: "Hill View", distance: 1.3 },
-  { from: "Anglican Church", to: "Feira Kindom Hall", distance: 0.1 },
+// Anglican Church Straight-Line Cluster
+  { from: "Feira Kindom Hall", to: "Anglican Church", distance: 0.1 },
   { from: "Anglican Church", to: "Luangwa Town Council", distance: 0.8 },
+  { from: "Luangwa Town Council", to: "Hill View", distance: 1.3 },
 
-  // Big 2 Zambezi cluster
+// Big 2 Zambezi cluster
   { from: "Big 2 Zambezi Water Front Resort & Safari", to: "Feira Day Secondary School", distance: 4.0 },
 
-  // BM residence cluster
-  
-  { from: "BM residence", to: "Hill View", distance: 1.0 },
-  { from: "BM residence", to: "Registration Office", distance: 1.89 },
-  { from: "BM residence", to: "Chidada Ground", distance: 2.5 },
-  { from: "BM residence", to: "Soweto Junction", distance: 1.8 },
-
-  
-  
-  { from: "BM residence", to: "Nyabota Lodge", distance: 3.6 },
+// BM Residence Straight-Line Route
+  { from: "BM Residence", to: "Feira Day Secondary School", distance: 1.1 },
+  { from: "Feira Day Secondary School", to: "Hill View", distance: 1.0 },
+  { from: "Hill View", to: "Nyabota Lodge", distance: 3.6 },
   { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.5 },
-  { from: "BM residence", to: "Feira Day Secondary School", distance: 1.1 },
-  { from: "BM residence", to: "River Spot Club", distance: 3.83},
+  { from: "Luangwa Basic School", to: "Chidada Ground", distance: 2.5 },
+  { from: "Chidada Ground", to: "Soweto Junction", distance: 1.8 },
+  { from: "Soweto Junction", to: "Registration Office", distance: 1.89 },
+  { from: "Registration Office", to: "River Spot Club", distance: 3.83 },
 
-
-  // Boma Clinic cluster
-  { from: "Boma Clinic", to: "Dzalo Skills Training Centre kambolozo", distance: 0.2 },
-
-  // Luangwa Town Council cluster
-  { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre kambolozo", distance: 0.6 },
-
-  // JB Mall cluster (expanded)
-  { from: "JB THREE BOARDERS MALL", to: "JB THREE BOARDERS CLUB", distance: 0.8 },
-  { from: "JB THREE BOARDERS MALL", to: "yellow shop", distance: 0.41 },
-  { from: "JB THREE BOARDERS CLUB", to: "yellow shop", distance: 0.45 },
-
-  // Chitope cluster
-  { from: "Chitope", to: "Kasinsa", distance: 10 },
-  { from: "Chitope", to: "Luangwa Bridge", distance: 32 },
-  { from: "Chitope", to: "Luangwa Bridge Market", distance: 29 },
-  { from: "Chitope", to: "Luangwa Secondary School", distance: 14 },
-  { from: "Mwavi Secondary School", to: "Chitope", distance: 1.1 },
+// Chitope Straight-Line Cluster
   { from: "Mwavi Secondary School", to: "Mburuma Local Court", distance: 0.65 },
+  { from: "Mburuma Local Court", to: "Chitope", distance: 1.1 },
+  { from: "Chitope", to: "Kasinsa", distance: 10.0 },
+  { from: "Kasinsa", to: "Luangwa Secondary School", distance: 14.0 },
+  { from: "Luangwa Secondary School", to: "Luangwa Bridge Market", distance: 29.0 },
+  { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 32.0 },
 
+// Dzalo Skills cluster
+  { from: "Dzalo Skills Training Centre Kambolozo", to: "Luangwa Filling Station", distance: 0.3 },
 
-  // Dzalo Skills cluster
-  { from: "Dzalo Skills Training Centre kambolozo", to: "Luangwa Filling Station", distance: 0.3 },
-
-  // Feira Kindom Hall cluster
+// Feira Kindom Hall cluster
   { from: "Feira Kindom Hall", to: "Luangwa (Feira)", distance: 0.7 },
 
-  // Feira Day Secondary cluster
-  { from: "Feira Day Secondary School", to: "Gerasmos Safari Lodge", distance: 3.1 },
-  { from: "Feira Day Secondary School", to: "Justifeli Lodge", distance: 2.2 },
-  { from: "Feira Day Secondary School", to: "Zambia Electricity Supply Corporation", distance: 2.0 },
+// Feira Day Secondary Straight-Line Route
+  { from: "Feira Day Secondary School", to: "ZESCO", distance: 2.0 },
+  { from: "ZESCO", to: "Justifeli Lodge", distance: 2.2 },
+  { from: "Justifeli Lodge", to: "Gerasmos Safari Lodge", distance: 3.1 },
 
-  // Gerasmos cluster
-  { from: "Gerasmos Safari Lodge", to: "Justifeli Lodge", distance: 2.0 },
+// Luangwa Secondary School Straight-Line Route
+  { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 },
+  { from: "Luangwa High School Police Post", to: "Katondwe Mission Hospital", distance: 5.2 },
+  { from: "Katondwe Mission Hospital", to: "Mwavi Secondary School", distance: 13.0 },
+  { from: "Mwavi Secondary School", to: "Mwalila Primary School", distance: 20.0 },
+  { from: "Mwalila Primary School", to: "Luangwa District Hospital", distance: 44.0 },
 
-    // Luangwa Secondary School Cluster
-  { from: "Luangwa Secondary School", to: "Luangwa District Hospital", distance: 44.0 },
-  { from: "Luangwa Secondary School", to: "Katondwe Mission Hospital", distance: 5.2 },
-  { from: "Luangwa Secondary School", to: "Mwalila Primary School", distance: 20.0 },
-  { from: "Luangwa Secondary School", to: "Mwavi Secondary School", distance: 13.0 },
-  { from: "Luangwa Secondary School", to: "Luangwa High School Police post", distance: 0.8 },
- 
- 
- // Katondwe Cluster Route (Straight Line Order)
-// Distances in kilometres (km)
+// Katondwe Cluster Route (Straight Line Order)
   { from: "Katondwe Mission Hospital", to: "Katondwe Chapel", distance: 0.50 },
   { from: "Katondwe Chapel", to: "Katondwe Primary School", distance: 0.05 },
-  { from: "Katondwe Primary School", to: "Katondwe Girls Secondary", distance: 0.00 },
-  { from: "Katondwe Girls Secondary", to: "Katondwe Chaz Hotel", distance: 0.45 },
+  { from: "Katondwe Primary School", to: "Katondwe Girls Secondary School", distance: 0.00 },
+  { from: "Katondwe Girls Secondary School", to: "Katondwe Chaz Hotel", distance: 0.45 },
   { from: "Katondwe Chaz Hotel", to: "Passover Living Lamb Ministry Katondwe", distance: 0.40 },
   { from: "Passover Living Lamb Ministry Katondwe", to: "Katondwe Dam", distance: 0.10 },
   { from: "Katondwe Dam", to: "Mwavi Secondary School", distance: 5.70 },
   { from: "Mwavi Secondary School", to: "Luangwa (Feira)", distance: 44.80 },
 
-
-  // Justifeli Lodge cluster
-  { from: "Justifeli Lodge", to: "Luangwa main sda churh", distance: 0.9 },
-  { from: "Justifeli Lodge", to: "Luangwa District Education Board Offices", distance: 2.0 },
-
-  // Kantuleni cluster
-  { from: "Kantuleni executive Lodge", to: "Luangwa Filling Station", distance: 0.19 },
-
-
-
-        
-  // Kakaro cluster
-  { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
+// Kakaro cluster
   { from: "Kakaro Primary School", to: "Kakaro Liberation Heritage Site", distance: 1.2 },
 
+// Kavalamanja cluster
+  { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23.0 },
 
-  // Kavalamanja cluster
-  { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23 },
-
-  // Luangwa (Feira) expanded cluster
+// Luangwa (Feira) Straight-Line Route (Expanded Cluster)
   { from: "Luangwa (Feira)", to: "Luangwa Market", distance: 0.4 },
-  { from: "Luangwa (Feira)", to: "Luangwa Police Station", distance: 0.55 },
-  { from: "Luangwa (Feira)", to: "Luangwa Filling Station", distance: 1.8 },
-  { from: "Luangwa (Feira)", to: "Luangwa Habour", distance: 0.9 },
-  { from: "Luangwa (Feira)", to: "Luangwa Indeco", distance: 0.9 },
-  { from: "Luangwa (Feira)", to: "Luangwa Post Office", distance: 1.65 },
-  { from: "Luangwa (Feira)", to: "Makichilo Lodge", distance: 0.4 },
-  { from: "Luangwa (Feira)", to: "Pentocostal Assembly of God Joshua Assembly", distance: 0.6 },
-  { from: "Luangwa (Feira)", to: "UCZ", distance: 0.5 },
-  { from: "Luangwa (Feira)", to: "Luangwa Council lodge", distance: 1.15 },
+  { from: "Luangwa Market", to: "Makichilo Lodge", distance: 0.4 },
+  { from: "Makichilo Lodge", to: "UCZ", distance: 0.5 },
+  { from: "UCZ", to: "Pentecostal Assembly of God Joshua Assembly", distance: 0.6 },
+  { from: "Pentecostal Assembly of God Joshua Assembly", to: "Luangwa Police Station", distance: 0.55 },
+  { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.65 },
+  { from: "Luangwa Post Office", to: "Luangwa Indeco", distance: 0.9 },
+  { from: "Luangwa Indeco", to: "Luangwa Habour", distance: 0.9 },
+  { from: "Luangwa Habour", to: "Luangwa Council Lodge", distance: 1.15 }
+];
 
-  // Luangwa Council Lodge cluster
-  { from: "Luangwa Council lodge", to: "Yangoma Hotel", distance: 0.15 },
-  { from: "Luangwa Council lodge", to: "Zambia Electricity Supply Corporation", distance: 2.4 },
 
-  // Luangwa District Hospital cluster
-  { from: "Luangwa District Hospital", to: "Zambia Electricity Supply Corporation", distance: 2.8 },
-  { from: "Zambia Electricity Supply Corporation", to: "Luangwa Airstrip", distance: 2.0 },
-
-  // Luangwa Filling Station cluster
-  { from: "Luangwa Filling Station", to: "Yangoma Hotel", distance: 0.7 },
-
-  // Luangwa Habour cluster
-  { from: "Luangwa Habour", to: "Luangwa Market", distance: 0.5 },
-
-  // Luangwa main sda church cluster
-  { from: "Luangwa main sda churh", to: "Hill View", distance: 1.6 },
-  { from: "Luangwa main sda churh", to: "Justifeli Lodge", distance: 0.9 },
-  { from: "Luangwa main sda churh", to: "Zambia Electricity Supply Corporation", distance: 0.65 },
-
-  // Hill View cluster
-  { from: "Hill View", to: "Luangwa Filling Station", distance: 3.1 },
-  { from: "Hill View", to: "Luangwa District Comission office", distance: 3.7 },
-
-  // Luangwa Police/Post Office cluster
-  { from: "Luangwa Police Station", to: "Luangwa Post Office", distance: 1.1 },
-  { from: "Luangwa Post Office", to: "Luangwa District Comission office", distance: 0.25 }
-];  
+    
     // Changed to input elements
     const originInput = document.getElementById('gm-origin');
     const destinationInput = document.getElementById('gm-destination');
