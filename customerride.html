@@ -379,7 +379,79 @@
     .input-group.valid .autocomplete-list {
       display: none; /* Hide list when input is valid/masked */
     }
-    
+
+    /* Footer Styles - UPDATED for icon-only buttons */
+    footer {
+        max-width: 1200px;
+        margin: 20px auto 0;
+        padding: 15px 20px;
+        border-top: 1px solid var(--border-color-light);
+        background: var(--bg-color-card);
+        text-align: center;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        display: none; /* Hidden by default */
+    }
+    .footer-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px; /* Slightly increased gap for icon buttons */
+        margin-bottom: 15px;
+    }
+    .footer-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px; /* Adjusted padding to make icons square/circular */
+        width: 45px; /* Fixed width */
+        height: 45px; /* Fixed height */
+        border-radius: 50%; /* Fully circular */
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center; /* Center icon */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .footer-btn:hover {
+        background-color: #174ea6;
+        transform: translateY(-1px);
+    }
+    .footer-btn .material-icons {
+        font-size: 22px; /* Slightly larger icon */
+        margin: 0; /* Remove margin/gap */
+    }
+    /* Specific styling for the call button */
+    #call-btn {
+        background-color: var(--success-color);
+    }
+    #call-btn:hover {
+        background-color: #138244;
+    }
+
+    .about-dropdown {
+        background: #f9fbfd;
+        border: 1px solid var(--border-color-light);
+        border-left: 3px solid var(--secondary-color);
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 10px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        display: none;
+        box-shadow: var(--box-shadow-light);
+        font-size: 0.9rem;
+        color: var(--font-color-medium);
+    }
+    .about-dropdown h4 {
+        color: var(--secondary-color);
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -485,7 +557,25 @@
         <div id="loader" class="loader"></div>
       </div>
     </section>
-  </main>
+
+    <footer id="main-footer">
+        <div class="footer-actions">
+            <a href="tel:0966423229" class="footer-btn" id="call-btn" title="Call for Inquiry/Complaint">
+                <span class="material-icons">call</span>
+            </a>
+            <button id="about-btn" class="footer-btn" title="About Luangwa Feira Rides">
+                <span class="material-icons">info</span>
+            </button>
+        </div>
+        <div id="about-info" class="about-dropdown">
+            <h4>About Our Service</h4>
+            <p><strong>Location:</strong> Dedicated service provider within the Luangwa Feira area and surrounding locations in Zambia. 🇿🇲</p>
+            <p><strong>Affordable:</strong> Our pricing is **cheap** as it has been submitted and competitive, calculated fairly based on distance.</p>
+            <p><strong>Reliable:</strong> We are committed to **reliable** and safe transport, ensuring you reach your destination efficiently.</p>
+        </div>
+        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">&copy; 2024 Luangwa Feira Rides. All rights reserved.</p>
+    </footer>
+    </main>
   <script>
     const config = {
       vehiclePricePerKm: 7.5,
@@ -532,6 +622,9 @@ const segments = [
   { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 },
   { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 },
   { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 },
+  
+  { from: "Kantuleni Executive Lodge", to: "Luangwa Habour", distance: 0.09 },
+  
   { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 },
   { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 },
   { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 },
@@ -636,6 +729,9 @@ const segments = [
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
+    const mainFooter = document.getElementById('main-footer'); 
+    const aboutBtn = document.getElementById('about-btn'); 
+    const aboutInfo = document.getElementById('about-info'); 
     let summaryData = null;
     let selectedOrigin = ''; // Store the actual selected place
     let selectedDestination = ''; // Store the actual selected place
@@ -745,7 +841,7 @@ const segments = [
       // Validation check for autocomplete inputs: must be a place in the array
       const isOriginValid = places.includes(origin);
       updateValidationStatus(originInput, isOriginValid);
-      // ALWAYS display ********** for the masked element
+      // ALWAYS display *********** for the masked element
       maskedOrigin.textContent = '**********'; 
       
       const isDestinationValid = places.includes(destination);
@@ -781,6 +877,7 @@ const segments = [
       summaryData = null;
       displayStatus('Please fill in all details correctly.', 'failed');
       summaryTableSection.classList.add('hidden-section');
+      mainFooter.style.display = 'none'; // Hide footer on reset
     }
     
     function reveal(eye) {
@@ -805,6 +902,7 @@ const segments = [
       submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null;
+      mainFooter.style.display = 'none'; // Ensure footer is hidden until submission is ready/complete
       
       // Validation now checks if the typed/selected value is in the 'places' array
       const isOriginValid = places.includes(origin);
@@ -964,10 +1062,14 @@ const segments = [
         loader.style.display = 'none';
         displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
         submitBtn.removeAttribute('disabled');
+        // --- LOGIC: Show Footer on Success ---
+        mainFooter.style.display = 'block'; 
+        // ----------------------------------------
       })
       .catch(error => {
         loader.style.display = 'none';
         submitBtn.removeAttribute('disabled');
+        displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
       });
     }
@@ -991,6 +1093,7 @@ const segments = [
             tripDetails.classList.add('hidden-section');
             summaryTableSection.classList.add('hidden-section');
             displayStatus('Please fill in all details correctly.', 'info');
+            mainFooter.style.display = 'none'; // Ensure footer is hidden if phone input is invalid
         }
     }
     
@@ -1006,6 +1109,11 @@ const segments = [
       modeVehicleRadio.addEventListener('change', updateSummaryTable);
       modeMotorbikeRadio.addEventListener('change', updateSummaryTable);
       extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
+
+      // Footer button logic
+      aboutBtn.addEventListener('click', () => {
+          aboutInfo.style.display = aboutInfo.style.display === 'block' ? 'none' : 'block';
+      });
     });
     
     // Reset validation for masked values
