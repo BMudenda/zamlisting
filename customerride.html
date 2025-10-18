@@ -375,18 +375,14 @@
       display: none;
     }
 
-    /* === START FOOTER STYLE MODIFICATION === */
     footer {
         width: 100%;
         padding: 0; 
         border-top: 1px solid var(--border-color-light);
         background: var(--bg-color-card);
         box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-        /* Set to hidden by default */
-        display: none; 
+        display: none; /* Controlled by JS */
     }
-    /* === END FOOTER STYLE MODIFICATION === */
-
     .footer-content-wrapper { 
         text-align: center;
         padding-top: 15px;
@@ -582,11 +578,10 @@
       motorbikeMinPrice: 10,
       avgSpeed: 60,
     };
-    // The Google Script URL remains the same
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzN_LoIE8sb7H9wuhzIz8kYNqNd-0aWCSS2t0duusBaLqC2DjcK3Affih3Q-3R3QhE/exec";
     
     // ===========================================
-    // Data for Luangwa Town Routes (Graph data omitted for brevity, assumed correct)
+    // Data for Luangwa Town Routes
     // ===========================================
     const places = [
       "Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic",
@@ -602,10 +597,13 @@
       "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School",
       "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly",
       "UCZ", "Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
+      // Include any place from the segments list that might have been missed from the above static list
       "Lusaka Water Office", "Immigration Flats", "OMNO"
     ];
 
+    // === Complete Segment List ===
     const segments = [
+      //  Long-distance routes connected to Luangwa Bus Station area
       { from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 },
       { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 },
       { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 },
@@ -616,6 +614,8 @@
       { from: 'Mwalila Primary School', to: 'Kaunga Secondary School', distance: 5 },
       { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 },
       { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 },
+
+      //  Town network near Bus Station
       { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
       { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 },
       { from: "Soweto Junction", to: "Airstrip", distance: 1.7 },
@@ -638,10 +638,12 @@
       { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 },
       { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
       { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
+      
+      //  Bus Station extended links
       { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
       { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
-      { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 4.36 },
+      { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
       { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 },
       { from: "Registration Office", to: "Chidada Ground", distance: 0.49 },
       { from: "Luangwa Town Council", to: "Hill View", distance: 0.40 },
@@ -656,10 +658,10 @@
       if (!graph[from]) graph[from] = [];
       if (!graph[to]) graph[to] = [];
       graph[from].push({ node: to, distance });
-      graph[to].push({ node: from, distance }); 
+      graph[to].push({ node: from, distance }); // two-way travel
     });
 
-    // === Dijkstra’s Algorithm for shortest path ===
+    // === Dijkstra’s Algorithm for shortest path (Assumed Correct) ===
     function findShortestDistance(start, end) { 
       if (start === end) return 0;
       if (!graph[start] || !graph[end]) return null;
@@ -667,10 +669,12 @@
       const distances = {};
       const unvisited = new Set(Object.keys(graph));
 
+      // 1. Initialize distances
       for (const node of unvisited) distances[node] = Infinity;
       distances[start] = 0;
 
       while (unvisited.size) {
+        // 2. Find the unvisited node with the smallest distance (The current node)
         let current = null;
         for (const node of unvisited) {
           if (current === null || distances[node] < distances[current]) {
@@ -678,14 +682,18 @@
           }
         }
         
+        // Check for unreachable graph partitions or end of search
         if (current === null || distances[current] === Infinity) break; 
         
+        // 3. Check if we've reached the destination
         if (current === end) {
             return distances[end];
         }
         
+        // 4. Mark the current node as visited and remove from unvisited set
         unvisited.delete(current);
 
+        // 5. Update neighbors' distances
         for (const neighbor of (graph[current] || [])) {
           const neighborNode = neighbor.node;
           const distanceToNeighbor = neighbor.distance;
@@ -699,50 +707,55 @@
         }
       }
       
+      // Route not found
       return null;
     }
 
-    // === Core Logic: Calculate Total Distance ===
+    // === NEW USER-REQUESTED Logic for Total Distance ===
     function calculateTotalDistance(pickup, destination) {
-      const BUS_STATION = "Luangwa Bus Station";
+      const busStation = "Luangwa Bus Station";
 
-      if (pickup === destination) return 0;
-
-      if (pickup === BUS_STATION) {
-        return findShortestDistance(BUS_STATION, destination);
+      // If pickup is same as bus station
+      if (pickup === busStation) {
+        return findShortestDistance(busStation, destination);
       }
 
-      if (destination === BUS_STATION) {
-        return findShortestDistance(pickup, BUS_STATION);
+      // If destination is the bus station
+      if (destination === busStation) {
+        return findShortestDistance(pickup, busStation);
       }
 
+      // Always calculate Bus Station -> Pickup -> Destination
+      const busToPickup = findShortestDistance(busStation, pickup);
       const pickupToDestination = findShortestDistance(pickup, destination);
-      if (pickupToDestination !== null) return pickupToDestination;
-
-      const busToPickup = findShortestDistance(BUS_STATION, pickup);
-      const busToDestination = findShortestDistance(BUS_STATION, destination);
       
-      if (busToPickup === null || busToDestination === null) {
-          return null;
+      // Check for impossible routes
+      if (busToPickup === null || pickupToDestination === null) {
+          return null; 
       }
 
-      // If no direct route, fallback to Hub routing A -> BS -> B
-      return busToPickup + busToDestination; 
+      // This is the new logic requested: BS -> Pickup -> Destination
+      return busToPickup + pickupToDestination;
     }
     
     // New function to convert the 0xxxxxxxxx format to +260xxxxxxxxx format
     function standardizePhoneNumber(phone) {
       if (!phone) return '';
+      // 1. Remove non-digit characters
       const cleaned = phone.replace(/\D/g, '');
       
+      // 2. Check for the common national format (10 digits starting with 0)
       if (cleaned.length === 10 && cleaned.startsWith('0')) {
+          // Remove the leading '0' and prepend '+260'
           return `+260${cleaned.substring(1)}`;
       }
       
+      // 3. If it's already in the 9-digit international format (e.g., 971234567), just prepend +260
       if (cleaned.length === 9) {
           return `+260${cleaned}`;
       }
 
+      // 4. If it's already in the full international format (+260...) return as is
       if (cleaned.length === 12 && cleaned.startsWith('260')) {
           return `+${cleaned}`;
       }
@@ -768,19 +781,20 @@
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
-    const mainFooter = document.getElementById('main-footer'); // Footer reference
+    const mainFooter = document.getElementById('main-footer'); 
     const aboutBtn = document.getElementById('about-btn'); 
     const aboutInfo = document.getElementById('about-info'); 
-    let summaryData = null; 
+    let summaryData = null; // HOLDS VALID DATA FOR SUBMISSION
     let selectedOrigin = '';
     let selectedDestination = '';
     
-    // Function to attach live autocomplete filtering (omitted for brevity, assumed correct)
+    // Function to attach live autocomplete filtering
     function setupAutocomplete(inputId, listId, inputElement) {
         const input = inputElement;
         const list = document.getElementById(listId);
 
         input.addEventListener("input", () => {
+            // Force reset validation on typing
             input.closest('.input-group').classList.remove('valid');
             
             const query = input.value.toLowerCase();
@@ -844,6 +858,7 @@
       maskedDestination.textContent = '**********';
     }
     
+    // --- CORRECTED FUNCTION ---
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
       const input = parentGroup.querySelector('input');
@@ -860,9 +875,10 @@
           parentGroup.classList.remove('valid');
       }
 
+      // VITAL FIX: Reset all state and disable button to prevent "No data to submit"
       summaryTableContainer.innerHTML = '';
       submitBtn.setAttribute('disabled', 'true');
-      summaryData = null;
+      summaryData = null; // Set data to null
       displayStatus('Please fill in all details correctly.', 'info');
       summaryTableSection.classList.add('hidden-section');
       mainFooter.style.display = 'none'; // CRITICAL: Hide footer on reset
@@ -886,9 +902,10 @@
       const isExtraLuggageChecked = extraLuggageCheckbox.checked;
       
       summaryTableContainer.innerHTML = '';
+      // VITAL FIX: Disable button and clear data at the start of validation
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
-      mainFooter.style.display = 'none'; // CRITICAL: Hide footer when recalculating/invalidating
+      mainFooter.style.display = 'none'; // CRITICAL: Hide footer while trip is invalid/recalculating
       
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
@@ -900,12 +917,14 @@
       
       maskLocationValues(origin, destination);
       
+      // Check ALL criteria to show the summary table
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
           summaryTableSection.classList.add('hidden-section');
           displayStatus('Please select transport mode and enter valid locations.', 'info');
           return;
       }
       
+      // All validations passed, proceed to calculation
       const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
       const hasExtraLuggage = isExtraLuggageChecked;
       
@@ -998,6 +1017,7 @@
         </div>
       `;
       summaryTableContainer.innerHTML = tableHTML;
+      // VITAL FIX: Populate data only on SUCCESS
       summaryData = {
         preferredMode: mode,
         extraLuggage: hasExtraLuggage ? 'Yes' : 'No',
@@ -1010,11 +1030,12 @@
       };
       summaryTableSection.classList.remove('hidden-section');
       displayStatus('Trip details calculated. Click submit to send your request.', 'success');
-      submitBtn.removeAttribute('disabled');
-      // DO NOT SHOW FOOTER YET - It's handled on successful submission
+      submitBtn.removeAttribute('disabled'); // ENABLE BUTTON
+      // mainFooter.style.display is intentionally NOT set to 'block' here. It will only show on successful submission.
     }
     
     function submitToGoogleSheet() {
+      // VITAL FIX: The check remains, but now the disabled button should prevent this from failing.
       if (!summaryData) { 
         displayStatus('No data to submit.', 'failed');
         submitBtn.setAttribute('disabled', 'true');
@@ -1022,11 +1043,14 @@
       }
       const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
       
+      // --- CRITICAL PHONE NUMBER STANDARDIZATION ---
       const standardizedPhone = standardizePhoneNumber(summaryData.phone);
+      // ---------------------------------------------
       
       const payload = {
         "preferredMode": summaryData.preferredMode,
         "extraLuggage": summaryData.extraLuggage,
+        // Use the standardized number for submission
         "phone": standardizedPhone, 
         "from": summaryData.from,
         "to": summaryData.to,
@@ -1048,12 +1072,10 @@
       })
       .then(response => {
         loader.style.display = 'none';
-        
-        // Assuming the Google Apps Script returns a successful status (2xx)
-        if (response.status >= 200 && response.status < 300) { 
+         if (response.status >= 200 && response.status < 300) { 
             displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
             submitBtn.removeAttribute('disabled');
-            mainFooter.style.display = 'block'; // CRITICAL: SHOW FOOTER ON SUCCESS
+            mainFooter.style.display = 'block'; // CRITICAL: SHOW FOOTER ON SUCCESSFUL SUBMISSION
         } else {
              throw new Error(`Server responded with status ${response.status}`);
         }
@@ -1063,7 +1085,7 @@
         submitBtn.removeAttribute('disabled');
         displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
-        mainFooter.style.display = 'none'; // CRITICAL: HIDE FOOTER ON FAILURE
+        mainFooter.style.display = 'none'; // CRITICAL: HIDE FOOTER ON FAILED SUBMISSION
       });
     }
     
@@ -1086,15 +1108,16 @@
             updateValidationStatus(customerPhoneInput, false);
             tripDetails.classList.add('hidden-section');
             summaryTableSection.classList.add('hidden-section');
-            submitBtn.setAttribute('disabled', 'true');
+            submitBtn.setAttribute('disabled', 'true'); // VITAL: Ensure button is disabled if phone invalid
             displayStatus('Please fill in all details correctly.', 'info');
-            mainFooter.style.display = 'none'; // CRITICAL: Hide footer if phone invalid
+            mainFooter.style.display = 'none'; // CRITICAL: Hide footer if phone is invalid
         }
     }
     
     document.addEventListener('DOMContentLoaded', () => {
+      // Initialize button as disabled on load
       submitBtn.setAttribute('disabled', 'true'); 
-      mainFooter.style.display = 'none'; // CRITICAL: Ensure hidden on page load
+      mainFooter.style.display = 'none'; // CRITICAL: Ensure footer is hidden on initial load
       
       setupAutocomplete("gm-origin", "originList", originInput);
       setupAutocomplete("gm-destination", "destinationList", destinationInput);
@@ -1110,6 +1133,7 @@
       });
     });
     
+    // Reset validation for masked values
     maskedPhone.addEventListener('click', resetValidation);
     maskedOrigin.addEventListener('click', resetValidation);
     maskedDestination.addEventListener('click', resetValidation);
