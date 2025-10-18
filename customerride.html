@@ -16,6 +16,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
+    /* ... (CSS remains unchanged) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -615,15 +616,22 @@
       { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 },
 
       // Town network near Bus Station
-      { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
-      { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 },
-      { from: "Soweto Junction", to: "Airstrip", distance: 1.7 },
+
+      // Hub routes (Bus Station)
+      { from: "Luangwa Bus Station", to: "Soweto Junction", distance: 4.0 }, 
+      { from: "Luangwa Bus Station", to: "Luangwa District Hospital", distance: 7.0 },
+      // Other links from Soweto Junction
+      { from: "Soweto Junction", to: "Airstrip", distance: 1.7 }, 
       { from: "Soweto Junction", to: "ZESCO Office", distance: 0.3 },
+      
+      // Other Town Links
+      { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
       { from: "ZESCO Office", to: "Luangwa Main SDA Church", distance: 0.65 },
       { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 },
       { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 },
       { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 },
       { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 },
+      
       { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 },
       { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 },
       { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 },
@@ -638,7 +646,7 @@
       { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
       { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
       
-      // Bus Station extended links
+      // Bus Station extended links (0.0 distance locations)
       { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
       { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
@@ -702,26 +710,26 @@
       return null;
     }
 
-    // === Total Distance (Enforcing Bus Station routing) ===
+    // === CORRECTED Total Distance (Additive Rule: Pickup->Destination + Pickup->BusStation) ===
     function calculateTotalDistance(pickup, destination) {
       const busStation = "Luangwa Bus Station";
-
-      if (pickup === busStation) {
-        return findShortestDistance(busStation, destination);
-      }
-
-      if (destination === busStation) {
-        return findShortestDistance(pickup, busStation);
-      }
-
-      const busToPickup = findShortestDistance(busStation, pickup);
-      const pickupToDestination = findShortestDistance(pickup, destination);
       
-      if (busToPickup === null || pickupToDestination === null) {
-          return null; 
+      // D1: Shortest distance between Pickup and Destination
+      const pickupToDestination = findShortestDistance(pickup, destination);
+
+      // D2: Shortest distance between Pickup and Bus Station (Hub)
+      const pickupToBus = findShortestDistance(pickup, busStation);
+      
+      if (pickupToDestination === null || pickupToBus === null) {
+          // If either path cannot be calculated, the trip is invalid/impossible
+          return { total: null };
       }
 
-      return busToPickup + pickupToDestination;
+      // Total Distance = (Pickup -> Destination) + (Pickup -> Bus Station)
+      // This correctly adds the hub distance only to the pickup point.
+      const total = pickupToDestination + pickupToBus;
+      
+      return { total: total };
     }
     
     // === Phone Number Standardization ===
@@ -752,7 +760,7 @@
     const customerPhoneInput = document.getElementById('customer-phone');
     const modeVehicleRadio = document.getElementById('mode-vehicle');
     const modeMotorbikeRadio = document.getElementById('mode-motorbike');
-    const modeSelectionGroup = document.getElementById('mode-selection-group'); // New reference for the parent element
+    const modeSelectionGroup = document.getElementById('mode-selection-group'); 
     const extraLuggageCheckbox = document.getElementById('extra-luggage-checkbox');
     const summaryTableSection = document.querySelector('.summary-table-section');
     const summaryTableContainer = document.getElementById('summary-table-container');
@@ -877,7 +885,6 @@
       const destination = destinationInput.value.trim();
       const customerPhone = customerPhoneInput.value.trim();
       
-      // Re-read status of radio buttons here for robustness
       const isVehicleSelected = modeVehicleRadio.checked;
       const isMotorbikeSelected = modeMotorbikeRadio.checked; 
       const isExtraLuggageChecked = extraLuggageCheckbox.checked;
@@ -890,7 +897,6 @@
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
       const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/); 
-      // CRITICAL CHECK: isModeSelected is true if EITHER radio button is checked.
       const isModeSelected = isVehicleSelected || isMotorbikeSelected; 
       
       if (isOriginValid) selectedOrigin = origin;
@@ -901,11 +907,12 @@
       // Check ALL criteria to show the summary table
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
           summaryTableSection.classList.add('hidden-section');
-          displayStatus('Please select transport mode and enter valid locations.', 'info');
           
+          let statusMessage = 'Please fill in all details correctly.';
           if(isOriginValid && isDestinationValid && isPhoneValid && !isModeSelected){
-               displayStatus('Please select either Vehicle or Motorbike.', 'info');
+               statusMessage = 'Please select either Vehicle or Motorbike.';
           }
+          displayStatus(statusMessage, 'info');
           
           return;
       }
@@ -913,15 +920,16 @@
       const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
       const hasExtraLuggage = isExtraLuggageChecked;
       
-      const distance = calculateTotalDistance(origin, destination);
+      const distanceObject = calculateTotalDistance(origin, destination);
+      const totalDistance = distanceObject.total;
       
-      if (distance === null || isNaN(distance)) {
+      if (totalDistance === null || isNaN(totalDistance)) {
         summaryTableSection.classList.add('hidden-section');
-        displayStatus('A route could not be found via the Bus Station.', 'failed');
+        displayStatus('A valid route could not be calculated with the additive rule.', 'failed');
         return;
       }
       
-      const timeHours = distance / config.avgSpeed;
+      const timeHours = totalDistance / config.avgSpeed;
       const wholeHours = Math.floor(timeHours);
       const minutes = Math.round((timeHours - wholeHours) * 60);
       let price = 0;
@@ -929,11 +937,11 @@
       // PRICING LOGIC applying the minimum cost
       if (mode === 'Vehicle') {
         // K6.6 per km, minimum K20
-        let calculatedPrice = distance * config.vehiclePricePerKm; 
+        let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
         price = Math.max(calculatedPrice, config.vehicleMinPrice); 
       } else {
         // K1.5 per km, minimum K10
-        let calculatedPrice = distance * config.motorbikePricePerKm; 
+        let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
         price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
       }
       
@@ -952,13 +960,14 @@
         timeText += `${minutes} min`;
       }
       
+      // Kept the table structure as requested in the previous revision.
       const tableHTML = `
         <div class="table-responsive">
           <table class="summary-table">
             <thead>
               <tr>
                 <th>Mode</th>
-                <th>Extra Luggage</th>
+                <th>Luggage</th>
                 <th>Phone</th>
                 <th>From</th>
                 <th>To</th>
@@ -990,7 +999,7 @@
                   <span class="eye-btn" onclick="reveal(this)">👁️</span>
                 </td>
                 <td>
-                  <span class="hidden-value">${distance.toFixed(2)}</span>
+                  <span class="hidden-value">${totalDistance.toFixed(2)}</span>
                   <span class="eye-btn" onclick="reveal(this)">👁️</span>
                 </td>
                 <td>
@@ -1013,7 +1022,7 @@
         phone: customerPhone,
         from: origin,
         to: destination,
-        distance: distance.toFixed(2), 
+        distance: totalDistance.toFixed(2), 
         estimatedTime: timeText,
         price: price
       };
@@ -1043,6 +1052,7 @@
         "price": summaryData.price,
         "timestamp": timestamp
       };
+      
       const formBody = new URLSearchParams(payload);
       displayStatus('Submitting...', 'info');
       loader.style.display = 'block';
@@ -1065,7 +1075,7 @@
         }
       })
       .catch(error => {
-        loader.style.display = 'none';
+        loader.style.none;
         submitBtn.removeAttribute('disabled');
         displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
@@ -1107,7 +1117,7 @@
       
       customerPhoneInput.addEventListener('input', handlePhoneNumberInput);
       
-      // *** THE CRUCIAL FIX: Listener on the parent element for robust radio button change detection. ***
+      // CRITICAL FIX: Listener on the parent element for robust radio button change detection.
       modeSelectionGroup.addEventListener('change', updateSummaryTable);
       extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
 
