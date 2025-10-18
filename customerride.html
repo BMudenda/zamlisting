@@ -381,7 +381,7 @@
         border-top: 1px solid var(--border-color-light);
         background: var(--bg-color-card);
         box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-        display: none; /* Controlled by JS */
+        display: none; 
     }
     .footer-content-wrapper { 
         text-align: center;
@@ -484,7 +484,7 @@
               <span class="material-icons input-icon">commute</span>
               <label>Trip Customization</label>
               <div class="option-group">
-                  <fieldset class="radio-group">
+                  <fieldset class="radio-group" id="mode-selection-group">
                       <legend>Transport Mode</legend>
                       <div class="radio-item">
                           <input type="radio" id="mode-vehicle" name="mode" value="vehicle">
@@ -572,10 +572,11 @@
   
   <script>
     const config = {
+      // **MINIMUM PRICE CONFIGURATION**
       vehiclePricePerKm: 6.6,
       motorbikePricePerKm: 1.5,
-      vehicleMinPrice: 20,
-      motorbikeMinPrice: 10,
+      vehicleMinPrice: 20, // K20 Minimum Price
+      motorbikeMinPrice: 10, // K10 Minimum Price
       avgSpeed: 60,
     };
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzN_LoIE8sb7H9wuhzIz8kYNqNd-0aWCSS2t0duusBaLqC2DjcK3Affih3Q-3R3QhE/exec";
@@ -597,13 +598,11 @@
       "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School",
       "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly",
       "UCZ", "Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
-      // Include any place from the segments list that might have been missed from the above static list
       "Lusaka Water Office", "Immigration Flats", "OMNO"
     ];
 
-    // === Complete Segment List ===
     const segments = [
-      //  Long-distance routes connected to Luangwa Bus Station area
+      // Long-distance routes connected to Luangwa Bus Station area
       { from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 },
       { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 },
       { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 },
@@ -615,7 +614,7 @@
       { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 },
       { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 },
 
-      //  Town network near Bus Station
+      // Town network near Bus Station
       { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
       { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 },
       { from: "Soweto Junction", to: "Airstrip", distance: 1.7 },
@@ -639,7 +638,7 @@
       { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
       { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
       
-      //  Bus Station extended links
+      // Bus Station extended links
       { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
       { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
@@ -658,10 +657,10 @@
       if (!graph[from]) graph[from] = [];
       if (!graph[to]) graph[to] = [];
       graph[from].push({ node: to, distance });
-      graph[to].push({ node: from, distance }); // two-way travel
+      graph[to].push({ node: from, distance }); 
     });
 
-    // === Dijkstra’s Algorithm for shortest path (Assumed Correct) ===
+    // === Dijkstra’s Algorithm for shortest path ===
     function findShortestDistance(start, end) { 
       if (start === end) return 0;
       if (!graph[start] || !graph[end]) return null;
@@ -669,12 +668,10 @@
       const distances = {};
       const unvisited = new Set(Object.keys(graph));
 
-      // 1. Initialize distances
       for (const node of unvisited) distances[node] = Infinity;
       distances[start] = 0;
 
       while (unvisited.size) {
-        // 2. Find the unvisited node with the smallest distance (The current node)
         let current = null;
         for (const node of unvisited) {
           if (current === null || distances[node] < distances[current]) {
@@ -682,18 +679,14 @@
           }
         }
         
-        // Check for unreachable graph partitions or end of search
         if (current === null || distances[current] === Infinity) break; 
         
-        // 3. Check if we've reached the destination
         if (current === end) {
             return distances[end];
         }
         
-        // 4. Mark the current node as visited and remove from unvisited set
         unvisited.delete(current);
 
-        // 5. Update neighbors' distances
         for (const neighbor of (graph[current] || [])) {
           const neighborNode = neighbor.node;
           const distanceToNeighbor = neighbor.distance;
@@ -706,56 +699,44 @@
           }
         }
       }
-      
-      // Route not found
       return null;
     }
 
-    // === NEW USER-REQUESTED Logic for Total Distance ===
+    // === Total Distance (Enforcing Bus Station routing) ===
     function calculateTotalDistance(pickup, destination) {
       const busStation = "Luangwa Bus Station";
 
-      // If pickup is same as bus station
       if (pickup === busStation) {
         return findShortestDistance(busStation, destination);
       }
 
-      // If destination is the bus station
       if (destination === busStation) {
         return findShortestDistance(pickup, busStation);
       }
 
-      // Always calculate Bus Station -> Pickup -> Destination
       const busToPickup = findShortestDistance(busStation, pickup);
       const pickupToDestination = findShortestDistance(pickup, destination);
       
-      // Check for impossible routes
       if (busToPickup === null || pickupToDestination === null) {
           return null; 
       }
 
-      // This is the new logic requested: BS -> Pickup -> Destination
       return busToPickup + pickupToDestination;
     }
     
-    // New function to convert the 0xxxxxxxxx format to +260xxxxxxxxx format
+    // === Phone Number Standardization ===
     function standardizePhoneNumber(phone) {
       if (!phone) return '';
-      // 1. Remove non-digit characters
       const cleaned = phone.replace(/\D/g, '');
       
-      // 2. Check for the common national format (10 digits starting with 0)
       if (cleaned.length === 10 && cleaned.startsWith('0')) {
-          // Remove the leading '0' and prepend '+260'
           return `+260${cleaned.substring(1)}`;
       }
       
-      // 3. If it's already in the 9-digit international format (e.g., 971234567), just prepend +260
       if (cleaned.length === 9) {
           return `+260${cleaned}`;
       }
 
-      // 4. If it's already in the full international format (+260...) return as is
       if (cleaned.length === 12 && cleaned.startsWith('260')) {
           return `+${cleaned}`;
       }
@@ -771,6 +752,7 @@
     const customerPhoneInput = document.getElementById('customer-phone');
     const modeVehicleRadio = document.getElementById('mode-vehicle');
     const modeMotorbikeRadio = document.getElementById('mode-motorbike');
+    const modeSelectionGroup = document.getElementById('mode-selection-group'); // New reference for the parent element
     const extraLuggageCheckbox = document.getElementById('extra-luggage-checkbox');
     const summaryTableSection = document.querySelector('.summary-table-section');
     const summaryTableContainer = document.getElementById('summary-table-container');
@@ -784,7 +766,7 @@
     const mainFooter = document.getElementById('main-footer'); 
     const aboutBtn = document.getElementById('about-btn'); 
     const aboutInfo = document.getElementById('about-info'); 
-    let summaryData = null; // HOLDS VALID DATA FOR SUBMISSION
+    let summaryData = null; 
     let selectedOrigin = '';
     let selectedDestination = '';
     
@@ -794,7 +776,6 @@
         const list = document.getElementById(listId);
 
         input.addEventListener("input", () => {
-            // Force reset validation on typing
             input.closest('.input-group').classList.remove('valid');
             
             const query = input.value.toLowerCase();
@@ -858,7 +839,7 @@
       maskedDestination.textContent = '**********';
     }
     
-    // --- CORRECTED FUNCTION ---
+    // Function to handle resetting the form section when clicking the masked value
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
       const input = parentGroup.querySelector('input');
@@ -875,13 +856,12 @@
           parentGroup.classList.remove('valid');
       }
 
-      // VITAL FIX: Reset all state and disable button to prevent "No data to submit"
       summaryTableContainer.innerHTML = '';
       submitBtn.setAttribute('disabled', 'true');
-      summaryData = null; // Set data to null
+      summaryData = null; 
       displayStatus('Please fill in all details correctly.', 'info');
       summaryTableSection.classList.add('hidden-section');
-      mainFooter.style.display = 'none'; // CRITICAL: Hide footer on reset
+      mainFooter.style.display = 'none'; 
     }
     
     function reveal(eye) {
@@ -897,20 +877,21 @@
       const destination = destinationInput.value.trim();
       const customerPhone = customerPhoneInput.value.trim();
       
+      // Re-read status of radio buttons here for robustness
       const isVehicleSelected = modeVehicleRadio.checked;
-      const isMotorbikeSelected = modeMotorbikeRadio.checked;
+      const isMotorbikeSelected = modeMotorbikeRadio.checked; 
       const isExtraLuggageChecked = extraLuggageCheckbox.checked;
       
       summaryTableContainer.innerHTML = '';
-      // VITAL FIX: Disable button and clear data at the start of validation
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
-      mainFooter.style.display = 'none'; // CRITICAL: Hide footer while trip is invalid/recalculating
+      mainFooter.style.display = 'none'; 
       
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
       const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/); 
-      const isModeSelected = isVehicleSelected || isMotorbikeRadio.checked;
+      // CRITICAL CHECK: isModeSelected is true if EITHER radio button is checked.
+      const isModeSelected = isVehicleSelected || isMotorbikeSelected; 
       
       if (isOriginValid) selectedOrigin = origin;
       if (isDestinationValid) selectedDestination = destination;
@@ -921,10 +902,14 @@
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
           summaryTableSection.classList.add('hidden-section');
           displayStatus('Please select transport mode and enter valid locations.', 'info');
+          
+          if(isOriginValid && isDestinationValid && isPhoneValid && !isModeSelected){
+               displayStatus('Please select either Vehicle or Motorbike.', 'info');
+          }
+          
           return;
       }
       
-      // All validations passed, proceed to calculation
       const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
       const hasExtraLuggage = isExtraLuggageChecked;
       
@@ -941,12 +926,15 @@
       const minutes = Math.round((timeHours - wholeHours) * 60);
       let price = 0;
       
+      // PRICING LOGIC applying the minimum cost
       if (mode === 'Vehicle') {
-        price = distance * config.vehiclePricePerKm;
-        price = Math.max(price, config.vehicleMinPrice);
+        // K6.6 per km, minimum K20
+        let calculatedPrice = distance * config.vehiclePricePerKm; 
+        price = Math.max(calculatedPrice, config.vehicleMinPrice); 
       } else {
-        price = distance * config.motorbikePricePerKm;
-        price = Math.max(price, config.motorbikeMinPrice);
+        // K1.5 per km, minimum K10
+        let calculatedPrice = distance * config.motorbikePricePerKm; 
+        price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
       }
       
       if (hasExtraLuggage) {
@@ -954,6 +942,8 @@
       }
       
       price = Math.round(price);
+
+      // Time formatting
       let timeText = '';
       if (wholeHours > 0) {
         timeText += `${wholeHours} hr`;
@@ -1017,7 +1007,6 @@
         </div>
       `;
       summaryTableContainer.innerHTML = tableHTML;
-      // VITAL FIX: Populate data only on SUCCESS
       summaryData = {
         preferredMode: mode,
         extraLuggage: hasExtraLuggage ? 'Yes' : 'No',
@@ -1030,12 +1019,10 @@
       };
       summaryTableSection.classList.remove('hidden-section');
       displayStatus('Trip details calculated. Click submit to send your request.', 'success');
-      submitBtn.removeAttribute('disabled'); // ENABLE BUTTON
-      // mainFooter.style.display is intentionally NOT set to 'block' here. It will only show on successful submission.
+      submitBtn.removeAttribute('disabled'); 
     }
     
     function submitToGoogleSheet() {
-      // VITAL FIX: The check remains, but now the disabled button should prevent this from failing.
       if (!summaryData) { 
         displayStatus('No data to submit.', 'failed');
         submitBtn.setAttribute('disabled', 'true');
@@ -1043,14 +1030,11 @@
       }
       const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
       
-      // --- CRITICAL PHONE NUMBER STANDARDIZATION ---
       const standardizedPhone = standardizePhoneNumber(summaryData.phone);
-      // ---------------------------------------------
       
       const payload = {
         "preferredMode": summaryData.preferredMode,
         "extraLuggage": summaryData.extraLuggage,
-        // Use the standardized number for submission
         "phone": standardizedPhone, 
         "from": summaryData.from,
         "to": summaryData.to,
@@ -1075,7 +1059,7 @@
          if (response.status >= 200 && response.status < 300) { 
             displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
             submitBtn.removeAttribute('disabled');
-            mainFooter.style.display = 'block'; // CRITICAL: SHOW FOOTER ON SUCCESSFUL SUBMISSION
+            mainFooter.style.display = 'block'; 
         } else {
              throw new Error(`Server responded with status ${response.status}`);
         }
@@ -1085,7 +1069,7 @@
         submitBtn.removeAttribute('disabled');
         displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
-        mainFooter.style.display = 'none'; // CRITICAL: HIDE FOOTER ON FAILED SUBMISSION
+        mainFooter.style.display = 'none'; 
       });
     }
     
@@ -1108,24 +1092,23 @@
             updateValidationStatus(customerPhoneInput, false);
             tripDetails.classList.add('hidden-section');
             summaryTableSection.classList.add('hidden-section');
-            submitBtn.setAttribute('disabled', 'true'); // VITAL: Ensure button is disabled if phone invalid
+            submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
-            mainFooter.style.display = 'none'; // CRITICAL: Hide footer if phone is invalid
+            mainFooter.style.display = 'none'; 
         }
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      // Initialize button as disabled on load
       submitBtn.setAttribute('disabled', 'true'); 
-      mainFooter.style.display = 'none'; // CRITICAL: Ensure footer is hidden on initial load
+      mainFooter.style.display = 'none'; 
       
       setupAutocomplete("gm-origin", "originList", originInput);
       setupAutocomplete("gm-destination", "destinationList", destinationInput);
       
       customerPhoneInput.addEventListener('input', handlePhoneNumberInput);
       
-      modeVehicleRadio.addEventListener('change', updateSummaryTable);
-      modeMotorbikeRadio.addEventListener('change', updateSummaryTable);
+      // *** THE CRUCIAL FIX: Listener on the parent element for robust radio button change detection. ***
+      modeSelectionGroup.addEventListener('change', updateSummaryTable);
       extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
 
       aboutBtn.addEventListener('click', () => {
