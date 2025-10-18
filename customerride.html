@@ -38,7 +38,6 @@
       background: var(--font-color-dark); color: white; padding: 20px; text-align: left;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    /* Updated .header-content and .footer-content-wrapper to share content alignment */
     .header-content, .footer-content-wrapper { 
       max-width: 1200px; 
       margin: auto; 
@@ -96,7 +95,7 @@
     .input-group.valid .validation-tick {
       opacity: 1;
     }
-    input[type="text"], input[type="tel"], select { /* Added input[type="text"] */
+    input[type="text"], input[type="tel"], select {
       width: 100%; padding: 10px; font-size: 1rem; border-radius: 5px;
       border: 1px solid var(--border-color-light); transition: border 0.2s, box-shadow 0.2s;
       background-color: transparent;
@@ -131,7 +130,7 @@
     }
     .input-group.valid input[type="text"],
     .input-group.valid select,
-    #customer-phone-wrapper.valid input[type="tel"] { /* Added phone input hiding */
+    #customer-phone-wrapper.valid input[type="tel"] {
       display: none;
     }
     .masked-value {
@@ -148,8 +147,8 @@
     }
     .input-group.valid .masked-value {
       display: block;
-      font-weight: bold; /* Make the ********** stand out */
-      letter-spacing: 2px; /* Spread ********** apart */
+      font-weight: bold;
+      letter-spacing: 2px;
     }
     .summary-table-section {
       margin-top: 20px; padding: 15px; background: var(--bg-color-card);
@@ -209,11 +208,9 @@
       align-items: center;
       justify-content: center;
     }
-    .fa-map { background: var(--primary-color); }
     .fa-send-o { background: var(--primary-color); }
-    .map-btn:hover { background: #174ea6; }
     .submit-btn:hover { background: #138244; }
-    .map-btn[disabled], .submit-btn[disabled] {
+    .submit-btn[disabled] {
       opacity: 0.5;
       cursor: not-allowed;
     }
@@ -231,12 +228,6 @@
     .submit-status.failed { color: var(--fail-color); }
     .submit-status.info { color: var(--primary-color); }
     .material-icons { font-size: 20px; vertical-align: middle; }
-    .share-options {
-      display: none;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 10px;
-    }
     .hidden-value {
       display: none;
       color: green;
@@ -328,7 +319,6 @@
       transform: translate(-50%, -50%);
     }
     
-    /* Make both fieldsets equal width on larger screens */
     .radio-group,
     .checkbox-group {
         flex: 1;
@@ -354,10 +344,9 @@
         }
     }
     
-    /* Autocomplete Styles */
     .autocomplete-wrapper {
         position: relative;
-        width: 100%; /* Important for inputs inside a group */
+        width: 100%;
     }
     .autocomplete-list {
         position: absolute;
@@ -370,7 +359,7 @@
         overflow-y: auto;
         box-shadow: var(--box-shadow-light);
         left: 0;
-        top: 100%; /* Position right under the input */
+        top: 100%;
     }
     .suggestion {
         padding: 10px;
@@ -383,20 +372,18 @@
         background-color: #f1f1f1;
     }
     .input-group.valid .autocomplete-list {
-      display: none; /* Hide list when input is valid/masked */
+      display: none;
     }
 
-    /* Footer Styles - ADJUSTED */
     footer {
-        width: 100%; /* Full width */
+        width: 100%;
         padding: 0; 
         border-top: 1px solid var(--border-color-light);
         background: var(--bg-color-card);
         box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-        display: none; /* Hidden by default */
+        display: none;
     }
     .footer-content-wrapper { 
-        /* Inherits max-width: 1200px; margin: auto; padding: 0 20px; */
         text-align: center;
         padding-top: 15px;
         padding-bottom: 15px;
@@ -429,7 +416,6 @@
         background-color: #174ea6;
         transform: translateY(-1px);
     }
-    /* Specific styling for the call button */
     #call-btn {
         background-color: var(--success-color);
     }
@@ -465,7 +451,6 @@
   <div class="header-content">
     <div class="company-info">
       <h2>
-
         Luangwa Feira Rides
       </h2>
       <ul>
@@ -492,7 +477,7 @@
               autocomplete="off"
               inputmode="numeric"
             >
-            <span class="masked-value" id="masked-phone"></span>
+            <span class="masked-value" id="masked-phone">**********</span>
           </div>
           <div id="trip-details" class="hidden-section">
             <div class="input-group" id="service-wrapper">
@@ -554,7 +539,7 @@
           </p>
           <div class="summary-actions-row">
             <div class="button-wrapper">
-              <a href="#" class="fa fa-send-o" id="submit-btn" title="Submit Trip Details"></a>
+              <a href="#" class="fa fa-send-o" id="submit-btn" title="Submit Trip Details" disabled></a>
               <span class="button-label">Submit Trip</span>
             </div>
           </div>
@@ -611,111 +596,172 @@
       "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station",
       "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School",
       "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly",
-      "UCZ", "Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Lodge", "Yellow Shop", "ZESCO Office"
+      "UCZ", "Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
+      // Include any place from the segments list that might have been missed from the above static list
+      "Lusaka Water Office", "Immigration Flats", "OMNO"
     ];
 
+    // === Complete Segment List ===
     const segments = [
+      //  Long-distance routes connected to Luangwa Bus Station area
+      { from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 },
+      { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 },
+      { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 },
+      { from: 'Katondwe Mission Hospital', to: 'Mburuma Local Court', distance: 7 },
+      { from: 'Mburuma Local Court', to: 'Mwavi Secondary School', distance: 0 },
+      { from: 'Mwavi Secondary School', to: 'Chitope Rural Health Centre', distance: 2 },
+      { from: 'Chitope Rural Health Centre', to: 'Mwalila Primary School', distance: 6 },
+      { from: 'Mwalila Primary School', to: 'Kaunga Secondary School', distance: 5 },
+      { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 },
+      { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 },
 
-      //  All segments reachable from Luangwa Bus Station
-
-  { from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 },
-  { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 },
-  { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 },
-  { from: 'Katondwe Mission Hospital', to: 'Mburuma Local Court', distance: 7 },
-  { from: 'Mburuma Local Court', to: 'Mwavi Secondary School', distance: 0 },
-  { from: 'Mwavi Secondary School', to: 'Chitope Rural Health Centre', distance: 2 },
-  { from: 'Chitope Rural Health Centre', to: 'Mwalila Primary School', distance: 6 },
-  { from: 'Mwalila Primary School', to: 'Kaunga Secondary School', distance: 5 },
-  { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 },
-  { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 },
-  
-  { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
-  { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 },
-  { from: "Soweto Junction", to: "Airstrip", distance: 1.7 },
-  { from: "Soweto Junction", to: "ZESCO Office", distance: 0.3 },
-  { from: "ZESCO Office", to: "Luangwa Main SDA Church", distance: 0.65 },
-  { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 },
-  { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 },
-  { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 },
-  { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 },
-  { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 },
-  { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 },
-  { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 },
-  { from: "Kantuleni Executive Lodge", to: "Luangwa Habour", distance: 0.09 },
-  { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 },
-  { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 },
-  { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 },
-  { from: "Luangwa Police Station", to: "Luangwa DEBS Offices", distance: 0.1 },
-  { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 },
-  { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 },
-  { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 },
-  { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
-  { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
-    // --- The custom shortest path method (Dijkstra's) to station ---
-  { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
-  { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
-  { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
-  { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
-  { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 },
-  { from: "Registration Office", to: "Chidada Ground", distance: 0.49 },
-  { from: "Luangwa Town Council", to: "Hill View", distance: 0.40 },
-  { from: "Hill View", to: "BM Residence", distance: 1.00 },
-  { from: "BM Residence", to: "Feira Day Secondary School", distance: 1.10 }
-];
+      //  Town network near Bus Station
+      { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
+      { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 },
+      { from: "Soweto Junction", to: "Airstrip", distance: 1.7 },
+      { from: "Soweto Junction", to: "ZESCO Office", distance: 0.3 },
+      { from: "ZESCO Office", to: "Luangwa Main SDA Church", distance: 0.65 },
+      { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 },
+      { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 },
+      { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 },
+      { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 },
+      { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 },
+      { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 },
+      { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 },
+      { from: "Kantuleni Executive Lodge", to: "Luangwa Habour", distance: 0.09 },
+      { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 },
+      { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 },
+      { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 },
+      { from: "Luangwa Police Station", to: "Luangwa DEBS Offices", distance: 0.1 },
+      { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 },
+      { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 },
+      { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 },
+      { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
+      { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
+      
+      //  Bus Station extended links
+      { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
+      { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
+      { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
+      { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
+      { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 },
+      { from: "Registration Office", to: "Chidada Ground", distance: 0.49 },
+      { from: "Luangwa Town Council", to: "Hill View", distance: 0.40 },
+      { from: "Hill View", to: "BM Residence", distance: 1.00 },
+      { from: "BM Residence", to: "Feira Day Secondary School", distance: 1.10 }
+    ];
 
 
-    // --- The custom shortest path method (Dijkstra's) ---
+    // === Build a bidirectional graph ===
+    const graph = {};
+    segments.forEach(({ from, to, distance }) => {
+      if (!graph[from]) graph[from] = [];
+      if (!graph[to]) graph[to] = [];
+      graph[from].push({ node: to, distance });
+      graph[to].push({ node: from, distance }); // two-way travel
+    });
 
-    // 1. Build an adjacency list (graph) from the segments
-    function buildGraph(segments) {
-      const graph = {};
-      segments.forEach(seg => {
-        if (!graph[seg.from]) graph[seg.from] = [];
-        if (!graph[seg.to]) graph[seg.to] = [];
-        // Add connections in both directions
-        graph[seg.from].push({ place: seg.to, distance: seg.distance });
-        graph[seg.to].push({ place: seg.from, distance: seg.distance });
-      });
-      return graph;
-    }
-
-    // 2. Find the shortest distance between two points using Dijkstra's algorithm
-    function findShortestDistance(from, to, segments) {
-      if (from === to) return 0; // Trivial case
-
-      const graph = buildGraph(segments);
-      if (!graph[from] || !graph[to]) return null; // Locations not in the graph or segments
+    // === Corrected Dijkstra’s Algorithm for shortest path ===
+    function findShortestDistance(start, end) { 
+      if (start === end) return 0;
+      if (!graph[start] || !graph[end]) return null;
 
       const distances = {};
-      const visited = new Set();
-      
-      // Initialize distances for all known places
-      places.forEach(place => distances[place] = Infinity);
-      distances[from] = 0;
+      const unvisited = new Set(Object.keys(graph));
 
-      // Use a simple array as a priority queue (less efficient, but works for this size)
-      let queue = [{ place: from, dist: 0 }];
+      // 1. Initialize distances
+      for (const node of unvisited) distances[node] = Infinity;
+      distances[start] = 0;
 
-      while (queue.length > 0) {
-        // Find the node with the smallest distance
-        queue.sort((a, b) => a.dist - b.dist);
-        const { place, dist } = queue.shift();
+      while (unvisited.size) {
+        // 2. Find the unvisited node with the smallest distance (The current node)
+        let current = null;
+        for (const node of unvisited) {
+          if (current === null || distances[node] < distances[current]) {
+            current = node;
+          }
+        }
+        
+        // Check for unreachable graph partitions or end of search
+        if (current === null || distances[current] === Infinity) break; 
+        
+        // 3. Check if we've reached the destination
+        if (current === end) {
+            return distances[end];
+        }
+        
+        // 4. Mark the current node as visited and remove from unvisited set
+        unvisited.delete(current);
 
-        if (place === to) return dist;
-        if (visited.has(place)) continue;
-
-        visited.add(place);
-
-        // Check neighbors
-        for (let neighbor of (graph[place] || [])) {
-          // Relaxation step
-          if (dist + neighbor.distance < distances[neighbor.place]) {
-            distances[neighbor.place] = dist + neighbor.distance;
-            queue.push({ place: neighbor.place, dist: distances[neighbor.place] });
+        // 5. Update neighbors' distances
+        for (const neighbor of (graph[current] || [])) {
+          const neighborNode = neighbor.node;
+          const distanceToNeighbor = neighbor.distance;
+          
+          if (unvisited.has(neighborNode)) {
+             const newDistance = distances[current] + distanceToNeighbor;
+             if (newDistance < distances[neighborNode]) {
+                distances[neighborNode] = newDistance;
+             }
           }
         }
       }
-      return null; // Route not found
+      
+      // Route not found
+      return null;
+    }
+
+    // === Core Logic: Include Bus Station only once ===
+    function calculateTotalDistance(pickup, destination) {
+      const BUS_STATION = "Luangwa Bus Station";
+
+      if (pickup === destination) return 0;
+
+      // Case 1: Trip starts from bus station
+      if (pickup === BUS_STATION) {
+        return findShortestDistance(BUS_STATION, destination);
+      }
+
+      // Case 2: Trip ends at bus station
+      if (destination === BUS_STATION) {
+        return findShortestDistance(pickup, BUS_STATION);
+      }
+
+      // Case 3: Normal case (bus → pickup → destination)
+      const busToPickup = findShortestDistance(BUS_STATION, pickup);
+      const pickupToDestination = findShortestDistance(pickup, destination);
+      
+      if (busToPickup === null || pickupToDestination === null) {
+          // If either leg cannot be found, the full route is invalid
+          return null;
+      }
+
+      return busToPickup + pickupToDestination;
+    }
+    
+    // New function to convert the 0xxxxxxxxx format to +260xxxxxxxxx format
+    function standardizePhoneNumber(phone) {
+      if (!phone) return '';
+      // 1. Remove non-digit characters
+      const cleaned = phone.replace(/\D/g, '');
+      
+      // 2. Check for the common national format (10 digits starting with 0)
+      if (cleaned.length === 10 && cleaned.startsWith('0')) {
+          // Remove the leading '0' and prepend '+260'
+          return `+260${cleaned.substring(1)}`;
+      }
+      
+      // 3. If it's already in the 9-digit international format (e.g., 971234567), just prepend +260
+      if (cleaned.length === 9) {
+          return `+260${cleaned}`;
+      }
+
+      // 4. If it's already in the full international format (+260...) return as is
+      if (cleaned.length === 12 && cleaned.startsWith('260')) {
+          return `+${cleaned}`;
+      }
+      
+      return phone; 
     }
     // ----------------------------------------------------------------
 
@@ -739,13 +785,13 @@
     const mainFooter = document.getElementById('main-footer'); 
     const aboutBtn = document.getElementById('about-btn'); 
     const aboutInfo = document.getElementById('about-info'); 
-    let summaryData = null;
-    let selectedOrigin = ''; // Store the actual selected place
-    let selectedDestination = ''; // Store the actual selected place
+    let summaryData = null; // HOLDS VALID DATA FOR SUBMISSION
+    let selectedOrigin = '';
+    let selectedDestination = '';
     
     // Function to attach live autocomplete filtering
     function setupAutocomplete(inputId, listId, inputElement) {
-        const input = inputElement; // Use the passed input element
+        const input = inputElement;
         const list = document.getElementById(listId);
 
         input.addEventListener("input", () => {
@@ -755,12 +801,11 @@
             const query = input.value.toLowerCase();
             list.innerHTML = "";
             
-            // Only show dropdown if there's a query and the input is not masked/valid
             if (!query || input.closest('.input-group').classList.contains('valid')) {
                 return;
             }
 
-            const filtered = places.filter(p => p.toLowerCase().includes(query)).sort(); // Added sort for alphabetical order
+            const filtered = places.filter(p => p.toLowerCase().includes(query)).sort();
             
             filtered.forEach(place => {
                 const item = document.createElement("div");
@@ -770,32 +815,28 @@
                     input.value = place;
                     list.innerHTML = "";
                     
-                    // Store the selected value
                     if (inputId === 'gm-origin') {
                         selectedOrigin = place;
                     } else if (inputId === 'gm-destination') {
                         selectedDestination = place;
                     }
                     
-                    updateSummaryTable(); // Trigger summary update after selection
+                    updateSummaryTable();
                 });
                 list.appendChild(item);
             });
             
-            // If no results, clear the list
             if (filtered.length === 0) {
                  list.innerHTML = "";
             }
         });
 
-        // Hide list when clicking outside the input or dropdown
         document.addEventListener("click", (e) => {
             if (!list.contains(e.target) && e.target !== input) {
                 list.innerHTML = "";
             }
         });
         
-        // Add event listener for calculating distance on focus change
         input.addEventListener("change", updateSummaryTable);
     }
     
@@ -807,51 +848,41 @@
             parentGroup.classList.remove('valid');
         }
     }
-    function maskInputValues(origin, destination, phone) {
-      const isPhoneValid = phone.match(/^0[0-9]{9}$/);
-      updateValidationStatus(customerPhoneInput, isPhoneValid);
-      maskedPhone.textContent = '**********';
-      
-      // Validation check for autocomplete inputs: must be a place in the array
+    
+    function maskLocationValues(origin, destination) {
       const isOriginValid = places.includes(origin);
       updateValidationStatus(originInput, isOriginValid);
-      // ALWAYS display *********** for the masked element
       maskedOrigin.textContent = '**********'; 
       
       const isDestinationValid = places.includes(destination);
       updateValidationStatus(destinationInput, isDestinationValid);
-      // ALWAYS display ********** for the masked element
       maskedDestination.textContent = '**********';
     }
     
-    // Core function to reset the input on masked click
+    // --- CORRECTED FUNCTION ---
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
       const input = parentGroup.querySelector('input');
       
-      // If the clicked element is masked-phone, reset phone input
       if (event.target === maskedPhone) {
-          input.value = ''; // Clear for re-entry
-          handlePhoneNumberInput(); // Run validation/hide check
+          parentGroup.classList.remove('valid');
+          handlePhoneNumberInput();
       } else {
-          // It's a place input (origin or destination)
-          // Set the value back to the actual selected place for editing
           if (input === originInput) {
               input.value = selectedOrigin;
           } else if (input === destinationInput) {
               input.value = selectedDestination;
           }
           parentGroup.classList.remove('valid');
-          // Important: Keep the input visible and editable
       }
 
+      // VITAL FIX: Reset all state and disable button to prevent "No data to submit"
       summaryTableContainer.innerHTML = '';
-      submitBtn.classList.add('disabled');
       submitBtn.setAttribute('disabled', 'true');
-      summaryData = null;
+      summaryData = null; // Set data to null
       displayStatus('Please fill in all details correctly.', 'failed');
       summaryTableSection.classList.add('hidden-section');
-      mainFooter.style.display = 'none'; // Hide footer on reset
+      mainFooter.style.display = 'none';
     }
     
     function reveal(eye) {
@@ -863,7 +894,6 @@
     }
     
     function updateSummaryTable() {
-      // Use the actual input value for calculation
       const origin = originInput.value.trim();
       const destination = destinationInput.value.trim();
       const customerPhone = customerPhoneInput.value.trim();
@@ -873,55 +903,39 @@
       const isExtraLuggageChecked = extraLuggageCheckbox.checked;
       
       summaryTableContainer.innerHTML = '';
-      submitBtn.classList.add('disabled');
+      // VITAL FIX: Disable button and clear data at the start of validation
       submitBtn.setAttribute('disabled', 'true');
-      summaryData = null;
+      summaryData = null; 
       mainFooter.style.display = 'none'; 
       
-      // Validation checks remain the same
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
-      const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
-      const isModeSelected = isVehicleSelected || isMotorbikeSelected;
+      const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/); 
+      const isModeSelected = isVehicleSelected || isMotorbikeRadio.checked;
       
       if (isOriginValid) selectedOrigin = origin;
       if (isDestinationValid) selectedDestination = destination;
       
-      maskInputValues(origin, destination, customerPhone);
+      maskLocationValues(origin, destination);
       
+      // Check ALL criteria to show the summary table
       if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
           summaryTableSection.classList.add('hidden-section');
-          displayStatus('Please fill in all details correctly.', 'info');
+          displayStatus('Please select transport mode and enter valid locations.', 'info');
           return;
       }
       
+      // All validations passed, proceed to calculation
       const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
       const hasExtraLuggage = isExtraLuggageChecked;
       
-      // ==============================================================
-      // ✅ CORE CHANGE: Calculate the Round Trip from Luangwa Bus Station
-      // ==============================================================
-      const BUS_STATION = "Luangwa Bus Station";
+      const distance = calculateTotalDistance(origin, destination);
       
-      // 1. Bus Station to Origin (Pickup)
-      const dist1 = findShortestDistance(BUS_STATION, origin, segments);
-      // 2. Origin to Destination (Drop-off)
-      const dist2 = findShortestDistance(origin, destination, segments);
-      // 3. Destination to Bus Station (Return)
-      const dist3 = findShortestDistance(destination, BUS_STATION, segments);
-      
-      // Total distance is the sum of all three legs
-      const totalDistance = (dist1 === null || dist2 === null || dist3 === null) ? null : dist1 + dist2 + dist3;
-      
-      if (totalDistance === null || isNaN(totalDistance)) {
+      if (distance === null || isNaN(distance)) {
         summaryTableSection.classList.add('hidden-section');
-        displayStatus('A full round route could not be found via the Bus Station.', 'failed');
+        displayStatus('A route could not be found via the Bus Station.', 'failed');
         return;
       }
-      
-      // Use totalDistance for pricing and time calculations
-      const distance = totalDistance; 
-      // ==============================================================
       
       const timeHours = distance / config.avgSpeed;
       const wholeHours = Math.floor(timeHours);
@@ -959,7 +973,7 @@
                 <th>Phone</th>
                 <th>From</th>
                 <th>To</th>
-                <th> Di-Distance (km)</th>
+                <th>Distance (km)</th>
                 <th>Time</th>
                 <th>Price (K)</th>
               </tr>
@@ -976,7 +990,7 @@
                 </td>
                 <td>
                   <span class="hidden-value">${customerPhone}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️️</span>
                 </td>
                 <td>
                   <span class="hidden-value">${origin}</span>
@@ -1004,32 +1018,41 @@
         </div>
       `;
       summaryTableContainer.innerHTML = tableHTML;
+      // VITAL FIX: Populate data only on SUCCESS
       summaryData = {
         preferredMode: mode,
         extraLuggage: hasExtraLuggage ? 'Yes' : 'No',
         phone: customerPhone,
         from: origin,
         to: destination,
-        distance: distance.toFixed(2), // This is now the round trip distance
+        distance: distance.toFixed(2), 
         estimatedTime: timeText,
         price: price
       };
       summaryTableSection.classList.remove('hidden-section');
       displayStatus('Trip details calculated. Click submit to send your request.', 'success');
-      submitBtn.classList.remove('disabled');
-      submitBtn.removeAttribute('disabled');
+      submitBtn.removeAttribute('disabled'); // ENABLE BUTTON
+      mainFooter.style.display = 'block'; 
     }
     
     function submitToGoogleSheet() {
-      if (!summaryData) {
+      // VITAL FIX: The check remains, but now the disabled button should prevent this from failing.
+      if (!summaryData) { 
         displayStatus('No data to submit.', 'failed');
+        submitBtn.setAttribute('disabled', 'true');
         return;
       }
       const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
+      
+      // --- CRITICAL PHONE NUMBER STANDARDIZATION ---
+      const standardizedPhone = standardizePhoneNumber(summaryData.phone);
+      // ---------------------------------------------
+      
       const payload = {
         "preferredMode": summaryData.preferredMode,
         "extraLuggage": summaryData.extraLuggage,
-        "phone": summaryData.phone,
+        // Use the standardized number for submission
+        "phone": standardizedPhone, 
         "from": summaryData.from,
         "to": summaryData.to,
         "distance": summaryData.distance,
@@ -1052,9 +1075,7 @@
         loader.style.display = 'none';
         displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
         submitBtn.removeAttribute('disabled');
-        // --- LOGIC: Show Footer on Success ---
         mainFooter.style.display = 'block'; 
-        // ----------------------------------------
       })
       .catch(error => {
         loader.style.display = 'none';
@@ -1073,34 +1094,35 @@
         const customerPhone = customerPhoneInput.value.trim();
         const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
         
-        // This validation check runs on *every* input/change for the phone field
-        updateValidationStatus(customerPhoneInput, isPhoneValid);
-
         if (isPhoneValid) {
+            updateValidationStatus(customerPhoneInput, true); 
+            maskedPhone.textContent = '**********';
+            
             tripDetails.classList.remove('hidden-section');
-            updateSummaryTable();
+            updateSummaryTable(); 
         } else {
+            updateValidationStatus(customerPhoneInput, false);
             tripDetails.classList.add('hidden-section');
             summaryTableSection.classList.add('hidden-section');
+            submitBtn.setAttribute('disabled', 'true'); // VITAL: Ensure button is disabled if phone invalid
             displayStatus('Please fill in all details correctly.', 'info');
-            mainFooter.style.display = 'none'; // Ensure footer is hidden if phone input is invalid
+            mainFooter.style.display = 'none';
         }
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      // Initialize autocomplete for origin and destination inputs
+      // Initialize button as disabled on load
+      submitBtn.setAttribute('disabled', 'true'); 
+      
       setupAutocomplete("gm-origin", "originList", originInput);
       setupAutocomplete("gm-destination", "destinationList", destinationInput);
       
-      // Event listener for phone number input
       customerPhoneInput.addEventListener('input', handlePhoneNumberInput);
       
-      // Event listeners for other inputs (only appear after phone is entered)
       modeVehicleRadio.addEventListener('change', updateSummaryTable);
       modeMotorbikeRadio.addEventListener('change', updateSummaryTable);
       extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
 
-      // Footer button logic
       aboutBtn.addEventListener('click', () => {
           aboutInfo.style.display = aboutInfo.style.display === 'block' ? 'none' : 'block';
       });
