@@ -2,20 +2,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>view data</title>
+<title>Live Data Dashboard</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    margin: 0;
-    padding: 20px;
-  }
-
-  h2 {
-    text-align: center;
-    color: #333;
-  }
-
+  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+  h2 { text-align: center; color: #333; }
+  
   #startBtn {
     display: block;
     margin: 0 auto 15px auto;
@@ -63,6 +54,7 @@
 
   #actions {
     text-align: center;
+    margin-bottom: 20px;
   }
 
   .action-btn {
@@ -79,23 +71,26 @@
     transition: background 0.3s;
   }
 
-  .call-btn { background-color: #28a745; }      /* Green */
-  .sms-btn { background-color: #007bff; }       /* Blue */
-  .whatsapp-btn { background-color: #25D366; }  /* WhatsApp Green */
+  .call-btn { background-color: #28a745; }      
+  .sms-btn { background-color: #007bff; }       
+  .whatsapp-btn { background-color: #25D366; }  
 
   .action-btn span {
     margin-right: 8px;
     font-size: 18px;
   }
 
-  .action-btn:hover {
-    opacity: 0.8;
+  .action-btn:hover { opacity: 0.8; }
+
+  @media(max-width:768px){
+    th, td { font-size: 12px; padding:8px; }
+    .action-btn { padding:8px 12px; font-size:14px; }
   }
 </style>
 </head>
 <body>
 
-<h2>📌 View Data</h2>
+<h2>📌 Live Data Dashboard</h2>
 
 <button id="startBtn">▶ Start Notifications</button>
 
@@ -112,7 +107,6 @@
 
 <audio id="beepSound" preload="auto">
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-  Your browser does not support the audio element.
 </audio>
 
 <script>
@@ -121,9 +115,16 @@ let lastRowCount = 0;
 let selectedRow = null;
 let selectedPhone = null;
 const beep = document.getElementById("beepSound");
-let intervalID = null;
 
-// Fetch and display sheet data
+// Format timestamp properly
+function formatTimestamp(value) {
+  if (!value) return "";
+  const dateObj = new Date(value);
+  if (isNaN(dateObj)) return value;
+  return dateObj.toLocaleString('en-US', { hour12: true });
+}
+
+// Fetch and render data
 async function fetchData() {
   try {
     const response = await fetch(SHEET_URL);
@@ -133,12 +134,12 @@ async function fetchData() {
 
     const tableHead = document.querySelector("#dataTable thead");
     const tableBody = document.querySelector("#dataTable tbody");
-    const prevSelectedPhone = selectedPhone;
 
+    const prevSelectedPhone = selectedPhone;
     tableHead.innerHTML = "";
     tableBody.innerHTML = "";
 
-    // Header row
+    // Headers
     const headerRow = document.createElement("tr");
     Object.keys(rows[0]).forEach(header => {
       const th = document.createElement("th");
@@ -149,18 +150,24 @@ async function fetchData() {
 
     const newDataAdded = rows.length > lastRowCount;
 
-    // Populate table
+    // Rows
     rows.forEach((row, index) => {
       const tr = document.createElement("tr");
-      Object.values(row).forEach(value => {
+      Object.entries(row).forEach(([key, value]) => {
         const td = document.createElement("td");
-        td.textContent = value;
+        // Format timestamp column if header contains "time" or "date"
+        if (key.toLowerCase().includes("time") || key.toLowerCase().includes("date")) {
+          td.textContent = formatTimestamp(value);
+        } else {
+          td.textContent = value;
+        }
         tr.appendChild(td);
       });
 
-      // Highlight new row
+      // Highlight newest row
       if (index === rows.length - 1 && newDataAdded) {
         tr.classList.add("new-row");
+        tr.scrollIntoView({behavior:"smooth"});
       }
 
       // Select row
@@ -171,7 +178,7 @@ async function fetchData() {
         selectedPhone = row.phone || row.Phone || null;
       });
 
-      // Re-select previous row
+      // Restore previous selection
       if (row.phone === prevSelectedPhone) {
         tr.classList.add("selected");
         selectedRow = tr;
@@ -181,42 +188,39 @@ async function fetchData() {
       tableBody.appendChild(tr);
     });
 
-    // Play beep for new row
+    // Play beep if new row
     if (newDataAdded) {
       beep.currentTime = 0;
-      beep.play().catch(err => console.log("Beep error:", err));
+      beep.play().catch(()=>{});
     }
 
     lastRowCount = rows.length;
-
-  } catch (err) {
+  } catch(err) {
     console.error("Error fetching data:", err);
   }
 }
 
-// Action buttons
+// Buttons
 document.getElementById("callBtn").addEventListener("click", () => {
   if (!selectedPhone) return alert("Select a row with a phone number first.");
   window.location.href = `tel:${selectedPhone}`;
 });
-
 document.getElementById("smsBtn").addEventListener("click", () => {
   if (!selectedPhone) return alert("Select a row with a phone number first.");
   window.location.href = `sms:${selectedPhone}`;
 });
-
 document.getElementById("whatsappBtn").addEventListener("click", () => {
   if (!selectedPhone) return alert("Select a row with a phone number first.");
   const phoneDigits = selectedPhone.replace(/\D/g,'');
   window.open(`https://wa.me/${phoneDigits}`, "_blank");
 });
 
-// Start notifications button (to unlock beep)
+// Start button
 document.getElementById("startBtn").addEventListener("click", () => {
   beep.play().catch(()=>{});
   document.getElementById("startBtn").style.display = "none";
   fetchData();
-  intervalID = setInterval(fetchData, 10000);
+  setInterval(fetchData, 10000);
 });
 </script>
 
