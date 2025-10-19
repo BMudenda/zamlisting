@@ -1,256 +1,224 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ride Tracker</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:18px; background:#f6f7fb}
-    .wrap{max-width:1200px;margin:0 auto}
-    h1{margin:6px 0 12px;font-size:20px}
-    #status{font-size:13px;color:#333;margin-bottom:8px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
-    select,input[type="text"]{padding:8px;border-radius:6px;border:1px solid #ccc}
-    button{padding:8px 10px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer; display: flex; align-items: center; gap: 6px;}
-    .tableWrap{overflow:auto;border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
-    th{background:#fafafa;position:sticky;top:0;cursor:pointer;user-select:none}
-    th .arrow{margin-left:6px;font-size:12px;color:#666;line-height:1}
-    tr:nth-child(even){background:#fbfbfb}
-    tr.selected{background:#d0ebff !important}
-    .small{font-size:12px;color:#666}
-    .shareBox{margin-top:10px;display:none;gap:10px}
-    @media (max-width:640px){ th,td{padding:8px} .controls{flex-direction:column} }
-  </style>
+<meta charset="UTF-8">
+<title>Live Sheet Dashboard</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+
+  #startBtn {
+    display: block;
+    margin: 0 auto 15px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+
+  th {
+    background-color: #343a40;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+  }
+
+  tr.new-row {
+    background-color: #d4edda;
+    font-weight: bold;
+    transition: background-color 0.5s;
+  }
+
+  tr.selected {
+    background-color: #ffeeba;
+  }
+
+  #actions {
+    text-align: center;
+  }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    padding: 10px 16px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .call-btn { background-color: #28a745; }      /* Green */
+  .sms-btn { background-color: #007bff; }       /* Blue */
+  .whatsapp-btn { background-color: #25D366; }  /* WhatsApp Green */
+
+  .action-btn span {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+
+  .action-btn:hover {
+    opacity: 0.8;
+  }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Ride Tracker</h1>
-    <div id="status" class="small">Status: idle</div>
 
-    <div class="controls">
-      <input id="searchBox" type="text" placeholder="Search..." />
-      <div style="margin-left:auto" class="small">Rows: <span id="rowCount">0</span></div>
-    </div>
+<h2>📌 Live Sheet Dashboard</h2>
 
-    <div class="tableWrap" style="max-height:70vh;">
-      <table id="table" role="table" aria-label="Sheet data">
-        <thead></thead>
-        <tbody></tbody>
-      </table>
-    </div>
+<button id="startBtn">▶ Start Notifications</button>
 
-    <div id="shareBox" class="shareBox">
-      <button id="copyBtn"><i class="fas fa-clipboard"></i> Copy Row</button>
-      <button id="smsBtn"><i class="fas fa-sms"></i> Share via SMS</button>
-      <button id="waBtn"><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
-    </div>
-  </div>
-  
-  <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+<table id="dataTable">
+  <thead></thead>
+  <tbody></tbody>
+</table>
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script>
-    (function(){
-      const defaultCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRQ6DOYBkE2Vbo6urPok9LqXctRh3EY8L-KXscsahWeDUW-Sj00NrDDcxl2IW5bN1K1rk-rbb2JhJ5J/pub?output=csv";
-      const statusEl = document.getElementById('status');
-      const searchBox = document.getElementById('searchBox');
-      const tableHead = document.querySelector('#table thead');
-      const tableBody = document.querySelector('#table tbody');
-      const rowCountEl = document.getElementById('rowCount');
-      const shareBox = document.getElementById('shareBox');
-      const copyBtn = document.getElementById('copyBtn');
-      const smsBtn = document.getElementById('smsBtn');
-      const waBtn = document.getElementById('waBtn');
-      const alertSound = document.getElementById('alertSound');
+<div id="actions">
+  <button class="action-btn call-btn" id="callBtn"><span>📞</span>Call</button>
+  <button class="action-btn sms-btn" id="smsBtn"><span>✉️</span>SMS</button>
+  <button class="action-btn whatsapp-btn" id="whatsappBtn"><span>💬</span>WhatsApp</button>
+</div>
 
-      let headers = [];
-      let allData = [];
-      let currentSort = {col:null, dir:1};
-      let selectedRow = null;
-      let lastRowCount = 0;
-      let notificationPermission = 'default';
+<audio id="beepSound" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+  Your browser does not support the audio element.
+</audio>
 
-      function requestNotificationPermission() {
-          if ('Notification' in window) {
-              Notification.requestPermission().then(permission => {
-                  notificationPermission = permission;
-                  console.log('Notification permission:', permission);
-              });
-          }
-      }
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+let lastRowCount = 0;
+let selectedRow = null;
+let selectedPhone = null;
+const beep = document.getElementById("beepSound");
+let intervalID = null;
 
-      function setStatus(msg, isError=false){
-        statusEl.textContent = 'Status: ' + msg;
-        statusEl.style.color = isError ? '#b00020' : '#333';
-        console.log('[SheetViewer]', msg);
-      }
+// Fetch and display sheet data
+async function fetchData() {
+  try {
+    const response = await fetch(SHEET_URL);
+    const data = await response.json();
+    const rows = data.rows;
+    if (!rows || rows.length === 0) return;
 
-      async function fetchWithProxy(url) {
-          const proxyUrl = 'https://api.allorigins.win/raw?url=';
-          const finalUrl = proxyUrl + encodeURIComponent(url);
-          try {
-              const response = await fetch(finalUrl);
-              if (!response.ok) {
-                  throw new Error(`Proxy error! Status: ${response.status}`);
-              }
-              return await response.text();
-          } catch (error) {
-              throw new Error('Failed to fetch data via proxy. It may be down.');
-          }
-      }
+    const tableHead = document.querySelector("#dataTable thead");
+    const tableBody = document.querySelector("#dataTable tbody");
+    const prevSelectedPhone = selectedPhone;
 
-      function sanitizeText(s){ return (s == null) ? '' : String(s); }
-      
-      function renderTable(){
-        tableBody.innerHTML = '';
-        tableHead.innerHTML = '';
-        shareBox.style.display = "none";
-        selectedRow = null;
+    tableHead.innerHTML = "";
+    tableBody.innerHTML = "";
 
-        const trh = document.createElement('tr');
-        headers.forEach(h => {
-          const th = document.createElement('th');
-          th.textContent = h;
-          th.style.cursor = 'pointer';
-          th.addEventListener('click', ()=>{ toggleSort(h); });
-          if (h === currentSort.col) {
-            const arrow = document.createElement('span');
-            arrow.className = 'arrow';
-            arrow.textContent = currentSort.dir === 1 ? '▼' : '▲';
-            th.appendChild(arrow);
-          }
-          trh.appendChild(th);
-        });
-        tableHead.appendChild(trh);
+    // Header row
+    const headerRow = document.createElement("tr");
+    Object.keys(rows[0]).forEach(header => {
+      const th = document.createElement("th");
+      th.textContent = header;
+      headerRow.appendChild(th);
+    });
+    tableHead.appendChild(headerRow);
 
-        let filtered = allData;
-        const searchTerm = searchBox.value.toLowerCase().trim();
+    const newDataAdded = rows.length > lastRowCount;
 
-        if (searchTerm) {
-          filtered = filtered.filter(row =>
-            headers.some(h => sanitizeText(row[h]).toLowerCase().includes(searchTerm))
-          );
-        }
-
-        if (currentSort.col) {
-          const col = currentSort.col, dir = currentSort.dir;
-          filtered = filtered.slice().sort((a,b)=>{
-            const av = sanitizeText(a[col]);
-            const bv = sanitizeText(b[col]);
-            if (col.toLowerCase().includes('timestamp')) {
-              return (new Date(av) - new Date(bv)) * dir;
-            } else {
-              return av.localeCompare(bv) * dir;
-            }
-          });
-        }
-
-        const frag = document.createDocumentFragment();
-        for (const row of filtered) {
-          const tr = document.createElement('tr');
-          tr.addEventListener('click', () => selectRow(row, tr));
-          for (const h of headers) {
-            const td = document.createElement('td');
-            td.textContent = sanitizeText(row[h]);
-            tr.appendChild(td);
-          }
-          frag.appendChild(tr);
-        }
-        tableBody.innerHTML = '';
-        tableBody.appendChild(frag);
-        rowCountEl.textContent = filtered.length;
-      }
-
-      function toggleSort(col){
-        if (currentSort.col === col) currentSort.dir = -currentSort.dir;
-        else { currentSort.col = col; currentSort.dir = 1; }
-        renderTable();
-      }
-
-      function selectRow(row, tr){
-        tableBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
-        tr.classList.add("selected");
-        selectedRow = row;
-        shareBox.style.display = "flex";
-      }
-
-      function getRowText(row){
-        return headers.map(h => `${h}: ${sanitizeText(row[h])}`).join("\n");
-      }
-
-      copyBtn.onclick = () => {
-        if (selectedRow) {
-          navigator.clipboard.writeText(getRowText(selectedRow));
-          alert("Row copied to clipboard!");
-        }
-      };
-
-      smsBtn.onclick = () => {
-        if (selectedRow) {
-          const msg = encodeURIComponent(getRowText(selectedRow));
-          window.location.href = `sms:?body=${msg}`;
-        }
-      };
-
-      waBtn.onclick = () => {
-        if (selectedRow) {
-          const msg = encodeURIComponent(getRowText(selectedRow));
-          window.open(`https://wa.me/?text=${msg}`, "_blank");
-        }
-      };
-
-      function debounce(func, delay) {
-          let timeout;
-          return function(...args) {
-              const context = this;
-              clearTimeout(timeout);
-              timeout = setTimeout(() => func.apply(context, args), delay);
-          };
-      }
-
-      async function loadAndRender(){
-        setStatus('Loading CSV...');
-        try {
-            const text = await fetchWithProxy(defaultCsvUrl);
-            const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
-            headers = parsed.meta.fields || [];
-            const newAllData = parsed.data || [];
-
-            if (newAllData.length > lastRowCount && lastRowCount !== 0) {
-                alertSound.play().catch(e => console.error("Sound playback failed:", e));
-                if (notificationPermission === 'granted') {
-                    new Notification('New Ride Alert!', {
-                        body: `A new ride has been added to the tracker.`,
-                        icon: 'https://cdn-icons-png.flaticon.com/512/3221/3221199.png' 
-                    });
-                }
-            }
-            lastRowCount = newAllData.length;
-            allData = newAllData;
-
-            if (!headers.length) { setStatus('No headers found', true); return; }
-
-            currentSort = {col: 'Timestamp', dir: -1};
-
-            renderTable();
-            setStatus('CSV loaded — ' + allData.length + ' rows');
-        } catch (err) {
-            setStatus('Load failed: ' + err.message, true);
-        }
-      }
-
-      searchBox.addEventListener('input', debounce(renderTable, 300));
-      window.addEventListener('load', () => {
-          requestNotificationPermission();
-          loadAndRender();
+    // Populate table
+    rows.forEach((row, index) => {
+      const tr = document.createElement("tr");
+      Object.values(row).forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
       });
-      
-      // Auto-reload data every 5 seconds for a faster refresh
-      setInterval(loadAndRender, 5000);
-    })();
-  </script>
+
+      // Highlight new row
+      if (index === rows.length - 1 && newDataAdded) {
+        tr.classList.add("new-row");
+      }
+
+      // Select row
+      tr.addEventListener("click", () => {
+        if (selectedRow) selectedRow.classList.remove("selected");
+        tr.classList.add("selected");
+        selectedRow = tr;
+        selectedPhone = row.phone || row.Phone || null;
+      });
+
+      // Re-select previous row
+      if (row.phone === prevSelectedPhone) {
+        tr.classList.add("selected");
+        selectedRow = tr;
+        selectedPhone = prevSelectedPhone;
+      }
+
+      tableBody.appendChild(tr);
+    });
+
+    // Play beep for new row
+    if (newDataAdded) {
+      beep.currentTime = 0;
+      beep.play().catch(err => console.log("Beep error:", err));
+    }
+
+    lastRowCount = rows.length;
+
+  } catch (err) {
+    console.error("Error fetching data:", err);
+  }
+}
+
+// Action buttons
+document.getElementById("callBtn").addEventListener("click", () => {
+  if (!selectedPhone) return alert("Select a row with a phone number first.");
+  window.location.href = `tel:${selectedPhone}`;
+});
+
+document.getElementById("smsBtn").addEventListener("click", () => {
+  if (!selectedPhone) return alert("Select a row with a phone number first.");
+  window.location.href = `sms:${selectedPhone}`;
+});
+
+document.getElementById("whatsappBtn").addEventListener("click", () => {
+  if (!selectedPhone) return alert("Select a row with a phone number first.");
+  const phoneDigits = selectedPhone.replace(/\D/g,'');
+  window.open(`https://wa.me/${phoneDigits}`, "_blank");
+});
+
+// Start notifications button (to unlock beep)
+document.getElementById("startBtn").addEventListener("click", () => {
+  beep.play().catch(()=>{});
+  document.getElementById("startBtn").style.display = "none";
+  fetchData();
+  intervalID = setInterval(fetchData, 10000);
+});
+</script>
+
 </body>
 </html>
