@@ -39,6 +39,8 @@
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            gap: 20px; 
+            flex-wrap: wrap; 
         }
 
         #startBtn {
@@ -58,6 +60,22 @@
         }
         #startBtn:hover { background-color: #218838; transform: translateY(-1px); }
         #startBtn:active { transform: translateY(1px); }
+
+        /* Search Input Styles */
+        #searchInput {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            width: 300px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
 
         /* Table Styles (Card Interface) */
         #dataTable {
@@ -162,6 +180,7 @@
             .action-btn { padding:10px 14px; font-size:14px; min-width: unset; }
             .controls-panel { flex-direction: column; gap: 15px; }
             #startBtn { width: 100%; justify-content: center; }
+            #searchInput { width: 100%; }
         }
     </style>
 </head>
@@ -175,6 +194,7 @@
                 <i class="fas fa-play-circle"></i> 
                 Start Live Feed
             </button>
+            <input type="text" id="searchInput" placeholder="Search table data..." aria-label="Search table data" disabled>
         </div>
 
         <table id="dataTable">
@@ -261,12 +281,13 @@
                 tableHead: document.querySelector("#dataTable thead"),
                 tableBody: document.querySelector("#dataTable tbody"),
                 startBtn: document.getElementById("startBtn"),
+                searchInput: document.getElementById("searchInput"),
                 callBtn: document.getElementById("callBtn"),
                 smsBtn: document.getElementById("smsBtn"),
                 whatsappBtn: document.getElementById("whatsappBtn"),
                 beep: document.getElementById("beepSound"),
                 notification: document.getElementById("notification"),
-                utilityBtn: document.getElementById("utilityBtn") // New button
+                utilityBtn: document.getElementById("utilityBtn")
             };
 
             // Utility Functions
@@ -299,6 +320,20 @@
                 elements.whatsappBtn.disabled = isDisabled;
                 elements.utilityBtn.disabled = isDisabled;
             };
+            
+            const filterTable = () => {
+                const filter = elements.searchInput.value.toUpperCase();
+                const rows = elements.tableBody.querySelectorAll("tr");
+
+                rows.forEach(row => {
+                    let textContent = row.textContent || row.innerText;
+                    if (textContent.toUpperCase().indexOf(filter) > -1) {
+                        row.style.display = ""; 
+                    } else {
+                        row.style.display = "none"; 
+                    }
+                });
+            };
 
             // Core Data Fetching and Rendering
             const fetchData = async () => {
@@ -311,9 +346,11 @@
                     if (!rows || rows.length === 0) {
                         elements.tableHead.innerHTML = '<tr><th>No Data Available</th></tr>';
                         elements.tableBody.innerHTML = '';
+                        elements.searchInput.disabled = true; 
                         return;
                     }
 
+                    elements.searchInput.disabled = false; 
                     const newDataAdded = rows.length > lastRowCount;
                     const prevSelectedPhone = selectedPhone;
                     
@@ -369,7 +406,6 @@
                             if (selectedRow) selectedRow.classList.remove("selected");
                             tr.classList.add("selected");
                             selectedRow = tr;
-                            // Update selectedPhone, ensuring it's not null/undefined if present in row
                             selectedPhone = currentRowPhone || null; 
                             updateActionButtons(selectedPhone);
                         });
@@ -383,29 +419,36 @@
                     }
                     
                     lastRowCount = rows.length;
-                    updateActionButtons(selectedPhone); // Ensure buttons reflect current state
+                    updateActionButtons(selectedPhone); 
+                    filterTable();
                 } catch (err) {
                     console.error("Error fetching data:", err);
                     showNotification("Data Error", "Failed to load data from server.", true);
+                    elements.searchInput.disabled = true; 
                 }
             };
 
-            // Event Handlers for Buttons
+            // Event Handlers for Buttons (UPDATED FOR SMS & WHATSAPP)
             const handleAction = (method) => {
                 if (!selectedPhone) {
                     return showNotification("Action Required", "Select a row with a phone number first.", true);
                 }
                 const phoneDigits = selectedPhone.replace(/\D/g, ''); 
 
+                // 🌟 DEFINED TEXT FOR SMS/WHATSAPP 🌟
+                const predefinedMessage = "Thank you for requesting a Ride with Luangwa Feira Rides /www.zamlisting.com/customerride. See you in the next few minutes.";
+                const encodedMessage = encodeURIComponent(predefinedMessage);
+
+
                 switch (method) {
                     case 'call':
                         window.location.href = `tel:${phoneDigits}`;
                         break;
                     case 'sms':
-                        window.location.href = `sms:${phoneDigits}`;
+                        window.location.href = `sms:${phoneDigits}?body=${encodedMessage}`;
                         break;
                     case 'whatsapp':
-                        window.open(`https://wa.me/${phoneDigits}`, "_blank");
+                        window.open(`https://wa.me/${phoneDigits}?text=${encodedMessage}`, "_blank");
                         break;
                     case 'utility':
                         showNotification("View Details", `You selected the phone: ${selectedPhone}. Implement modal or detail view here.`, false);
@@ -415,6 +458,7 @@
 
             const startFeed = () => {
                 elements.startBtn.style.display = "none";
+                elements.searchInput.disabled = false; 
                 showNotification("Live Feed Started", "Data is now updating every 10 seconds.");
                 fetchData();
                 // Start the polling interval (10 seconds)
@@ -424,10 +468,13 @@
             // Initialization
             const init = () => {
                 elements.startBtn.addEventListener("click", startFeed);
+                elements.searchInput.addEventListener("input", filterTable); 
+
                 elements.callBtn.addEventListener("click", () => handleAction('call'));
                 elements.smsBtn.addEventListener("click", () => handleAction('sms'));
                 elements.whatsappBtn.addEventListener("click", () => handleAction('whatsapp'));
                 elements.utilityBtn.addEventListener("click", () => handleAction('utility'));
+                
                 updateActionButtons(null);
             };
             
