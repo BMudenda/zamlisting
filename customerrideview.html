@@ -1,228 +1,450 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Live Data Dashboard</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-  h2 { text-align: center; color: #333; }
-  
-  #startBtn {
-    display: block;
-    margin: 0 auto 15px auto;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-  }
+    <meta charset="UTF-8">
+    <title>Live Data Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --accent: #17a2b8;
+            --background: #f4f6f9;
+        }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-  }
+        /* Base & Typography */
+        body { font-family: 'Roboto', sans-serif; background: var(--background); margin: 0; padding: 20px; color: #333; }
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
+        h2 { 
+            text-align: center; 
+            color: var(--dark); 
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
 
-  th, td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-  }
+        /* Start Button & Controls Area */
+        .controls-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
 
-  th {
-    background-color: #343a40;
-    color: #fff;
-    text-transform: uppercase;
-    font-size: 14px;
-  }
+        #startBtn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: var(--success);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        #startBtn:hover { background-color: #218838; transform: translateY(-1px); }
+        #startBtn:active { transform: translateY(1px); }
 
-  tr.new-row {
-    background-color: #d4edda;
-    font-weight: bold;
-    transition: background-color 0.5s;
-  }
+        /* Table Styles (Card Interface) */
+        #dataTable {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        th, td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef; /* Lighter border for clean look */
+            text-align: left;
+            font-size: 14px;
+        }
+        th { 
+            background-color: var(--dark); 
+            color: #fff; 
+            text-transform: uppercase; 
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        tr:nth-child(even) { background-color: var(--light); }
+        tr:last-child td { border-bottom: none; }
 
-  tr.selected {
-    background-color: #ffeeba;
-  }
+        /* Row States */
+        tr:hover { background-color: #e2e6ea; cursor: pointer; }
+        tr.new-row { background-color: #d4edda; font-weight: 500; animation: flash-new 3s ease-in-out; }
+        tr.selected { 
+            background-color: #ffeeba !important; /* Warning yellow */
+            box-shadow: inset 5px 0 0 0 var(--warning); /* Left border highlight */
+            border-color: var(--warning);
+        }
+        @keyframes flash-new {
+            0%, 100% { background-color: #d4edda; }
+            50% { background-color: #fff; }
+        }
 
-  #actions {
-    text-align: center;
-    margin-bottom: 20px;
-  }
+        /* Action Buttons Area */
+        #actions { 
+            text-align: center; 
+            margin: 25px auto; 
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .action-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 8px;
+            border: none; color: #fff; cursor: pointer; 
+            transition: all 0.2s ease-in-out;
+            min-width: 120px;
+        }
+        .action-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .action-btn i { margin-right: 8px; font-size: 18px; }
+        
+        /* Specific Button Colors & Effects */
+        .call-btn { background-color: var(--success); box-shadow: 0 4px 6px rgba(40, 167, 69, 0.4); }
+        .sms-btn { background-color: var(--primary); box-shadow: 0 4px 6px rgba(0, 123, 255, 0.4); }
+        .whatsapp-btn { background-color: #25D366; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.4); }
+        
+        .action-btn:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            filter: brightness(1.1);
+        }
 
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: 5px;
-    padding: 10px 16px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
+        /* UI Notification */
+        #notification {
+            position: fixed;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 25px;
+            background-color: var(--accent);
+            color: white;
+            font-weight: 500;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: top 0.5s ease-out, opacity 0.5s;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #notification.show { top: 0; opacity: 1; }
 
-  .call-btn { background-color: #28a745; }      
-  .sms-btn { background-color: #007bff; }       
-  .whatsapp-btn { background-color: #25D366; }  
-
-  .action-btn span {
-    margin-right: 8px;
-    font-size: 18px;
-  }
-
-  .action-btn:hover { opacity: 0.8; }
-
-  @media(max-width:768px){
-    th, td { font-size: 12px; padding:8px; }
-    .action-btn { padding:8px 12px; font-size:14px; }
-  }
-</style>
+        /* Media Queries */
+        @media(max-width:768px){
+            body { padding: 10px; }
+            th, td { font-size: 11px; padding:10px; }
+            .action-btn { padding:10px 14px; font-size:14px; min-width: unset; }
+            .controls-panel { flex-direction: column; gap: 15px; }
+            #startBtn { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>
 <body>
 
-<h2>📌 Live Data Dashboard</h2>
+    <div class="dashboard-container">
+        <h2><i class="fas fa-chart-line"></i> Live Data Dashboard</h2>
 
-<button id="startBtn">▶ Start Notifications</button>
+        <div class="controls-panel">
+            <button id="startBtn">
+                <i class="fas fa-play-circle"></i> 
+                Start Live Feed
+            </button>
+        </div>
 
-<table id="dataTable">
-  <thead></thead>
-  <tbody></tbody>
-</table>
+        <table id="dataTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
 
-<div id="actions">
-  <button class="action-btn call-btn" id="callBtn"><span>📞</span>Call</button>
-  <button class="action-btn sms-btn" id="smsBtn"><span>✉️</span>SMS</button>
-  <button class="action-btn whatsapp-btn" id="whatsappBtn"><span>💬</span>WhatsApp</button>
-</div>
+        <div id="actions">
+            <button class="action-btn call-btn" id="callBtn" disabled>
+                <i class="fas fa-phone"></i>
+                Call
+            </button>
+            <button class="action-btn sms-btn" id="smsBtn" disabled>
+                <i class="fas fa-sms"></i>
+                SMS
+            </button>
+            <button class="action-btn whatsapp-btn" id="whatsappBtn" disabled>
+                <i class="fab fa-whatsapp"></i>
+                WhatsApp
+            </button>
+            <button class="action-btn action-btn-utility" id="utilityBtn" disabled title="Future utility action">
+                <i class="fas fa-eye"></i>
+                View Details
+            </button>
+        </div>
 
-<audio id="beepSound" preload="auto">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
+        <div id="notification" role="alert" aria-live="assertive"></div>
 
-<script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-let lastRowCount = 0;
-let selectedRow = null;
-let selectedPhone = null;
-const beep = document.getElementById("beepSound");
+        <audio id="beepSound" preload="auto">
+            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+        </audio>
+    </div>
 
-// Format timestamp properly
-function formatTimestamp(value) {
-  if (!value) return "";
-  const dateObj = new Date(value);
-  if (isNaN(dateObj)) return value;
-  return dateObj.toLocaleString('en-US', { hour12: true });
-}
+    <script type="module" defer>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
 
-// Fetch and render data
-async function fetchData() {
-  try {
-    const response = await fetch(SHEET_URL);
-    const data = await response.json();
-    const rows = data.rows;
-    if (!rows || rows.length === 0) return;
+        // IMPORTANT: Replace placeholders with your actual keys.
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY_HERE", 
+            authDomain: "livenoti-1c991.firebaseapp.com",
+            projectId: "livenoti-1c991",
+            storageBucket: "livenoti-1c991.firebasestorage.app",
+            messagingSenderId: "128526406523",
+            appId: "1:128526406523:web:0d8f25909746a15e9c63de",
+            measurementId: "G-K6MZ7CTLCW"
+        };
 
-    const tableHead = document.querySelector("#dataTable thead");
-    const tableBody = document.querySelector("#dataTable tbody");
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
 
-    const prevSelectedPhone = selectedPhone;
-    tableHead.innerHTML = "";
-    tableBody.innerHTML = "";
+        // Request permission and get token
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
+                getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' })
+                    .then(token => console.log('FCM Token:', token))
+                    .catch(console.error);
+            }
+        });
 
-    // Headers
-    const headerRow = document.createElement("tr");
-    Object.keys(rows[0]).forEach(header => {
-      const th = document.createElement("th");
-      th.textContent = header;
-      headerRow.appendChild(th);
-    });
-    tableHead.appendChild(headerRow);
+        // Handle foreground messages
+        onMessage(messaging, (payload) => {
+            console.log('FCM Message received:', payload);
+            if (window.dashboard && typeof window.dashboard.handleNewData === 'function') {
+                window.dashboard.handleNewData(payload.notification.title, payload.notification.body);
+            } else {
+                 console.error("Dashboard module not fully initialized when FCM received.");
+            }
+        });
+    </script>
 
-    const newDataAdded = rows.length > lastRowCount;
+    <script defer>
+        /**
+         * Live Dashboard Module (IIFE)
+         */
+        const Dashboard = (() => {
+            const SHEET_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+            let lastRowCount = 0;
+            let selectedRow = null;
+            let selectedPhone = null;
 
-    // Rows
-    rows.forEach((row, index) => {
-      const tr = document.createElement("tr");
-      Object.entries(row).forEach(([key, value]) => {
-        const td = document.createElement("td");
-        // Format timestamp column if header contains "time" or "date"
-        if (key.toLowerCase().includes("time") || key.toLowerCase().includes("date")) {
-          td.textContent = formatTimestamp(value);
-        } else {
-          td.textContent = value;
-        }
-        tr.appendChild(td);
-      });
+            // DOM Elements
+            const elements = {
+                tableHead: document.querySelector("#dataTable thead"),
+                tableBody: document.querySelector("#dataTable tbody"),
+                startBtn: document.getElementById("startBtn"),
+                callBtn: document.getElementById("callBtn"),
+                smsBtn: document.getElementById("smsBtn"),
+                whatsappBtn: document.getElementById("whatsappBtn"),
+                beep: document.getElementById("beepSound"),
+                notification: document.getElementById("notification"),
+                utilityBtn: document.getElementById("utilityBtn") // New button
+            };
 
-      // Highlight newest row
-      if (index === rows.length - 1 && newDataAdded) {
-        tr.classList.add("new-row");
-        tr.scrollIntoView({behavior:"smooth"});
-      }
+            // Utility Functions
+            const formatTimestamp = (value) => {
+                if (!value) return "";
+                const dateObj = new Date(value);
+                if (isNaN(dateObj)) return value;
+                return dateObj.toLocaleString('en-US', { hour12: true });
+            };
 
-      // Select row
-      tr.addEventListener("click", () => {
-        if (selectedRow) selectedRow.classList.remove("selected");
-        tr.classList.add("selected");
-        selectedRow = tr;
-        selectedPhone = row.phone || row.Phone || null;
-      });
+            const showNotification = (title, body, isError = false) => {
+                const message = `${title || 'Notification'}: ${body || 'Table Updated.'}`;
+                elements.notification.innerHTML = `<i class="fas fa-bell"></i> ${message}`;
+                elements.notification.style.backgroundColor = isError ? 'var(--danger)' : 'var(--accent)';
+                elements.notification.classList.add('show');
+                setTimeout(() => {
+                    elements.notification.classList.remove('show');
+                }, 4000);
+            };
 
-      // Restore previous selection
-      if (row.phone === prevSelectedPhone) {
-        tr.classList.add("selected");
-        selectedRow = tr;
-        selectedPhone = prevSelectedPhone;
-      }
+            const playBeep = () => {
+                elements.beep.currentTime = 0;
+                elements.beep.play().catch(e => console.warn("Audio playback failed:", e));
+            };
 
-      tableBody.appendChild(tr);
-    });
+            const updateActionButtons = (phone) => {
+                const isDisabled = !phone;
+                elements.callBtn.disabled = isDisabled;
+                elements.smsBtn.disabled = isDisabled;
+                elements.whatsappBtn.disabled = isDisabled;
+                elements.utilityBtn.disabled = isDisabled;
+            };
 
-    // Play beep if new row
-    if (newDataAdded) {
-      beep.currentTime = 0;
-      beep.play().catch(()=>{});
-    }
+            // Core Data Fetching and Rendering
+            const fetchData = async () => {
+                try {
+                    const response = await fetch(SHEET_URL);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const data = await response.json();
+                    const rows = data.rows;
+                    if (!rows || rows.length === 0) {
+                        elements.tableHead.innerHTML = '<tr><th>No Data Available</th></tr>';
+                        elements.tableBody.innerHTML = '';
+                        return;
+                    }
 
-    lastRowCount = rows.length;
-  } catch(err) {
-    console.error("Error fetching data:", err);
-  }
-}
+                    const newDataAdded = rows.length > lastRowCount;
+                    const prevSelectedPhone = selectedPhone;
+                    
+                    elements.tableHead.innerHTML = "";
+                    elements.tableBody.innerHTML = "";
 
-// Buttons
-document.getElementById("callBtn").addEventListener("click", () => {
-  if (!selectedPhone) return alert("Select a row with a phone number first.");
-  window.location.href = `tel:${selectedPhone}`;
-});
-document.getElementById("smsBtn").addEventListener("click", () => {
-  if (!selectedPhone) return alert("Select a row with a phone number first.");
-  window.location.href = `sms:${selectedPhone}`;
-});
-document.getElementById("whatsappBtn").addEventListener("click", () => {
-  if (!selectedPhone) return alert("Select a row with a phone number first.");
-  const phoneDigits = selectedPhone.replace(/\D/g,'');
-  window.open(`https://wa.me/${phoneDigits}`, "_blank");
-});
+                    // Render Headers
+                    const headerRow = document.createElement("tr");
+                    Object.keys(rows[0]).forEach(header => {
+                        const th = document.createElement("th");
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                    elements.tableHead.appendChild(headerRow);
 
-// Start button
-document.getElementById("startBtn").addEventListener("click", () => {
-  beep.play().catch(()=>{});
-  document.getElementById("startBtn").style.display = "none";
-  fetchData();
-  setInterval(fetchData, 10000);
-});
-</script>
+                    // Render Body Rows
+                    rows.forEach((row, index) => {
+                        const tr = document.createElement("tr");
+                        let currentRowPhone = null;
 
+                        Object.entries(row).forEach(([key, value]) => {
+                            const td = document.createElement("td");
+                            const lowerKey = key.toLowerCase();
+
+                            if (lowerKey.includes("time") || lowerKey.includes("date")) {
+                                td.textContent = formatTimestamp(value);
+                            } else {
+                                td.textContent = value;
+                            }
+                            
+                            if (lowerKey.includes("phone")) {
+                                currentRowPhone = String(value);
+                            }
+
+                            tr.appendChild(td);
+                        });
+
+                        // Highlight New Row and Scroll
+                        if (index === rows.length - 1 && newDataAdded) {
+                            tr.classList.add("new-row");
+                            tr.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                        }
+
+                        // Re-select previously selected row
+                        if (currentRowPhone && currentRowPhone === prevSelectedPhone) {
+                            tr.classList.add("selected");
+                            selectedRow = tr;
+                            selectedPhone = prevSelectedPhone;
+                        }
+
+                        // Add click listener
+                        tr.addEventListener("click", () => {
+                            if (selectedRow) selectedRow.classList.remove("selected");
+                            tr.classList.add("selected");
+                            selectedRow = tr;
+                            // Update selectedPhone, ensuring it's not null/undefined if present in row
+                            selectedPhone = currentRowPhone || null; 
+                            updateActionButtons(selectedPhone);
+                        });
+
+                        elements.tableBody.appendChild(tr);
+                    });
+                    
+                    if(newDataAdded) {
+                        playBeep();
+                        showNotification(`New Entry (${rows.length})`, 'Table updated with new data.');
+                    }
+                    
+                    lastRowCount = rows.length;
+                    updateActionButtons(selectedPhone); // Ensure buttons reflect current state
+                } catch (err) {
+                    console.error("Error fetching data:", err);
+                    showNotification("Data Error", "Failed to load data from server.", true);
+                }
+            };
+
+            // Event Handlers for Buttons
+            const handleAction = (method) => {
+                if (!selectedPhone) {
+                    return showNotification("Action Required", "Select a row with a phone number first.", true);
+                }
+                const phoneDigits = selectedPhone.replace(/\D/g, ''); 
+
+                switch (method) {
+                    case 'call':
+                        window.location.href = `tel:${phoneDigits}`;
+                        break;
+                    case 'sms':
+                        window.location.href = `sms:${phoneDigits}`;
+                        break;
+                    case 'whatsapp':
+                        window.open(`https://wa.me/${phoneDigits}`, "_blank");
+                        break;
+                    case 'utility':
+                        showNotification("View Details", `You selected the phone: ${selectedPhone}. Implement modal or detail view here.`, false);
+                        break;
+                }
+            };
+
+            const startFeed = () => {
+                elements.startBtn.style.display = "none";
+                showNotification("Live Feed Started", "Data is now updating every 10 seconds.");
+                fetchData();
+                // Start the polling interval (10 seconds)
+                setInterval(fetchData, 10000);
+            };
+
+            // Initialization
+            const init = () => {
+                elements.startBtn.addEventListener("click", startFeed);
+                elements.callBtn.addEventListener("click", () => handleAction('call'));
+                elements.smsBtn.addEventListener("click", () => handleAction('sms'));
+                elements.whatsappBtn.addEventListener("click", () => handleAction('whatsapp'));
+                elements.utilityBtn.addEventListener("click", () => handleAction('utility'));
+                updateActionButtons(null);
+            };
+            
+            // Public Interface
+            return {
+                init: init,
+                handleNewData: (title, body) => {
+                    playBeep();
+                    showNotification(title, body);
+                    fetchData();
+                }
+            };
+        })();
+
+        // Start the dashboard
+        Dashboard.init();
+        window.dashboard = Dashboard;
+    </script>
 </body>
 </html>
