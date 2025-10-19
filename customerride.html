@@ -129,11 +129,20 @@
     .mode-radio input[type="radio"]:checked + .heart-icon::before {
       content: "♥";
     }
-    .input-group.valid input[type="text"],
-    .input-group.valid select,
+
+    /* === START OF MODIFICATION 1: CSS Changes === */
+    /* Only hide location inputs when their group is valid */
+    .input-group.valid:not(#customer-phone-wrapper) input[type="text"],
+    .input-group.valid:not(#customer-phone-wrapper) select {
+      display: none;
+    }
+    
+    /* Hide the phone input ONLY when the phone wrapper is valid (showing the masked value) */
     #customer-phone-wrapper.valid input[type="tel"] {
       display: none;
     }
+    /* === END OF MODIFICATION 1: CSS Changes === */
+
     .masked-value {
       display: none;
       width: 100%;
@@ -898,30 +907,36 @@
       maskedDestination.textContent = '**********';
     }
     
+    // === START OF MODIFICATION 2: JavaScript Changes ===
     // Function to handle resetting the form section when clicking the masked value
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
       const input = parentGroup.querySelector('input');
       
       if (event.target === maskedPhone) {
+          // Action for Phone Number: Make input editable without resetting the rest of the trip details
           parentGroup.classList.remove('valid');
-          handlePhoneNumberInput();
+          customerPhoneInput.focus(); // Focus on the phone input field for editing
+          
       } else {
+          // Action for Origin/Destination: Full reset to recalculate on change
           if (input === originInput) {
               input.value = selectedOrigin;
           } else if (input === destinationInput) {
               input.value = selectedDestination;
           }
           parentGroup.classList.remove('valid');
-      }
 
-      summaryTableContainer.innerHTML = '';
-      submitBtn.setAttribute('disabled', 'true');
-      summaryData = null; 
-      displayStatus('Please fill in all details correctly.', 'info');
-      summaryTableSection.classList.add('hidden-section');
-      mainFooter.style.display = 'none'; 
+          // Reset everything below the phone number
+          summaryTableContainer.innerHTML = '';
+          submitBtn.setAttribute('disabled', 'true');
+          summaryData = null; 
+          displayStatus('Please fill in all details correctly.', 'info');
+          summaryTableSection.classList.add('hidden-section');
+          mainFooter.style.display = 'none'; 
+      }
     }
+    // === END OF MODIFICATION 2: JavaScript Changes ===
     
     function reveal(eye) {
       document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
