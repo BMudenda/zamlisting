@@ -624,7 +624,7 @@
       "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station",
       "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School",
       "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly",
-      "UCZ", "Soweto Junction", "Registration Office", "River Spot Club","SDA Katondwe", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
+      "UCZ", "Soweto Junction", "Registration Office", "River Spot Club", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
       "Lusaka Water Office", "Immigration Flats", "OMNO"
     ];
 
@@ -713,7 +713,7 @@
       { from: "Luangwa High School Police Post", to: "Chiriwe Primary School", distance: 2.1 },
       { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 },
       { from: "Kapoche", to: "Chiriwe Primary School", distance: 19.7 },
-      { from: "Luangwa High School Police Post", to: "SDA Katondwe", distance: 1.0 },
+      
       // Katondwe cluster (many missing-place members)
       { from: "Katondwe Chapel", to: "Katondwe Primary School", distance: 0.05 },
       { from: "Katondwe Primary School", to: "Katondwe Girls Secondary School", distance: 0.0 },
@@ -728,6 +728,13 @@
       { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23.0 } 
     ];
 
+    // **MODIFIED: List of all possible hubs**
+    const hubs = [
+        "Luangwa Bus Station", 
+        "x", 
+        "y", 
+        "z"
+    ];
 
     // === Build a bidirectional graph ===
     const graph = {};
@@ -780,29 +787,44 @@
       return null;
     }
 
-    // === Total Distance (Additive Rule) ===
+    // **MODIFIED: Logic to find the nearest hub and calculate total distance**
     function calculateTotalDistance(pickup, destination) {
-      const busStation = "Luangwa Bus Station";
-      
-      // D1: Shortest distance between Bus Station and Pickup
-      const busToPickup = findShortestDistance(busStation, pickup);
+      if (!graph[pickup] || !graph[destination]) return { total: null, trip: null, hub: null };
 
-      // D2: Shortest distance between Pickup and Destination
-      const pickupToDestination = findShortestDistance(pickup, destination);
+      let nearestHub = null;
+      let minDistanceToHub = Infinity;
+
+      // 1. Find the Nearest Hub to the Pickup point (D1)
+      for (const hub of hubs) {
+          const distanceToHub = findShortestDistance(pickup, hub);
+          if (distanceToHub !== null && distanceToHub < minDistanceToHub) {
+              minDistanceToHub = distanceToHub;
+              nearestHub = hub;
+          }
+      }
       
-      // D3: Shortest distance between Destination and Bus Station
-      const destinationToBus = findShortestDistance(destination, busStation);
-      
-      if (busToPickup === null || pickupToDestination === null || destinationToBus === null) {
-          return { total: null, trip: null };
+      if (nearestHub === null || minDistanceToHub === Infinity) {
+          return { total: null, trip: null, hub: null };
       }
 
-      // Total Operational Distance
-      const total = busToPickup + pickupToDestination + destinationToBus;
+      // 2. Calculate trip distance (D2)
+      const pickupToDestination = findShortestDistance(pickup, destination);
+      
+      // 3. Calculate distance from Destination back to the SAME Nearest Hub (D3)
+      const destinationToHub = findShortestDistance(destination, nearestHub);
+      
+      if (pickupToDestination === null || destinationToHub === null) {
+          return { total: null, trip: null, hub: nearestHub };
+      }
+
+      // Total Operational Distance = D1 (Hub->Pickup) + D2 (Pickup->Destination) + D3 (Destination->Hub)
+      // Note: Since Dijkstra's is undirected, minDistanceToHub is also the distance from Hub to Pickup (Hub->Pickup)
+      const total = minDistanceToHub + pickupToDestination + destinationToHub;
       
       return { 
           total: total, 
-          trip: pickupToDestination 
+          trip: pickupToDestination,
+          hub: nearestHub
       };
     }
     
@@ -997,7 +1019,7 @@
       }
       
       // ----------------------------------------------------------------
-      // NEW LOADER LOGIC START
+      // LOADER LOGIC START
       // ----------------------------------------------------------------
       summaryTableSection.classList.add('hidden-section'); // Hide old table instantly
       displayStatus('Calculating distance and price...', 'info');
@@ -1010,12 +1032,14 @@
 
         const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
         
+        // MODIFIED: Call calculateTotalDistance which now handles hub selection
         const distanceObject = calculateTotalDistance(origin, destination);
         const totalDistance = distanceObject.total;
-        const tripDistance = distanceObject.trip; // Direct distance (Pickup to Destination)
+        const tripDistance = distanceObject.trip; 
+        const nearestHub = distanceObject.hub; // **Retrieve dynamic hub**
         
         if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
-          displayStatus('A valid route could not be calculated with the additive rule.', 'failed');
+          displayStatus(`A valid route could not be calculated via any hub. Nearest Hub tried: ${nearestHub || 'N/A'}`, 'failed');
           return;
         }
         
@@ -1044,7 +1068,7 @@
           timeText += `${minutes} min`;
         }
         
-        // Table HTML
+        // Table HTML (MODIFIED TO UNHIDE TRIP DISTANCE AND HIDE HUB)
         const tableHTML = `
           <div class="table-responsive">
             <table class="summary-table">
@@ -1052,9 +1076,10 @@
                 <tr>
                   <th>Mode</th>
                   <th>Phone</th>
+                  <th class="hide-col">Hub</th>
                   <th>From</th>
                   <th>To</th>
-                  <th class="hide-col">Trip Distance (km)</th>
+                  <th>Trip Distance (km)</th>
                   <th class="hide-col">Total Distance (km)</th>
                   <th class="hide-col">Time</th>
                   <th>Price (K)</th>
@@ -1070,6 +1095,10 @@
                     <span class="hidden-value">${customerPhone}</span>
                     <span class="eye-btn" onclick="reveal(this)">👁️️</span>
                   </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${nearestHub}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
                   <td>
                     <span class="hidden-value">${origin}</span>
                     <span class="eye-btn" onclick="reveal(this)">👁️</span>
@@ -1078,7 +1107,7 @@
                     <span class="hidden-value">${destination}</span>
                     <span class="eye-btn" onclick="reveal(this)">👁️</span>
                   </td>
-                  <td class="hide-col">
+                  <td>
                     <span class="hidden-value">${tripDistance.toFixed(2)}</span>
                     <span class="eye-btn" onclick="reveal(this)">👁️</span>
                   </td>
@@ -1104,6 +1133,7 @@
         summaryData = {
           preferredMode: mode,
           phone: customerPhone,
+          hub: nearestHub, // **ADDED HUB TO SUMMARY DATA**
           from: origin,
           to: destination,
           tripDistance: tripDistance.toFixed(2), 
@@ -1112,12 +1142,15 @@
           price: price
         };
         summaryTableSection.classList.remove('hidden-section');
-        displayStatus('Trip details calculated. Click submit to send your request.', 'success');
+        
+        // **UPDATED STATUS MESSAGE**
+        displayStatus(`Trip details calculated via ${nearestHub}. Click submit to send your request.`, 'success');
+        
         submitBtn.removeAttribute('disabled'); 
 
       }, 1000); // 1000ms (1 second) delay for the loader animation
       // ----------------------------------------------------------------
-      // NEW LOADER LOGIC END
+      // LOADER LOGIC END
       // ----------------------------------------------------------------
     }
     
@@ -1131,9 +1164,11 @@
       
       const standardizedPhone = standardizePhoneNumber(summaryData.phone);
       
+      // PAYLOAD MODIFIED TO INCLUDE HUB
       const payload = {
         "preferredMode": summaryData.preferredMode,
         "phone": standardizedPhone, 
+        "hub": summaryData.hub, // **ADDED HUB TO PAYLOAD**
         "from": summaryData.from,
         "to": summaryData.to,
         "tripDistance": summaryData.tripDistance, 
