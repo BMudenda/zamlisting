@@ -258,7 +258,7 @@
         gap: 20px;
         align-items: flex-start;
     }
-    .radio-group, .checkbox-group, .locations-group {
+    .radio-group, .locations-group {
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -273,24 +273,24 @@
       flex-direction: row;
       gap: 20px;
     }
-    .radio-group legend, .checkbox-group legend, .locations-group legend {
+    .radio-group legend, .locations-group legend {
       font-weight: bold;
       color: var(--primary-color);
       font-size: 0.95rem;
       padding: 0 5px;
       margin-bottom: 5px;
     }
-    .radio-item, .checkbox-item {
+    .radio-item {
       display: flex;
       align-items: center;
       cursor: pointer;
       gap: 10px;
       font-size: 1rem;
     }
-    .radio-item label, .checkbox-item label {
+    .radio-item label {
         font-size: 0.85rem;
     }
-    .radio-item input[type="radio"], .checkbox-item input[type="checkbox"] {
+    .radio-item input[type="radio"] {
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
@@ -301,9 +301,7 @@
       outline: none;
       cursor: pointer;
       position: relative;
-    }
-    .radio-item input[type="radio"] {
-        border-radius: 50%;
+      border-radius: 50%;
     }
     .radio-item input[type="radio"]:checked:after {
         content: '';
@@ -316,21 +314,8 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
-    .checkbox-item input[type="checkbox"]:checked {
-      background-color: var(--primary-color);
-    }
-    .checkbox-item input[type="checkbox"]:checked:after {
-      content: '✔';
-      color: white;
-      font-size: 14px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
     
-    .radio-group,
-    .checkbox-group {
+    .radio-group {
         flex: 1;
         min-width: 150px;
     }
@@ -505,14 +490,7 @@
                           <label for="mode-motorbike">Motorbike 🏍️</label>
                       </div>
                   </fieldset>
-                  <fieldset class="checkbox-group">
-                      <legend>Additions</legend>
-                      <div class="checkbox-item">
-                          <input type="checkbox" id="extra-luggage-checkbox" name="extra-luggage" value="yes">
-                          <label for="extra-luggage-checkbox">Luggage/Extra-Persons🧳👤</label>
-                      </div>
-                  </fieldset>
-              </div>
+                  </div>
             </div>
             <div class="input-group">
               <span class="material-icons input-icon">location_on</span>
@@ -773,26 +751,32 @@
       return null;
     }
 
-    // === CORRECTED Total Distance (Additive Rule: Pickup->Destination + Pickup->BusStation) ===
+    // === MODIFIED Total Distance (Additive Rule: Bus->Pickup + Pickup->Destination + Destination->Bus) ===
+    // Also returns the direct trip distance (Pickup to Destination)
     function calculateTotalDistance(pickup, destination) {
       const busStation = "Luangwa Bus Station";
       
-      // D1: Shortest distance between Pickup and Destination
-      const pickupToDestination = findShortestDistance(pickup, destination);
+      // D1: Shortest distance between Bus Station and Pickup
+      const busToPickup = findShortestDistance(busStation, pickup);
 
-      // D2: Shortest distance between Pickup and Bus Station (Hub)
-      const pickupToBus = findShortestDistance(pickup, busStation);
+      // D2: Shortest distance between Pickup and Destination
+      const pickupToDestination = findShortestDistance(pickup, destination);
       
-      if (pickupToDestination === null || pickupToBus === null) {
-          // If either path cannot be calculated, the trip is invalid/impossible
-          return { total: null };
+      // D3: Shortest distance between Destination and Bus Station
+      const destinationToBus = findShortestDistance(destination, busStation);
+      
+      if (busToPickup === null || pickupToDestination === null || destinationToBus === null) {
+          // If any path segment cannot be calculated, the trip is invalid/impossible
+          return { total: null, trip: null };
       }
 
-      // Total Distance = (Pickup -> Destination) + (Pickup -> Bus Station)
-      // This correctly adds the hub distance only to the pickup point.
-      const total = pickupToDestination + pickupToBus;
+      // Total Operational Distance = (Bus -> Pickup) + (Pickup -> Destination) + (Destination -> Bus)
+      const total = busToPickup + pickupToDestination + destinationToBus;
       
-      return { total: total };
+      return { 
+          total: total, 
+          trip: pickupToDestination 
+      };
     }
     
     // === Phone Number Standardization ===
@@ -824,7 +808,7 @@
     const modeVehicleRadio = document.getElementById('mode-vehicle');
     const modeMotorbikeRadio = document.getElementById('mode-motorbike');
     const modeSelectionGroup = document.getElementById('mode-selection-group'); 
-    const extraLuggageCheckbox = document.getElementById('extra-luggage-checkbox');
+    // const extraLuggageCheckbox = document.getElementById('extra-luggage-checkbox'); // Removed
     const summaryTableSection = document.querySelector('.summary-table-section');
     const summaryTableContainer = document.getElementById('summary-table-container');
     const submitBtn = document.getElementById('submit-btn');
@@ -910,7 +894,6 @@
       maskedDestination.textContent = '**********';
     }
     
-    // === START OF MODIFICATION 2: JavaScript Changes ===
     // Function to handle resetting the form section when clicking the masked value
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
@@ -939,7 +922,6 @@
           mainFooter.style.display = 'none'; 
       }
     }
-    // === END OF MODIFICATION 2: JavaScript Changes ===
     
     function reveal(eye) {
       document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
@@ -956,7 +938,7 @@
       
       const isVehicleSelected = modeVehicleRadio.checked;
       const isMotorbikeSelected = modeMotorbikeRadio.checked; 
-      const isExtraLuggageChecked = extraLuggageCheckbox.checked;
+      // const isExtraLuggageChecked = extraLuggageCheckbox.checked; // Removed
       
       summaryTableContainer.innerHTML = '';
       submitBtn.setAttribute('disabled', 'true');
@@ -987,12 +969,12 @@
       }
       
       const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
-      const hasExtraLuggage = isExtraLuggageChecked;
       
       const distanceObject = calculateTotalDistance(origin, destination);
       const totalDistance = distanceObject.total;
+      const tripDistance = distanceObject.trip; // Direct distance (Pickup to Destination)
       
-      if (totalDistance === null || isNaN(totalDistance)) {
+      if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
         summaryTableSection.classList.add('hidden-section');
         displayStatus('A valid route could not be calculated with the additive rule.', 'failed');
         return;
@@ -1005,18 +987,16 @@
       
       // PRICING LOGIC applying the minimum cost
       if (mode === 'Vehicle') {
-        // K6.6 per km, minimum K20
+        // K5.75 per km, minimum K20
         let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
         price = Math.max(calculatedPrice, config.vehicleMinPrice); 
       } else {
-        // K1.5 per km, minimum K10
+        // K1.88 per km, minimum K10
         let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
         price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
       }
       
-      if (hasExtraLuggage) {
-        price = price * 1.25;
-      }
+      // Removed Extra Luggage price multiplier
       
       price = Math.round(price);
 
@@ -1029,18 +1009,18 @@
         timeText += `${minutes} min`;
       }
       
-      // Kept the table structure as requested in the previous revision.
+      // Kept the table structure but changed 'Luggage' to 'Trip Distance (km)' and 'Distance (wkm)' to 'Total Distance (km)'
       const tableHTML = `
         <div class="table-responsive">
           <table class="summary-table">
             <thead>
               <tr>
                 <th>Mode</th>
-                <th>Luggage</th>
+                <th>Trip Distance (km)</th>
                 <th>Phone</th>
                 <th>From</th>
                 <th>To</th>
-                <th>Distance (wkm)</th>
+                <th>Total Distance (km)</th>
                 <th>Time</th>
                 <th>Price (K)</th>
               </tr>
@@ -1052,7 +1032,7 @@
                   <span class="eye-btn" onclick="reveal(this)">👁️</span>
                 </td>
                 <td>
-                  <span class="hidden-value">${hasExtraLuggage ? 'Yes' : 'No'}</span>
+                  <span class="hidden-value">${tripDistance.toFixed(2)}</span>
                   <span class="eye-btn" onclick="reveal(this)">👁️</span>
                 </td>
                 <td>
@@ -1087,11 +1067,12 @@
       summaryTableContainer.innerHTML = tableHTML;
       summaryData = {
         preferredMode: mode,
-        extraLuggage: hasExtraLuggage ? 'Yes' : 'No',
+        // extraLuggage: 'No', // Removed
         phone: customerPhone,
         from: origin,
         to: destination,
-        distance: totalDistance.toFixed(2), 
+        tripDistance: tripDistance.toFixed(2), // New field for direct distance
+        totalDistance: totalDistance.toFixed(2), // Renamed for clarity in data
         estimatedTime: timeText,
         price: price
       };
@@ -1112,11 +1093,12 @@
       
       const payload = {
         "preferredMode": summaryData.preferredMode,
-        "extraLuggage": summaryData.extraLuggage,
+        // "extraLuggage": summaryData.extraLuggage, // Removed
         "phone": standardizedPhone, 
         "from": summaryData.from,
         "to": summaryData.to,
-        "distance": summaryData.distance,
+        "tripDistance": summaryData.tripDistance, // Added
+        "distance": summaryData.totalDistance, // Updated to be total distance
         "estimatedTime": summaryData.estimatedTime,
         "price": summaryData.price,
         "timestamp": timestamp
@@ -1188,7 +1170,7 @@
       
       // CRITICAL FIX: Listener on the parent element for robust radio button change detection.
       modeSelectionGroup.addEventListener('change', updateSummaryTable);
-      extraLuggageCheckbox.addEventListener('change', updateSummaryTable);
+      // extraLuggageCheckbox.addEventListener('change', updateSummaryTable); // Removed
 
       aboutBtn.addEventListener('click', () => {
           aboutInfo.style.display = aboutInfo.style.display === 'block' ? 'none' : 'block';
