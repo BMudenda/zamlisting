@@ -987,11 +987,11 @@
       
       // PRICING LOGIC applying the minimum cost
       if (mode === 'Vehicle') {
-        // K5.75 per km, minimum K20
+        // K4.70 per km, minimum K20
         let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
         price = Math.max(calculatedPrice, config.vehicleMinPrice); 
       } else {
-        // K1.88 per km, minimum K10
+        // K1.50 per km, minimum K10
         let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
         price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
       }
@@ -1009,14 +1009,13 @@
         timeText += `${minutes} min`;
       }
       
-      // Kept the table structure but changed 'Luggage' to 'Trip Distance (km)' and 'Distance (wkm)' to 'Total Distance (km)'
+      // **MODIFICATION START: Reordering columns for distance proximity**
       const tableHTML = `
         <div class="table-responsive">
           <table class="summary-table">
             <thead>
               <tr>
                 <th>Mode</th>
-                
                 <th>Phone</th>
                 <th>From</th>
                 <th>To</th>
@@ -1033,10 +1032,6 @@
                   <span class="eye-btn" onclick="reveal(this)">👁️</span>
                 </td>
                 <td>
-                  <span class="hidden-value">${tripDistance.toFixed(2)}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td>
                   <span class="hidden-value">${customerPhone}</span>
                   <span class="eye-btn" onclick="reveal(this)">👁️️</span>
                 </td>
@@ -1046,6 +1041,10 @@
                 </td>
                 <td>
                   <span class="hidden-value">${destination}</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </td>
+                <td>
+                  <span class="hidden-value">${tripDistance.toFixed(2)}</span>
                   <span class="eye-btn" onclick="reveal(this)">👁️</span>
                 </td>
                 <td>
@@ -1065,15 +1064,16 @@
           </table>
         </div>
       `;
+      // **MODIFICATION END**
+      
       summaryTableContainer.innerHTML = tableHTML;
       summaryData = {
         preferredMode: mode,
-        // extraLuggage: 'No', // Removed
         phone: customerPhone,
         from: origin,
         to: destination,
-        tripDistance: tripDistance.toFixed(2), // New field for direct distance
-        totalDistance: totalDistance.toFixed(2), // Renamed for clarity in data
+        tripDistance: tripDistance.toFixed(2), 
+        totalDistance: totalDistance.toFixed(2), 
         estimatedTime: timeText,
         price: price
       };
@@ -1094,12 +1094,11 @@
       
       const payload = {
         "preferredMode": summaryData.preferredMode,
-        // "extraLuggage": summaryData.extraLuggage, // Removed
         "phone": standardizedPhone, 
         "from": summaryData.from,
         "to": summaryData.to,
-        "tripDistance": summaryData.tripDistance, // Added
-        "distance": summaryData.totalDistance, // Updated to be total distance
+        "tripDistance": summaryData.tripDistance, 
+        "distance": summaryData.totalDistance, 
         "estimatedTime": summaryData.estimatedTime,
         "price": summaryData.price,
         "timestamp": timestamp
@@ -1171,7 +1170,6 @@
       
       // CRITICAL FIX: Listener on the parent element for robust radio button change detection.
       modeSelectionGroup.addEventListener('change', updateSummaryTable);
-      // extraLuggageCheckbox.addEventListener('change', updateSummaryTable); // Removed
 
       aboutBtn.addEventListener('click', () => {
           aboutInfo.style.display = aboutInfo.style.display === 'block' ? 'none' : 'block';
