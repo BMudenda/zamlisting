@@ -228,12 +228,40 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-    .loader {
-      display: none; width: 20px; height: 20px; border: 3px solid var(--primary-color);
-      border-radius: 50%; border-top: 3px solid #e5e7eb;
-      animation: spin 1s linear infinite; margin: 10px auto;
+    
+    /* Calculation Status Wrapper */
+    .calculation-status-wrapper {
+        text-align: center;
+        padding: 15px;
+        min-height: 80px; /* Ensure space even when empty */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
+    
+    /* General Loader (Used for both calculation and submission) */
+    .loader {
+      display: none; 
+      width: 20px; 
+      height: 20px; 
+      border: 3px solid var(--primary-color);
+      border-radius: 50%; 
+      border-top: 3px solid #e5e7eb;
+      animation: spin 1s linear infinite; 
+      margin: 10px auto;
+    }
+    
+    /* Dedicated Calculation Spinner (larger and secondary color) */
+    #calculation-spinner.loader {
+      border: 4px solid #f3f3f3; 
+      border-top: 4px solid var(--secondary-color);
+      width: 40px;
+      height: 40px;
+    }
+    
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
     .submit-status {
       display: flex; align-items: center; gap: 5px; margin-top: 10px;
       justify-content: center; font-weight: 500;
@@ -537,8 +565,12 @@
             </div>
           </div>
         </div>
-        <div id="submit-status" class="submit-status">Please fill in all details correctly.</div>
-        <div id="loader" class="loader"></div>
+        
+        <div class="calculation-status-wrapper" id="calculation-status-wrapper">
+          <div id="submit-status" class="submit-status">Please fill in all details correctly.</div>
+          <div id="calculation-spinner" class="loader"></div>
+        </div>
+        <div id="loader" class="loader" style="margin-top: 0;"></div>
       </div>
     </section>
   </main>
@@ -808,6 +840,7 @@
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
+    const calculationSpinner = document.getElementById('calculation-spinner'); // NEW ELEMENT
     const maskedPhone = document.getElementById('masked-phone');
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
@@ -958,116 +991,134 @@
           }
           displayStatus(statusMessage, 'info');
           
+          calculationSpinner.style.display = 'none'; // Ensure spinner is off if conditions fail
+          
           return;
       }
       
-      const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
+      // ----------------------------------------------------------------
+      // NEW LOADER LOGIC START
+      // ----------------------------------------------------------------
+      summaryTableSection.classList.add('hidden-section'); // Hide old table instantly
+      displayStatus('Calculating distance and price...', 'info');
+      calculationSpinner.style.display = 'block'; // Show the calculation spinner
       
-      const distanceObject = calculateTotalDistance(origin, destination);
-      const totalDistance = distanceObject.total;
-      const tripDistance = distanceObject.trip; // Direct distance (Pickup to Destination)
-      
-      if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
-        summaryTableSection.classList.add('hidden-section');
-        displayStatus('A valid route could not be calculated with the additive rule.', 'failed');
-        return;
-      }
-      
-      const timeHours = totalDistance / config.avgSpeed;
-      const wholeHours = Math.floor(timeHours);
-      const minutes = Math.round((timeHours - wholeHours) * 60);
-      let price = 0;
-      
-      // PRICING LOGIC applying the minimum cost
-      if (mode === 'Vehicle') {
-        let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
-        price = Math.max(calculatedPrice, config.vehicleMinPrice); 
-      } else {
-        let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
-        price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
-      }
-      
-      price = Math.round(price);
+      // Use a brief timeout to allow the loader to show before calculation runs.
+      setTimeout(() => {
+        
+        calculationSpinner.style.display = 'none'; // Hide loader once calculation starts
 
-      // Time formatting
-      let timeText = '';
-      if (wholeHours > 0) {
-        timeText += `${wholeHours} hr`;
-        if (minutes > 0) timeText += ` ${minutes} min`;
-      } else {
-        timeText += `${minutes} min`;
-      }
-      
-      // Table HTML
-      const tableHTML = `
-        <div class="table-responsive">
-          <table class="summary-table">
-            <thead>
-              <tr>
-                <th>Mode</th>
-                <th>Phone</th>
-                <th>From</th>
-                <th>To</th>
-                <th class="hide-col">Trip Distance (km)</th>
-                <th class="hide-col">Total Distance (km)</th>
-                <th class="hide-col">Time</th>
-                <th>Price (K)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <span class="hidden-value">${mode}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td>
-                  <span class="hidden-value">${customerPhone}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️️</span>
-                </td>
-                <td>
-                  <span class="hidden-value">${origin}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td>
-                  <span class="hidden-value">${destination}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td class="hide-col">
-                  <span class="hidden-value">${tripDistance.toFixed(2)}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td class="hide-col">
-                  <span class="hidden-value">${totalDistance.toFixed(2)}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td class="hide-col">
-                  <span class="hidden-value">${timeText}</span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-                <td>
-                  <span class="hidden-value"><b>K${price}</b></span>
-                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-      
-      summaryTableContainer.innerHTML = tableHTML;
-      summaryData = {
-        preferredMode: mode,
-        phone: customerPhone,
-        from: origin,
-        to: destination,
-        tripDistance: tripDistance.toFixed(2), 
-        totalDistance: totalDistance.toFixed(2), 
-        estimatedTime: timeText,
-        price: price
-      };
-      summaryTableSection.classList.remove('hidden-section');
-      displayStatus('Trip details calculated. Click submit to send your request.', 'success');
-      submitBtn.removeAttribute('disabled'); 
+        const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
+        
+        const distanceObject = calculateTotalDistance(origin, destination);
+        const totalDistance = distanceObject.total;
+        const tripDistance = distanceObject.trip; // Direct distance (Pickup to Destination)
+        
+        if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
+          displayStatus('A valid route could not be calculated with the additive rule.', 'failed');
+          return;
+        }
+        
+        const timeHours = totalDistance / config.avgSpeed;
+        const wholeHours = Math.floor(timeHours);
+        const minutes = Math.round((timeHours - wholeHours) * 60);
+        let price = 0;
+        
+        // PRICING LOGIC applying the minimum cost
+        if (mode === 'Vehicle') {
+          let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
+          price = Math.max(calculatedPrice, config.vehicleMinPrice); 
+        } else {
+          let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
+          price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
+        }
+        
+        price = Math.round(price);
+
+        // Time formatting
+        let timeText = '';
+        if (wholeHours > 0) {
+          timeText += `${wholeHours} hr`;
+          if (minutes > 0) timeText += ` ${minutes} min`;
+        } else {
+          timeText += `${minutes} min`;
+        }
+        
+        // Table HTML
+        const tableHTML = `
+          <div class="table-responsive">
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>Mode</th>
+                  <th>Phone</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th class="hide-col">Trip Distance (km)</th>
+                  <th class="hide-col">Total Distance (km)</th>
+                  <th class="hide-col">Time</th>
+                  <th>Price (K)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="hidden-value">${mode}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${customerPhone}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${origin}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${destination}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${tripDistance.toFixed(2)}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${totalDistance.toFixed(2)}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${timeText}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value"><b>K${price}</b></span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        
+        summaryTableContainer.innerHTML = tableHTML;
+        summaryData = {
+          preferredMode: mode,
+          phone: customerPhone,
+          from: origin,
+          to: destination,
+          tripDistance: tripDistance.toFixed(2), 
+          totalDistance: totalDistance.toFixed(2), 
+          estimatedTime: timeText,
+          price: price
+        };
+        summaryTableSection.classList.remove('hidden-section');
+        displayStatus('Trip details calculated. Click submit to send your request.', 'success');
+        submitBtn.removeAttribute('disabled'); 
+
+      }, 1000); // 1000ms (1 second) delay for the loader animation
+      // ----------------------------------------------------------------
+      // NEW LOADER LOGIC END
+      // ----------------------------------------------------------------
     }
     
     function submitToGoogleSheet() {
@@ -1144,6 +1195,7 @@
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
             mainFooter.style.display = 'none'; 
+            calculationSpinner.style.display = 'none'; // Ensure spinner is off
         }
     }
     
