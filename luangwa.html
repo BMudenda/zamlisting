@@ -1269,55 +1269,28 @@
     });
   </script>
 
-  <script>
-    // script for downloading apk for android down below 
-document.addEventListener("DOMContentLoaded", function() {
-  const apkUrl = "https://zamlisting.com/Luangwa_Feira_Rides.apk";
+<script>
+  // add to home screen code below
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
 
-  // Create a simple floating install button
-  const box = document.createElement("div");
-  box.style.position = "fixed";
-  box.style.top = "15px";
-  box.style.right = "15px";
-  box.style.background = "#2b6ef6";
-  box.style.color = "#fff";
-  box.style.borderRadius = "8px";
-  box.style.padding = "8px 14px";
-  box.style.fontFamily = "system-ui, sans-serif";
-  box.style.fontSize = "14px";
-  box.style.cursor = "pointer";
-  box.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-  box.style.zIndex = "9999";
-  box.style.display = "flex";
-  box.style.alignItems = "center";
-  box.style.gap = "8px";
-
-  box.innerHTML = `
-    <span id="installText">Install</span>
-    <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
-  `;
-
-  document.body.appendChild(box);
-
-  // Click to install
-  document.getElementById("installText").addEventListener("click", function() {
-    window.location.href = apkUrl; // triggers APK download
-    box.remove();
-    localStorage.setItem("installPromptHidden", "true");
-  });
-
-  // Cancel (close) button
-  document.getElementById("closeInstall").addEventListener("click", function() {
-    box.remove();
-    localStorage.setItem("installPromptHidden", "true");
-  });
-
-  // Hide if user already dismissed it
-  if (localStorage.getItem("installPromptHidden") === "true") {
-    box.remove();
-  }
+// Listen for the PWA install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();      // Prevent Chrome from showing default prompt
+  deferredPrompt = e;
+  installBtn.style.display = 'inline-block'; // Show our custom button
 });
-  </script>
+
+// When the user clicks the button
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();  // Show the browser install prompt
+  const choiceResult = await deferredPrompt.userChoice;
+  console.log('User choice:', choiceResult.outcome);
+  deferredPrompt = null;
+  installBtn.style.display = 'none'; // Hide button after prompt
+});
+    </script>
   
 </body>
 </html>
