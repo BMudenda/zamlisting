@@ -1270,56 +1270,54 @@
   </script>
 
   <script>
-    // downloading apk to install on android phone script below.
+    // script for downloading apk for android down below 
 document.addEventListener("DOMContentLoaded", function() {
   const apkUrl = "https://zamlisting.com/Luangwa_Feira_Rides.apk";
 
-  // Small floating install prompt
-  const prompt = document.createElement("div");
-  prompt.style.position = "fixed";
-  prompt.style.top = "15px";
-  prompt.style.right = "15px";
-  prompt.style.background = "#fff";
-  prompt.style.border = "1px solid #ccc";
-  prompt.style.borderRadius = "10px";
-  prompt.style.padding = "12px 16px";
-  prompt.style.boxShadow = "0 4px 10px rgba(0,0,0,0.15)";
-  prompt.style.fontFamily = "system-ui, sans-serif";
-  prompt.style.zIndex = "9999";
-  prompt.style.maxWidth = "280px";
+  // Create a simple floating install button
+  const box = document.createElement("div");
+  box.style.position = "fixed";
+  box.style.top = "15px";
+  box.style.right = "15px";
+  box.style.background = "#2b6ef6";
+  box.style.color = "#fff";
+  box.style.borderRadius = "8px";
+  box.style.padding = "8px 14px";
+  box.style.fontFamily = "system-ui, sans-serif";
+  box.style.fontSize = "14px";
+  box.style.cursor = "pointer";
+  box.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+  box.style.zIndex = "9999";
+  box.style.display = "flex";
+  box.style.alignItems = "center";
+  box.style.gap = "8px";
 
-  prompt.innerHTML = `
-    <div style="font-weight:600;margin-bottom:6px;">Install Luangwa Feira Rides?</div>
-    <div style="font-size:13px;margin-bottom:10px;color:#333;">
-      Tap Install to download the app.
-    </div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;">
-      <button id="cancelBtn" style="background:#eee;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;">Later</button>
-      <button id="installBtn" style="background:#2b6ef6;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">Install</button>
-    </div>
+  box.innerHTML = `
+    <span id="installText">Install</span>
+    <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
   `;
 
-  document.body.appendChild(prompt);
+  document.body.appendChild(box);
 
-  // Button actions
-  document.getElementById("installBtn").addEventListener("click", function() {
-    window.location.href = apkUrl; // triggers download
-    prompt.remove();
-    localStorage.setItem("luangwaPromptHidden", "true");
+  // Click to install
+  document.getElementById("installText").addEventListener("click", function() {
+    window.location.href = apkUrl; // triggers APK download
+    box.remove();
+    localStorage.setItem("installPromptHidden", "true");
   });
 
-  document.getElementById("cancelBtn").addEventListener("click", function() {
-    prompt.remove();
-    localStorage.setItem("luangwaPromptHidden", "true");
+  // Cancel (close) button
+  document.getElementById("closeInstall").addEventListener("click", function() {
+    box.remove();
+    localStorage.setItem("installPromptHidden", "true");
   });
 
-  // Optional: prevent showing again after user dismissed
-  if (localStorage.getItem("luangwaPromptHidden") === "true") {
-    prompt.remove();
+  // Hide if user already dismissed it
+  if (localStorage.getItem("installPromptHidden") === "true") {
+    box.remove();
   }
 });
   </script>
-   
   
 </body>
 </html>
