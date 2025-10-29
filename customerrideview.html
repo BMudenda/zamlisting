@@ -5,17 +5,34 @@
     <title>Rides Data Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-
+    <meta name="theme-color" content="#2b6ef6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+    <link rel="apple-touch-icon" href="lfr.jpg">
     
-<link rel="manifest" href="manifest2.json">
-<meta name="theme-color" content="#2b6ef6">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
-<link rel="apple-touch-icon" href="lfr.jpg">
-
-
+    <script type="application/json" id="pwa-manifest">
+        {
+          "short_name": "LFRides",
+          "name": "Luangwa Feira Rides Data",
+          "icons": [
+            {
+              "src": "lfr.jpg",
+              "type": "image/jpeg",
+              "sizes": "192x192"
+            },
+            {
+              "src": "lfr.jpg",
+              "type": "image/jpeg",
+              "sizes": "512x512"
+            }
+          ],
+          "start_url": "./index.html",
+          "display": "standalone",
+          "background_color": "#2b6ef6",
+          "theme_color": "#2b6ef6"
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -240,6 +257,7 @@
             }
         }
     </style>
+    <link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjogIkxGUmlkZXMiLCAibmFtZSI6ICJMdWFuZ3dhIEZlaXJhIFJpZGVzIERhdGEiLCAiaWNvbnMiOiBbeyJzcmMiOiAibGZyLmpwZyIsICJ0eXBlIjogImltYWdlL2pwZWciLCAic2l6ZXMiOiAiMTkyeDE5MiJ9LCAiezNyYyI6ICJscmYuanBnIiwgInR5cGUiOiAiaW1hZ2UvanBlZyIsICJzaXplcyI6ICI1MTJ4NTEyIn1dLCAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmI2ZWY2IiwgInRoZW1lX2NvbG9yIjogIiMyYjZlZjYifQ==">
 </head>
 <body>
 
@@ -294,6 +312,110 @@
         </audio>
     </div>
 
+    <script>
+        // Minimal Service Worker Content (Inline sw2.js replacement)
+        const swContent = `
+            const CACHE_NAME = 'static-cache-v1';
+            const ASSETS_TO_CACHE = [
+                '/',
+                'lfr.jpg',
+                // Add other static assets if needed for offline functionality
+            ];
+
+            self.addEventListener('install', (event) => {
+                console.log('[Service Worker] Installing...');
+                self.skipWaiting();
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                    .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+                );
+            });
+
+            self.addEventListener('activate', (event) => {
+                console.log('[Service Worker] Activated.');
+                event.waitUntil(
+                    clients.claim()
+                );
+            });
+            
+            self.addEventListener('fetch', (event) => {
+                // Example: Only handle static file requests with cache-first strategy
+                if (event.request.url.startsWith(self.location.origin)) {
+                    event.respondWith(
+                        caches.match(event.request)
+                        .then((response) => response || fetch(event.request))
+                    );
+                }
+            });
+        `;
+
+        // Register Service Worker from Blob
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+                // Create a Blob from the inline worker content
+                const swBlob = new Blob([swContent], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swUrl).then(
+                    function(reg) {
+                        console.log("ServiceWorker registered with scope:", reg.scope);
+                    },
+                    function(err) {
+                        console.log("ServiceWorker registration failed:", err);
+                    }
+                );
+            });
+        }
+
+        // Show simple install button
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            const deferredPrompt = e;
+
+            // Only show install prompt on the screen sizes where it's needed/visible
+            if (window.matchMedia('(display-mode: standalone)').matches || document.getElementById('installBox')) {
+                 return; // Do not show if already installed or box exists
+            }
+            
+            const installBox = document.createElement("div");
+            installBox.id = "installBox";
+            installBox.style.position = "fixed";
+            installBox.style.top = "15px";
+            installBox.style.right = "15px";
+            installBox.style.background = "#2b6ef6";
+            installBox.style.color = "#fff";
+            installBox.style.borderRadius = "8px";
+            installBox.style.padding = "8px 14px";
+            installBox.style.fontFamily = "system-ui, sans-serif";
+            installBox.style.fontSize = "14px";
+            installBox.style.cursor = "pointer";
+            installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+            installBox.style.zIndex = "9999";
+            installBox.style.display = "flex";
+            installBox.style.alignItems = "center";
+            installBox.style.gap = "8px";
+            installBox.innerHTML = `
+              <i class="fas fa-download"></i>
+              <span id="installText">Install App</span>
+              <span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left: 5px;">×</span>
+            `;
+
+            document.body.appendChild(installBox);
+
+            document.getElementById("installText").addEventListener("click", async () => {
+              installBox.remove();
+              deferredPrompt.prompt();
+              const choiceResult = await deferredPrompt.userChoice;
+              if (choiceResult.outcome === "accepted") {
+                console.log("User accepted install prompt");
+              }
+            });
+
+            document.getElementById("closeInstall").addEventListener("click", () => {
+              installBox.remove();
+            });
+        });
+    </script>
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
@@ -615,63 +737,5 @@ Price: ${selectedRow.cells[8].textContent}
         Dashboard.init();
         window.dashboard = Dashboard;
     </script>
-
-    <script>
-  // Register Service Worker
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function() {
-      navigator.serviceWorker.register("sw2.js").then(
-        function(reg) {
-          console.log("ServiceWorker registered with scope:", reg.scope);
-        },
-        function(err) {
-          console.log("ServiceWorker registration failed:", err);
-        }
-      );
-    });
-  }
-
-  // Show simple install button
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    const deferredPrompt = e;
-
-    const installBox = document.createElement("div");
-    installBox.style.position = "fixed";
-    installBox.style.top = "15px";
-    installBox.style.right = "15px";
-    installBox.style.background = "#2b6ef6";
-    installBox.style.color = "#fff";
-    installBox.style.borderRadius = "8px";
-    installBox.style.padding = "8px 14px";
-    installBox.style.fontFamily = "system-ui, sans-serif";
-    installBox.style.fontSize = "14px";
-    installBox.style.cursor = "pointer";
-    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-    installBox.style.zIndex = "9999";
-    installBox.style.display = "flex";
-    installBox.style.alignItems = "center";
-    installBox.style.gap = "8px";
-    installBox.innerHTML = `
-      <span id="installText">Install</span>
-      <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
-    `;
-
-    document.body.appendChild(installBox);
-
-    document.getElementById("installText").addEventListener("click", async () => {
-      installBox.remove();
-      deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted install prompt");
-      }
-    });
-
-    document.getElementById("closeInstall").addEventListener("click", () => {
-      installBox.remove();
-    });
-  });
-</script>
 </body>
 </html>
