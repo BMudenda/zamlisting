@@ -371,10 +371,11 @@
         window.addEventListener("beforeinstallprompt", (e) => {
             e.preventDefault();
             const deferredPrompt = e;
-
-            // Only show install prompt on the screen sizes where it's needed/visible
+            
+            // CRITICAL CHECK: Do not show the prompt if the app is already installed (standalone mode)
             if (window.matchMedia('(display-mode: standalone)').matches || document.getElementById('installBox')) {
-                 return; // Do not show if already installed or box exists
+                 console.log("App is already installed or prompt is visible.");
+                 return; 
             }
             
             const installBox = document.createElement("div");
