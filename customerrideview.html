@@ -5,7 +5,7 @@
     <title>Rides Data Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="manifest" href="manifest2.json">
+    <link rel="manifest" href="manifest2.json"> 
     <meta name="theme-color" content="#2b6ef6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -37,8 +37,6 @@
             position: relative; 
         }
         
-        /* NOTE: The #manualInstallBtn styles have been removed */
-
         .controls-panel {
             display: flex;
             justify-content: center;
@@ -297,8 +295,9 @@
       // Register Service Worker and install wba script
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function() {
-          // *** Service Worker file name updated to sw2.js ***
-          navigator.serviceWorker.register("sw2.js").then(
+          // *** IMPORTANT FIX: Explicitly set the scope to the current /install/ directory ***
+          // The path to sw2.js is relative, but the scope must be absolute from the root.
+          navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
             function(reg) {
               console.log("ServiceWorker registered with scope:", reg.scope);
             },
@@ -372,7 +371,8 @@
         // Request permission and get token
         Notification.requestPermission().then(permission => {
             if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
-                getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' })
+                // IMPORTANT: Replace this placeholder with your actual VAPID key
+                getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' }) 
                     .then(token => console.log('FCM Token:', token))
                     .catch(console.error);
             }
