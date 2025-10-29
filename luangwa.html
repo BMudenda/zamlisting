@@ -15,6 +15,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- PWA Meta and Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b6ef6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+<link rel="apple-touch-icon" href="icon-192.png">
   <style>
     /* ... (CSS remains unchanged) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1268,54 +1275,62 @@
       submitToGoogleSheet();
     });
   </script>
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const apkUrl = "https://drive.google.com/uc?export=download&id=1vfOTOw5a_S09ZscjQoB4GvXjlw7xVI5Q";
-
-  // Create a simple floating install button
-  const box = document.createElement("div");
-  box.style.position = "fixed";
-  box.style.top = "15px";
-  box.style.right = "15px";
-  box.style.background = "#2b6ef6";
-  box.style.color = "#fff";
-  box.style.borderRadius = "8px";
-  box.style.padding = "8px 14px";
-  box.style.fontFamily = "system-ui, sans-serif";
-  box.style.fontSize = "14px";
-  box.style.cursor = "pointer";
-  box.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-  box.style.zIndex = "9999";
-  box.style.display = "flex";
-  box.style.alignItems = "center";
-  box.style.gap = "8px";
-
-  box.innerHTML = `
-    <span id="installText">Install</span>
-    <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
-  `;
-
-  document.body.appendChild(box);
-
-  // Click to install (open direct Google Drive download)
-  document.getElementById("installText").addEventListener("click", function() {
-    window.open(apkUrl, "_blank");
-    box.remove();
-    localStorage.setItem("installPromptHidden", "true");
-  });
-
-  // Cancel (close) button
-  document.getElementById("closeInstall").addEventListener("click", function() {
-    box.remove();
-    localStorage.setItem("installPromptHidden", "true");
-  });
-
-  // Hide if user already dismissed it
-  if (localStorage.getItem("installPromptHidden") === "true") {
-    box.remove();
+  // Register Service Worker and install wba script
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("sw.js").then(
+        function(reg) {
+          console.log("ServiceWorker registered with scope:", reg.scope);
+        },
+        function(err) {
+          console.log("ServiceWorker registration failed:", err);
+        }
+      );
+    });
   }
-});
+
+  // Show simple install button
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    const deferredPrompt = e;
+
+    const installBox = document.createElement("div");
+    installBox.style.position = "fixed";
+    installBox.style.top = "15px";
+    installBox.style.right = "15px";
+    installBox.style.background = "#2b6ef6";
+    installBox.style.color = "#fff";
+    installBox.style.borderRadius = "8px";
+    installBox.style.padding = "8px 14px";
+    installBox.style.fontFamily = "system-ui, sans-serif";
+    installBox.style.fontSize = "14px";
+    installBox.style.cursor = "pointer";
+    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+    installBox.style.zIndex = "9999";
+    installBox.style.display = "flex";
+    installBox.style.alignItems = "center";
+    installBox.style.gap = "8px";
+    installBox.innerHTML = `
+      <span id="installText">Install</span>
+      <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
+    `;
+
+    document.body.appendChild(installBox);
+
+    document.getElementById("installText").addEventListener("click", async () => {
+      installBox.remove();
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult.outcome === "accepted") {
+        console.log("User accepted install prompt");
+      }
+    });
+
+    document.getElementById("closeInstall").addEventListener("click", () => {
+      installBox.remove();
+    });
+  });
 </script>
   
 </body>
