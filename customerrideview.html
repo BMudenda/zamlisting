@@ -40,7 +40,7 @@
             position: relative; /* Needed for install button positioning */
         }
         
-        /* UPDATED: Manual Install Button Style - Made smaller */
+        /* UPDATED: Manual Install Button Style (Smaller) */
         #manualInstallBtn {
             position: absolute;
             top: 5px;
@@ -60,7 +60,8 @@
             transition: background-color 0.3s, transform 0.1s;
             white-space: nowrap; /* Prevents text wrap */
         }
-        #manualInstallBtn:hover { background-color: #0056b3; transform: translateY(-1px); }
+        #manualInstallBtn:hover:not(:disabled) { background-color: #0056b3; transform: translateY(-1px); }
+        #manualInstallBtn:disabled { cursor: default; opacity: 0.8; }
 
 
         /* Existing styles... */
@@ -332,7 +333,7 @@
 
     <script id="sw-code" type="text/plain">
         // Minimal Service Worker Content (Inline sw2.js replacement)
-        const CACHE_NAME = 'static-cache-v1';
+        const CACHE_NAME = 'static-cache-v1'; // Increment this (e.g., to v2) to force updates on deployment
         const ASSETS_TO_CACHE = [
             '/',
             'lfr.jpg',
@@ -350,8 +351,18 @@
 
         self.addEventListener('activate', (event) => {
             console.log('[Service Worker] Activated.');
+            // Clean up old caches
             event.waitUntil(
-                clients.claim()
+                caches.keys().then(cacheNames => {
+                    return Promise.all(
+                        cacheNames.map(cacheName => {
+                            if (cacheName !== CACHE_NAME) {
+                                console.log('[Service Worker] Deleting old cache:', cacheName);
+                                return caches.delete(cacheName);
+                            }
+                        })
+                    );
+                }).then(() => clients.claim())
             );
         });
         
@@ -373,71 +384,73 @@
         const installBtnText = document.getElementById("installBtnText");
 
         /**
-         * Checks the installation state of the PWA and updates the button text/icon.
+         * Triggers the native browser installation prompt.
          */
-        const updateInstallButtonState = () => {
-             // Check if the app is running in 'standalone' mode (i.e., installed PWA)
-            const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
-
-            if (isInstalled) {
-                // State: Installed PWA (in standalone mode)
-                installBtnText.textContent = 'App Installed';
-                installBtnIcon.className = 'fas fa-check-circle'; // Checkmark icon
-                installBtn.style.display = 'flex'; // Show the button for confirmation
-                installBtn.style.backgroundColor = 'var(--success)'; // Green background
-                installBtn.onclick = () => alert("The app is already installed and running in standalone mode.");
-                installBtn.disabled = true; // Disable the button
-            } else if (deferredPrompt) {
-                 // State: NOT installed, but the install prompt is available (browser tab view)
-                installBtnText.textContent = 'Install App';
-                installBtnIcon.className = 'fas fa-download'; // Download icon
-                installBtn.style.display = 'flex'; // Show the button
-                installBtn.style.backgroundColor = 'var(--primary)'; // Primary blue
-                installBtn.disabled = false; // Enable the button
-                // Restore the original install click handler
-                installBtn.onclick = handleInstallClick; 
-            } else if (!deferredPrompt && 'serviceWorker' in navigator) {
-                 // State: Not installed, but browser criteria are met (or almost met). 
-                 // This covers the case when the PWA IS installed and running in a regular browser tab.
-                const isRunningInBrowser = !isInstalled && window.location.href.startsWith('http');
-                
-                if (isRunningInBrowser) {
-                    installBtnText.textContent = 'Update App'; // Assume update is needed
-                    installBtnIcon.className = 'fas fa-sync-alt'; // Refresh icon
-                    installBtn.style.display = 'flex';
-                    installBtn.style.backgroundColor = 'var(--accent)';
-                    installBtn.disabled = false;
-                    installBtn.onclick = () => {
-                        alert("PWA update: The browser automatically fetches updates via the Service Worker. You may need to manually refresh the page or clear cache.");
-                        // Optional: Trigger a Service Worker update check here if needed
-                        if (navigator.serviceWorker.controller) {
-                            navigator.serviceWorker.controller.postMessage({ type: 'CHECK_FOR_UPDATE' });
-                        }
-                    };
-                } else {
-                    installBtn.style.display = 'none';
-                }
-            } else {
-                 // Fallback: Hide if no install prompt and no service worker support
-                 installBtn.style.display = 'none';
-            }
-        };
-
         const handleInstallClick = async () => {
             if (deferredPrompt) {
-                installBtn.style.display = 'none'; // Hide the button immediately upon click
+                // Hide the button to prevent double-click or confusion
+                installBtn.style.display = 'none'; 
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`User response to install prompt: ${outcome}`);
                 
-                // If accepted, the app is installed and the update button state will take over
-                if (outcome === 'accepted') {
-                    // Update state after successful install (before potential reload)
-                    deferredPrompt = null;
-                    updateInstallButtonState(); 
-                }
+                // If the user accepts or dismisses, the browser state changes, so we update the button
+                deferredPrompt = null;
+                // Re-evaluate the button state after the user interaction
+                updateInstallButtonState(); 
             } else {
-                 alert("The install prompt is not available, possibly because the app is already installed (showing 'Update App') or PWA criteria aren't met.");
+                 alert("The install prompt is not available. Please ensure your site is running over HTTPS and PWA criteria are met.");
+            }
+        };
+
+
+        /**
+         * Checks the installation state of the PWA and updates the button text/icon and action.
+         */
+        const updateInstallButtonState = () => {
+             // 1. Check if the app is running in 'standalone' mode (i.e., installed PWA)
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+
+            if (isInstalled) {
+                // State A: App is installed (running in its own window)
+                installBtnText.textContent = 'App Installed';
+                installBtnIcon.className = 'fas fa-check-circle'; // Checkmark icon
+                installBtn.style.display = 'flex'; 
+                installBtn.style.backgroundColor = 'var(--success)'; // Green
+                installBtn.disabled = true; 
+                installBtn.onclick = () => alert("The app is already installed and running in standalone mode. Look for the app icon on your device/desktop.");
+
+            } else if (deferredPrompt) {
+                 // State B: NOT installed, but the install prompt is available (browser tab view)
+                installBtnText.textContent = 'Install App';
+                installBtnIcon.className = 'fas fa-download'; // Download icon
+                installBtn.style.display = 'flex'; 
+                installBtn.style.backgroundColor = 'var(--primary)'; // Primary blue
+                installBtn.disabled = false; 
+                // Set the action to trigger the native prompt
+                installBtn.onclick = handleInstallClick; 
+
+            } else if ('serviceWorker' in navigator) {
+                 // State C: Not running in standalone mode AND no install prompt available.
+                 // This covers two main scenarios: 1) The app IS installed but the user is viewing it in a browser tab. 2) The app is NOT installed, but the browser already showed/dismissed the prompt.
+                installBtnText.textContent = 'Update App'; 
+                installBtnIcon.className = 'fas fa-sync-alt'; // Refresh icon
+                installBtn.style.display = 'flex';
+                installBtn.style.backgroundColor = 'var(--accent)';
+                installBtn.disabled = false;
+                
+                // Set the action to inform the user about automatic updates and advise refreshing.
+                installBtn.onclick = () => {
+                    const message = "PWA updates are applied automatically in the background by the Service Worker. To ensure you have the latest code immediately, please close and reopen the app, or manually **refresh the browser tab**.";
+                    alert(message);
+                    console.log(message);
+                    // Optional: Manually trigger page reload to check for new updates
+                    // window.location.reload(); 
+                };
+
+            } else {
+                 // State D: Hide button (PWA criteria not met or unsupported browser)
+                 installBtn.style.display = 'none';
             }
         };
 
@@ -452,13 +465,9 @@
             updateInstallButtonState();
         });
 
-        // 2. Handle Manual Button Click (Re-attached below if state changes)
-        installBtn.addEventListener("click", handleInstallClick);
-
-
-        // 3. Service Worker Registration and Initial State Check
+        // 2. Initial State Check and Service Worker Registration
         window.addEventListener("load", function() {
-             // Always call the state check on load to handle the "Update App" state
+             // Always call the state check on load to handle all scenarios
             updateInstallButtonState(); 
 
             if ("serviceWorker" in navigator) {
