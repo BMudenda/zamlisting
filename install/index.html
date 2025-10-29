@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rides Data Dashboard</title>
+    <title>Rides Data Dashboard - Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="manifest" href="manifest2.json"> 
@@ -215,6 +215,65 @@
         }
         #notification.show { top: 0; opacity: 1; }
 
+        /* Login Screen Styles */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .login-box {
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .login-box h3 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        #password-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #login-btn:hover { background-color: #0056b3; }
+        #login-message {
+            color: var(--danger);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        /* Hide main content initially */
+        .dashboard-container { display: none; }
+
+
         /* Media Queries: Ensures stacking on small screens */
         @media(max-width:768px){
             body { padding: 10px; }
@@ -238,7 +297,16 @@
 </head>
 <body>
 
-    <div class="dashboard-container">
+    <div id="login-screen">
+        <div class="login-box">
+            <h3>Luangwa Feira Rides Admin</h3>
+            <p>Enter Password to access the Dashboard.</p>
+            <input type="password" id="password-input" placeholder="Password" autofocus>
+            <button id="login-btn">Login</button>
+            <p id="login-message"></p>
+        </div>
+    </div>
+    <div class="dashboard-container" id="dashboard-content">
         <h2>
             <i class="fas fa-chart-line"></i> Rides Data 
             </h2>
@@ -292,12 +360,50 @@
     </div>
 
     <script>
+        // --- NEW LOGIN SCRIPT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('password-input');
+            const loginBtn = document.getElementById('login-btn');
+            const loginScreen = document.getElementById('login-screen');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const loginMessage = document.getElementById('login-message');
+            
+            const CORRECT_PASSWORD = 'admin2010';
+
+            const attemptLogin = () => {
+                if (passwordInput.value === CORRECT_PASSWORD) {
+                    loginScreen.style.display = 'none';
+                    dashboardContent.style.display = 'block';
+                    // Optional: Immediately initialize dashboard components after successful login
+                    if (window.dashboard && typeof window.dashboard.init === 'function') {
+                        window.dashboard.init();
+                    }
+                } else {
+                    loginMessage.textContent = 'Invalid password. Please try again.';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            };
+
+            loginBtn.addEventListener('click', attemptLogin);
+            passwordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    attemptLogin();
+                }
+            });
+            
+            // Focus on password field when the page loads
+            passwordInput.focus();
+        });
+        // ------------------------
+
       // Register Service Worker and install wba script
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function() {
           // *** IMPORTANT FIX: Explicitly set the scope to the current /install/ directory ***
           // The path to sw2.js is relative, but the scope must be absolute from the root.
-          navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
+          // NOTE: This scope line may need adjustment based on your server path structure.
+          navigator.serviceWorker.register("sw2.js", { scope: "./" }).then(
             function(reg) {
               console.log("ServiceWorker registered with scope:", reg.scope);
             },
@@ -334,7 +440,23 @@
           <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
         `;
 
-        document.body.appendChild(installBox);
+        // Check if the login screen is showing before appending the install box
+        if (document.getElementById('login-screen').style.display !== 'none') {
+            // Append only if the dashboard is visible (after successful login)
+            document.body.appendChild(installBox);
+        } else {
+            // Wait for successful login to show install prompt
+            const observer = new MutationObserver((mutationsList, observer) => {
+                for(const mutation of mutationsList) {
+                    if (mutation.attributeName === 'style' && dashboardContent.style.display === 'block') {
+                         document.body.appendChild(installBox);
+                         observer.disconnect();
+                    }
+                }
+            });
+            observer.observe(dashboardContent, { attributes: true });
+        }
+
 
         document.getElementById("installText").addEventListener("click", async () => {
           installBox.remove();
@@ -369,25 +491,30 @@
         const messaging = getMessaging(app);
 
         // Request permission and get token
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
-                // IMPORTANT: Replace this placeholder with your actual VAPID key
-                getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' }) 
-                    .then(token => console.log('FCM Token:', token))
-                    .catch(console.error);
-            }
-        });
-
+        const requestNotificationPermission = () => {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
+                    // IMPORTANT: Replace this placeholder with your actual VAPID key
+                    getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' }) 
+                        .then(token => console.log('FCM Token:', token))
+                        .catch(console.error);
+                }
+            });
+        };
+        
         // Handle foreground messages
         onMessage(messaging, (payload) => {
             console.log('FCM Message received:', payload);
-            if (window.dashboard && typeof window.dashboard.handleNewData === 'function') {
-                // Pass notification data to the dashboard handler
+            // Only handle data if the dashboard is visible (logged in)
+            if (document.getElementById('dashboard-content').style.display === 'block' && window.dashboard && typeof window.dashboard.handleNewData === 'function') {
                 window.dashboard.handleNewData(payload.notification.title, payload.notification.body);
             } else {
-                 console.error("Dashboard module not fully initialized when FCM received.");
+                 console.warn("FCM received before login or dashboard not initialized.");
             }
         });
+        
+        // Expose a function to request permission after login
+        window.requestNotificationPermission = requestNotificationPermission;
     </script>
 
     <script defer>
@@ -402,6 +529,7 @@
             let lastRowCount = 0;
             let selectedRow = null;
             let selectedPhone = null; // Customer's phone number
+            let intervalId = null; // To hold the interval timer
 
             // DOM Elements
             const elements = {
@@ -471,6 +599,9 @@
 
             // Core Data Fetching and Rendering
             const fetchData = async () => {
+                // Do not fetch if the dashboard is hidden
+                if (document.getElementById('dashboard-content').style.display !== 'block') return;
+
                 try {
                     const response = await fetch(SHEET_URL);
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -641,11 +772,15 @@ Price: ${selectedRow.cells[8].textContent}
                 showNotification("Live Feed Started", "Data is now updating every 10 seconds.");
                 fetchData();
                 // Start the polling interval (10 seconds)
-                setInterval(fetchData, 10000);
+                if (intervalId) clearInterval(intervalId); // Clear any existing interval
+                intervalId = setInterval(fetchData, 10000);
             };
 
             // Initialization
             const init = () => {
+                // Ensure the login process has completed before attaching main listeners
+                if (document.getElementById('dashboard-content').style.display !== 'block') return;
+
                 elements.startBtn.addEventListener("click", startFeed);
                 elements.searchInput.addEventListener("input", filterTable); 
 
@@ -655,22 +790,29 @@ Price: ${selectedRow.cells[8].textContent}
                 });
                 
                 updateActionButtons(null);
+                
+                // Request notification permission right after dashboard loads
+                if (window.requestNotificationPermission) {
+                    window.requestNotificationPermission();
+                }
             };
             
             // Public Interface
             return {
                 init: init,
                 handleNewData: (title, body) => {
-                    playBeep();
-                    showNotification(title, body);
-                    fetchData();
+                    // Only process new data if the feed hasn't been started yet (and only if logged in)
+                    if (document.getElementById('dashboard-content').style.display === 'block') {
+                        playBeep();
+                        showNotification(title, body);
+                        fetchData();
+                    }
                 }
             };
         })();
 
-        // Start the dashboard
-        Dashboard.init();
-        window.dashboard = Dashboard;
+        // We no longer call Dashboard.init() here. It is called upon successful login.
+        window.dashboard = Dashboard; 
     </script>
 </body>
 </html>
