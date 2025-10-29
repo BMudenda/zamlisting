@@ -368,16 +368,22 @@
             const dashboardContent = document.getElementById('dashboard-content');
             const loginMessage = document.getElementById('login-message');
             
-            const CORRECT_PASSWORD = 'admin2010';
+            const CORRECT_PASSWORD = 'admin2010'; // <-- The required password
 
             const attemptLogin = () => {
                 if (passwordInput.value === CORRECT_PASSWORD) {
                     loginScreen.style.display = 'none';
                     dashboardContent.style.display = 'block';
-                    // Optional: Immediately initialize dashboard components after successful login
+                    
+                    // --- CRITICAL FIX: Initialize Dashboard after successful login ---
                     if (window.dashboard && typeof window.dashboard.init === 'function') {
                         window.dashboard.init();
                     }
+                    // Optional: Request FCM permission (defined in the module script)
+                    if (window.requestNotificationPermission) {
+                        window.requestNotificationPermission();
+                    }
+                    
                 } else {
                     loginMessage.textContent = 'Invalid password. Please try again.';
                     passwordInput.value = '';
@@ -400,10 +406,8 @@
       // Register Service Worker and install wba script
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function() {
-          // *** IMPORTANT FIX: Explicitly set the scope to the current /install/ directory ***
-          // The path to sw2.js is relative, but the scope must be absolute from the root.
-          // NOTE: This scope line may need adjustment based on your server path structure.
-          navigator.serviceWorker.register("sw2.js", { scope: "./" }).then(
+          // *** FIX: Set the scope explicitly for subdirectory hosting (/install/) ***
+          navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
             function(reg) {
               console.log("ServiceWorker registered with scope:", reg.scope);
             },
@@ -439,10 +443,12 @@
           <span id="installText">Install</span>
           <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
         `;
+        
+        const dashboardContent = document.getElementById('dashboard-content');
 
         // Check if the login screen is showing before appending the install box
-        if (document.getElementById('login-screen').style.display !== 'none') {
-            // Append only if the dashboard is visible (after successful login)
+        if (dashboardContent && dashboardContent.style.display === 'block') {
+            // Append if the dashboard is already visible (e.g., if cache retains visibility)
             document.body.appendChild(installBox);
         } else {
             // Wait for successful login to show install prompt
@@ -454,6 +460,7 @@
                     }
                 }
             });
+            // We observe dashboardContent for the style change (display: block)
             observer.observe(dashboardContent, { attributes: true });
         }
 
@@ -490,7 +497,7 @@
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
 
-        // Request permission and get token
+        // Function to request permission and get token (called after successful login)
         const requestNotificationPermission = () => {
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
@@ -776,11 +783,8 @@ Price: ${selectedRow.cells[8].textContent}
                 intervalId = setInterval(fetchData, 10000);
             };
 
-            // Initialization
+            // Initialization (This is called ONCE upon successful login)
             const init = () => {
-                // Ensure the login process has completed before attaching main listeners
-                if (document.getElementById('dashboard-content').style.display !== 'block') return;
-
                 elements.startBtn.addEventListener("click", startFeed);
                 elements.searchInput.addEventListener("input", filterTable); 
 
@@ -790,11 +794,6 @@ Price: ${selectedRow.cells[8].textContent}
                 });
                 
                 updateActionButtons(null);
-                
-                // Request notification permission right after dashboard loads
-                if (window.requestNotificationPermission) {
-                    window.requestNotificationPermission();
-                }
             };
             
             // Public Interface
@@ -811,8 +810,11 @@ Price: ${selectedRow.cells[8].textContent}
             };
         })();
 
-        // We no longer call Dashboard.init() here. It is called upon successful login.
+        // Expose the dashboard object globally so the login script can access its init function
         window.dashboard = Dashboard; 
+        
+        // IMPORTANT: Dashboard.init() is NOT called here. It is called inside the 
+        // successful login function in the first <script> block.
     </script>
 </body>
 </html>
