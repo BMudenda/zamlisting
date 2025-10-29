@@ -40,7 +40,7 @@
             position: relative; /* Needed for install button positioning */
         }
         
-        /* NEW: Manual Install Button Style - Made smaller */
+        /* UPDATED: Manual Install Button Style - Made smaller */
         #manualInstallBtn {
             position: absolute;
             top: 5px;
@@ -53,11 +53,12 @@
             background-color: var(--primary);
             color: #fff;
             border: none;
-            display: none; /* Hide by default, show in JS if prompt fires OR app is installed */
+            display: none; /* Hide by default, shown by JS */
             align-items: center;
             gap: 5px; /* Smaller gap */
             box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3); /* Smaller shadow */
             transition: background-color 0.3s, transform 0.1s;
+            white-space: nowrap; /* Prevents text wrap */
         }
         #manualInstallBtn:hover { background-color: #0056b3; transform: translateY(-1px); }
 
@@ -371,27 +372,53 @@
         const installBtnIcon = installBtn.querySelector('i');
         const installBtnText = document.getElementById("installBtnText");
 
-        // Function to check and update the button's text/state
+        /**
+         * Checks the installation state of the PWA and updates the button text/icon.
+         */
         const updateInstallButtonState = () => {
              // Check if the app is running in 'standalone' mode (i.e., installed PWA)
             const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
 
             if (isInstalled) {
-                // App is installed: change button to "Update" (though PWA updates are automatic via SW)
-                installBtnText.textContent = 'Update App';
-                installBtnIcon.className = 'fas fa-sync-alt'; // Change icon to refresh
-                installBtn.style.display = 'flex'; // Show the button for a visual cue or manual update check
-                // NOTE: We don't disable the click handler, as an "Update" button *could* trigger a manual SW update check/skip waiting
-                installBtn.onclick = () => alert("App is installed. PWA updates are generally automatic in the background via the Service Worker.");
+                // State: Installed PWA (in standalone mode)
+                installBtnText.textContent = 'App Installed';
+                installBtnIcon.className = 'fas fa-check-circle'; // Checkmark icon
+                installBtn.style.display = 'flex'; // Show the button for confirmation
+                installBtn.style.backgroundColor = 'var(--success)'; // Green background
+                installBtn.onclick = () => alert("The app is already installed and running in standalone mode.");
+                installBtn.disabled = true; // Disable the button
             } else if (deferredPrompt) {
-                 // App is NOT installed, but the install prompt is available
+                 // State: NOT installed, but the install prompt is available (browser tab view)
                 installBtnText.textContent = 'Install App';
-                installBtnIcon.className = 'fas fa-download'; // Change icon to download
+                installBtnIcon.className = 'fas fa-download'; // Download icon
                 installBtn.style.display = 'flex'; // Show the button
+                installBtn.style.backgroundColor = 'var(--primary)'; // Primary blue
+                installBtn.disabled = false; // Enable the button
                 // Restore the original install click handler
                 installBtn.onclick = handleInstallClick; 
+            } else if (!deferredPrompt && 'serviceWorker' in navigator) {
+                 // State: Not installed, but browser criteria are met (or almost met). 
+                 // This covers the case when the PWA IS installed and running in a regular browser tab.
+                const isRunningInBrowser = !isInstalled && window.location.href.startsWith('http');
+                
+                if (isRunningInBrowser) {
+                    installBtnText.textContent = 'Update App'; // Assume update is needed
+                    installBtnIcon.className = 'fas fa-sync-alt'; // Refresh icon
+                    installBtn.style.display = 'flex';
+                    installBtn.style.backgroundColor = 'var(--accent)';
+                    installBtn.disabled = false;
+                    installBtn.onclick = () => {
+                        alert("PWA update: The browser automatically fetches updates via the Service Worker. You may need to manually refresh the page or clear cache.");
+                        // Optional: Trigger a Service Worker update check here if needed
+                        if (navigator.serviceWorker.controller) {
+                            navigator.serviceWorker.controller.postMessage({ type: 'CHECK_FOR_UPDATE' });
+                        }
+                    };
+                } else {
+                    installBtn.style.display = 'none';
+                }
             } else {
-                 // App is NOT installed, and no prompt is available yet/anymore
+                 // Fallback: Hide if no install prompt and no service worker support
                  installBtn.style.display = 'none';
             }
         };
@@ -403,13 +430,14 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`User response to install prompt: ${outcome}`);
                 
-                // If accepted, the app is installed and the standalone check will take over
+                // If accepted, the app is installed and the update button state will take over
                 if (outcome === 'accepted') {
-                     // Since installation often reloads into standalone mode, this is a clean up
-                    installBtn.remove();
+                    // Update state after successful install (before potential reload)
+                    deferredPrompt = null;
+                    updateInstallButtonState(); 
                 }
             } else {
-                 alert("The install prompt is not available, possibly because the browser doesn't support PWA installation or the criteria haven't been met yet. If installed, the 'Update App' message would show.");
+                 alert("The install prompt is not available, possibly because the app is already installed (showing 'Update App') or PWA criteria aren't met.");
             }
         };
 
@@ -424,13 +452,16 @@
             updateInstallButtonState();
         });
 
-        // 2. Handle Manual Button Click
+        // 2. Handle Manual Button Click (Re-attached below if state changes)
         installBtn.addEventListener("click", handleInstallClick);
 
 
-        // 3. Service Worker Registration (using the inline script content via Blob URL)
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", function() {
+        // 3. Service Worker Registration and Initial State Check
+        window.addEventListener("load", function() {
+             // Always call the state check on load to handle the "Update App" state
+            updateInstallButtonState(); 
+
+            if ("serviceWorker" in navigator) {
                 try {
                     // Get the content from the script tag
                     const swContent = document.getElementById('sw-code').textContent;
@@ -440,8 +471,6 @@
                     navigator.serviceWorker.register(swUrl).then(
                         function(reg) {
                             console.log("ServiceWorker registered with scope:", reg.scope);
-                            // Initial check on load, especially if PWA is already installed
-                            updateInstallButtonState(); 
                         },
                         function(err) {
                             console.log("ServiceWorker registration FAILED:", err);
@@ -450,11 +479,8 @@
                 } catch (e) {
                     console.error("Service Worker setup failed:", e);
                 }
-            });
-        } else {
-            // Fallback for browsers without Service Worker support
-            window.addEventListener("load", updateInstallButtonState);
-        }
+            }
+        });
     </script>
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
