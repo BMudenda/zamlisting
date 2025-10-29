@@ -11,28 +11,9 @@
     <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
     <link rel="apple-touch-icon" href="lfr.jpg">
     
-    <script type="application/json" id="pwa-manifest">
-        {
-          "short_name": "LFRides",
-          "name": "Luangwa Feira Rides Data",
-          "icons": [
-            {
-              "src": "lfr.jpg",
-              "type": "image/jpeg",
-              "sizes": "192x192"
-            },
-            {
-              "src": "lfr.jpg",
-              "type": "image/jpeg",
-              "sizes": "512x512"
-            }
-          ],
-          "start_url": "./index.html",
-          "display": "standalone",
-          "background_color": "#2b6ef6",
-          "theme_color": "#2b6ef6"
-        }
-    </script>
+    <link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjogIkxGUmlkZXMiLCAibmFtZSI6ICJMdWFuZ3dhIEZlaXJhIFJpZGVzIERhdGEiLCAiaWNvbnMiOiBbeyJzcmMiOiAibGZyLmpwZyIsICJ0eXBlIjogImltYWdlL2pwZWciLCAic2l6ZXMiOiAiMTkyeDE5MiJ9LCAiezNyYyI6ICJscmYuanBnIiwgInR5cGUiOiAiaW1hZ2UvanBlZyIsICJzaXplcyI6ICI1MTJ4NTEyIn1dLCAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmI2ZWY2IiwgInRoZW1lX2NvbG9yIjogIiMyYjZlZjYifQ==">
+
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -56,9 +37,32 @@
             margin-bottom: 25px;
             font-weight: 700;
             letter-spacing: 0.5px;
+            position: relative; /* Needed for install button positioning */
         }
+        
+        /* NEW: Manual Install Button Style */
+        #manualInstallBtn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            display: none; /* Hide by default, show in JS if prompt fires */
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        #manualInstallBtn:hover { background-color: #0056b3; transform: translateY(-1px); }
 
-        /* Start Button & Controls Area */
+
+        /* Existing styles... */
         .controls-panel {
             display: flex;
             justify-content: center;
@@ -255,15 +259,26 @@
                 width: 100%;
                 box-sizing: border-box; /* Include padding/border in width */
             }
+            #manualInstallBtn {
+                position: static;
+                margin-top: 10px;
+                display: flex;
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
-    <link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjogIkxGUmlkZXMiLCAibmFtZSI6ICJMdWFuZ3dhIEZlaXJhIFJpZGVzIERhdGEiLCAiaWNvbnMiOiBbeyJzcmMiOiAibGZyLmpwZyIsICJ0eXBlIjogImltYWdlL2pwZWciLCAic2l6ZXMiOiAiMTkyeDE5MiJ9LCAiezNyYyI6ICJscmYuanBnIiwgInR5cGUiOiAiaW1hZ2UvanBlZyIsICJzaXplcyI6ICI1MTJ4NTEyIn1dLCAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmI2ZWY2IiwgInRoZW1lX2NvbG9yIjogIiMyYjZlZjYifQ==">
 </head>
 <body>
 
     <div class="dashboard-container">
-        <h2><i class="fas fa-chart-line"></i> Rides Data </h2>
-
+        <h2>
+            <i class="fas fa-chart-line"></i> Rides Data 
+            <button id="manualInstallBtn">
+                <i class="fas fa-download"></i> Install App
+            </button>
+        </h2>
+        
         <div class="controls-panel">
             <button id="startBtn">
                 <i class="fas fa-play-circle"></i> 
@@ -312,110 +327,99 @@
         </audio>
     </div>
 
-    <script>
+    <script id="sw-code" type="text/plain">
         // Minimal Service Worker Content (Inline sw2.js replacement)
-        const swContent = `
-            const CACHE_NAME = 'static-cache-v1';
-            const ASSETS_TO_CACHE = [
-                '/',
-                'lfr.jpg',
-                // Add other static assets if needed for offline functionality
-            ];
+        const CACHE_NAME = 'static-cache-v1';
+        const ASSETS_TO_CACHE = [
+            '/',
+            'lfr.jpg',
+            // Add other static assets if needed for offline functionality
+        ];
 
-            self.addEventListener('install', (event) => {
-                console.log('[Service Worker] Installing...');
-                self.skipWaiting();
-                event.waitUntil(
-                    caches.open(CACHE_NAME)
-                    .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+        self.addEventListener('install', (event) => {
+            console.log('[Service Worker] Installing...');
+            self.skipWaiting();
+            event.waitUntil(
+                caches.open(CACHE_NAME)
+                .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+            );
+        });
+
+        self.addEventListener('activate', (event) => {
+            console.log('[Service Worker] Activated.');
+            event.waitUntil(
+                clients.claim()
+            );
+        });
+        
+        self.addEventListener('fetch', (event) => {
+            // Cache-first strategy for static resources
+            if (event.request.url.startsWith(self.location.origin)) {
+                event.respondWith(
+                    caches.match(event.request)
+                    .then((response) => response || fetch(event.request))
                 );
-            });
+            }
+        });
+    </script>
 
-            self.addEventListener('activate', (event) => {
-                console.log('[Service Worker] Activated.');
-                event.waitUntil(
-                    clients.claim()
-                );
-            });
-            
-            self.addEventListener('fetch', (event) => {
-                // Example: Only handle static file requests with cache-first strategy
-                if (event.request.url.startsWith(self.location.origin)) {
-                    event.respondWith(
-                        caches.match(event.request)
-                        .then((response) => response || fetch(event.request))
-                    );
-                }
-            });
-        `;
+    <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById("manualInstallBtn");
 
-        // Register Service Worker from Blob
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", function() {
-                // Create a Blob from the inline worker content
-                const swBlob = new Blob([swContent], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                
-                navigator.serviceWorker.register(swUrl).then(
-                    function(reg) {
-                        console.log("ServiceWorker registered with scope:", reg.scope);
-                    },
-                    function(err) {
-                        console.log("ServiceWorker registration failed:", err);
-                    }
-                );
-            });
-        }
-
-        // Show simple install button
+        // 1. Capture the 'beforeinstallprompt' event
         window.addEventListener("beforeinstallprompt", (e) => {
             e.preventDefault();
-            const deferredPrompt = e;
+            // Store the event for later use
+            deferredPrompt = e;
             
-            // CRITICAL CHECK: Do not show the prompt if the app is already installed (standalone mode)
-            if (window.matchMedia('(display-mode: standalone)').matches || document.getElementById('installBox')) {
-                 console.log("App is already installed or prompt is visible.");
-                 return; 
+            // CRITICAL CHECK: Show button only if the app is NOT installed
+            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.style.display = 'flex'; 
             }
-            
-            const installBox = document.createElement("div");
-            installBox.id = "installBox";
-            installBox.style.position = "fixed";
-            installBox.style.top = "15px";
-            installBox.style.right = "15px";
-            installBox.style.background = "#2b6ef6";
-            installBox.style.color = "#fff";
-            installBox.style.borderRadius = "8px";
-            installBox.style.padding = "8px 14px";
-            installBox.style.fontFamily = "system-ui, sans-serif";
-            installBox.style.fontSize = "14px";
-            installBox.style.cursor = "pointer";
-            installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-            installBox.style.zIndex = "9999";
-            installBox.style.display = "flex";
-            installBox.style.alignItems = "center";
-            installBox.style.gap = "8px";
-            installBox.innerHTML = `
-              <i class="fas fa-download"></i>
-              <span id="installText">Install App</span>
-              <span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left: 5px;">×</span>
-            `;
-
-            document.body.appendChild(installBox);
-
-            document.getElementById("installText").addEventListener("click", async () => {
-              installBox.remove();
-              deferredPrompt.prompt();
-              const choiceResult = await deferredPrompt.userChoice;
-              if (choiceResult.outcome === "accepted") {
-                console.log("User accepted install prompt");
-              }
-            });
-
-            document.getElementById("closeInstall").addEventListener("click", () => {
-              installBox.remove();
-            });
         });
+
+        // 2. Handle Manual Button Click
+        installBtn.addEventListener("click", async () => {
+            installBtn.style.display = 'none'; // Hide the button immediately
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to install prompt: ${outcome}`);
+                
+                // If accepted, the app is installed and the standalone check will prevent the button from showing again
+                if (outcome === 'accepted') {
+                    // Remove button permanently as the app is installed
+                    installBtn.remove();
+                }
+            } else {
+                 alert("The install prompt is not available, possibly because the browser doesn't support PWA installation or the criteria haven't been met yet.");
+            }
+        });
+
+        // 3. Service Worker Registration (using the inline script content via Blob URL)
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+                try {
+                    // Get the content from the script tag
+                    const swContent = document.getElementById('sw-code').textContent;
+                    const swBlob = new Blob([swContent], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(swBlob);
+                    
+                    navigator.serviceWorker.register(swUrl).then(
+                        function(reg) {
+                            console.log("ServiceWorker registered with scope:", reg.scope);
+                        },
+                        function(err) {
+                            console.log("ServiceWorker registration FAILED:", err);
+                        }
+                    );
+                } catch (e) {
+                    console.error("Service Worker setup failed:", e);
+                }
+            });
+        }
     </script>
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
