@@ -5,15 +5,12 @@
     <title>Rides Data Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2b6ef6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
     <link rel="apple-touch-icon" href="lfr.jpg">
-    
-    <link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjogIkxGUmlkZXMiLCAibmFtZSI6ICJMdWFuZ3dhIEZlaXJhIFJpZGVzIERhdGEiLCAiaWNvbnMiOiBbeyJzcmMiOiAibGZyLmpwZyIsICJ0eXBlIjogImltYWdlL2pwZWciLCAic2l6ZXMiOiAiMTkyeDE5MiJ9LCAiezNyYyI6ICJscmYuanBnIiwgInR5cGUiOiAiaW1hZ2UvanBlZyIsICJzaXplcyI6ICI1MTJ4NTEyIn1dLCAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmI2ZWY2IiwgInRoZW1lX2NvbG9yIjogIiMyYjZlZjYifQ==">
-
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -37,34 +34,11 @@
             margin-bottom: 25px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            position: relative; /* Needed for install button positioning */
+            position: relative; 
         }
         
-        /* UPDATED: Manual Install Button Style (Smaller) */
-        #manualInstallBtn {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            padding: 5px 10px; /* Smaller padding */
-            font-size: 12px; /* Smaller font size */
-            font-weight: 500;
-            border-radius: 4px; /* Smaller border radius */
-            cursor: pointer;
-            background-color: var(--primary);
-            color: #fff;
-            border: none;
-            display: none; /* Hide by default, shown by JS */
-            align-items: center;
-            gap: 5px; /* Smaller gap */
-            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3); /* Smaller shadow */
-            transition: background-color 0.3s, transform 0.1s;
-            white-space: nowrap; /* Prevents text wrap */
-        }
-        #manualInstallBtn:hover:not(:disabled) { background-color: #0056b3; transform: translateY(-1px); }
-        #manualInstallBtn:disabled { cursor: default; opacity: 0.8; }
+        /* NOTE: The #manualInstallBtn styles have been removed */
 
-
-        /* Existing styles... */
         .controls-panel {
             display: flex;
             justify-content: center;
@@ -261,15 +235,6 @@
                 width: 100%;
                 box-sizing: border-box; /* Include padding/border in width */
             }
-            #manualInstallBtn {
-                position: static;
-                margin-top: 10px;
-                display: flex;
-                width: 100%;
-                justify-content: center;
-                padding: 8px 15px; /* Adjust mobile padding */
-                font-size: 14px; /* Adjust mobile font size */
-            }
         }
     </style>
 </head>
@@ -278,10 +243,7 @@
     <div class="dashboard-container">
         <h2>
             <i class="fas fa-chart-line"></i> Rides Data 
-            <button id="manualInstallBtn" title="Install or Update the PWA">
-                <i class="fas fa-download"></i> <span id="installBtnText">Install App</span>
-            </button>
-        </h2>
+            </h2>
         
         <div class="controls-panel">
             <button id="startBtn">
@@ -331,165 +293,62 @@
         </audio>
     </div>
 
-    <script id="sw-code" type="text/plain">
-        // Minimal Service Worker Content (Inline sw2.js replacement)
-        const CACHE_NAME = 'static-cache-v1'; // Increment this (e.g., to v2) to force updates on deployment
-        const ASSETS_TO_CACHE = [
-            '/',
-            'lfr.jpg',
-            // Add other static assets if needed for offline functionality
-        ];
-
-        self.addEventListener('install', (event) => {
-            console.log('[Service Worker] Installing...');
-            self.skipWaiting();
-            event.waitUntil(
-                caches.open(CACHE_NAME)
-                .then((cache) => cache.addAll(ASSETS_TO_CACHE))
-            );
-        });
-
-        self.addEventListener('activate', (event) => {
-            console.log('[Service Worker] Activated.');
-            // Clean up old caches
-            event.waitUntil(
-                caches.keys().then(cacheNames => {
-                    return Promise.all(
-                        cacheNames.map(cacheName => {
-                            if (cacheName !== CACHE_NAME) {
-                                console.log('[Service Worker] Deleting old cache:', cacheName);
-                                return caches.delete(cacheName);
-                            }
-                        })
-                    );
-                }).then(() => clients.claim())
-            );
-        });
-        
-        self.addEventListener('fetch', (event) => {
-            // Cache-first strategy for static resources
-            if (event.request.url.startsWith(self.location.origin)) {
-                event.respondWith(
-                    caches.match(event.request)
-                    .then((response) => response || fetch(event.request))
-                );
-            }
-        });
-    </script>
-
     <script>
-        let deferredPrompt;
-        const installBtn = document.getElementById("manualInstallBtn");
-        const installBtnIcon = installBtn.querySelector('i');
-        const installBtnText = document.getElementById("installBtnText");
-
-        /**
-         * Triggers the native browser installation prompt.
-         */
-        const handleInstallClick = async () => {
-            if (deferredPrompt) {
-                // Hide the button to prevent double-click or confusion
-                installBtn.style.display = 'none'; 
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response to install prompt: ${outcome}`);
-                
-                // If the user accepts or dismisses, the browser state changes, so we update the button
-                deferredPrompt = null;
-                // Re-evaluate the button state after the user interaction
-                updateInstallButtonState(); 
-            } else {
-                 alert("The install prompt is not available. Please ensure your site is running over HTTPS and PWA criteria are met.");
-            }
-        };
-
-
-        /**
-         * Checks the installation state of the PWA and updates the button text/icon and action.
-         */
-        const updateInstallButtonState = () => {
-             // 1. Check if the app is running in 'standalone' mode (i.e., installed PWA)
-            const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
-
-            if (isInstalled) {
-                // State A: App is installed (running in its own window)
-                installBtnText.textContent = 'App Installed';
-                installBtnIcon.className = 'fas fa-check-circle'; // Checkmark icon
-                installBtn.style.display = 'flex'; 
-                installBtn.style.backgroundColor = 'var(--success)'; // Green
-                installBtn.disabled = true; 
-                installBtn.onclick = () => alert("The app is already installed and running in standalone mode. Look for the app icon on your device/desktop.");
-
-            } else if (deferredPrompt) {
-                 // State B: NOT installed, but the install prompt is available (browser tab view)
-                installBtnText.textContent = 'Install App';
-                installBtnIcon.className = 'fas fa-download'; // Download icon
-                installBtn.style.display = 'flex'; 
-                installBtn.style.backgroundColor = 'var(--primary)'; // Primary blue
-                installBtn.disabled = false; 
-                // Set the action to trigger the native prompt
-                installBtn.onclick = handleInstallClick; 
-
-            } else if ('serviceWorker' in navigator) {
-                 // State C: Not running in standalone mode AND no install prompt available.
-                 // This covers two main scenarios: 1) The app IS installed but the user is viewing it in a browser tab. 2) The app is NOT installed, but the browser already showed/dismissed the prompt.
-                installBtnText.textContent = 'Update App'; 
-                installBtnIcon.className = 'fas fa-sync-alt'; // Refresh icon
-                installBtn.style.display = 'flex';
-                installBtn.style.backgroundColor = 'var(--accent)';
-                installBtn.disabled = false;
-                
-                // Set the action to inform the user about automatic updates and advise refreshing.
-                installBtn.onclick = () => {
-                    const message = "PWA updates are applied automatically in the background by the Service Worker. To ensure you have the latest code immediately, please close and reopen the app, or manually **refresh the browser tab**.";
-                    alert(message);
-                    console.log(message);
-                    // Optional: Manually trigger page reload to check for new updates
-                    // window.location.reload(); 
-                };
-
-            } else {
-                 // State D: Hide button (PWA criteria not met or unsupported browser)
-                 installBtn.style.display = 'none';
-            }
-        };
-
-
-        // 1. Capture the 'beforeinstallprompt' event
-        window.addEventListener("beforeinstallprompt", (e) => {
-            e.preventDefault();
-            // Store the event for later use
-            deferredPrompt = e;
-            
-            // Show/update button when prompt is available
-            updateInstallButtonState();
-        });
-
-        // 2. Initial State Check and Service Worker Registration
+      // Register Service Worker and install wba script
+      if ("serviceWorker" in navigator) {
         window.addEventListener("load", function() {
-             // Always call the state check on load to handle all scenarios
-            updateInstallButtonState(); 
-
-            if ("serviceWorker" in navigator) {
-                try {
-                    // Get the content from the script tag
-                    const swContent = document.getElementById('sw-code').textContent;
-                    const swBlob = new Blob([swContent], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(swBlob);
-                    
-                    navigator.serviceWorker.register(swUrl).then(
-                        function(reg) {
-                            console.log("ServiceWorker registered with scope:", reg.scope);
-                        },
-                        function(err) {
-                            console.log("ServiceWorker registration FAILED:", err);
-                        }
-                    );
-                } catch (e) {
-                    console.error("Service Worker setup failed:", e);
-                }
+          navigator.serviceWorker.register("sw.js").then(
+            function(reg) {
+              console.log("ServiceWorker registered with scope:", reg.scope);
+            },
+            function(err) {
+              console.log("ServiceWorker registration failed:", err);
             }
+          );
         });
+      }
+
+      // Show simple install button
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        const deferredPrompt = e;
+
+        const installBox = document.createElement("div");
+        installBox.style.position = "fixed";
+        installBox.style.top = "15px";
+        installBox.style.right = "15px";
+        installBox.style.background = "#2b6ef6";
+        installBox.style.color = "#fff";
+        installBox.style.borderRadius = "8px";
+        installBox.style.padding = "8px 14px";
+        installBox.style.fontFamily = "system-ui, sans-serif";
+        installBox.style.fontSize = "14px";
+        installBox.style.cursor = "pointer";
+        installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+        installBox.style.zIndex = "9999";
+        installBox.style.display = "flex";
+        installBox.style.alignItems = "center";
+        installBox.style.gap = "8px";
+        installBox.innerHTML = `
+          <span id="installText">Install</span>
+          <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
+        `;
+
+        document.body.appendChild(installBox);
+
+        document.getElementById("installText").addEventListener("click", async () => {
+          installBox.remove();
+          deferredPrompt.prompt();
+          const choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult.outcome === "accepted") {
+            console.log("User accepted install prompt");
+          }
+        });
+
+        document.getElementById("closeInstall").addEventListener("click", () => {
+          installBox.remove();
+        });
+      });
     </script>
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
