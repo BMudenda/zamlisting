@@ -2,7 +2,7 @@
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open("luangwa-cache").then((cache) => {
-      return cache.addAll(["./", "luangwa.html", "icon-192.png", "icon-512.png"]);
+      return cache.addAll(["./", "customerideview.html", "icon-192.jpg", "icon-512.jpg"]);
     })
   );
 });
