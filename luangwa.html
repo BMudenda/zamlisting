@@ -27,7 +27,7 @@
   <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
   <link rel="apple-touch-icon" href="lfr.jpg">
   <style>
-    /* ... (CSS remains unchanged) ... */
+    /* ... (CSS remains unchanged from original code) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -611,8 +611,9 @@
   
   <script>
     const config = {
-      // **MINIMUM PRICE CONFIGURATION** vehiclePricePerKm: 3.20,
-      motorbikePricePerKm: 1.02,
+      // **FIXED: Price configuration was commented out, causing KNan**
+      vehiclePricePerKm: 3.20, // Sample rate for Vehicle (K/km)
+      motorbikePricePerKm: 1.02, // Sample rate for Motorbike (K/km)
       vehicleMinPrice: 20, // K20 Minimum Price
       motorbikeMinPrice: 10, // K10 Minimum Price
       avgSpeed: 60,
@@ -622,7 +623,7 @@
                                
     
     // ===========================================
-    // Data for Luangwa Town Routes
+    // Data for Luangwa Town Routes (All data unchanged)
     // ===========================================
     const places = [
       "Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic",
@@ -762,7 +763,7 @@
       graph[to].push({ node: from, distance }); 
     });
 
-    // === Dijkstra’s Algorithm for shortest path ===
+    // === Dijkstra’s Algorithm for shortest path (Unchanged) ===
     function findShortestDistance(start, end) { 
       if (start === end) return 0;
       if (!graph[start] || !graph[end]) return null;
@@ -804,7 +805,7 @@
       return null;
     }
 
-    // **MODIFIED: Logic to find the nearest hub and calculate total distance**
+    // **MODIFIED: Logic to find the nearest hub and calculate total distance (Unchanged)**
     function calculateTotalDistance(pickup, destination) {
       if (!graph[pickup] || !graph[destination]) return { total: null, trip: null, hub: null };
 
@@ -845,7 +846,7 @@
       };
     }
     
-    // === Phone Number Standardization ===
+    // === Phone Number Standardization (Unchanged) ===
     function standardizePhoneNumber(phone) {
       if (!phone) return '';
       const cleaned = phone.replace(/\D/g, '');
@@ -866,7 +867,7 @@
     }
     // ----------------------------------------------------------------
 
-    // Element references
+    // Element references (Unchanged)
     const originInput = document.getElementById('gm-origin');
     const destinationInput = document.getElementById('gm-destination');
     
@@ -879,7 +880,7 @@
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
-    const calculationSpinner = document.getElementById('calculation-spinner'); // NEW ELEMENT
+    const calculationSpinner = document.getElementById('calculation-spinner'); 
     const maskedPhone = document.getElementById('masked-phone');
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
@@ -891,7 +892,7 @@
     let selectedOrigin = '';
     let selectedDestination = '';
     
-    // Function to attach live autocomplete filtering
+    // Function to attach live autocomplete filtering (Unchanged)
     function setupAutocomplete(inputId, listId, inputElement) {
         const input = inputElement;
         const list = document.getElementById(listId);
@@ -960,7 +961,7 @@
       maskedDestination.textContent = '**********';
     }
     
-    // Function to handle resetting the form section when clicking the masked value
+    // Function to handle resetting the form section when clicking the masked value (Unchanged)
     function resetValidation(event) {
       const parentGroup = event.target.closest('.input-group');
       const input = parentGroup.querySelector('input');
@@ -1030,7 +1031,7 @@
           }
           displayStatus(statusMessage, 'info');
           
-          calculationSpinner.style.display = 'none'; // Ensure spinner is off if conditions fail
+          calculationSpinner.style.display = 'none'; 
           
           return;
       }
@@ -1038,23 +1039,23 @@
       // ----------------------------------------------------------------
       // LOADER LOGIC START
       // ----------------------------------------------------------------
-      summaryTableSection.classList.add('hidden-section'); // Hide old table instantly
+      summaryTableSection.classList.add('hidden-section'); 
       displayStatus('Calculating distance and price...', 'info');
-      calculationSpinner.style.display = 'block'; // Show the calculation spinner
+      calculationSpinner.style.display = 'block'; 
       
       // Use a brief timeout to allow the loader to show before calculation runs.
       setTimeout(() => {
         
-        calculationSpinner.style.display = 'none'; // Hide loader once calculation starts
+        calculationSpinner.style.display = 'none'; 
 
         const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
         
-        // MODIFIED: Call calculateTotalDistance which now handles hub selection
         const distanceObject = calculateTotalDistance(origin, destination);
         const totalDistance = distanceObject.total;
         const tripDistance = distanceObject.trip; 
-        const nearestHub = distanceObject.hub; // **Retrieve dynamic hub**
+        const nearestHub = distanceObject.hub; 
         
+        // **FIXED: Check if distance calculation returned a valid number**
         if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
           displayStatus(`A valid route could not be calculated via any hub. Nearest Hub tried: ${nearestHub || 'N/A'}`, 'failed');
           return;
@@ -1067,9 +1068,11 @@
         
         // PRICING LOGIC applying the minimum cost
         if (mode === 'Vehicle') {
+          // **FIXED: config.vehiclePricePerKm is now defined**
           let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
           price = Math.max(calculatedPrice, config.vehicleMinPrice); 
         } else {
+          // **FIXED: config.motorbikePricePerKm is now defined**
           let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
           price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
         }
@@ -1085,7 +1088,7 @@
           timeText += `${minutes} min`;
         }
         
-        // Table HTML (MODIFIED TO UNHIDE TRIP DISTANCE AND HIDE HUB)
+        // Table HTML (Unchanged)
         const tableHTML = `
           <div class="table-responsive">
             <table class="summary-table">
@@ -1150,7 +1153,7 @@
         summaryData = {
           preferredMode: mode,
           phone: customerPhone,
-          hub: nearestHub, // **ADDED HUB TO SUMMARY DATA**
+          hub: nearestHub, 
           from: origin,
           to: destination,
           tripDistance: tripDistance.toFixed(2), 
@@ -1165,11 +1168,13 @@
         
         submitBtn.removeAttribute('disabled'); 
 
-      }, 1000); // 1000ms (1 second) delay for the loader animation
+      }, 1000); 
       // ----------------------------------------------------------------
       // LOADER LOGIC END
       // ----------------------------------------------------------------
     }
+    
+    // Remaining functions (submitToGoogleSheet, displayStatus, handlePhoneNumberInput, event listeners) are unchanged...
     
     function submitToGoogleSheet() {
       if (!summaryData) { 
@@ -1185,7 +1190,7 @@
       const payload = {
         "preferredMode": summaryData.preferredMode,
         "phone": standardizedPhone, 
-        "hub": summaryData.hub, // **ADDED HUB TO PAYLOAD**
+        "hub": summaryData.hub, 
         "from": summaryData.from,
         "to": summaryData.to,
         "tripDistance": summaryData.tripDistance, 
@@ -1247,7 +1252,7 @@
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
             mainFooter.style.display = 'none'; 
-            calculationSpinner.style.display = 'none'; // Ensure spinner is off
+            calculationSpinner.style.display = 'none'; 
         }
     }
     
