@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luangwa Feira Rides| Book a Ride</title>
+  
+  <link rel="icon" type="image/jpeg" href="lfr.jpg">
+  <link rel="shortcut icon" href="lfr.jpg" type="image/jpeg">
+  
+  <meta property="og:image" content="https://zamlisting.com/taxi.webp" />
+  <meta property="og:image:secure_url" content="https://zamlisting.com/taxi.webp" />
+  <meta property="og:image:width" content="220" />
+  <meta property="og:image:height" content="120" />
+  <meta property="og:url" content="https://zamlisting.com/customeride" />
+  <meta property="og:title" content="Luangwa Feira Rides| Book a Ride" />
+  <meta property="og:description" content="Book your taxi ride in Luangwa! Choose vehicle or motorbike, enter trip details, and submit via the app." />
+  <meta property="og:type" content="website" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2b6ef6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+  <link rel="apple-touch-icon" href="lfr.jpg">
+  <style>
+    /* ... (CSS remains unchanged from original code) ... */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #ff9900;
+      --success-color: #1aaf5d;
+      --whatsapp-color: #25d366;
+      --fail-color: #dc2626;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --bg-color-input: #f5f7fa;
+      --border-color-light: #ccc;
+      --border-color-blue: #2563eb;
+      --box-shadow-light: 0 2px 5px rgba(0,0,0,0.1);
+      --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
+      --font-color-dark: #333;
+      --font-color-medium: #2d3a4a;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+    header {
+      background: var(--font-color-dark); color: white; padding: 20px; text-align: left;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .header-content, .footer-content-wrapper { 
+      max-width: 1200px; 
+      margin: auto; 
+      padding: 0 20px; 
+    }
+    .header-content {
+      display: flex; flex-wrap: wrap;
+      justify-content: space-between; align-items: center; gap: 15px;
+    }
+    .company-info { flex: 1 1 60%; }
+    .company-info h2 { font-size: 1.4rem; color: var(--secondary-color); }
+    .company-info ul { list-style: none; margin-top: 8px; }
+    .company-info li { margin-bottom: 5px; font-size: 0.95rem; }
+    .price-tag {
+      font-size: 1.3rem; font-weight: bold; background: #e67e22;
+      padding: 8px 15px; border-radius: 5px; color: white;
+    }
+    .product-container {
+      max-width: 1200px; margin: 30px auto; padding: 0 20px;
+      display: flex; flex-wrap: wrap; gap: 30px;
+      justify-content: center;
+    }
+    .booking-section {
+      flex: 1 1 100%;
+      min-width: 300px;
+    }
+    .booking-container {
+      background: var(--bg-color-card); border-radius: 8px;
+      box-shadow: var(--box-shadow-strong);
+      padding: 20px;
+    }
+    .inputs-wrapper { display: flex; flex-direction: column; gap: 15px; margin: 15px 0; }
+    .input-group {
+      position: relative; background: var(--bg-color-input); border-radius: 5px;
+      padding: 10px 10px 10px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .input-group label {
+      font-weight: bold; color: var(--primary-color); font-size: 0.9rem;
+      margin-bottom: 5px; display: block;
+    }
+    .input-group .material-icons.input-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--primary-color); font-size: 20px; opacity: 0.85;
+    }
+    .input-group .material-icons.validation-tick {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--success-color);
+        font-size: 24px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .input-group.valid .validation-tick {
+      opacity: 1;
+    }
+    input[type="text"], input[type="tel"], select {
+      width: 100%; padding: 10px; font-size: 1rem; border-radius: 5px;
+      border: 1px solid var(--border-color-light); transition: border 0.2s, box-shadow 0.2s;
+      background-color: transparent;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus {
+      border: 1px solid var(--border-color-blue); box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+    }
+    .mode-group {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .mode-radio {
+      display: flex; align-items: center; gap: 5px; font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .mode-radio input[type="radio"] {
+      display: none;
+    }
+    .heart-icon {
+      font-size: 20px;
+      color: #ccc;
+      transition: color 0.2s ease;
+    }
+    .heart-icon::before {
+      content: "♡";
+    }
+    .mode-radio input[type="radio"]:checked + .heart-icon {
+      color: var(--primary-color);
+    }
+    .mode-radio input[type="radio"]:checked + .heart-icon::before {
+      content: "♥";
+    }
+
+    /* CSS to hide location inputs when their group is valid */
+    .input-group.valid:not(#customer-phone-wrapper) input[type="text"],
+    .input-group.valid:not(#customer-phone-wrapper) select {
+      display: none;
+    }
+    
+    /* Hide the phone input ONLY when the phone wrapper is valid (showing the masked value) */
+    #customer-phone-wrapper.valid input[type="tel"] {
+      display: none;
+    }
+
+    .masked-value {
+      display: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid var(--border-color-light);
+      background-color: var(--bg-color-card);
+      color: var(--font-color-dark);
+      cursor: pointer;
+      min-height: 40px;
+    }
+    .input-group.valid .masked-value {
+      display: block;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .summary-table-section {
+      margin-top: 20px; padding: 15px; background: var(--bg-color-card);
+      border-radius: 8px; box-shadow: var(--box-shadow-light);
+    }
+    .section-title {
+      font-weight: bold; color: var(--primary-color); font-size: 1.1rem;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+    }
+    #summary-table-container {
+      width: 100%;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table.summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: #f9fbfd;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      white-space: nowrap;
+    }
+    table.summary-table th, table.summary-table td {
+      border: 1px solid #dbeafe;
+      padding: 8px;
+      text-align: left;
+    }
+    table.summary-table th {
+      background-color: #e7f0fe; color: #222; font-weight: bold;
+    }
+    table.summary-table td { color: var(--font-color-medium); font-weight: 500; }
+    
+    /* CSS to hide columns by class */
+    .summary-table .hide-col {
+        display: none;
+    }
+
+    .summary-actions-row {
+      display: flex; gap: 15px; justify-content: center; margin: 10px 0; align-items: center;
+      flex-wrap: wrap;
+    }
+    .button-wrapper {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .button-label {
+      font-size: 0.95rem; color: var(--font-color-dark); font-weight: 500;
+    }
+    .fa {
+      padding: 10px;
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      line-height: 24px;
+      text-align: center;
+      text-decoration: none;
+      margin: 5px;
+      border-radius: 50%;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fa-send-o { background: var(--primary-color); }
+    .submit-btn:hover { background: #174ea6; }
+    .submit-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Calculation Status Wrapper */
+    .calculation-status-wrapper {
+        text-align: center;
+        padding: 15px;
+        min-height: 80px; /* Ensure space even when empty */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* General Loader (Used for both calculation and submission) */
+    .loader {
+      display: none; 
+      width: 20px; 
+      height: 20px; 
+      border: 3px solid var(--primary-color);
+      border-radius: 50%; 
+      border-top: 3px solid #e5e7eb;
+      animation: spin 1s linear infinite; 
+      margin: 10px auto;
+    }
+    
+    /* Dedicated Calculation Spinner (larger and secondary color) */
+    #calculation-spinner.loader {
+      border: 4px solid #f3f3f3; 
+      border-top: 4px solid var(--secondary-color);
+      width: 40px;
+      height: 40px;
+    }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    .submit-status {
+      display: flex; align-items: center; gap: 5px; margin-top: 10px;
+      justify-content: center; font-weight: 500;
+    }
+    .submit-status.success { color: var(--success-color); }
+    .submit-status.failed { color: var(--fail-color); }
+    .submit-status.info { color: var(--primary-color); }
+    .material-icons { font-size: 20px; vertical-align: middle; }
+    .hidden-value {
+      display: none;
+      color: green;
+      font-weight: bold;
+    }
+    .eye-btn {
+      cursor: pointer;
+      font-size: 18px;
+    }
+    @media (min-width: 768px) {
+      .booking-section {
+        flex: 1 1 50%;
+      }
+    }
+    .option-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .radio-group, .locations-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 1px solid var(--border-color-light);
+      border-radius: 5px;
+      padding: 10px;
+      background: #f9fbfd;
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+    .radio-group {
+      flex-direction: row;
+      gap: 20px;
+    }
+    .radio-group legend, .locations-group legend {
+      font-weight: bold;
+      color: var(--primary-color);
+      font-size: 0.95rem;
+      padding: 0 5px;
+      margin-bottom: 5px;
+    }
+    .radio-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 10px;
+      font-size: 1rem;
+    }
+    .radio-item label {
+        font-size: 0.85rem;
+    }
+    .radio-item input[type="radio"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      border-radius: 50%;
+    }
+    .radio-item input[type="radio"]:checked:after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .radio-group {
+        flex: 1;
+        min-width: 150px;
+    }
+    .locations-group {
+        flex: 1 1 100%;
+    }
+    .hidden-section {
+      display: none;
+    }
+    .locations-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    @media (min-width: 500px) {
+        .locations-wrapper {
+            flex-direction: row;
+        }
+        .locations-wrapper .input-group {
+            flex-grow: 1;
+        }
+    }
+    
+    .autocomplete-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    .autocomplete-list {
+        position: absolute;
+        z-index: 100;
+        border: 1px solid var(--border-color-light);
+        border-top: none;
+        background-color: white;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: var(--box-shadow-light);
+        left: 0;
+        top: 100%;
+    }
+    .suggestion {
+        padding: 10px;
+        cursor: pointer;
+        background-color: white;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+    }
+    .suggestion:hover {
+        background-color: #f1f1f1;
+    }
+    .input-group.valid .autocomplete-list {
+      display: none;
+    }
+
+    footer {
+        width: 100%;
+        padding: 0; 
+        border-top: 1px solid var(--border-color-light);
+        background: var(--bg-color-card);
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        display: none; 
+    }
+    .footer-content-wrapper { 
+        text-align: center;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+    .footer-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px; 
+        margin-bottom: 15px;
+    }
+    .footer-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px; 
+        width: 45px; 
+        height: 45px; 
+        border-radius: 50%; 
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .footer-btn:hover {
+        background-color: #174ea6;
+        transform: translateY(-1px);
+    }
+    #call-btn {
+        background-color: var(--success-color);
+    }
+    #call-btn:hover {
+        background-color: #138244;
+    }
+
+    .about-dropdown {
+        background: #f9fbfd;
+        border: 1px solid var(--border-color-light);
+        border-left: 3px solid var(--secondary-color);
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 10px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        display: none;
+        box-shadow: var(--box-shadow-light);
+        font-size: 0.9rem;
+        color: var(--font-color-medium);
+    }
+    .about-dropdown h4 {
+        color: var(--secondary-color);
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+  <div class="header-content">
+    <div class="company-info">
+      <h2>
+        Luangwa Feira Rides
+      </h2>
+      <ul>
+        <li><strong>Location:</strong> Luangwa, Zambia</li>
+      </ul>
+    </div>
+    <div>
+      <div class="price-tag">Book Your Ride Now!</div>
+    </div>
+  </div>
+</header>
+  <main class="product-container">
+    <section class="booking-section">
+      <div class="booking-container">
+        <div class="inputs-wrapper">
+          <div class="input-group" id="customer-phone-wrapper">
+            <span class="material-icons input-icon">phone</span>
+            <label for="customer-phone">Phone Number</label>
+            <input
+              type="tel"
+              id="customer-phone"
+              maxlength="10"
+              placeholder="0xxxxxxxxx"
+              autocomplete="off"
+              inputmode="numeric"
+            >
+            <span class="masked-value" id="masked-phone">**********</span>
+          </div>
+          <div id="trip-details" class="hidden-section">
+            <div class="input-group" id="service-wrapper">
+              <span class="material-icons input-icon">commute</span>
+              <label>Trip Customization</label>
+              <div class="option-group">
+                  <fieldset class="radio-group" id="mode-selection-group">
+                      <legend>Transport Mode</legend>
+                      
+                      <div class="radio-item">
+                          <input type="radio" id="mode-motorbike" name="mode" value="motorbike">
+                          <label for="mode-motorbike">Motorbike 🏍️</label>
+                      </div>
+                      <div class="radio-item">
+                          <input type="radio" id="mode-vehicle" name="mode" value="vehicle">
+                          <label for="mode-vehicle">Vehicle 🚗</label>
+                      </div>
+                      </fieldset>
+                  </div>
+            </div>
+            <div class="input-group">
+              <span class="material-icons input-icon">location_on</span>
+              <fieldset class="locations-group">
+                  <legend>Trip Locations</legend>
+                  <div class="locations-wrapper">
+                    <div class="autocomplete-wrapper input-group" id="origin-input-group">
+                      <span class="material-icons input-icon">place</span>
+                      <label for="gm-origin">From</label>
+                      <input type="text" id="gm-origin" placeholder="Type & Select Pickup Location..." autocomplete="off">
+                      <div id="originList" class="autocomplete-list"></div>
+                      <span class="masked-value" id="masked-origin"></span>
+                    </div>
+                    <div class="autocomplete-wrapper input-group" id="destination-input-group">
+                      <span class="material-icons input-icon">flag</span>
+                      <label for="gm-destination">To</label>
+                      <input type="text" id="gm-destination" placeholder="Type & Select Destination location..." autocomplete="off">
+                      <div id="destinationList" class="autocomplete-list"></div>
+                      <span class="masked-value" id="masked-destination"></span>
+                    </div>
+                  </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+        <div class="summary-table-section hidden-section">
+          <div class="section-title">
+            <span class="material-icons">table_chart</span>
+            Trip Summary
+          </div>
+          <div id="summary-table-container"></div>
+          <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
+            Review and verify all trip information(press on the field 👀 to check )
+          </p>
+          <div class="summary-actions-row">
+            <div class="button-wrapper">
+              <a href="#" class="fa fa-send-o" id="submit-btn" title="Submit Trip Details" disabled></a>
+              <span class="button-label">Request A Ride</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="calculation-status-wrapper" id="calculation-status-wrapper">
+          <div id="submit-status" class="submit-status">Please fill in all details correctly.</div>
+          <div id="calculation-spinner" class="loader"></div>
+        </div>
+        <div id="loader" class="loader" style="margin-top: 0;"></div>
+      </div>
+    </section>
+  </main>
+  
+  <footer id="main-footer">
+    <div class="footer-content-wrapper"> <div class="footer-actions">
+            <a href="tel:0966423229" class="footer-btn" id="call-btn" title="Call for Inquiry/Complaint">
+                <span class="material-icons">call</span>
+            </a>
+            <button id="about-btn" class="footer-btn" title="About Luangwa Feira Rides">
+                <span class="material-icons">info</span>
+            </button>
+        </div>
+        <div id="about-info" class="about-dropdown">
+            <h4>About Our Service</h4>
+            <p><strong>Location:</strong> Dedicated service provider within the Luangwa Feira area and surrounding locations in Zambia. 🇿🇲</p>
+            <p><strong>Affordable:</strong> Our pricing is **cheap and fixed as shown** and competitive, calculated fairly based on distance.</p>
+            <p><strong>Reliable:</strong> We are committed to **reliable** and safe transport, ensuring you reach your destination efficiently.</p>
+            <p><strong>Station:</strong>We have Luangwa Bus Station, Chitope and Luangwa Market Bridge...Other Stations or Hubs near your place will be added to make your movement cheaper</p>
+            <p><strong>Collaboration & Inquiries </strong> We are open: Call or Email:zamlisting@gmail.com</p>
+        </div>
+      
+        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;"> For inquiries and queries call.</p>
+        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">&copy; 2024 Luangwa Feira Rides. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    const config = {
+      // **FIXED: Price configuration was commented out, causing KNan**
+      vehiclePricePerKm: 3.20, // Sample rate for Vehicle (K/km)
+      motorbikePricePerKm: 1.02, // Sample rate for Motorbike (K/km)
+      vehicleMinPrice: 20, // K20 Minimum Price
+      motorbikeMinPrice: 10, // K10 Minimum Price
+      avgSpeed: 60,
+    };
+    // **CRITICAL: REPLACE THIS URL with your published Google Apps Script Web App URL**
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+                               
+    
+    // ===========================================
+    // Data for Luangwa Town Routes (All data unchanged)
+    // ===========================================
+    const places = [
+      "Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic",
+      "Chidada Ground", "Chitope", "Chitope Rural Health Centre", "Chilombwe Community School", "Chiriwe Primary School",
+      "Dzalo Skills Training Centre Kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge",
+      "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", "Justifeli Lodge", "Kakaro Primary School",
+      "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kaunga Secondary School", "Kasinsa",
+      "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", "Katondwe Girls Secondary School", "Katondwe Mission Hospital",
+      "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge",
+      "Luangwa Bridge Market", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices",
+      "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", "Luangwa Habour",
+      "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station",
+      "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School",
+      "Mwalila Primary School", "Nyabota Lodge", "National Assembly Office", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly",
+      "UCZ", "Soweto Junction", "Registration Office", "River Spot Club","SDA Katondwe", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
+      "Lusaka Water Office", "Immigration Flats", "OMINO office"
+    ];
+
+    const segments = [
+      // Long-distance routes connected to Luangwa Bus Station area
+      { from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 },
+      { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 },
+      { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 },
+      { from: 'Katondwe Mission Hospital', to: 'Mburuma Local Court', distance: 7 },
+      { from: 'Mburuma Local Court', to: 'Mwavi Secondary School', distance: 0.65 },
+      { from: 'Mburuma Local Court', to: 'Katondwe Mission Hospital', distance: 7.8 },
+      { from: 'Mwavi Secondary School', to: 'Chitope Rural Health Centre', distance: 2 },
+      { from: 'Chitope Rural Health Centre', to: 'Mwalila Primary School', distance: 6 },
+      { from: 'Mwalila Primary School', to: 'Kaunga Secondary School', distance: 5 },
+      { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 },
+      { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 },
+
+      // Town network near Bus Station
+
+      // Hub routes (Bus Station)
+      { from: "Luangwa Bus Station", to: "Soweto Junction", distance: 4.0 }, 
+      { from: "Luangwa Bus Station", to: "Luangwa District Hospital", distance: 7.0 },
+      // Other links from Soweto Junction
+      { from: "Soweto Junction", to: "Airstrip", distance: 1.7 }, 
+      { from: "Soweto Junction", to: "ZESCO Office", distance: 0.3 },
+      
+      // Other Town Links
+      { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 },
+      { from: "ZESCO Office", to: "Luangwa Main SDA Church", distance: 0.65 },
+      { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 },
+      { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 },
+      { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 },
+      { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 },
+      
+      { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 },
+      { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 },
+      { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 },
+      { from: "Kantuleni Executive Lodge", to: "Luangwa Habour", distance: 0.09 },
+      { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 },
+      { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 },
+      { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 },
+      { from: "Luangwa Police Station", to: "Luangwa DEBS Offices", distance: 0.1 },
+      { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 },
+      { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 },
+      { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 },
+      { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
+      { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
+      
+      // Bus Station extended links (0.0 distance locations)
+      { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
+      { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
+      { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
+      { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
+      { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 },
+      { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo", distance: 0.60 },
+      { from: "Luangwa Town Council", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 3.2 },
+      { from: "Big 2 Zambezi Water Front Resort & Safari", to: "Chilombwe Community School", distance: 9.8 },
+      { from: "Registration Office", to: "Chidada Ground", distance: 0.49 },
+      { from: "Chidada Ground", to: "Yangoma Lodge", distance: 2.34 },
+      { from: "National Assembly Office", to: "Hill View", distance: 0.30 },
+      { from: "Hill View", to: "BM Residence", distance: 1.00 },
+      { from: "BM Residence", to: "Feira Day Secondary School", distance: 1.10 },
+
+      // Anglican / Feira cluster
+      { from: "Feira Kindom Hall", to: "Anglican Church", distance: 0.08 },
+      { from: "Feira Kindom Hall", to: "Luangwa (Feira)", distance: 0.7 },
+      { from: "Luangwa (Feira)", to: "Luangwa Bus Station", distance: 0.1 },
+      
+      // Dzalo / Justifeli cluster
+      { from: "Dzalo Skills Training Centre Kambolozo", to: "Justifeli Lodge", distance: 0.26 },
+
+      // Makichilo / Luangwa Market / Lodges / UCZ cluster
+      { from: "Luangwa Market", to: "Makichilo Lodge", distance: 0.4 },
+      { from: "Makichilo Lodge", to: "Gerasmos Safari Lodge", distance: 0.3 },
+      { from: "Makichilo Lodge", to: "UCZ", distance: 0.5 },
+      { from: "OMINO office", to: "Luangwa Main SDA Church", distance: 0.6 },
+      { from: "OMINO office", to: "National Assembly Office", distance: 0.1 },
+      { from: "Luangwa Town Council", to: "National Assembly Office", distance: 0.1 },
+      { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.02 },
+
+      // Pentecostal / Kindom Hall / UCZ
+      { from: "Pentecostal Assembly of God Joshua Assembly", to: "Kindom Hall", distance: 0.13 },
+      { from: "UCZ", to: "Pentecostal Assembly of God Joshua Assembly", distance: 0.08 },
+
+      // Chitope / Kasinsa cluster
+      { from: "Chitope", to: "Kasinsa", distance: 10.0 },
+      { from: "Chitope", to: "Mwavi Secondary School", distance: 1.1 }, 
+      { from: "Kasinsa", to: "Luangwa Secondary School", distance: 14.0 }, 
+
+      // Luangwa High School / Chiriwe
+      { from: "Luangwa High School Police Post", to: "Chiriwe Primary School", distance: 2.1 },
+      { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 },
+      { from: "Kapoche", to: "Chiriwe Primary School", distance: 19.7 },
+      { from: "Luangwa High School Police Post", to: "SDA Katondwe", distance: 1.0 },
+      
+      // Katondwe cluster (many missing-place members)
+      { from: "Katondwe Mission Hospital", to: "Katondwe Primary School", distance: 0.55 },
+      { from: "Katondwe Chapel", to: "Katondwe Primary School", distance: 0.05 },
+      { from: "Katondwe Primary School", to: "Katondwe Girls Secondary School", distance: 0.0 },
+      { from: "Katondwe Girls Secondary School", to: "Katondwe Chaz Hotel", distance: 0.45 },
+      { from: "Katondwe Chaz Hotel", to: "Passover Living Lamb Ministry Katondwe", distance: 0.4 },
+      { from: "Passover Living Lamb Ministry Katondwe", to: "Katondwe Dam", distance: 0.1 },
+
+      // Kakaro / Kakaro Liberation 
+      { from: "Kakaro Primary School", to: "Kakaro Liberation Heritage Site", distance: 1.2 },
+
+      // Kavalamanja
+      { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23.0 } 
+    ];
+
+    // **MODIFIED: List of all possible hubs**
+    const hubs = [
+        "Luangwa Bus Station", 
+        "Chitope", 
+        "Luangwa Bridge Market", 
+        "z"
+    ];
+
+    // === Build a bidirectional graph ===
+    const graph = {};
+    segments.forEach(({ from, to, distance }) => {
+      if (!graph[from]) graph[from] = [];
+      if (!graph[to]) graph[to] = [];
+      graph[from].push({ node: to, distance });
+      graph[to].push({ node: from, distance }); 
+    });
+
+    // === Dijkstra’s Algorithm for shortest path (Unchanged) ===
+    function findShortestDistance(start, end) { 
+      if (start === end) return 0;
+      if (!graph[start] || !graph[end]) return null;
+
+      const distances = {};
+      const unvisited = new Set(Object.keys(graph));
+
+      for (const node of unvisited) distances[node] = Infinity;
+      distances[start] = 0;
+
+      while (unvisited.size) {
+        let current = null;
+        for (const node of unvisited) {
+          if (current === null || distances[node] < distances[current]) {
+            current = node;
+          }
+        }
+        
+        if (current === null || distances[current] === Infinity) break; 
+        
+        if (current === end) {
+            return distances[end];
+        }
+        
+        unvisited.delete(current);
+
+        for (const neighbor of (graph[current] || [])) {
+          const neighborNode = neighbor.node;
+          const distanceToNeighbor = neighbor.distance;
+          
+          if (unvisited.has(neighborNode)) {
+             const newDistance = distances[current] + distanceToNeighbor;
+             if (newDistance < distances[neighborNode]) {
+                distances[neighborNode] = newDistance;
+             }
+          }
+        }
+      }
+      return null;
+    }
+
+    // **MODIFIED: Logic to find the nearest hub and calculate total distance (Unchanged)**
+    function calculateTotalDistance(pickup, destination) {
+      if (!graph[pickup] || !graph[destination]) return { total: null, trip: null, hub: null };
+
+      let nearestHub = null;
+      let minDistanceToHub = Infinity;
+
+      // 1. Find the Nearest Hub to the Pickup point (D1)
+      for (const hub of hubs) {
+          const distanceToHub = findShortestDistance(pickup, hub);
+          if (distanceToHub !== null && distanceToHub < minDistanceToHub) {
+              minDistanceToHub = distanceToHub;
+              nearestHub = hub;
+          }
+      }
+      
+      if (nearestHub === null || minDistanceToHub === Infinity) {
+          return { total: null, trip: null, hub: null };
+      }
+
+      // 2. Calculate trip distance (D2)
+      const pickupToDestination = findShortestDistance(pickup, destination);
+      
+      // 3. Calculate distance from Destination back to the SAME Nearest Hub (D3)
+      const destinationToHub = findShortestDistance(destination, nearestHub);
+      
+      if (pickupToDestination === null || destinationToHub === null) {
+          return { total: null, trip: null, hub: nearestHub };
+      }
+
+      // Total Operational Distance = D1 (Hub->Pickup) + D2 (Pickup->Destination) + D3 (Destination->Hub)
+      // Note: Since Dijkstra's is undirected, minDistanceToHub is also the distance from Hub to Pickup (Hub->Pickup)
+      const total = minDistanceToHub + pickupToDestination + destinationToHub;
+      
+      return { 
+          total: total, 
+          trip: pickupToDestination,
+          hub: nearestHub
+      };
+    }
+    
+    // === Phone Number Standardization (Unchanged) ===
+    function standardizePhoneNumber(phone) {
+      if (!phone) return '';
+      const cleaned = phone.replace(/\D/g, '');
+      
+      if (cleaned.length === 10 && cleaned.startsWith('0')) {
+          return `+260${cleaned.substring(1)}`;
+      }
+      
+      if (cleaned.length === 9) {
+          return `+260${cleaned}`;
+      }
+
+      if (cleaned.length === 12 && cleaned.startsWith('260')) {
+          return `+${cleaned}`;
+      }
+      
+      return phone; 
+    }
+    // ----------------------------------------------------------------
+
+    // Element references (Unchanged)
+    const originInput = document.getElementById('gm-origin');
+    const destinationInput = document.getElementById('gm-destination');
+    
+    const customerPhoneInput = document.getElementById('customer-phone');
+    const modeVehicleRadio = document.getElementById('mode-vehicle');
+    const modeMotorbikeRadio = document.getElementById('mode-motorbike');
+    const modeSelectionGroup = document.getElementById('mode-selection-group'); 
+    const summaryTableSection = document.querySelector('.summary-table-section');
+    const summaryTableContainer = document.getElementById('summary-table-container');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitStatusDiv = document.getElementById('submit-status');
+    const loader = document.getElementById('loader');
+    const calculationSpinner = document.getElementById('calculation-spinner'); 
+    const maskedPhone = document.getElementById('masked-phone');
+    const maskedOrigin = document.getElementById('masked-origin');
+    const maskedDestination = document.getElementById('masked-destination');
+    const tripDetails = document.getElementById('trip-details');
+    const mainFooter = document.getElementById('main-footer'); 
+    const aboutBtn = document.getElementById('about-btn'); 
+    const aboutInfo = document.getElementById('about-info'); 
+    let summaryData = null; 
+    let selectedOrigin = '';
+    let selectedDestination = '';
+    
+    // Function to attach live autocomplete filtering (Unchanged)
+    function setupAutocomplete(inputId, listId, inputElement) {
+        const input = inputElement;
+        const list = document.getElementById(listId);
+
+        input.addEventListener("input", () => {
+            input.closest('.input-group').classList.remove('valid');
+            
+            const query = input.value.toLowerCase();
+            list.innerHTML = "";
+            
+            if (!query || input.closest('.input-group').classList.contains('valid')) {
+                return;
+            }
+
+            const filtered = places.filter(p => p.toLowerCase().includes(query)).sort();
+            
+            filtered.forEach(place => {
+                const item = document.createElement("div");
+                item.textContent = place;
+                item.classList.add("suggestion");
+                item.addEventListener("click", () => {
+                    input.value = place;
+                    list.innerHTML = "";
+                    
+                    if (inputId === 'gm-origin') {
+                        selectedOrigin = place;
+                    } else if (inputId === 'gm-destination') {
+                        selectedDestination = place;
+                    }
+                    
+                    updateSummaryTable();
+                });
+                list.appendChild(item);
+            });
+            
+            if (filtered.length === 0) {
+                 list.innerHTML = "";
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!list.contains(e.target) && e.target !== input) {
+                list.innerHTML = "";
+            }
+        });
+        
+        input.addEventListener("change", updateSummaryTable);
+    }
+    
+    function updateValidationStatus(element, isValid) {
+        const parentGroup = element.closest('.input-group');
+        if (isValid) {
+            parentGroup.classList.add('valid');
+        } else {
+            parentGroup.classList.remove('valid');
+        }
+    }
+    
+    function maskLocationValues(origin, destination) {
+      const isOriginValid = places.includes(origin);
+      updateValidationStatus(originInput, isOriginValid);
+      maskedOrigin.textContent = '**********'; 
+      
+      const isDestinationValid = places.includes(destination);
+      updateValidationStatus(destinationInput, isDestinationValid);
+      maskedDestination.textContent = '**********';
+    }
+    
+    // Function to handle resetting the form section when clicking the masked value (Unchanged)
+    function resetValidation(event) {
+      const parentGroup = event.target.closest('.input-group');
+      const input = parentGroup.querySelector('input');
+      
+      if (event.target === maskedPhone) {
+          // Action for Phone Number: Make input editable
+          parentGroup.classList.remove('valid');
+          customerPhoneInput.focus();
+          
+      } else {
+          // Action for Origin/Destination: Full reset to recalculate on change
+          if (input === originInput) {
+              input.value = selectedOrigin;
+          } else if (input === destinationInput) {
+              input.value = selectedDestination;
+          }
+          parentGroup.classList.remove('valid');
+
+          // Reset everything below the phone number
+          summaryTableContainer.innerHTML = '';
+          submitBtn.setAttribute('disabled', 'true');
+          summaryData = null; 
+          displayStatus('Please fill in all details correctly.', 'info');
+          summaryTableSection.classList.add('hidden-section');
+          mainFooter.style.display = 'none'; 
+      }
+    }
+    
+    function reveal(eye) {
+      document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
+      document.querySelectorAll(".eye-btn").forEach(e => e.style.display = "inline");
+      let value = eye.previousElementSibling;
+      value.style.display = "inline";
+      eye.style.display = "none";
+    }
+    
+    function updateSummaryTable() {
+      const origin = originInput.value.trim();
+      const destination = destinationInput.value.trim();
+      const customerPhone = customerPhoneInput.value.trim();
+      
+      const isVehicleSelected = modeVehicleRadio.checked;
+      const isMotorbikeSelected = modeMotorbikeRadio.checked; 
+      
+      summaryTableContainer.innerHTML = '';
+      submitBtn.setAttribute('disabled', 'true');
+      summaryData = null; 
+      mainFooter.style.display = 'none'; 
+      
+      const isOriginValid = places.includes(origin);
+      const isDestinationValid = places.includes(destination);
+      const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/); 
+      const isModeSelected = isVehicleSelected || isMotorbikeSelected; 
+      
+      if (isOriginValid) selectedOrigin = origin;
+      if (isDestinationValid) selectedDestination = destination;
+      
+      maskLocationValues(origin, destination);
+      
+      // Check ALL criteria to show the summary table
+      if (!isOriginValid || !isDestinationValid || !isPhoneValid || !isModeSelected) {
+          summaryTableSection.classList.add('hidden-section');
+          
+          let statusMessage = 'Please fill in all details correctly.';
+          if(isOriginValid && isDestinationValid && isPhoneValid && !isModeSelected){
+               statusMessage = 'Please select either Vehicle or Motorbike.';
+          }
+          displayStatus(statusMessage, 'info');
+          
+          calculationSpinner.style.display = 'none'; 
+          
+          return;
+      }
+      
+      // ----------------------------------------------------------------
+      // LOADER LOGIC START
+      // ----------------------------------------------------------------
+      summaryTableSection.classList.add('hidden-section'); 
+      displayStatus('Calculating distance and price...', 'info');
+      calculationSpinner.style.display = 'block'; 
+      
+      // Use a brief timeout to allow the loader to show before calculation runs.
+      setTimeout(() => {
+        
+        calculationSpinner.style.display = 'none'; 
+
+        const mode = isVehicleSelected ? 'Vehicle' : 'Motorbike';
+        
+        const distanceObject = calculateTotalDistance(origin, destination);
+        const totalDistance = distanceObject.total;
+        const tripDistance = distanceObject.trip; 
+        const nearestHub = distanceObject.hub; 
+        
+        // **FIXED: Check if distance calculation returned a valid number**
+        if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
+          displayStatus(`A valid route could not be calculated via any hub. Nearest Hub tried: ${nearestHub || 'N/A'}`, 'failed');
+          return;
+        }
+        
+        const timeHours = totalDistance / config.avgSpeed;
+        const wholeHours = Math.floor(timeHours);
+        const minutes = Math.round((timeHours - wholeHours) * 60);
+        let price = 0;
+        
+        // PRICING LOGIC applying the minimum cost
+        if (mode === 'Vehicle') {
+          // **FIXED: config.vehiclePricePerKm is now defined**
+          let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
+          price = Math.max(calculatedPrice, config.vehicleMinPrice); 
+        } else {
+          // **FIXED: config.motorbikePricePerKm is now defined**
+          let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
+          price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
+        }
+        
+        price = Math.round(price);
+
+        // Time formatting
+        let timeText = '';
+        if (wholeHours > 0) {
+          timeText += `${wholeHours} hr`;
+          if (minutes > 0) timeText += ` ${minutes} min`;
+        } else {
+          timeText += `${minutes} min`;
+        }
+        
+        // Table HTML (Unchanged)
+        const tableHTML = `
+          <div class="table-responsive">
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>Mode</th>
+                  <th>Phone</th>
+                  <th class="hide-col">Hub</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Trip Distance (km)</th>
+                  <th class="hide-col">Total Distance (km)</th>
+                  <th class="hide-col">Time</th>
+                  <th>Price (K)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="hidden-value">${mode}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${customerPhone}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️️</span>
+                  </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${nearestHub}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${origin}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${destination}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value">${tripDistance.toFixed(2)}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${totalDistance.toFixed(2)}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td class="hide-col">
+                    <span class="hidden-value">${timeText}</span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                  <td>
+                    <span class="hidden-value"><b>K${price}</b></span>
+                    <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        
+        summaryTableContainer.innerHTML = tableHTML;
+        summaryData = {
+          preferredMode: mode,
+          phone: customerPhone,
+          hub: nearestHub, 
+          from: origin,
+          to: destination,
+          tripDistance: tripDistance.toFixed(2), 
+          totalDistance: totalDistance.toFixed(2), 
+          estimatedTime: timeText,
+          price: price
+        };
+        summaryTableSection.classList.remove('hidden-section');
+        
+        // **UPDATED STATUS MESSAGE**
+        displayStatus(`Trip details calculated via ${nearestHub}. Click Request Ride to send your request.`, 'success');
+        
+        submitBtn.removeAttribute('disabled'); 
+
+      }, 1000); 
+      // ----------------------------------------------------------------
+      // LOADER LOGIC END
+      // ----------------------------------------------------------------
+    }
+    
+    // Remaining functions (submitToGoogleSheet, displayStatus, handlePhoneNumberInput, event listeners) are unchanged...
+    
+    function submitToGoogleSheet() {
+      if (!summaryData) { 
+        displayStatus('No data to submit.', 'failed');
+        submitBtn.setAttribute('disabled', 'true');
+        return;
+      }
+      const timestamp = new Date().toLocaleString("en-US", { timeZone: "Africa/Lusaka" });
+      
+      const standardizedPhone = standardizePhoneNumber(summaryData.phone);
+      
+      // PAYLOAD MODIFIED TO INCLUDE HUB
+      const payload = {
+        "preferredMode": summaryData.preferredMode,
+        "phone": standardizedPhone, 
+        "hub": summaryData.hub, 
+        "from": summaryData.from,
+        "to": summaryData.to,
+        "tripDistance": summaryData.tripDistance, 
+        "distance": summaryData.totalDistance, 
+        "estimatedTime": summaryData.estimatedTime,
+        "price": summaryData.price,
+        "timestamp": timestamp
+      };
+      
+      const formBody = new URLSearchParams(payload);
+      displayStatus('Submitting...', 'info');
+      loader.style.display = 'block';
+      submitBtn.setAttribute('disabled', 'true');
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        body: formBody,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+      })
+      .then(response => {
+        loader.style.display = 'none';
+         if (response.status >= 200 && response.status < 300) { 
+            displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
+            submitBtn.removeAttribute('disabled');
+            mainFooter.style.display = 'block'; 
+        } else {
+             throw new Error(`Server responded with status ${response.status}`);
+        }
+      })
+      .catch(error => {
+        loader.style.display = 'none';
+        submitBtn.removeAttribute('disabled');
+        displayStatus('Submission failed. Please try again.', 'failed');
+        console.error('Submission error:', error);
+        mainFooter.style.display = 'none'; 
+      });
+    }
+    
+    function displayStatus(message, type) {
+      submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
+      submitStatusDiv.className = `submit-status ${type}`;
+    }
+    
+    function handlePhoneNumberInput() {
+        const customerPhone = customerPhoneInput.value.trim();
+        const isPhoneValid = customerPhone.match(/^0[0-9]{9}$/);
+        
+        if (isPhoneValid) {
+            updateValidationStatus(customerPhoneInput, true); 
+            maskedPhone.textContent = '**********';
+            
+            tripDetails.classList.remove('hidden-section');
+            updateSummaryTable(); 
+        } else {
+            updateValidationStatus(customerPhoneInput, false);
+            tripDetails.classList.add('hidden-section');
+            summaryTableSection.classList.add('hidden-section');
+            submitBtn.setAttribute('disabled', 'true'); 
+            displayStatus('Please fill in all details correctly.', 'info');
+            mainFooter.style.display = 'none'; 
+            calculationSpinner.style.display = 'none'; 
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      submitBtn.setAttribute('disabled', 'true'); 
+      mainFooter.style.display = 'none'; 
+      
+      setupAutocomplete("gm-origin", "originList", originInput);
+      setupAutocomplete("gm-destination", "destinationList", destinationInput);
+      
+      customerPhoneInput.addEventListener('input', handlePhoneNumberInput);
+      
+      // Listener on the parent element for radio button change detection.
+      modeSelectionGroup.addEventListener('change', updateSummaryTable);
+
+      aboutBtn.addEventListener('click', () => {
+          aboutInfo.style.display = aboutInfo.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+    
+    // Reset validation for masked values
+    maskedPhone.addEventListener('click', resetValidation);
+    maskedOrigin.addEventListener('click', resetValidation);
+    maskedDestination.addEventListener('click', resetValidation);
+    
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitToGoogleSheet();
+    });
+  </script>
+<script>
+  // Register Service Worker and install wba script
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("sw.js").then(
+        function(reg) {
+          console.log("ServiceWorker registered with scope:", reg.scope);
+        },
+        function(err) {
+          console.log("ServiceWorker registration failed:", err);
+        }
+      );
+    });
+  }
+
+  // Show simple install button
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    const deferredPrompt = e;
+
+    const installBox = document.createElement("div");
+    installBox.style.position = "fixed";
+    installBox.style.top = "15px";
+    installBox.style.right = "15px";
+    installBox.style.background = "#2b6ef6";
+    installBox.style.color = "#fff";
+    installBox.style.borderRadius = "8px";
+    installBox.style.padding = "8px 14px";
+    installBox.style.fontFamily = "system-ui, sans-serif";
+    installBox.style.fontSize = "14px";
+    installBox.style.cursor = "pointer";
+    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+    installBox.style.zIndex = "9999";
+    installBox.style.display = "flex";
+    installBox.style.alignItems = "center";
+    installBox.style.gap = "8px";
+    installBox.innerHTML = `
+      <span id="installText">Install</span>
+      <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
+    `;
+
+    document.body.appendChild(installBox);
+
+    document.getElementById("installText").addEventListener("click", async () => {
+      installBox.remove();
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult.outcome === "accepted") {
+        console.log("User accepted install prompt");
+      }
+    });
+
+    document.getElementById("closeInstall").addEventListener("click", () => {
+      installBox.remove();
+    });
+  });
+</script>
+  
+</body>
+</html>
