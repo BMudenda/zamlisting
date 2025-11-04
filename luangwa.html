@@ -27,7 +27,7 @@
   <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
   <link rel="apple-touch-icon" href="lfr.jpg">
   <style>
-    /* ... (CSS remains unchanged from previous version) ... */
+    /* ... (Existing CSS remains unchanged) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -169,103 +169,115 @@
       font-weight: bold;
       letter-spacing: 2px;
     }
-    
-    /* Fieldset styling for summary section */
-    .summary-fieldset {
-        border: 1px solid var(--border-color-light);
-        border-radius: 8px;
-        padding: 15px;
-        margin-top: 20px;
-        background: var(--bg-color-card);
-        box-shadow: var(--box-shadow-light);
+    .summary-table-section {
+      margin-top: 20px; padding: 0; background: transparent; /* Removed padding/bg here for fieldset to take over */
+      border-radius: 8px; box-shadow: none;
     }
-    .summary-fieldset legend {
-        font-weight: bold; 
-        color: var(--primary-color); 
+    
+    /* MODIFIED: Styling for the fieldset */
+    .summary-table-section fieldset {
+      border: 1px solid var(--border-color-light);
+      border-radius: 8px;
+      padding: 15px;
+      background: var(--bg-color-card);
+      box-shadow: var(--box-shadow-light);
+    }
+    
+    .summary-table-section legend {
+        font-weight: bold;
+        color: var(--primary-color);
         font-size: 1.1rem;
         padding: 0 10px;
-        margin-left: -10px;
-        display: flex; 
-        align-items: center; 
-        gap: 5px;
+        margin-left: -5px; 
     }
-
-    /* NEW STYLES FOR CARD-LIKE SUMMARY DISPLAY */
+    .section-title {
+      font-weight: bold; color: var(--primary-color); font-size: 1.1rem;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+      /* HIDDEN as legend takes over */
+      display: none; 
+    }
     #summary-table-container {
       width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 5px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table.summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: #f9fbfd;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      white-space: nowrap;
+      /* HIDDEN for card-based display */
+      display: none; 
+    }
+    table.summary-table th, table.summary-table td {
+      border: 1px solid #dbeafe;
+      padding: 8px;
+      text-align: left;
+    }
+    table.summary-table th {
+      background-color: #e7f0fe; color: #222; font-weight: bold;
+    }
+    table.summary-table td { color: var(--font-color-medium); font-weight: 500; }
+    
+    /* CSS to hide columns by class */
+    .summary-table .hide-col {
+        display: none;
     }
 
+    /* --- NEW CARD CSS START --- */
     .summary-card-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .summary-item {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         background: #f9fbfd;
         border: 1px solid #dbeafe;
         border-radius: 6px;
         padding: 10px;
-        flex-basis: 100%; /* Default to full width on small screens */
+    }
+
+    .summary-card {
+        background-color: var(--bg-color-card);
+        border: 1px solid #f0f0f0;
+        border-radius: 5px;
+        padding: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .card-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        padding: 4px 0;
+        border-bottom: 1px dashed #eee;
+        font-size: 0.95rem;
+    }
+    .card-row:last-child {
+        border-bottom: none;
     }
     
-    .summary-item .label {
+    .key-label {
+        color: var(--font-color-medium);
         font-weight: 500;
-        color: #555;
-        font-size: 0.9rem;
-        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
-    
-    .summary-item .value {
+    .key-value {
         font-weight: bold;
-        color: var(--primary-color);
-        font-size: 1rem;
+        color: var(--font-color-dark);
         text-align: right;
     }
     
-    .summary-item.main-item {
-        background: #e7f0fe;
-        border-left: 5px solid var(--secondary-color);
-        flex-basis: calc(50% - 5px); /* Two columns on wider screens */
-        justify-content: center;
-        flex-direction: column;
-        text-align: center;
-        padding: 15px 10px;
-    }
-    
-    .summary-item.main-item .label {
-        font-size: 0.95rem;
-        color: #333;
-    }
-    
-    .summary-item.main-item .value {
+    .price-card .key-value {
         font-size: 1.2rem;
         color: var(--secondary-color);
     }
-    .summary-item.detail-item {
-        font-size: 0.9rem;
-    }
-    
-    @media (max-width: 400px) {
-        .summary-item.main-item {
-            flex-basis: 100%; /* Single column on very small screens */
-            padding: 10px;
-        }
-    }
-    
-    /* NEW: Hide the detail items by default */
-    .detail-item-hidden {
-        display: none;
-    }
-
+    /* --- NEW CARD CSS END --- */
 
     .summary-actions-row {
       display: flex; gap: 15px; justify-content: center; margin: 10px 0; align-items: center;
@@ -619,16 +631,15 @@
             </div>
           </div>
         </div>
-        
         <div class="summary-table-section hidden-section">
-          <fieldset class="summary-fieldset">
-            <legend class="section-title">
+          <fieldset>
+            <legend>
               <span class="material-icons">table_chart</span>
               Trip Summary
             </legend>
-            <div id="summary-table-container"></div> 
+            <div id="summary-table-container"></div>
             <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
-              Review and verify all trip information.
+              Review and verify all trip information(press on the field 👀 to check )
             </p>
             <div class="summary-actions-row">
               <div class="button-wrapper">
@@ -1055,9 +1066,8 @@
       }
     }
     
-    // This function is now mostly redundant as the main values are always visible,
-    // but we keep it in case other fields (like the detail ones) were to use it.
     function reveal(eye) {
+      // Logic for table columns hide/show
       document.querySelectorAll(".hidden-value").forEach(v => v.style.display = "none");
       document.querySelectorAll(".eye-btn").forEach(e => e.style.display = "inline");
       let value = eye.previousElementSibling;
@@ -1155,44 +1165,75 @@
           timeText += `${minutes} min`;
         }
         
-        // NEW: Focused Card-like HTML display - REMOVED HIDDEN-VALUE/EYE FOR MAIN FIELDS
-        const summaryHTML = `
+        // --- MODIFIED: Card HTML to hide Mode and Phone but keep data for submission ---
+        const cardHTML = `
           <div class="summary-card-container">
-            <div class="summary-item main-item">
-              <div class="label">Total Price (K)</div>
-              <div class="value">
-                <b>K${price}</b>
+            <div class="summary-card" style="display:none;">
+              <div class="card-row">
+                <span class="key-label">Mode</span>
+                <span class="key-value">
+                  <span class="hidden-value">${mode}</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </span>
+              </div>
+              <div class="card-row">
+                <span class="key-label">Phone</span>
+                <span class="key-value">
+                  <span class="hidden-value">${customerPhone}</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️️</span>
+                </span>
               </div>
             </div>
             
-            <div class="summary-item main-item">
-              <div class="label">Trip Distance (km)</div>
-              <div class="value">
-                ${tripDistance.toFixed(2)} km
+            <div class="summary-card">
+              <div class="card-row">
+                <span class="key-label"><span class="material-icons" style="font-size: 18px;">place</span> From</span>
+                <span class="key-value">
+                  <span class="hidden-value">${origin}</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </span>
+              </div>
+              <div class="card-row">
+                <span class="key-label"><span class="material-icons" style="font-size: 18px;">flag</span> To</span>
+                <span class="key-value">
+                  <span class="hidden-value">${destination}</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </span>
+              </div>
+              <div class="card-row">
+                <span class="key-label"><span class="material-icons" style="font-size: 18px;">near_me</span> Trip Distance</span>
+                <span class="key-value">
+                  <span class="hidden-value">${tripDistance.toFixed(2)} km</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </span>
+              </div>
+              <div class="card-row">
+                <span class="key-label"><span class="material-icons" style="font-size: 18px;">schedule</span> Time</span>
+                <span class="key-value">
+                  <span class="hidden-value">${timeText}</span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </span>
               </div>
             </div>
-            
-            <div class="summary-item main-item" style="flex-basis: 100%;">
-              <div class="label">Estimated Time</div>
-              <div class="value">${timeText}</div>
+            <div class="summary-card price-card">
+              <div class="card-row">
+                <span class="key-label"><span class="material-icons" style="font-size: 20px; color: var(--secondary-color);">local_atm</span> Estimated Price</span>
+                <span class="key-value">
+                  <span class="hidden-value"><b>K${price}</b></span>
+                  <span class="eye-btn" onclick="reveal(this)">👁️</span>
+                </span>
+              </div>
             </div>
-
-            <div class="summary-item detail-item detail-item-hidden">
-              <div class="label">Mode Selected</div>
-              <div class="value">${mode}</div>
-            </div>
-            <div class="summary-item detail-item detail-item-hidden">
-              <div class="label">Calculated via Hub</div>
-              <div class="value">${nearestHub}</div>
-            </div>
-            <div class="summary-item detail-item detail-item-hidden">
-              <div class="label">Total Operational Distance (km)</div>
-              <div class="value">${totalDistance.toFixed(2)} km</div>
+            <div style="display:none;"> 
+                <span id="hidden-hub">${nearestHub}</span>
+                <span id="hidden-total-distance">${totalDistance.toFixed(2)}</span>
             </div>
           </div>
         `;
         
-        summaryTableContainer.innerHTML = summaryHTML;
+        summaryTableContainer.innerHTML = cardHTML;
+        // --- END MODIFIED CARD HTML ---
+
         summaryData = {
           preferredMode: mode,
           phone: customerPhone,
