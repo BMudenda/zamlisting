@@ -18,7 +18,10 @@
   <meta property="og:type" content="website" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2b6ef6">
@@ -33,7 +36,7 @@
       --primary-color: #2563eb;
       --secondary-color: #ff9900;
       --success-color: #1aaf5d;
-      --whatsapp-color: #25d366; 
+      --whatsapp-color: #25d366;
       --fail-color: #dc2626;
       --bg-color-body: #f5f5f5;
       --bg-color-card: #ffffff;
@@ -44,12 +47,17 @@
       --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
       --font-color-dark: #333;
       --font-color-medium: #2d3a4a;
+      /* NEW BRAND COLORS */
+      --facebook-color: #3b5998;
+      --call-color: #1aaf5d; /* Using success color for consistency */
+      --sms-color: #6c757d; /* Neutral color */
+      --email-color: #dc2626; /* Using fail color for contrast */
     }
     body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
     header {
       background: var(--font-color-dark); color: white; padding: 20px; text-align: left;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: relative; 
+      position: relative; /* Added for menu positioning */
     }
     .header-content, .footer-content-wrapper { 
       max-width: 1200px; 
@@ -171,11 +179,11 @@
       letter-spacing: 2px;
     }
     .summary-table-section {
-      margin-top: 20px; padding: 0; background: transparent; 
+      margin-top: 20px; padding: 0; background: transparent; /* Removed padding/bg here for fieldset to take over */
       border-radius: 8px; box-shadow: none;
     }
     
-    /* Styling for the fieldset */
+    /* MODIFIED: Styling for the fieldset */
     .summary-table-section fieldset {
       border: 1px solid var(--border-color-light);
       border-radius: 8px;
@@ -194,6 +202,7 @@
     .section-title {
       font-weight: bold; color: var(--primary-color); font-size: 1.1rem;
       margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+      /* HIDDEN as legend takes over */
       display: none; 
     }
     #summary-table-container {
@@ -211,6 +220,7 @@
       border-radius: 6px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       white-space: nowrap;
+      /* HIDDEN for card-based display */
       display: none; 
     }
     table.summary-table th, table.summary-table td {
@@ -288,7 +298,7 @@
     .button-label {
       font-size: 0.95rem; color: var(--font-color-dark); font-weight: 500;
     }
-    .fa {
+    .fa, .fa-brands { /* ADDED .fa-brands */
       padding: 10px;
       font-size: 24px;
       width: 44px;
@@ -350,7 +360,7 @@
     .submit-status.success { color: var(--success-color); }
     .submit-status.failed { color: var(--fail-color); }
     .submit-status.info { color: var(--primary-color); }
-    .material-icons, .fa { font-size: 20px; vertical-align: middle; } 
+    .material-icons { font-size: 20px; vertical-align: middle; }
     .hidden-value {
       display: none;
       color: green;
@@ -483,197 +493,202 @@
       display: none;
     }
 
-    /* --- DROPDOWN MENU STYLES --- */
-    .dropdown-container {
-        position: absolute;
-        top: 10px; 
-        right: 10px; 
-        z-index: 1000;
+    /* REMOVED FOOTER CSS */
+    footer {
+        display: none; 
     }
-    
+    /* END REMOVED FOOTER CSS */
+
+    /* --- NEW MENU CSS START --- */
+    .menu-dropdown-container {
+        position: absolute;
+        top: 0; /* Align with header top */
+        right: 20px; /* 20px right padding of header-content */
+        z-index: 20;
+    }
     .menu-button {
-        background: var(--font-color-dark); 
+        background: transparent;
+        border: none;
         color: white;
-        border: 1px solid white; 
-        padding: 8px 10px; 
-        border-radius: 5px;
+        font-size: 30px;
         cursor: pointer;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        transition: background-color 0.2s;
+        padding: 5px 10px;
+        transition: opacity 0.2s;
+        line-height: 1;
     }
     .menu-button:hover {
-        background: #444; 
-        border-color: var(--secondary-color);
+        opacity: 0.8;
     }
-    
     .dropdown-content {
         display: none;
         position: absolute;
         right: 0;
-        min-width: 300px; /* Increased width for new layout */
+        top: 100%; /* Position below the button */
         background-color: var(--bg-color-card);
-        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        min-width: 250px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         z-index: 1;
         border-radius: 5px;
         overflow: hidden;
-        margin-top: 5px;
         border: 1px solid var(--border-color-light);
     }
-    
     .dropdown-content.show {
         display: block;
     }
-    
-    /* MODIFIED: Grouping and styling for the contact icons */
-    .contact-group {
-        display: flex;
-        justify-content: space-around;
-        align-items: flex-start; /* Align items to the top (default) */
-        padding: 10px 5px;
-        background: #f9f9f9;
-        border-top: 1px solid #eee;
-    }
-
-    /* NEW: Styling for each contact link item */
-    .contact-group .contact-item {
-        display: flex;
-        flex-direction: column; /* Stack icon and label */
-        align-items: center; /* Center them horizontally */
-        text-decoration: none;
+    /* Updated .dropdown-item for general links - kept for possible future use */
+    .dropdown-item {
         color: var(--font-color-dark);
-        padding: 5px; 
-        border-radius: 5px;
-        transition: background-color 0.2s;
-        flex: 1; /* Give each item equal width */
-        max-width: 65px; /* Limit width */
-        text-align: center;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.1s;
+    }
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-item:hover {
+        background-color: #f1f1f1;
+    }
+    .dropdown-item .material-icons {
+        font-size: 20px;
+        color: var(--primary-color);
     }
     
-    .contact-group .contact-item:hover {
-        background-color: #eee;
-    }
-
-    /* NEW: Styling for the text label */
-    .contact-label {
-        font-size: 0.75rem; /* Smaller font size for label */
-        font-weight: 500;
-        color: var(--font-color-medium);
-        margin-top: 4px;
-        white-space: nowrap;
-    }
-
-    /* Icon Styling */
-    .contact-group .material-icons,
-    .contact-group .fa { 
-        font-size: 26px; /* Larger icons for visibility */
-        min-width: 26px; 
-        height: 26px;
-        display: block; /* Ensure the icon is treated as a block for vertical alignment */
-    }
-
-    /* Menu Button Icon Size */
-    .menu-button .material-icons {
-        font-size: 26px; 
-        color: white; 
-    }
-
-    #sms-link .fa { color: var(--primary-color); } 
-    #whatsapp-link .fa { color: var(--whatsapp-color); } 
-    #call-link .material-icons { color: var(--success-color); }
-    #email-link .material-icons { color: #f25022; } /* Microsoft/Outlook orange/red */
-    
-    /* --- IN-MENU ABOUT CONTENT STYLES (Unchanged) --- */
-    .about-content-dropdown {
+    /* Styling for the About/Queries section */
+    .about-queries-section {
         padding: 15px;
-        text-align: left;
-        font-size: 0.85rem;
-        color: var(--font-color-medium);
-        border-bottom: 1px solid var(--border-color-light); /* Separator above contacts */
+        background: #f9f9f9;
+        border-top: 1px solid var(--border-color-light);
     }
-    .about-content-dropdown h4 {
-        color: var(--secondary-color);
-        margin-bottom: 8px;
-        font-size: 1.1rem;
-        border-bottom: 1px solid #f0f0f0;
+    .about-queries-section h4 {
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        font-size: 1rem;
+        border-bottom: 1px dashed #ddd;
         padding-bottom: 5px;
     }
-    .about-content-dropdown p {
-        margin-bottom: 6px;
-        line-height: 1.4;
+    .about-queries-section p {
+        font-size: 0.85rem;
+        color: var(--font-color-medium);
+        margin-bottom: 8px;
     }
-    .about-content-dropdown strong {
+    .contact-links {
+        display: flex;
+        flex-direction: column;
+        border-top: 1px solid #eee;
+    }
+    /* UPDATED: Styling for ALL Contact Links */
+    .contact-links a {
+        padding: 12px 16px;
+        text-decoration: none;
         color: var(--font-color-dark);
-        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        transition: background-color 0.1s;
+        border-bottom: 1px solid #eee;
     }
-    .about-content-dropdown .small-note {
-        font-size: 0.75rem; 
-        color: #999;
-        margin-top: 10px;
-        display: block;
+    .contact-links a:last-child {
+        border-bottom: none;
     }
-
-    /* Footer is completely removed/hidden per request */
-    footer {
-        display: none;
+    .contact-links a:hover {
+        background-color: #f1f1f1;
+    }
+    /* Icon Styling for Better Visibility/Branding */
+    .contact-links i, .contact-links .material-icons {
+        font-size: 22px; /* Slightly larger icons */
     }
     
+    /* Dedicated Brand Colors for Icons */
+    /* MODIFIED: Targets the Font Awesome 6 WhatsApp icon */
+    #whatsapp-link i.fa-brands.fa-whatsapp { color: var(--whatsapp-color); } 
+    #call-link i { color: var(--call-color); } /* Phone (Font Awesome) */
+    #sms-link i { color: var(--sms-color); } /* SMS (Font Awesome) */
+    #email-link i { color: var(--email-color); } /* Email (Font Awesome) */
+    #facebook-link i.fa-brands.fa-facebook-square { color: var(--facebook-color); } /* MODIFIED: Target FA6 brand class */
+    /* --- END NEW MENU CSS --- */
+
+    .about-dropdown {
+        background: #f9fbfd;
+        border: 1px solid var(--border-color-light);
+        border-left: 3px solid var(--secondary-color);
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 10px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        display: none;
+        box-shadow: var(--box-shadow-light);
+        font-size: 0.9rem;
+        color: var(--font-color-medium);
+    }
+    .about-dropdown h4 {
+        color: var(--secondary-color);
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
   </style>
 </head>
 <body>
   <header>
-  <div class="header-content">
-    <div class="company-info">
-      <h2>
-        Luangwa Feira Rides
-      </h2>
-      <ul>
-        <li><strong>Location:</strong> Luangwa, Zambia</li>
-      </ul>
-    </div>
-    <div>
-      <div class="price-tag">Book Your Ride Now!</div>
+    <div class="header-content">
+        <div class="company-info">
+            <h2>Luangwa Feira Rides</h2>
+            <ul>
+                <li><strong>Location:</strong> Luangwa, Zambia</li>
+            </ul>
+        </div>
+        <div>
+            <div class="price-tag">Book Your Ride Now!</div>
+        </div>
     </div>
     
-    <div class="dropdown-container">
-        <button class="menu-button" id="menu-button" aria-label="Menu">
-            <span class="material-icons">more_vert</span> 
+    <div class="menu-dropdown-container">
+        <button class="menu-button" id="menu-button">
+            <span class="material-icons">more_vert</span>
         </button>
         <div class="dropdown-content" id="dropdown-menu">
-            
-            <div class="about-content-dropdown" id="about-queries-info">
-                <h4><span class="material-icons" style="font-size: 18px; color: var(--secondary-color); vertical-align: middle;">info</span> About Luangwa Feira Rides</h4>
-                <p><strong>Location:</strong> Dedicated service provider within the **Luangwa Feira** area and surrounding locations in Zambia. 🇿🇲</p>
-                <p><strong>Affordable:</strong> Our pricing is **cheap and fixed** and competitive, calculated fairly based on distance.</p>
-                <p><strong>Reliable:</strong> We ensure **reliable** and safe transport.</p>
-                <p class="small-note">&copy; 2024 Luangwa Feira Rides. All rights reserved.</p>
+            <div class="about-queries-section">
+                <h4><span class="material-icons" style="font-size: 18px; color: var(--secondary-color);">info</span> About & Queries</h4>
+                <p><strong>Location:</strong> Dedicated service provider within the Luangwa Feira area and surrounding locations in Zambia. 🇿🇲</p>
+                <p><strong>Affordable:</strong> Our pricing is **cheap and fixed as shown** and competitive, calculated fairly based on distance.</p>
+                <p><strong>Reliable:</strong> We are committed to **reliable** and safe transport, ensuring you reach your destination efficiently.</p>
+                <p><strong>Stations:</strong> Luangwa Bus Station, Chitope, Luangwa Market Bridge, and more hubs near you will be added.</p>
+                <p><strong>&copy; 2024 Luangwa Feira Rides.</strong> All rights reserved.</p>
             </div>
+            
+            <div class="contact-links">
+                <a href="https://wa.me/260966423229?text=I%20have%20a%20query%20about%20a%20ride%20booking." id="whatsapp-link" target="_blank" title="Chat with us on WhatsApp">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+                
+                <a href="tel:0966423229" id="call-link" title="Call for Inquiry/Complaint">
+                    <i class="fa fa-phone-square"></i> Call
+                </a>
+                
+                <a href="sms:+260966423229?body=I%20have%20a%20query%20about%20a%20ride%20booking." id="sms-link" title="Send us an SMS">
+                    <i class="fa fa-comment"></i> SMS
+                </a>
 
-            <div class="contact-group">
-                <a href="sms:+260966423229?body=Hi%2C%20I%20have%20a%20query%20about%20a%20Luangwa%20Feira%20Ride." class="contact-item" id="sms-link" title="Contact via SMS">
-                    <i class="fa fa-envelope-o"></i> 
-                    <span class="contact-label">SMS</span>
+                <a href="mailto:zamlisting@gmail.com?subject=Luangwa%20Feira%20Rides%20Inquiry" id="email-link" title="Send us an Email">
+                    <i class="fa fa-envelope"></i> Email
                 </a>
-                <a href="https://wa.me/260966423229?text=Hello%2C%20I%20have%20a%20query%20about%20a%20Luangwa%20Feira%20Ride." target="_blank" class="contact-item" id="whatsapp-link" title="Contact via WhatsApp">
-                    <i class="fa fa-whatsapp"></i> 
-                    <span class="contact-label">WhatsApp</span>
-                </a>
-                <a href="tel:0966423229" class="contact-item" id="call-link" title="Call for Inquiry">
-                    <span class="material-icons">call</span>
-                    <span class="contact-label">Call</span>
-                </a>
-                <a href="mailto:zamlisting@gmail.com?subject=Inquiry%20Luangwa%20Feira%20Rides" class="contact-item" id="email-link" title="Contact via Email">
-                    <span class="material-icons">email</span>
-                    <span class="contact-label">Email</span>
+
+                <a href="https://www.facebook.com/yourpagename" id="facebook-link" target="_blank" title="Visit our Facebook Page">
+                    <i class="fa-brands fa-facebook-square"></i> Facebook
                 </a>
             </div>
         </div>
     </div>
-    </div>
-</header>
+    </header>
   <main class="product-container">
     <section class="booking-section">
       <div class="booking-container">
@@ -760,7 +775,7 @@
         <div id="loader" class="loader" style="margin-top: 0;"></div>
       </div>
     </section>
-    </main>
+  </main>
   
   <script>
     const config = {
@@ -772,7 +787,7 @@
       avgSpeed: 60,
     };
     // **CRITICAL: REPLACE THIS URL with your published Google Apps Script Web App URL**
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVU8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
                                
     
     // ===========================================
@@ -785,7 +800,7 @@
       "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", "Justifeli Lodge", "Kakaro Primary School",
       "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kaunga Secondary School", "Kasinsa",
       "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", "Katondwe Girls Secondary School", "Katondwe Mission Hospital",
-      "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Bridge",
+      "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge",
       "Luangwa Bridge Market", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices",
       "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", "Luangwa Habour",
       "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station",
@@ -837,13 +852,13 @@
       { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 },
       { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 },
       { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 },
-      { from: "Nyaborders Mall", to: "Luangwa Basic School", distance: 0.18 },
+      { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
       { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
       
       // Bus Station extended links (0.0 distance locations)
       { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
-      { from: "Immigration Flats", to: "OMINO office", distance: 0.0 },
+      { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
       { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 },
       { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo", distance: 0.60 },
@@ -873,7 +888,7 @@
       { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.02 },
 
       // Pentecostal / Kindom Hall / UCZ
-      { from: "Pentecostal Assembly of God Joshua Assembly", to: "Feira Kindom Hall", distance: 0.13 },
+      { from: "Pentecostal Assembly of God Joshua Assembly", to: "Kindom Hall", distance: 0.13 },
       { from: "UCZ", to: "Pentecostal Assembly of God Joshua Assembly", distance: 0.08 },
 
       // Chitope / Kasinsa cluster
@@ -902,7 +917,7 @@
       { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23.0 } 
     ];
 
-    // List of all possible hubs
+    // **MODIFIED: List of all possible hubs**
     const hubs = [
         "Luangwa Bus Station", 
         "Chitope", 
@@ -961,7 +976,7 @@
       return null;
     }
 
-    // Logic to find the nearest hub and calculate total distance (Unchanged)
+    // **MODIFIED: Logic to find the nearest hub and calculate total distance (Unchanged)**
     function calculateTotalDistance(pickup, destination) {
       if (!graph[pickup] || !graph[destination]) return { total: null, trip: null, hub: null };
 
@@ -992,6 +1007,7 @@
       }
 
       // Total Operational Distance = D1 (Hub->Pickup) + D2 (Pickup->Destination) + D3 (Destination->Hub)
+      // Note: Since Dijkstra's is undirected, minDistanceToHub is also the distance from Hub to Pickup (Hub->Pickup)
       const total = minDistanceToHub + pickupToDestination + destinationToHub;
       
       return { 
@@ -1040,12 +1056,11 @@
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
-    
-
-    // Dropdown Menu Elements
-    const menuButton = document.getElementById('menu-button');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-    
+    // const mainFooter = document.getElementById('main-footer'); // REMOVED
+    // const aboutBtn = document.getElementById('about-btn'); // REMOVED
+    // const aboutInfo = document.getElementById('about-info'); // REMOVED
+    const menuButton = document.getElementById('menu-button'); // NEW
+    const dropdownMenu = document.getElementById('dropdown-menu'); // NEW
     let summaryData = null; 
     let selectedOrigin = '';
     let selectedDestination = '';
@@ -1144,6 +1159,7 @@
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
           summaryTableSection.classList.add('hidden-section');
+          // mainFooter.style.display = 'none'; // REMOVED
       }
     }
     
@@ -1167,6 +1183,7 @@
       summaryTableContainer.innerHTML = '';
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
+      // mainFooter.style.display = 'none'; // REMOVED
       
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
@@ -1212,7 +1229,7 @@
         const tripDistance = distanceObject.trip; 
         const nearestHub = distanceObject.hub; 
         
-        // Check if distance calculation returned a valid number
+        // **FIXED: Check if distance calculation returned a valid number**
         if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
           displayStatus(`A valid route could not be calculated via any hub. Nearest Hub tried: ${nearestHub || 'N/A'}`, 'failed');
           return;
@@ -1225,9 +1242,11 @@
         
         // PRICING LOGIC applying the minimum cost
         if (mode === 'Vehicle') {
+          // **FIXED: config.vehiclePricePerKm is now defined**
           let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
           price = Math.max(calculatedPrice, config.vehicleMinPrice); 
         } else {
+          // **FIXED: config.motorbikePricePerKm is now defined**
           let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
           price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
         }
@@ -1378,6 +1397,7 @@
          if (response.status >= 200 && response.status < 300) { 
             displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
             submitBtn.removeAttribute('disabled');
+            // mainFooter.style.display = 'block'; // REMOVED
         } else {
              throw new Error(`Server responded with status ${response.status}`);
         }
@@ -1387,6 +1407,7 @@
         submitBtn.removeAttribute('disabled');
         displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
+        // mainFooter.style.display = 'none'; // REMOVED
       });
     }
     
@@ -1411,17 +1432,19 @@
             summaryTableSection.classList.add('hidden-section');
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
+            // mainFooter.style.display = 'none'; // REMOVED
             calculationSpinner.style.display = 'none'; 
         }
     }
     
-    // FUNCTION: Toggle Dropdown Menu visibility (Unchanged logic)
-    function toggleDropdown() {
+    // NEW Menu Toggle Logic
+    function toggleMenu() {
         dropdownMenu.classList.toggle('show');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       submitBtn.setAttribute('disabled', 'true'); 
+      // mainFooter.style.display = 'none'; // REMOVED
       
       setupAutocomplete("gm-origin", "originList", originInput);
       setupAutocomplete("gm-destination", "destinationList", destinationInput);
@@ -1430,28 +1453,27 @@
       
       // Listener on the parent element for radio button change detection.
       modeSelectionGroup.addEventListener('change', updateSummaryTable);
-      
-      // Dropdown Menu Listener
-      menuButton.addEventListener('click', toggleDropdown);
 
-      // Close the main dropdown if the user clicks outside of it
-      window.addEventListener('click', (event) => {
-        if (!event.target.matches('#menu-button, .dropdown-container *, .dropdown-content *')) {
-          if (dropdownMenu.classList.contains('show')) {
+      // Listener for the new menu button
+      menuButton.addEventListener('click', toggleMenu);
+      
+      // Close the dropdown if the user clicks outside of it
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('.menu-dropdown-container')) {
             dropdownMenu.classList.remove('show');
-          }
         }
       });
       
-      // Reset validation for masked values
-      maskedPhone.addEventListener('click', resetValidation);
-      maskedOrigin.addEventListener('click', resetValidation);
-      maskedDestination.addEventListener('click', resetValidation);
-      
-      submitBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        submitToGoogleSheet();
-      });
+    });
+    
+    // Reset validation for masked values
+    maskedPhone.addEventListener('click', resetValidation);
+    maskedOrigin.addEventListener('click', resetValidation);
+    maskedDestination.addEventListener('click', resetValidation);
+    
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitToGoogleSheet();
     });
   </script>
 <script>
