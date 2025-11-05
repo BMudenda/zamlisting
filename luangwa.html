@@ -49,6 +49,7 @@
     header {
       background: var(--font-color-dark); color: white; padding: 20px; text-align: left;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative; /* Added for dropdown positioning */
     }
     .header-content, .footer-content-wrapper { 
       max-width: 1200px; 
@@ -484,75 +485,162 @@
       display: none;
     }
 
-    footer {
-        width: 100%;
-        padding: 0; 
-        border-top: 1px solid var(--border-color-light);
-        background: var(--bg-color-card);
-        box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-        display: none; 
+    /* --- DROPDOWN MENU STYLES --- */
+    .dropdown-container {
+        position: absolute;
+        top: 10px; 
+        right: 10px; 
+        z-index: 1000;
     }
-    .footer-content-wrapper { 
-        text-align: center;
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
-    .footer-actions {
-        display: flex;
-        justify-content: center;
-        gap: 15px; 
-        margin-bottom: 15px;
-    }
-    .footer-btn {
-        background-color: var(--primary-color);
+    
+    .menu-button {
+        background: var(--font-color-dark); 
         color: white;
-        border: none;
-        padding: 10px; 
-        width: 45px; 
-        height: 45px; 
-        border-radius: 50%; 
-        font-weight: 500;
-        font-size: 0.9rem;
+        border: 1px solid white; 
+        padding: 8px 10px; 
+        border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.2s, transform 0.1s;
-        text-decoration: none;
-        display: inline-flex;
+        font-size: 1rem;
+        display: flex;
         align-items: center;
-        justify-content: center; 
+        gap: 0; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: background-color 0.2s;
     }
-    .footer-btn:hover {
-        background-color: #174ea6;
-        transform: translateY(-1px);
+    .menu-button:hover {
+        background: #444; 
+        border-color: var(--secondary-color);
     }
-    #call-btn {
-        background-color: var(--success-color);
+    
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        min-width: 220px;
+        background-color: var(--bg-color-card);
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 5px;
+        border: 1px solid var(--border-color-light);
     }
-    #call-btn:hover {
-        background-color: #138244;
+    
+    .dropdown-content.show {
+        display: block;
+    }
+    
+    .dropdown-content a, .dropdown-item {
+        color: var(--font-color-dark);
+        padding: 12px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.1s;
+        cursor: pointer;
+    }
+    .dropdown-content a:last-child, .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    .dropdown-content a:hover, .dropdown-item:hover {
+        background-color: #f1f1f1;
+    }
+    
+    .contact-group {
+        border-top: 1px solid var(--border-color-light);
+        padding: 10px 0;
     }
 
-    .about-dropdown {
-        background: #f9fbfd;
-        border: 1px solid var(--border-color-light);
-        border-left: 3px solid var(--secondary-color);
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 10px;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: left;
+    .dropdown-content .material-icons {
+        font-size: 20px;
+        color: var(--primary-color);
+    }
+    .menu-button .material-icons {
+        font-size: 26px; 
+        color: white; 
+    }
+
+    #sms-link .material-icons { color: var(--primary-color); }
+    #whatsapp-link .material-icons { color: var(--whatsapp-color); }
+    #call-link .material-icons { color: var(--success-color); }
+    #about-queries-item .material-icons { color: var(--secondary-color); }
+
+    /* Footer is completely removed/hidden per request */
+    footer {
         display: none;
-        box-shadow: var(--box-shadow-light);
+    }
+
+    /* --- NEW MODAL STYLES FOR ABOUT/QUERIES START --- */
+    #about-modal-overlay {
+        display: none; /* Initially hidden */
+        position: fixed;
+        z-index: 10000; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+        padding-top: 50px;
+    }
+
+    .about-queries-info {
+        background: var(--bg-color-card);
+        border: 1px solid var(--border-color-light);
+        border-left: 5px solid var(--secondary-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 5% auto; /* 5% from the top and centered */
+        max-width: 600px;
+        width: 90%;
+        text-align: left;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         font-size: 0.9rem;
         color: var(--font-color-medium);
+        position: relative;
     }
-    .about-dropdown h4 {
+    .about-queries-info h4 {
         color: var(--secondary-color);
-        margin-bottom: 5px;
-        font-size: 1rem;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 5px;
     }
+    .about-queries-info p {
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+    .about-queries-info strong {
+        color: var(--font-color-dark);
+        font-weight: 700;
+    }
+
+    .modal-close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 30px;
+        font-weight: bold;
+        line-height: 1;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        padding: 0;
+        background: none;
+        border: none;
+    }
+
+    .modal-close-btn:hover,
+    .modal-close-btn:focus {
+        color: var(--fail-color);
+        text-decoration: none;
+        cursor: pointer;
+    }
+    /* --- NEW MODAL STYLES FOR ABOUT/QUERIES END --- */
+    
   </style>
 </head>
 <body>
@@ -569,7 +657,29 @@
     <div>
       <div class="price-tag">Book Your Ride Now!</div>
     </div>
-  </div>
+    
+    <div class="dropdown-container">
+        <button class="menu-button" id="menu-button" aria-label="Menu">
+            <span class="material-icons">menu</span>
+        </button>
+        <div class="dropdown-content" id="dropdown-menu">
+            <div class="dropdown-item" id="about-queries-item">
+                <span class="material-icons">info</span> About & Queries
+            </div>
+            <div class="contact-group">
+                <a href="sms:+260966423229?body=Hi%2C%20I%20have%20a%20query%20about%20a%20Luangwa%20Feira%20Ride." id="sms-link">
+                    <span class="material-icons">message</span> Contact via SMS
+                </a>
+                <a href="https://wa.me/260966423229?text=Hello%2C%20I%20have%20a%20query%20about%20a%20Luangwa%20Feira%20Ride." target="_blank" id="whatsapp-link">
+                    <span class="material-icons">chat</span> Contact via WhatsApp
+                </a>
+                <a href="tel:0966423229" id="call-link">
+                    <span class="material-icons">call</span> Call for Inquiry
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
 </header>
   <main class="product-container">
     <section class="booking-section">
@@ -657,32 +767,23 @@
         <div id="loader" class="loader" style="margin-top: 0;"></div>
       </div>
     </section>
-  </main>
+    </main>
   
-  <footer id="main-footer">
-    <div class="footer-content-wrapper"> <div class="footer-actions">
-            <a href="tel:0966423229" class="footer-btn" id="call-btn" title="Call for Inquiry/Complaint">
-                <span class="material-icons">call</span>
-            </a>
-            <button id="about-btn" class="footer-btn" title="About Luangwa Feira Rides">
-                <span class="material-icons">info</span>
-            </button>
-        </div>
-        <div id="about-info" class="about-dropdown">
-            <h4>About Our Service</h4>
+    <div id="about-modal-overlay">
+        <div class="about-queries-info">
+            <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+            <h4>About Luangwa Feira Rides & Queries</h4>
             <p><strong>Location:</strong> Dedicated service provider within the Luangwa Feira area and surrounding locations in Zambia. 🇿🇲</p>
             <p><strong>Affordable:</strong> Our pricing is **cheap and fixed as shown** and competitive, calculated fairly based on distance.</p>
             <p><strong>Reliable:</strong> We are committed to **reliable** and safe transport, ensuring you reach your destination efficiently.</p>
-            <p><strong>Station:</strong>We have Luangwa Bus Station, Chitope and Luangwa Market Bridge...Other Stations or Hubs near your place will be added to make your movement cheaper</p>
-            <p><strong>Collaboration & Inquiries </strong> We are open: Call or Email:zamlisting@gmail.com</p>
+            <p><strong>Stations (Hubs):</strong> We have Luangwa Bus Station, Chitope and Luangwa Market Bridge...Other Stations or Hubs near your place will be added to make your movement cheaper.</p>
+            <p><strong>Collaboration & Inquiries: </strong> We are open: Call or Email: zamlisting@gmail.com</p>
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 10px 0;">
+            <p style="font-size: 0.8rem; color: #999;"> For general inquiries and queries, please use the contact options in the Menu above.</p>
+            <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">&copy; 2024 Luangwa Feira Rides. All rights reserved.</p>
         </div>
-      
-        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;"> For inquiries and queries call.</p>
-        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">&copy; 2024 Luangwa Feira Rides. All rights reserved.</p>
     </div>
-  </footer>
-  
-  <script>
+    <script>
     const config = {
       // **FIXED: Price configuration was commented out, causing KNan**
       vehiclePricePerKm: 3.20, // Sample rate for Vehicle (K/km)
@@ -705,7 +806,7 @@
       "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", "Justifeli Lodge", "Kakaro Primary School",
       "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kaunga Secondary School", "Kasinsa",
       "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", "Katondwe Girls Secondary School", "Katondwe Mission Hospital",
-      "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge",
+      "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Bridge",
       "Luangwa Bridge Market", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices",
       "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", "Luangwa Habour",
       "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station",
@@ -757,13 +858,13 @@
       { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 },
       { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 },
       { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 },
-      { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 },
+      { from: "Nyaborders Mall", to: "Luangwa Basic School", distance: 0.18 },
       { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 },
       
       // Bus Station extended links (0.0 distance locations)
       { from: "Luangwa Bus Station", to: "Lusaka Water Office", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Immigration Flats", distance: 0.0 },
-      { from: "Immigration Flats", to: "OMNO", distance: 0.0 },
+      { from: "Immigration Flats", to: "OMINO office", distance: 0.0 },
       { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
       { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 },
       { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo", distance: 0.60 },
@@ -793,7 +894,7 @@
       { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.02 },
 
       // Pentecostal / Kindom Hall / UCZ
-      { from: "Pentecostal Assembly of God Joshua Assembly", to: "Kindom Hall", distance: 0.13 },
+      { from: "Pentecostal Assembly of God Joshua Assembly", to: "Feira Kindom Hall", distance: 0.13 },
       { from: "UCZ", to: "Pentecostal Assembly of God Joshua Assembly", distance: 0.08 },
 
       // Chitope / Kasinsa cluster
@@ -961,9 +1062,15 @@
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
-    const mainFooter = document.getElementById('main-footer'); 
-    const aboutBtn = document.getElementById('about-btn'); 
-    const aboutInfo = document.getElementById('about-info'); 
+    // MODIFIED: Use the new ID for the modal overlay
+    const aboutModalOverlay = document.getElementById('about-modal-overlay');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    // Dropdown Menu Elements
+    const menuButton = document.getElementById('menu-button');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const aboutQueriesItem = document.getElementById('about-queries-item');
+    
     let summaryData = null; 
     let selectedOrigin = '';
     let selectedDestination = '';
@@ -1062,7 +1169,7 @@
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
           summaryTableSection.classList.add('hidden-section');
-          mainFooter.style.display = 'none'; 
+          // No mainFooter to hide/show
       }
     }
     
@@ -1086,7 +1193,7 @@
       summaryTableContainer.innerHTML = '';
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
-      mainFooter.style.display = 'none'; 
+      // No mainFooter to hide/show
       
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
@@ -1300,7 +1407,7 @@
          if (response.status >= 200 && response.status < 300) { 
             displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
             submitBtn.removeAttribute('disabled');
-            mainFooter.style.display = 'block'; 
+            // No footer to show/hide
         } else {
              throw new Error(`Server responded with status ${response.status}`);
         }
@@ -1310,7 +1417,7 @@
         submitBtn.removeAttribute('disabled');
         displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
-        mainFooter.style.display = 'none'; 
+        // No footer to show/hide
       });
     }
     
@@ -1335,14 +1442,33 @@
             summaryTableSection.classList.add('hidden-section');
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
-            mainFooter.style.display = 'none'; 
+            // No footer to show/hide
             calculationSpinner.style.display = 'none'; 
         }
     }
     
+    // NEW FUNCTION: Toggle Dropdown Menu visibility
+    function toggleDropdown() {
+        dropdownMenu.classList.toggle('show');
+        // Close the About/Queries modal when the menu is opened/closed
+        aboutModalOverlay.style.display = 'none'; 
+    }
+
+    // NEW FUNCTION: Open the About Modal
+    function openAboutModal() {
+        aboutModalOverlay.style.display = 'block';
+        dropdownMenu.classList.remove('show');
+    }
+
+    // NEW FUNCTION: Close the About Modal
+    function closeAboutModal() {
+        aboutModalOverlay.style.display = 'none';
+    }
+
+
     document.addEventListener('DOMContentLoaded', () => {
       submitBtn.setAttribute('disabled', 'true'); 
-      mainFooter.style.display = 'none'; 
+      // No mainFooter to hide/show
       
       setupAutocomplete("gm-origin", "originList", originInput);
       setupAutocomplete("gm-destination", "destinationList", destinationInput);
@@ -1351,20 +1477,38 @@
       
       // Listener on the parent element for radio button change detection.
       modeSelectionGroup.addEventListener('change', updateSummaryTable);
+      
+      // Dropdown Menu Listener
+      menuButton.addEventListener('click', toggleDropdown);
 
-      aboutBtn.addEventListener('click', () => {
-          aboutInfo.style.display = aboutInfo.style.display === 'block' ? 'none' : 'block';
+      // MODIFIED: About/Queries Item Listener to open the Modal
+      aboutQueriesItem.addEventListener('click', openAboutModal);
+      
+      // Modal Close Button Listener
+      modalCloseBtn.addEventListener('click', closeAboutModal);
+
+      // Close the modal if the user clicks outside of the modal content
+      window.addEventListener('click', (event) => {
+          if (event.target === aboutModalOverlay) {
+              closeAboutModal();
+          }
+        // Close the main dropdown if the user clicks outside of it
+        if (!event.target.matches('#menu-button, .dropdown-container *')) {
+          if (dropdownMenu.classList.contains('show')) {
+            dropdownMenu.classList.remove('show');
+          }
+        }
       });
-    });
-    
-    // Reset validation for masked values
-    maskedPhone.addEventListener('click', resetValidation);
-    maskedOrigin.addEventListener('click', resetValidation);
-    maskedDestination.addEventListener('click', resetValidation);
-    
-    submitBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      submitToGoogleSheet();
+      
+      // Reset validation for masked values
+      maskedPhone.addEventListener('click', resetValidation);
+      maskedOrigin.addEventListener('click', resetValidation);
+      maskedDestination.addEventListener('click', resetValidation);
+      
+      submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        submitToGoogleSheet();
+      });
     });
   </script>
 <script>
