@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luangwa Feira Rides| Book a Ride</title>
+  <title>Luangwa Feira Rides | Book a Ride</title>
   
   <link rel="icon" type="image/jpeg" href="lfr.jpg">
   <link rel="shortcut icon" href="lfr.jpg" type="image/jpeg">
@@ -20,7 +20,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <link rel="manifest" href="manifest.json">
@@ -30,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
   <link rel="apple-touch-icon" href="lfr.jpg">
   <style>
-    /* ... (Existing CSS remains unchanged) ... */
+    /* ... (CSS remains unchanged from previous version, kept here for completeness) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -47,7 +46,6 @@
       --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
       --font-color-dark: #333;
       --font-color-medium: #2d3a4a;
-      /* NEW BRAND COLORS */
       --facebook-color: #3b5998;
       --call-color: #1aaf5d; 
       --sms-color: #6c757d; 
@@ -692,7 +690,7 @@
                                
     
     // ===========================================
-    // Data for Luangwa Town Routes (All data unchanged)
+    // Data for Luangwa Town Routes (unchanged)
     // ===========================================
     const places = [
       "Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic",
@@ -708,7 +706,7 @@
       "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School",
       "Mwalila Primary School", "Nyabota Lodge", "National Assembly Office", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly",
       "UCZ", "Soweto Junction", "Registration Office", "River Spot Club","SDA Katondwe", "Yangoma Lodge", "Yellow Shop", "ZESCO Office",
-      "Lusaka Water Office", "Immigration Flats", "OMINO office"
+      "Lusaka Water Office", "Immigration Flats", "OMINO office", "Takusortha Lodge", "Sev7ens Safari Lodge", "Luambazi River Camp"
     ];
 
     const segments = [
@@ -1064,64 +1062,48 @@
     }
     
     /**
-     * UPDATED: Toggles the visibility of the Price and reverses the visibility of the Trip Details.
-     * The control is now tied to a single, central eye icon.
+     * UPDATED: Toggles visibility: 
+     * If Details are hidden, hide Price and show Details.
+     * If Details are visible, show Price and hide Details.
      */
     function toggleDetails(togglerIcon) {
         const summaryCardContainer = document.querySelector('.summary-card-container');
         
-        // Rows that contain the location/distance/time data
-        const tripDetailRows = summaryCardContainer.querySelectorAll('.trip-detail-row');
+        // The container for the Price value (to be hidden/shown)
+        const priceValueSpan = summaryCardContainer.querySelector('.price-value-span');
+        // The card containing all the trip details (to be hidden/shown)
+        const detailCard = summaryCardContainer.querySelector('.detail-card');
         
-        // The price row elements
-        const priceRow = summaryCardContainer.querySelector('.price-control-row');
-        const priceValueSpan = priceRow.querySelector(".price-value-span");
-        
-        // Check if the price is currently visible (initial state)
-        // We check the display style of the price span.
-        const priceIsVisible = priceValueSpan.style.display !== "none";
+        // Check if the detail card is currently visible
+        const detailsAreVisible = detailCard.style.display !== "none";
 
-        if (priceIsVisible) {
-            // State: Price is Visible.
-            // Action: Hide Price, Show Details.
+        if (detailsAreVisible) {
+            // State: Details are Visible.
+            // Action: Hide Details, SHOW Price, change icon to indicate details are hidden (closed eye).
             
-            // 1. Hide Price
-            priceValueSpan.style.display = "none";
-            priceValueSpan.title = "Click the icon to show Price"; 
-
-            // 2. Show Details
-            tripDetailRows.forEach(row => {
-                const detailSpan = row.querySelector(".detail-value-span");
-                if (detailSpan) {
-                    detailSpan.style.display = "inline";
-                }
-            });
+            // 1. Hide Details
+            detailCard.style.display = "none";
+            
+            // 2. Show Price
+            priceValueSpan.style.display = "inline";
             
             // 3. Update Icon (Eye Open -> Eye Closed)
-            // When details are showing, the eye suggests 'hide' (visibility_off)
-            togglerIcon.textContent = 'visibility_off'; 
-            togglerIcon.title = 'Hide details, show price';
+            togglerIcon.textContent = 'visibility_off'; // Icon when details are HIDDEN
+            togglerIcon.title = 'Show trip details';
 
         } else {
-            // State: Price is Hidden, Details are Visible.
-            // Action: Show Price, Hide Details.
+            // State: Details are Hidden.
+            // Action: Show Details, HIDE Price, change icon to indicate details are visible (open eye).
             
-            // 1. Show Price
-            priceValueSpan.style.display = "inline";
-            priceValueSpan.title = "Click the icon to hide Details"; 
-
-            // 2. Hide Details
-            tripDetailRows.forEach(row => {
-                const detailSpan = row.querySelector(".detail-value-span");
-                if (detailSpan) {
-                    detailSpan.style.display = "none";
-                }
-            });
+            // 1. Show Details (use 'block' as the parent is a flex container)
+            detailCard.style.display = "block"; 
+            
+            // 2. Hide Price
+            priceValueSpan.style.display = "none";
             
             // 3. Update Icon (Eye Closed -> Eye Open)
-            // When price is showing, the eye suggests 'show' details (visibility)
-            togglerIcon.textContent = 'visibility'; 
-            togglerIcon.title = 'Show details, hide price';
+            togglerIcon.textContent = 'visibility'; // Icon when details are VISIBLE
+            togglerIcon.title = 'Hide trip details';
         }
     }
 
@@ -1212,7 +1194,7 @@
           timeText += `${minutes} min`;
         }
         
-        // --- MODIFIED: Card HTML for icon-based toggle ---
+        // --- MODIFIED: Card HTML for Price always visible, Details hidden by default ---
         const cardHTML = `
           <div class="summary-card-container">
             
@@ -1223,46 +1205,47 @@
                   Estimated Price
                 </span>
                 <span class="key-value" style="display:flex; align-items:center; gap: 10px;">
-                  <span class="price-value-span" style="display:inline;" title="Click the icon to hide Details">
+                  <span class="price-value-span" style="display:inline;">
                     <b>K${price}</b>
                   </span>
                   <span 
                     class="material-icons price-toggle-icon" 
                     style="font-size: 24px; color: var(--primary-color); cursor: pointer;"
                     onclick="toggleDetails(this)"
-                    title="Show details, hide price"
+                    title="Show trip details"
                   >
-                    visibility </span>
+                    visibility_off </span>
                 </span>
               </div>
             </div>
             
-            <div class="summary-card detail-card">
+            <div class="summary-card detail-card" style="display:none;"> 
+              
               <div class="card-row trip-detail-row">
                 <span class="key-label"><span class="material-icons" style="font-size: 18px;">place</span> From</span>
                 <span class="key-value">
-                  <span class="detail-value-span" style="display:none;">${origin}</span>
+                  <span class="detail-value-span">${origin}</span>
                 </span>
               </div>
               
               <div class="card-row trip-detail-row">
                 <span class="key-label"><span class="material-icons" style="font-size: 18px;">flag</span> To</span>
                 <span class="key-value">
-                  <span class="detail-value-span" style="display:none;">${destination}</span>
+                  <span class="detail-value-span">${destination}</span>
                 </span>
               </div>
               
               <div class="card-row trip-detail-row">
                 <span class="key-label"><span class="material-icons" style="font-size: 18px;">near_me</span> Trip Distance</span>
                 <span class="key-value">
-                  <span class="detail-value-span" style="display:none;">${tripDistance.toFixed(2)} km</span>
+                  <span class="detail-value-span">${tripDistance.toFixed(2)} km</span>
                 </span>
               </div>
               
               <div class="card-row trip-detail-row time-row">
                 <span class="key-label"><span class="material-icons" style="font-size: 18px;">schedule</span> Time</span>
                 <span class="key-value">
-                  <span class="detail-value-span" style="display:none;">${timeText}</span>
+                  <span class="detail-value-span">${timeText}</span>
                 </span>
               </div>
             </div>
@@ -1301,8 +1284,8 @@
       // ----------------------------------------------------------------
     }
     
-    // Remaining functions (submitToGoogleSheet, displayStatus, handlePhoneNumberInput, event listeners) are unchanged...
-    
+    // Remaining helper functions (submitToGoogleSheet, displayStatus, handlePhoneNumberInput, etc.) are unchanged
+
     function submitToGoogleSheet() {
       if (!summaryData) { 
         displayStatus('No data to submit.', 'failed');
