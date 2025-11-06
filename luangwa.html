@@ -653,8 +653,14 @@
         <div class="summary-table-section hidden-section">
           <fieldset>
             <legend>
-              
               Trip Summary
+              <span 
+                class="material-icons price-toggle-icon" 
+                style="font-size: 24px; color: var(--primary-color); cursor: pointer; vertical-align: middle; margin-left: 10px;"
+                onclick="toggleDetails(this)"
+                title="Show trip details"
+              >
+                visibility_off </span>
             </legend>
             <div id="summary-table-container"></div>
             <div class="summary-actions-row">
@@ -1063,15 +1069,20 @@
      * UPDATED: Toggles visibility: 
      * If Details are hidden, hide Price and show Details.
      * If Details are visible, show Price and hide Details.
+     * Logic adjusted to find elements without relying on the togglerIcon's position.
      */
     function toggleDetails(togglerIcon) {
+        // *** MODIFIED: Find the relevant containers starting from a known point ***
+        // Since the icon is now in the fieldset legend, we use a document-wide query for the containers.
         const summaryCardContainer = document.querySelector('.summary-card-container');
         
-        // The container for the Price value (to be hidden/shown)
+        // Safety check in case the card hasn't been rendered yet
+        if (!summaryCardContainer) return;
+
         const priceValueSpan = summaryCardContainer.querySelector('.price-value-span');
-        // The card containing all the trip details (to be hidden/shown)
         const detailCard = summaryCardContainer.querySelector('.detail-card');
-        
+        // *** END MODIFIED ***
+
         // Check if the detail card is currently visible
         const detailsAreVisible = detailCard.style.display !== "none";
 
@@ -1193,6 +1204,7 @@
         }
         
         // --- MODIFIED: Card HTML for Price always visible, Details hidden by default ---
+        // *** THE ICON IS REMOVED HERE AS IT'S NOW IN THE FIELDSET LEGEND ***
         const cardHTML = `
           <div class="summary-card-container">
             
@@ -1202,17 +1214,10 @@
                   <span class="material-icons" style="font-size: 20px; color: var(--secondary-color);">local_atm</span> 
                   Estimated Price
                 </span>
-                <span class="key-value" style="display:flex; align-items:center; gap: 10px;">
+                <span class="key-value">
                   <span class="price-value-span" style="display:inline;">
                     <b>K${price}</b>
                   </span>
-                  <span 
-                    class="material-icons price-toggle-icon" 
-                    style="font-size: 24px; color: var(--primary-color); cursor: pointer;"
-                    onclick="toggleDetails(this)"
-                    title="Show trip details"
-                  >
-                    visibility_off </span>
                 </span>
               </div>
             </div>
