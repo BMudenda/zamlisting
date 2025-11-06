@@ -29,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
   <link rel="apple-touch-icon" href="lfr.jpg">
   <style>
-    /* ... (CSS remains unchanged from previous version) ... */
+    /* ... (CSS remains mostly unchanged) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -1066,35 +1066,34 @@
     }
     
     /**
-     * UPDATED: Toggles visibility: 
-     * If Details are hidden, hide Price and show Details.
-     * If Details are visible, show Price and hide Details.
-     * Logic adjusted to find elements without relying on the togglerIcon's position.
+     * MODIFIED: Toggles visibility: 
+     * If Details are hidden, HIDE Details and SHOW Price Card.
+     * If Details are visible, SHOW Details and HIDE Price Card.
      */
     function toggleDetails(togglerIcon) {
-        // *** MODIFIED: Find the relevant containers starting from a known point ***
-        // Since the icon is now in the fieldset legend, we use a document-wide query for the containers.
         const summaryCardContainer = document.querySelector('.summary-card-container');
         
-        // Safety check in case the card hasn't been rendered yet
         if (!summaryCardContainer) return;
 
-        const priceValueSpan = summaryCardContainer.querySelector('.price-value-span');
+        // Get the two cards that contain the information
+        const priceCard = summaryCardContainer.querySelector('.price-card');
         const detailCard = summaryCardContainer.querySelector('.detail-card');
-        // *** END MODIFIED ***
+        
+        // Safety check
+        if (!priceCard || !detailCard) return;
 
-        // Check if the detail card is currently visible
-        const detailsAreVisible = detailCard.style.display !== "none";
+        // Check if the detail card is currently visible (default style is block for card)
+        const detailsAreVisible = detailCard.style.display === "block" || detailCard.style.display === "";
 
         if (detailsAreVisible) {
             // State: Details are Visible.
-            // Action: Hide Details, SHOW Price, change icon to indicate details are hidden (closed eye).
+            // Action: Hide Details Card, SHOW Price Card, change icon to indicate details are hidden (closed eye).
             
-            // 1. Hide Details
+            // 1. Hide Details Card
             detailCard.style.display = "none";
             
-            // 2. Show Price
-            priceValueSpan.style.display = "inline";
+            // 2. Show Price Card
+            priceCard.style.display = "block"; 
             
             // 3. Update Icon (Eye Open -> Eye Closed)
             togglerIcon.textContent = 'visibility_off'; // Icon when details are HIDDEN
@@ -1102,13 +1101,13 @@
 
         } else {
             // State: Details are Hidden.
-            // Action: Show Details, HIDE Price, change icon to indicate details are visible (open eye).
+            // Action: Show Details Card, HIDE Price Card, change icon to indicate details are visible (open eye).
             
-            // 1. Show Details (use 'block' as the parent is a flex container)
+            // 1. Show Details Card
             detailCard.style.display = "block"; 
             
-            // 2. Hide Price
-            priceValueSpan.style.display = "none";
+            // 2. Hide Price Card
+            priceCard.style.display = "none";
             
             // 3. Update Icon (Eye Closed -> Eye Open)
             togglerIcon.textContent = 'visibility'; // Icon when details are VISIBLE
@@ -1203,19 +1202,18 @@
           timeText += `${minutes} min`;
         }
         
-        // --- MODIFIED: Card HTML for Price always visible, Details hidden by default ---
-        // *** THE ICON IS REMOVED HERE AS IT'S NOW IN THE FIELDSET LEGEND ***
+        // --- MODIFIED: The structure remains the same, but the JS logic for showing/hiding is critical ---
         const cardHTML = `
           <div class="summary-card-container">
             
-            <div class="summary-card price-card">
+            <div class="summary-card price-card" style="display:block;">
               <div class="card-row price-row price-control-row">
                 <span class="key-label">
                   <span class="material-icons" style="font-size: 20px; color: var(--secondary-color);">local_atm</span> 
                   Estimated Price
                 </span>
                 <span class="key-value">
-                  <span class="price-value-span" style="display:inline;">
+                  <span class="price-value-span">
                     <b>K${price}</b>
                   </span>
                 </span>
@@ -1277,7 +1275,6 @@
         };
         summaryTableSection.classList.remove('hidden-section');
         
-        // --- MODIFIED STATUS MESSAGE LOGIC START ---
         // 1. Display the main calculation status first (using the updated function that clears old paragraphs)
         displayStatus(
           `Trip details calculated via **${nearestHub}**`, 
@@ -1296,7 +1293,13 @@
         `;
         // Append the new paragraph under the submit-status div
         statusWrapper.querySelector('#submit-status').insertAdjacentHTML('afterend', verificationInstructionHTML);
-        // --- MODIFIED STATUS MESSAGE LOGIC END ---
+        
+        // Reset icon to 'visibility_off' on new calculation
+        const toggleIcon = document.querySelector('.price-toggle-icon');
+        if(toggleIcon) {
+             toggleIcon.textContent = 'visibility_off'; 
+             toggleIcon.title = 'Show trip details';
+        }
         
         submitBtn.removeAttribute('disabled'); 
 
