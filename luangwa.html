@@ -29,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
   <link rel="apple-touch-icon" href="lfr.jpg">
   <style>
-    /* ... (CSS remains unchanged from previous version, kept here for completeness) ... */
+    /* ... (CSS remains unchanged from previous version) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -557,13 +557,12 @@
         <div class="dropdown-content" id="dropdown-menu">
             <div class="about-queries-section">
                 <h4><span class="material-icons" style="font-size: 18px; color: var(--secondary-color);">info</span> About & Queries</h4>
-                <p><strong>&copy; 2024 Luangwa Feira Rides.</strong> All rights reserved.</p>
                 <p><strong>Location:</strong> Dedicated service provider within the Luangwa Feira area and surrounding locations in Zambia. 🇿🇲</p>
-                <p><strong>Affordable:</strong> Our pricing is <strong>cheap and fixed as shown</strong> and competitive, calculated fairly based on distance.</p>
-                <p><strong>Reliable:</strong> We are committed to <strong>reliable and safe transport </strong>, ensuring you reach your destination efficiently.</p>
+                <p><strong>Affordable:</strong> Our pricing is **cheap and fixed as shown** and competitive, calculated fairly based on distance.</p>
+                <p><strong>Reliable:</strong> We are committed to **reliable** and safe transport, ensuring you reach your destination efficiently.</p>
                 <p><strong>Stations:</strong> Luangwa Bus Station, Chitope, Luangwa Market Bridge, and more hubs near you will be added.</p>
                 <p><strong>For collaborations, inquiries, or social connections:</strong> Please use the contact details below.</p>
-                
+                <p><strong>&copy; 2024 Luangwa Feira Rides.</strong> All rights reserved.</p>
             </div>
             
             <div class="contact-links">
@@ -586,7 +585,6 @@
                 <a href="https://www.facebook.com/profile.php?id=61581247756569" id="facebook-link" target="_blank" title="Visit our Facebook Page">
                     <i class="fa-brands fa-facebook-square"></i> Facebook
                 </a>
-              
             </div>
         </div>
     </div>
@@ -658,9 +656,6 @@
               Trip Summary
             </legend>
             <div id="summary-table-container"></div>
-            <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
-              Review and verify all trip information (Click the <span class="material-icons" style="font-size: 14px; vertical-align: middle;">visibility_off</span> icon to toggle the price/details view)
-            </p>
             <div class="summary-actions-row">
               <div class="button-wrapper">
                 <a href="#" class="fa fa-send-o" id="submit-btn" title="Submit Trip Details" disabled></a>
@@ -1276,7 +1271,26 @@
         };
         summaryTableSection.classList.remove('hidden-section');
         
-        displayStatus(`Trip details calculated via ${nearestHub}. Click Request Ride to send your request.`, 'success');
+        // --- MODIFIED STATUS MESSAGE LOGIC START ---
+        // 1. Display the main calculation status first (using the updated function that clears old paragraphs)
+        displayStatus(
+          `Trip details calculated via **${nearestHub}**`, 
+          'success'
+        );
+
+        // 2. Add the separate verification paragraph immediately after #submit-status.
+        const statusWrapper = document.getElementById('calculation-status-wrapper');
+        const verificationInstructionHTML = `
+            <p style="margin-top: 5px; font-size: 0.9em; color: var(--font-color-dark); font-weight: 500;">
+                Review and verify all trip information 
+                (Click the 
+                <span class="material-icons" style="font-size: 14px; vertical-align: middle;">visibility_off</span> 
+                icon to toggle the price/details view)
+            </p>
+        `;
+        // Append the new paragraph under the submit-status div
+        statusWrapper.querySelector('#submit-status').insertAdjacentHTML('afterend', verificationInstructionHTML);
+        // --- MODIFIED STATUS MESSAGE LOGIC END ---
         
         submitBtn.removeAttribute('disabled'); 
 
@@ -1339,9 +1353,19 @@
       });
     }
     
+    // MODIFIED displayStatus function to clear the extra paragraph
     function displayStatus(message, type) {
-      submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
-      submitStatusDiv.className = `submit-status ${type}`;
+        const statusWrapper = document.getElementById('calculation-status-wrapper');
+        
+        // Clear the previous verification paragraph if it exists
+        const oldParagraph = statusWrapper.querySelector('p:last-of-type');
+        if (oldParagraph) {
+            oldParagraph.remove();
+        }
+        
+        // Update the main status message
+        submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
+        submitStatusDiv.className = `submit-status ${type}`;
     }
     
     function handlePhoneNumberInput() {
