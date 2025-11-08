@@ -841,9 +841,6 @@
             </legend>
             </fieldset>
 
-          <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
-            Review and verify all trip information.
-          </p>
           <div class="summary-actions-row">
             <div class="button-wrapper">
               <a href="#" class="fas fa-paper-plane submit-btn" id="submit-btn" title="Submit Trip Details" disabled></a>
@@ -854,6 +851,9 @@
         
         <div class="calculation-status-wrapper" id="calculation-status-wrapper">
           <div id="submit-status" class="submit-status">Please fill in all details correctly.</div>
+          <p id="review-info-message" style="display: none; text-align: center; font-style: italic; font-size: 0.9rem; color: #4a5568; margin-top: 10px;">
+              **Review and verify all trip information** 👁‍🗨. The price is final, fixed, and includes all operational costs.
+          </p>
           <div id="calculation-spinner" class="loader"></div>
         </div>
         <div id="loader" class="loader" style="margin-top: 0;"></div>
@@ -1142,6 +1142,8 @@
     // RENAMED: const aboutBtn = document.getElementById('about-btn'); to aboutMenuBtn
     // REMOVED: const aboutInfo = document.getElementById('about-info'); // THIS IS REMOVED
     const masterRevealBtn = document.getElementById('master-reveal-btn'); // NEW Master Button
+    // NEW: Review/Verify message element
+    const reviewInfoMessage = document.getElementById('review-info-message'); 
     
     // NEW: Menu button elements
     const menuToggleBtn = document.getElementById('menu-toggle-btn');
@@ -1248,6 +1250,7 @@
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
           summaryTableSection.classList.add('hidden-section');
+          reviewInfoMessage.style.display = 'none'; // **ADDED**
           // REMOVED: mainFooter.style.display = 'none'; 
       }
     }
@@ -1281,6 +1284,7 @@
       summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>';
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
+      reviewInfoMessage.style.display = 'none'; // **ADDED**
       // REMOVED: mainFooter.style.display = 'none'; 
       
       const isOriginValid = places.includes(origin);
@@ -1424,7 +1428,8 @@
         }
 
         // **UPDATED STATUS MESSAGE**
-        displayStatus(`Trip details calculated via ${nearestHub}. Click Request Ride to send your request.`, 'success');
+        displayStatus(`Trip information calculated via ${nearestHub}.`, 'success');
+        reviewInfoMessage.style.display = 'block'; // **ADDED**
         
         submitBtn.removeAttribute('disabled'); 
 
@@ -1462,6 +1467,7 @@
       displayStatus('Submitting...', 'info');
       loader.style.display = 'block';
       submitBtn.setAttribute('disabled', 'true');
+      reviewInfoMessage.style.display = 'none'; // **ADDED**
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         body: formBody,
@@ -1509,6 +1515,7 @@
             summaryTableSection.classList.add('hidden-section');
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
+            reviewInfoMessage.style.display = 'none'; // **ADDED**
             // REMOVED: mainFooter.style.display = 'none'; 
             calculationSpinner.style.display = 'none'; // Ensure spinner is off
         }
