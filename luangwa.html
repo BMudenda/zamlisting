@@ -361,6 +361,10 @@
         font-size: 0.95rem;
         padding: 0 5px;
         margin-bottom: 5px;
+        /* MODIFICATION: Align items for the eye button */
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     .summary-card {
         background: white;
@@ -457,7 +461,7 @@
       font-size: 20px;
       color: var(--primary-color);
       transition: color 0.2s ease;
-      margin-left: 5px;
+      /* MODIFIED: Removed margin-left: 5px; as it is now inside legend */
     }
     #master-reveal-btn:hover {
         color: var(--secondary-color);
@@ -830,14 +834,11 @@
           </div>
         </div>
         <div class="summary-table-section hidden-section">
-          <div class="section-title">
-          
-            Trip Summary
-            <span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span>
-          </div>
-          
           <fieldset class="summary-card-fieldset" id="summary-card-fieldset">
-            <legend>Trip Details</legend>
+            <legend>
+                Trip Summary
+                <span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span>
+            </legend>
             </fieldset>
 
           <p style="text-align: center; font-style: italic; font-size: 0.85rem; color: #666; margin-top: 10px;">
@@ -862,7 +863,8 @@
   
   <script>
     const config = {
-      // **MINIMUM PRICE CONFIGURATION** vehiclePricePerKm: 3.20,
+      // **MINIMUM PRICE CONFIGURATION**
+      vehiclePricePerKm: 3.20, // <--- ADDED VEHICLE PRICE PER KM
       motorbikePricePerKm: 1.02,
       vehicleMinPrice: 20, // K20 Minimum Price
       motorbikeMinPrice: 10, // K10 Minimum Price
@@ -1241,7 +1243,7 @@
           parentGroup.classList.remove('valid');
 
           // Reset everything below the phone number
-          summaryCardFieldset.innerHTML = '<legend>Trip Details</legend>'; // MODIFIED
+          summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>'; // MODIFIED
           submitBtn.setAttribute('disabled', 'true');
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
@@ -1275,7 +1277,8 @@
       const isVehicleSelected = modeVehicleRadio.checked;
       const isMotorbikeSelected = modeMotorbikeRadio.checked; 
       
-      summaryCardFieldset.innerHTML = '<legend>Trip Details</legend>'; // MODIFIED
+      // MODIFIED: Reset the fieldset content *with* the eye button
+      summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>';
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
       // REMOVED: mainFooter.style.display = 'none'; 
@@ -1337,10 +1340,7 @@
         
         // PRICING LOGIC applying the minimum cost
         if (mode === 'Vehicle') {
-          // NOTE: vehiclePricePerKm is not defined in the code you provided, 
-          // I'll use a placeholder value of 3.20 as mentioned in the comment
-          const vehiclePricePerKm = 3.20; 
-          let calculatedPrice = totalDistance * vehiclePricePerKm; 
+          let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
           price = Math.max(calculatedPrice, config.vehicleMinPrice); 
         } else {
           let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
@@ -1415,7 +1415,13 @@
         
         // Default to hidden state when calculated
         summaryCardFieldset.classList.remove('revealed');
-        masterRevealBtn.textContent = 'visibility';
+        // RE-ATTACH LISTENER TO THE NEWLY CREATED MASTER BUTTON
+        const newMasterRevealBtn = document.getElementById('master-reveal-btn');
+        if (newMasterRevealBtn) {
+            newMasterRevealBtn.textContent = 'visibility';
+            newMasterRevealBtn.removeEventListener('click', toggleSummaryVisibility);
+            newMasterRevealBtn.addEventListener('click', toggleSummaryVisibility);
+        }
 
         // **UPDATED STATUS MESSAGE**
         displayStatus(`Trip details calculated via ${nearestHub}. Click Request Ride to send your request.`, 'success');
@@ -1541,8 +1547,9 @@
           }
       });
       
-      // MODIFIED: Attach listener to the new master button
-      masterRevealBtn.addEventListener('click', toggleSummaryVisibility);
+      // MODIFIED: Attach listener to the master button on DOMContentLoaded
+      // It's already in the initial HTML, so this is fine.
+      masterRevealBtn.addEventListener('click', toggleSummaryVisibility); 
     });
     
     // Reset validation for masked values
