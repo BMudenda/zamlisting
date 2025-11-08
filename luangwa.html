@@ -374,20 +374,31 @@
         flex: 1 1 calc(50% - 15px); /* Two columns on small screens, adjusts larger */
         min-width: 140px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
+        
+        /* === CRITICAL MODIFICATION FOR ALIGNMENT === */
+        display: flex; 
+        flex-direction: row; /* Ensure label and value are on the same line */
+        justify-content: space-between; /* Pushes content to opposite ends */
+        align-items: center; /* Vertically centers the content */
+        /* === END CRITICAL MODIFICATION === */
     }
     .summary-card.full-width {
         flex: 1 1 100%;
     }
+    /* MODIFIED: The card-label now contains the label text and icon (if any) and is left-aligned */
     .card-label {
-        font-size: 0.75rem;
-        color: #666;
-        margin-bottom: 3px;
+        font-size: 0.9rem; /* Slightly larger for better readability */
+        color: var(--font-color-medium);
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px; /* Increased gap for icon-label separation */
+        margin-bottom: 0; /* Removed margin-bottom */
     }
+    .card-label .material-icons {
+        font-size: 18px; /* Icon size */
+        color: var(--primary-color); /* Icon color */
+    }
+    /* MODIFIED: card-value is now right-aligned and takes up remaining space */
     .card-value {
         font-size: 1rem;
         font-weight: bold;
@@ -396,9 +407,11 @@
         align-items: center;
         gap: 5px;
         min-height: 20px;
+        text-align: right; /* Ensure text aligns right if it wraps */
     }
     .card-value b {
         color: var(--secondary-color);
+        font-size: 1.2rem; /* Make price stand out more */
     }
     
     /* This rule is ALWAYS active: It hides any card you don't want seen in the 'revealed' state */
@@ -430,7 +443,11 @@
     
     /* Show the price card */
     .summary-card-fieldset:not(.revealed) .summary-card.large-price {
-        display: flex;
+        /* CRITICAL MODIFICATION: Re-enable the flex properties for the price card */
+        display: flex; 
+        flex-direction: row; 
+        justify-content: space-between;
+        align-items: center;
     }
 
     /* ...and show its value */
@@ -447,7 +464,11 @@
 
     /* Show all OTHER cards (that don't have .large-price or .hidden-detail) */
     .summary-card-fieldset.revealed .summary-card:not(.large-price) {
-        display: flex;
+        /* CRITICAL MODIFICATION: Re-enable the flex properties for the revealed cards */
+        display: flex; 
+        flex-direction: row; 
+        justify-content: space-between;
+        align-items: center;
     }
     
     /* ...and show their values */
@@ -839,7 +860,7 @@
                 Trip Summary
                 <span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span>
             </legend>
-            </fieldset>
+             </fieldset>
 
           <div class="summary-actions-row">
             <div class="button-wrapper">
@@ -1363,35 +1384,37 @@
         }
         
         // ==================================================================
-        // JAVASCRIPT EDIT: Removed Mode, Phone, Distance, and Hub cards
+        // JAVASCRIPT EDIT: APPLIED THE REQUESTED ICON CHANGES
+        // The 'From' icon changed from 'directions_walk' to 'place'.
+        // The 'Final Price' icon is confirmed as 'payments' (money icon).
         // ==================================================================
         const cardHTML = `
           <div class="summary-card full-width">
-              <span class="card-label">From:</span>
+              <span class="card-label"><span class="material-icons">place</span>From:</span>
               <span class="card-value">
                   <span class="hidden-value">${origin}</span>
               </span>
           </div>
           <div class="summary-card full-width">
-              <span class="card-label">To:</span>
+              <span class="card-label"><span class="material-icons">flag</span>To:</span>
               <span class="card-value">
                   <span class="hidden-value">${destination}</span>
               </span>
           </div>
           <div class="summary-card">
-              <span class="card-label">Trip Distance (km):</span>
+              <span class="card-label"><span class="material-icons">route</span>Trip Dist (km):</span>
               <span class="card-value">
                   <span class="hidden-value">${tripDistance.toFixed(2)} km</span>
               </span>
           </div>
           <div class="summary-card">
-              <span class="card-label">Est. Time:</span>
+              <span class="card-label"><span class="material-icons">schedule</span>Est. Time:</span>
               <span class="card-value">
                   <span class="hidden-value">${timeText}</span>
               </span>
           </div>
           <div class="summary-card full-width large-price">
-              <span class="card-label">Final Price:</span>
+              <span class="card-label"><span class="material-icons">payments</span>Final Price:</span>
               <span class="card-value">
                   <span class="hidden-value"><b>K${price}</b></span>
               </span>
