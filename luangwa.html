@@ -22,45 +22,157 @@
 <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
 <link rel="apple-touch-icon" href="lfr.jpg">
   <style>
+    /* Global Reset and Variables */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #ff9900;
+      --success-color: #1aaf5d;
+      --whatsapp-color: #25d366;
+      --fail-color: #dc2626;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --bg-color-input: #f5f7fa;
+      --border-color-light: #ccc;
+      --border-color-blue: #2563eb;
+      --box-shadow-light: 0 2px 5px rgba(0,0,0,0.1);
+      --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
+      --font-color-dark: #333;
+      --font-color-medium: #2d3a4a;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+    
     /* ------------------------------------------------ */
-    /* NEW MENU BUTTON STYLES */
+    /* === HEADER REDESIGN FOR MOBILE START === */
     /* ------------------------------------------------ */
+    header {
+      background: var(--font-color-dark); 
+      color: white; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 100%; /* Ensure it spans full width */
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-content { 
+      max-width: 1200px; 
+      margin: auto; 
+      padding: 8px 15px; /* Reduced padding for small screens */
+      display: flex; 
+      /* flex-wrap: wrap; REMOVED: Force elements on one line for a clean header */
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 10px; 
+    }
+    .company-info { 
+      /* Logo/Name Area - Allow it to take up most of the left space */
+      flex: 1 1 auto; 
+      min-width: 0; /* Prevents overflow issues */
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center;
+      line-height: 1.2; /* Tighten up line spacing */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .company-info h2 { 
+      font-size: 1.3rem; /* Slightly smaller for mobile */
+      color: var(--secondary-color); 
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .company-info ul { 
+      list-style: none; 
+      margin-top: 2px; 
+      font-size: 0.8rem; /* Smaller text for location detail */
+    }
+    .company-info li { 
+      margin-bottom: 0; 
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Container for price tag and menu button - ensures they stick together on the right */
+    .header-actions {
+      display: flex; 
+      align-items: center; 
+      gap: 5px; /* Reduced gap between price tag and menu button */
+      flex-shrink: 0; /* Prevents shrinking */
+    }
+    
+    .price-tag {
+      font-size: 0.9rem; /* Smaller price tag on mobile */
+      font-weight: bold; 
+      background: #e67e22;
+      padding: 4px 8px; /* Smaller padding */
+      border-radius: 4px; 
+      color: white;
+      white-space: nowrap; /* Keep the text on one line */
+      flex-shrink: 0;
+    }
+
+    /* Menu Button Positioning */
     .menu-dropdown-container {
         position: relative;
-        /* FIX: Ensure it is absolutely positioned relative to the header-content */
-        /* REMOVED: display: flex; align-items: center; margin-left: auto; */
+        display: flex;
+        align-items: center;
+        /* margin-left: auto; REMOVED as it's now contained in header-actions */
+        flex-shrink: 0;
     }
     .menu-button {
-        /* CHANGED: Styling for three-dot menu */
-        background: none; /* Make it transparent */
+        background: none; 
         color: white;
         border: none;
-        padding: 5px 8px; /* Smaller padding */
-        border-radius: 50%; /* Make it round */
-        font-size: 1.5rem; /* Larger icon size for three dots */
+        padding: 5px; /* Minimal padding for three dots icon */
+        border-radius: 50%; 
+        font-size: 1.3rem; /* Small icon size */
         cursor: pointer;
         display: flex;
         align-items: center;
         transition: background 0.2s;
-        /* FIX: Ensures the button itself is vertically centered if the actions container is slightly taller */
-        align-self: center;
+        line-height: 1; /* Essential for vertical centering */
     }
-    .menu-button:hover {
-        background: rgba(255, 255, 255, 0.2); /* Subtle hover effect */
-    }
+    
+    /* Dropdown position: CRUCIAL for top-right corner placement */
     .menu-dropdown {
         position: absolute;
         top: 100%; /* Position below the button */
-        right: 0;
+        right: 0; /* Aligns to the right edge of the header */
         background: var(--bg-color-card);
         border: 1px solid var(--border-color-light);
         border-radius: 5px;
         box-shadow: var(--box-shadow-strong);
-        z-index: 200; /* Above other content */
-        min-width: 250px; /* Increased size to fit 'About' content */
-        max-width: 300px;
-        display: none; /* Hidden by default */
-        padding: 10px; /* Added padding */
+        z-index: 200; 
+        min-width: 250px; 
+        display: none; 
+        padding: 10px; 
+    }
+    
+    /* Media Query for Larger Screens (Optional, but good practice) */
+    @media (min-width: 768px) {
+        .header-content {
+            padding: 10px 20px; /* Restore desktop padding */
+        }
+        .company-info h2 { 
+            font-size: 1.4rem; 
+        }
+        .price-tag {
+            font-size: 1.1rem; 
+            padding: 6px 12px;
+        }
+        .menu-button {
+            font-size: 1.5rem;
+            padding: 5px 8px;
+        }
+    }
+    /* ------------------------------------------------ */
+    /* === HEADER REDESIGN FOR MOBILE END === */
+    /* ------------------------------------------------ */
+
+    /* The rest of the original CSS follows... (unchanged) */
+    .menu-button:hover {
+        background: rgba(255, 255, 255, 0.2); 
     }
     
     /* NEW STYLING FOR CONTENT INSIDE THE DROPDOWN */
@@ -93,7 +205,7 @@
     .menu-dropdown a, .menu-dropdown button {
         display: block;
         width: 100%;
-        padding: 10px 10px; /* Increased padding for better click area */
+        padding: 10px 10px; 
         text-align: left;
         text-decoration: none;
         color: var(--font-color-dark);
@@ -101,14 +213,14 @@
         border: none;
         cursor: pointer;
         transition: background-color 0.2s;
-        font-size: 1rem; /* Slightly larger font */
+        font-size: 1rem; 
         display: flex;
         align-items: center;
-        gap: 12px; /* Increased gap between icon and text */
-        border-radius: 4px; /* Slight rounding for a cleaner look */
+        gap: 12px; 
+        border-radius: 4px; 
     }
     .menu-dropdown a:hover, .menu-dropdown button:hover {
-        background-color: var(--bg-color-input); /* Use the subtle background color for hover */
+        background-color: var(--bg-color-input); 
     }
 
     /* Icon Styling */
@@ -135,10 +247,10 @@
     
     /* Targetting a single, professional link in the 'About' section */
     .menu-dropdown .about-info-link {
-        font-weight: bold; /* Make the link stand out more */
-        text-align: center; /* Center text if needed */
-        margin: 5px 0 10px 0; /* Add margin */
-        justify-content: center; /* Center content */
+        font-weight: bold; 
+        text-align: center; 
+        margin: 5px 0 10px 0; 
+        justify-content: center; 
         color: var(--primary-color);
     }
     .menu-dropdown .about-info-link:hover {
@@ -160,97 +272,9 @@
     /* FOOTER REMOVAL */
     /* ------------------------------------------------ */
     footer {
-        display: none; /* Hides the entire footer */
+        display: none; 
     }
     
-    /* ... (rest of the original CSS - unchanged) ... */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --primary-color: #2563eb;
-      --secondary-color: #ff9900;
-      --success-color: #1aaf5d;
-      --whatsapp-color: #25d366;
-      --fail-color: #dc2626;
-      --bg-color-body: #f5f5f5;
-      --bg-color-card: #ffffff;
-      --bg-color-input: #f5f7fa;
-      --border-color-light: #ccc;
-      --border-color-blue: #2563eb;
-      --box-shadow-light: 0 2px 5px rgba(0,0,0,0.1);
-      --box-shadow-strong: 0 4px 8px rgba(0, 0, 0, 0.2);
-      --font-color-dark: #333;
-      --font-color-medium: #2d3a4a;
-    }
-    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
-    
-    /* === ALIGNMENT FIX START === */
-    header {
-      background: var(--font-color-dark); 
-      color: white; 
-      /* Removed padding from header */
-      text-align: left;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .header-content { 
-      max-width: 1200px; 
-      margin: auto; 
-      padding: 10px 20px; /* Reduced vertical padding for better alignment */
-      display: flex; 
-      /* FIX: Ensures elements wrap cleanly on small screens */
-      flex-wrap: wrap; 
-      justify-content: space-between; 
-      align-items: center; /* Ensures vertical alignment */
-      gap: 10px; /* Reduced gap */
-    }
-    .company-info { 
-      /* This is the logo/name area */
-      flex: 1 1 auto; /* Allow it to grow, but not consume excessive space */
-      display: flex; /* Make it a flex container */
-      flex-direction: column; /* Stack h2 and ul */
-      justify-content: center;
-      /* FIX: Ensure it occupies space and wraps before the price/menu */
-      min-width: 200px;
-    }
-    .company-info h2 { 
-      font-size: 1.4rem; 
-      color: var(--secondary-color); 
-      /* Reduced margin/padding if needed, keeping it as is for now */
-    }
-    .company-info ul { 
-      list-style: none; 
-      margin-top: 2px; /* Reduced margin */
-    }
-    .company-info li { 
-      margin-bottom: 0; 
-      font-size: 0.9rem; /* Slightly smaller font */
-    }
-    
-    /* Container for price tag and menu button */
-    .header-actions {
-      display: flex; 
-      align-items: center; 
-      gap: 10px;
-      /* FIX: Prevents wrapping before company-info on very small screens */
-      flex-shrink: 0; 
-      /* FIX: This is key for top-right alignment */
-      margin-left: auto;
-    }
-    
-    .price-tag {
-      font-size: 1.1rem; /* Slightly smaller price tag */
-      font-weight: bold; 
-      background: #e67e22;
-      padding: 6px 12px; /* Smaller padding */
-      border-radius: 5px; 
-      color: white;
-    }
-    
-    .menu-button {
-        /* Ensure the menu button aligns with the price tag */
-        align-self: center;
-    }
-    /* === ALIGNMENT FIX END === */
-
     .product-container {
       max-width: 1200px; margin: 30px auto; padding: 0 20px;
       display: flex; flex-wrap: wrap; gap: 30px;
@@ -382,7 +406,6 @@
         font-size: 0.95rem;
         padding: 0 5px;
         margin-bottom: 5px;
-        /* MODIFICATION: Align items for the eye button */
         display: flex;
         align-items: center;
         gap: 5px;
@@ -392,34 +415,32 @@
         border: 1px solid #e0e0e0;
         border-radius: 6px;
         padding: 10px;
-        flex: 1 1 calc(50% - 15px); /* Two columns on small screens, adjusts larger */
+        flex: 1 1 calc(50% - 15px); 
         min-width: 140px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         
-        /* === CRITICAL MODIFICATION FOR ALIGNMENT === */
         display: flex; 
-        flex-direction: row; /* Ensure label and value are on the same line */
-        justify-content: space-between; /* Pushes content to opposite ends */
-        align-items: center; /* Vertically centers the content */
-        /* === END CRITICAL MODIFICATION === */
+        flex-direction: row; 
+        justify-content: space-between; 
+        align-items: center; 
     }
     .summary-card.full-width {
         flex: 1 1 100%;
     }
-    /* MODIFIED: The card-label now contains the label text and icon (if any) and is left-aligned */
+    
     .card-label {
-        font-size: 0.9rem; /* Slightly larger for better readability */
+        font-size: 0.9rem; 
         color: var(--font-color-medium);
         display: flex;
         align-items: center;
-        gap: 6px; /* Increased gap for icon-label separation */
-        margin-bottom: 0; /* Removed margin-bottom */
+        gap: 6px; 
+        margin-bottom: 0; 
     }
     .card-label .material-icons {
-        font-size: 18px; /* Icon size */
-        color: var(--primary-color); /* Icon color */
+        font-size: 18px; 
+        color: var(--primary-color); 
     }
-    /* MODIFIED: card-value is now right-aligned and takes up remaining space */
+    
     .card-value {
         font-size: 1rem;
         font-weight: bold;
@@ -428,28 +449,25 @@
         align-items: center;
         gap: 5px;
         min-height: 20px;
-        text-align: right; /* Ensure text aligns right if it wraps */
+        text-align: right; 
     }
     .card-value b {
         color: var(--secondary-color);
-        font-size: 1.2rem; /* Make price stand out more */
+        font-size: 1.2rem; 
     }
     
-    /* This rule is ALWAYS active: It hides any card you don't want seen in the 'revealed' state */
     .summary-card.hidden-detail {
         display: none;
     }
     
     /* ------------------------------------------------ */
-    /* MODIFIED EYE/HIDING STYLES (Per User Request) */
+    /* MODIFIED EYE/HIDING STYLES */
     /* ------------------------------------------------ */
     
-    /* The individual eye button in the card is now HIDDEN */
     .summary-card .eye-btn {
       display: none !important;
     }
 
-    /* By default, all hidden values are hidden */
     .hidden-value {
       display: none;
       color: green;
@@ -464,7 +482,6 @@
     
     /* Show the price card */
     .summary-card-fieldset:not(.revealed) .summary-card.large-price {
-        /* CRITICAL MODIFICATION: Re-enable the flex properties for the price card */
         display: flex; 
         flex-direction: row; 
         justify-content: space-between;
@@ -485,7 +502,6 @@
 
     /* Show all OTHER cards (that don't have .large-price or .hidden-detail) */
     .summary-card-fieldset.revealed .summary-card:not(.large-price) {
-        /* CRITICAL MODIFICATION: Re-enable the flex properties for the revealed cards */
         display: flex; 
         flex-direction: row; 
         justify-content: space-between;
@@ -503,16 +519,11 @@
       font-size: 20px;
       color: var(--primary-color);
       transition: color 0.2s ease;
-      /* MODIFIED: Removed margin-left: 5px; as it is now inside legend */
     }
     #master-reveal-btn:hover {
         color: var(--secondary-color);
     }
     
-    /* Old table styles removed/not used */
-    /* ------------------------------------------------ */
-
-
     .summary-actions-row {
       display: flex; gap: 15px; justify-content: center; margin: 10px 0; align-items: center;
       flex-wrap: wrap;
@@ -523,7 +534,7 @@
     .button-label {
       font-size: 0.95rem; color: var(--font-color-dark); font-weight: 500;
     }
-    .fa, .fas { /* ADDED .fas HERE TO TARGET FONT AWESOME 6 ICONS */
+    .fa, .fas { 
       padding: 10px;
       font-size: 24px;
       width: 44px;
@@ -543,7 +554,6 @@
     .fa-paper-plane, .fas.fa-paper-plane { 
         background: var(--primary-color); 
     }
-    /* ************************************************************************************************* */
 
     .submit-btn:hover { background: #174ea6; }
     .submit-btn[disabled] {
@@ -555,7 +565,7 @@
     .calculation-status-wrapper {
         text-align: center;
         padding: 15px;
-        min-height: 80px; /* Ensure space even when empty */
+        min-height: 80px; 
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -594,7 +604,6 @@
     .material-icons { font-size: 20px; vertical-align: middle; }
     
     .eye-btn {
-      /* This rule is now effectively for the master button only, the others are hidden */
       cursor: pointer;
       font-size: 18px;
     }
@@ -735,13 +744,11 @@
         padding-bottom: 15px;
     }
     .footer-actions {
-        display: none; /* Hidden */
+        display: none; 
     }
     .footer-btn {
-        display: none; /* Hidden */
+        display: none; 
     }
-
-    /* REMOVED: .about-dropdown { ... } as content is now inside .menu-dropdown */
   </style>
 </head>
 <body>
@@ -924,7 +931,7 @@
                                
     
     // ===========================================
-    // Data for Luangwa Town Routes
+    // Data for Luangwa Town Routes (UNCHANGED)
     // ===========================================
     const places = [
       "Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic",
@@ -1190,25 +1197,20 @@
     const maskedOrigin = document.getElementById('masked-origin');
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
-    // REMOVED: const mainFooter = document.getElementById('main-footer'); 
-    // RENAMED: const aboutBtn = document.getElementById('about-btn'); to aboutMenuBtn
-    // REMOVED: const aboutInfo = document.getElementById('about-info'); // THIS IS REMOVED
-    const masterRevealBtn = document.getElementById('master-reveal-btn'); // NEW Master Button
+    const masterRevealBtn = document.getElementById('master-reveal-btn'); 
     // NEW: Review/Verify message element
     const reviewInfoMessage = document.getElementById('review-info-message'); 
     
     // NEW: Menu button elements
     const menuToggleBtn = document.getElementById('menu-toggle-btn');
     const headerMenuDropdown = document.getElementById('header-menu-dropdown');
-    // REMOVED: const aboutMenuBtn = document.getElementById('about-menu-btn');
-    // REMOVED: const editTripBtn = document.getElementById('edit-trip-btn'); 
     
 
     let summaryData = null; 
     let selectedOrigin = '';
     let selectedDestination = '';
     
-    // Function to attach live autocomplete filtering
+    // Function to attach live autocomplete filtering (UNCHANGED)
     function setupAutocomplete(inputId, listId, inputElement) {
         const input = inputElement;
         const list = document.getElementById(listId);
@@ -1297,13 +1299,12 @@
           parentGroup.classList.remove('valid');
 
           // Reset everything below the phone number
-          summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>'; // MODIFIED
+          summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>'; 
           submitBtn.setAttribute('disabled', 'true');
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
           summaryTableSection.classList.add('hidden-section');
-          reviewInfoMessage.style.display = 'none'; // **ADDED**
-          // REMOVED: mainFooter.style.display = 'none'; 
+          reviewInfoMessage.style.display = 'none'; 
       }
     }
     
@@ -1336,8 +1337,7 @@
       summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>';
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
-      reviewInfoMessage.style.display = 'none'; // **ADDED**
-      // REMOVED: mainFooter.style.display = 'none'; 
+      reviewInfoMessage.style.display = 'none'; 
       
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
@@ -1416,8 +1416,6 @@
         
         // ==================================================================
         // JAVASCRIPT EDIT: APPLIED THE REQUESTED ICON CHANGES
-        // The 'From' icon changed from 'directions_walk' to 'place'.
-        // The 'Final Price' icon is confirmed as 'payments' (money icon).
         // ==================================================================
         const cardHTML = `
           <div class="summary-card full-width">
@@ -1483,7 +1481,7 @@
 
         // **UPDATED STATUS MESSAGE**
         displayStatus(`Trip information calculated via ${nearestHub}.`, 'success');
-        reviewInfoMessage.style.display = 'block'; // **ADDED**
+        reviewInfoMessage.style.display = 'block'; 
         
         submitBtn.removeAttribute('disabled'); 
 
@@ -1511,7 +1509,7 @@
         "from": summaryData.from,
         "to": summaryData.to,
         "tripDistance": summaryData.tripDistance, 
-        "distance": summaryData.totalDistance, 
+        "totalDistance": summaryData.totalDistance, 
         "estimatedTime": summaryData.estimatedTime,
         "price": summaryData.price,
         "timestamp": timestamp
@@ -1521,7 +1519,7 @@
       displayStatus('Submitting...', 'info');
       loader.style.display = 'block';
       submitBtn.setAttribute('disabled', 'true');
-      reviewInfoMessage.style.display = 'none'; // **ADDED**
+      reviewInfoMessage.style.display = 'none'; 
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         body: formBody,
@@ -1534,7 +1532,6 @@
          if (response.status >= 200 && response.status < 300) { 
             displayStatus('Booking request sent successfully! You will be contacted shortly.', 'success');
             submitBtn.removeAttribute('disabled');
-            // REMOVED: mainFooter.style.display = 'block'; 
         } else {
              throw new Error(`Server responded with status ${response.status}`);
         }
@@ -1544,7 +1541,6 @@
         submitBtn.removeAttribute('disabled');
         displayStatus('Submission failed. Please try again.', 'failed');
         console.error('Submission error:', error);
-        // REMOVED: mainFooter.style.display = 'none'; 
       });
     }
     
@@ -1569,9 +1565,8 @@
             summaryTableSection.classList.add('hidden-section');
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
-            reviewInfoMessage.style.display = 'none'; // **ADDED**
-            // REMOVED: mainFooter.style.display = 'none'; 
-            calculationSpinner.style.display = 'none'; // Ensure spinner is off
+            reviewInfoMessage.style.display = 'none'; 
+            calculationSpinner.style.display = 'none'; 
         }
     }
     
@@ -1581,12 +1576,9 @@
         headerMenuDropdown.style.display = headerMenuDropdown.style.display === 'block' ? 'none' : 'block';
     }
     
-    // REMOVED: Edit Trip Functionality (No longer needed)
-
 
     document.addEventListener('DOMContentLoaded', () => {
       submitBtn.setAttribute('disabled', 'true'); 
-      // REMOVED: mainFooter.style.display = 'none'; 
       
       setupAutocomplete("gm-origin", "originList", originInput);
       setupAutocomplete("gm-destination", "destinationList", destinationInput);
@@ -1609,8 +1601,10 @@
       });
       
       // MODIFIED: Attach listener to the master button on DOMContentLoaded
-      // It's already in the initial HTML, so this is fine.
-      masterRevealBtn.addEventListener('click', toggleSummaryVisibility); 
+      const newMasterRevealBtn = document.getElementById('master-reveal-btn');
+      if (newMasterRevealBtn) {
+          newMasterRevealBtn.addEventListener('click', toggleSummaryVisibility); 
+      }
     });
     
     // Reset validation for masked values
