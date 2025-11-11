@@ -395,10 +395,6 @@
         padding: 10px;
         margin-top: 10px;
         background: #f9fbfd;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: space-around;
     }
     .summary-card-fieldset legend {
         font-weight: bold;
@@ -410,6 +406,48 @@
         align-items: center;
         gap: 5px;
     }
+
+    /* Styles for the nested card containers */
+    #price-card-wrapper, #other-details-wrapper {
+        border: none; /* Remove border from nested fieldsets */
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-around;
+    }
+    
+    /* Style for the eye icon fieldset (the toggle control) */
+    #toggle-control-fieldset {
+        border: 1px solid var(--border-color-light);
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+        background: #e6f0ff; /* Light blue background for emphasis */
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background 0.2s;
+    }
+    #toggle-control-fieldset:hover {
+        background: #d9e7ff;
+    }
+    
+    #toggle-control-fieldset legend {
+        display: none; /* Hide the legend text for a cleaner button look */
+    }
+    
+    #toggle-control-fieldset .toggle-label {
+        font-weight: bold;
+        color: var(--primary-color);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
     .summary-card {
         background: white;
         border: 1px solid #e0e0e0;
@@ -464,55 +502,19 @@
     /* MODIFIED EYE/HIDING STYLES */
     /* ------------------------------------------------ */
     
-    .summary-card .eye-btn {
-      display: none !important;
-    }
-
-    .hidden-value {
-      display: none;
-      color: green;
-      font-weight: bold;
-    }
-
-    /* --- STATE 1: DEFAULT (NOT REVEALED) --- */
-    /* Hide all cards EXCEPT the price card */
-    .summary-card-fieldset:not(.revealed) .summary-card:not(.large-price) {
-        display: none;
-    }
-    
-    /* Show the price card */
-    .summary-card-fieldset:not(.revealed) .summary-card.large-price {
-        display: flex; 
-        flex-direction: row; 
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    /* ...and show its value */
-    .summary-card-fieldset:not(.revealed) .summary-card.large-price .hidden-value {
-        display: inline;
-    }
-    
-    /* --- STATE 2: REVEALED (EYE CLICKED) --- */
-    
-    /* Hide the price card */
-    .summary-card-fieldset.revealed .summary-card.large-price {
+    /* Initial state: Price card wrapper is shown, other details are hidden */
+    #other-details-wrapper {
         display: none;
     }
 
-    /* Show all OTHER cards (that don't have .large-price or .hidden-detail) */
-    .summary-card-fieldset.revealed .summary-card:not(.large-price) {
-        display: flex; 
-        flex-direction: row; 
-        justify-content: space-between;
-        align-items: center;
+    /* State when the master eye is active (showing other details) */
+    .revealed-details #price-card-wrapper {
+        display: none;
+    }
+    .revealed-details #other-details-wrapper {
+        display: flex; /* Show the other cards */
     }
     
-    /* ...and show their values */
-    .summary-card-fieldset.revealed .summary-card:not(.large-price) .hidden-value {
-        display: inline;
-    }
-
     /* The master eye button in the header */
     #master-reveal-btn {
       cursor: pointer;
@@ -894,9 +896,22 @@
           <fieldset class="summary-card-fieldset" id="summary-card-fieldset">
             <legend>
                 Trip Summary
+                </legend>
+            
+            <fieldset id="price-card-wrapper">
+                </fieldset>
+
+            <fieldset id="other-details-wrapper">
+                </fieldset>
+
+            <fieldset id="toggle-control-fieldset" onclick="toggleSummaryVisibility(event)">
+                <div class="toggle-label">
+                    <span id="toggle-text">View Details</span>
+                </div>
                 <span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span>
-            </legend>
-             </fieldset>
+            </fieldset>
+
+          </fieldset>
 
           <div class="summary-actions-row">
             <div class="button-wrapper">
@@ -1188,8 +1203,13 @@
     const modeMotorbikeRadio = document.getElementById('mode-motorbike');
     const modeSelectionGroup = document.getElementById('mode-selection-group'); 
     const summaryTableSection = document.querySelector('.summary-table-section');
-    // MODIFIED: Using the new fieldset ID
+    // MODIFIED: References for new nested fieldsets
     const summaryCardFieldset = document.getElementById('summary-card-fieldset'); 
+    const priceCardWrapper = document.getElementById('price-card-wrapper'); 
+    const otherDetailsWrapper = document.getElementById('other-details-wrapper'); 
+    const toggleControlFieldset = document.getElementById('toggle-control-fieldset');
+    const toggleText = document.getElementById('toggle-text');
+    
     const submitBtn = document.getElementById('submit-btn');
     const submitStatusDiv = document.getElementById('submit-status');
     const loader = document.getElementById('loader');
@@ -1300,7 +1320,8 @@
           parentGroup.classList.remove('valid');
 
           // Reset everything below the phone number
-          summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>'; 
+          priceCardWrapper.innerHTML = ''; 
+          otherDetailsWrapper.innerHTML = '';
           submitBtn.setAttribute('disabled', 'true');
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
@@ -1310,19 +1331,25 @@
     }
     
     // MODIFIED: New function to toggle visibility of all summary data
-    function toggleSummaryVisibility() {
+    function toggleSummaryVisibility(event) {
+        // Prevent click from propagating if it's on the eye button itself
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
         if (!summaryData) return;
         
-        const isRevealed = summaryCardFieldset.classList.contains('revealed');
+        const isRevealed = summaryCardFieldset.classList.toggle('revealed-details');
         
         if (isRevealed) {
-            // Hide/Mask the details
-            summaryCardFieldset.classList.remove('revealed');
-            masterRevealBtn.textContent = 'visibility'; // Icon for visible/unmask
+            // Revealed: Show details, hide price
+            masterRevealBtn.textContent = 'visibility_off'; 
+            toggleText.textContent = 'View Price';
         } else {
-            // Reveal/Unmask the details
-            summaryCardFieldset.classList.add('revealed');
-            masterRevealBtn.textContent = 'visibility_off'; // Icon for hidden/mask
+            // Hidden: Show price, hide details
+            masterRevealBtn.textContent = 'visibility'; 
+            toggleText.textContent = 'View Details';
         }
     }
     
@@ -1334,8 +1361,13 @@
       const isVehicleSelected = modeVehicleRadio.checked;
       const isMotorbikeSelected = modeMotorbikeRadio.checked; 
       
-      // MODIFIED: Reset the fieldset content *with* the eye button
-      summaryCardFieldset.innerHTML = '<legend>Trip Summary<span id="master-reveal-btn" class="material-icons eye-btn" title="Review/Hide Details">visibility</span></legend>';
+      // MODIFIED: Reset the nested fieldset content
+      priceCardWrapper.innerHTML = ''; 
+      otherDetailsWrapper.innerHTML = '';
+      summaryCardFieldset.classList.remove('revealed-details'); // Reset to default view (price card)
+      masterRevealBtn.textContent = 'visibility';
+      toggleText.textContent = 'View Details';
+      
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
       reviewInfoMessage.style.display = 'none'; 
@@ -1416,46 +1448,53 @@
         }
         
         // ==================================================================
-        // JAVASCRIPT EDIT: APPLIED THE REQUESTED ICON CHANGES
+        // JAVASCRIPT EDIT: POPULATING THE NESTED FIELDSETS
         // ==================================================================
-        const cardHTML = `
-          <div class="summary-card full-width">
-              <span class="card-label"><span class="material-icons">place</span>From:</span>
-              <span class="card-value">
-                  <span class="hidden-value">${origin}</span>
-              </span>
-          </div>
-          <div class="summary-card full-width">
-              <span class="card-label"><span class="material-icons">flag</span>To:</span>
-              <span class="card-value">
-                  <span class="hidden-value">${destination}</span>
-              </span>
-          </div>
-          <div class="summary-card">
-              <span class="card-label"><span class="material-icons">route</span>Trip Dist:</span>
-              <span class="card-value">
-                  <span class="hidden-value">${tripDistance.toFixed(2)} km</span>
-              </span>
-          </div>
-          <div class="summary-card">
-              <span class="card-label"><span class="material-icons">schedule</span>Time:</span>
-              <span class="card-value">
-                  <span class="hidden-value">${timeText}</span>
-              </span>
-          </div>
-          <div class="summary-card full-width large-price">
-              <span class="card-label"><span class="material-icons">payments</span>Price:</span>
-              <span class="card-value">
-                  <span class="hidden-value"><b>K${price}</b></span>
-              </span>
-          </div>
+        
+        const priceCardHTML = `
+            <div class="summary-card full-width large-price">
+                <span class="card-label"><span class="material-icons">payments</span>Price:</span>
+                <span class="card-value">
+                    <span class="hidden-value"><b>K${price}</b></span>
+                </span>
+            </div>
         `;
+        
+        // Note: The hidden-detail card remains hidden per the original request
+        const otherCardsHTML = `
+            <div class="summary-card full-width">
+                <span class="card-label"><span class="material-icons">place</span>From:</span>
+                <span class="card-value">
+                    <span class="hidden-value">${origin}</span>
+                </span>
+            </div>
+            <div class="summary-card full-width">
+                <span class="card-label"><span class="material-icons">flag</span>To:</span>
+                <span class="card-value">
+                    <span class="hidden-value">${destination}</span>
+                </span>
+            </div>
+            <div class="summary-card">
+                <span class="card-label"><span class="material-icons">route</span>Trip Dist:</span>
+                <span class="card-value">
+                    <span class="hidden-value">${tripDistance.toFixed(2)} km</span>
+                </span>
+            </div>
+            <div class="summary-card">
+                <span class="card-label"><span class="material-icons">schedule</span>Time:</span>
+                <span class="card-value">
+                    <span class="hidden-value">${timeText}</span>
+                </span>
+            </div>
+        `;
+
+        priceCardWrapper.innerHTML = priceCardHTML;
+        otherDetailsWrapper.innerHTML = otherCardsHTML;
+        
         // ==================================================================
         // END OF JAVASCRIPT EDIT
         // ==================================================================
 
-        
-        summaryCardFieldset.innerHTML += cardHTML; // MODIFIED
         
         summaryData = {
           preferredMode: mode,
@@ -1470,15 +1509,11 @@
         };
         summaryTableSection.classList.remove('hidden-section');
         
-        // Default to hidden state when calculated
-        summaryCardFieldset.classList.remove('revealed');
-        // RE-ATTACH LISTENER TO THE NEWLY CREATED MASTER BUTTON
-        const newMasterRevealBtn = document.getElementById('master-reveal-btn');
-        if (newMasterRevealBtn) {
-            newMasterRevealBtn.textContent = 'visibility';
-            newMasterRevealBtn.removeEventListener('click', toggleSummaryVisibility);
-            newMasterRevealBtn.addEventListener('click', toggleSummaryVisibility);
-        }
+        // Default state is price card shown, details hidden
+        summaryCardFieldset.classList.remove('revealed-details');
+        masterRevealBtn.textContent = 'visibility';
+        toggleText.textContent = 'View Details';
+
 
         // **UPDATED STATUS MESSAGE**
         displayStatus(`Trip information calculated via ${nearestHub}.`, 'success');
@@ -1601,11 +1636,9 @@
           }
       });
       
-      // MODIFIED: Attach listener to the master button on DOMContentLoaded
-      const newMasterRevealBtn = document.getElementById('master-reveal-btn');
-      if (newMasterRevealBtn) {
-          newMasterRevealBtn.addEventListener('click', toggleSummaryVisibility); 
-      }
+      // **REMOVED** the event listener attachment here as it is now attached via inline onclick="toggleSummaryVisibility(event)"
+      // This is necessary because the target element (toggle-control-fieldset) is always present in the DOM.
+      
     });
     
     // Reset validation for masked values
