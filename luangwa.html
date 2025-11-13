@@ -568,7 +568,7 @@
       cursor: not-allowed;
     }
     
-    /* Calculation Status Wrapper */
+    /* Calculation Status Wrapper - now contains the status message AND the new tooltip container */
     .calculation-status-wrapper {
         text-align: center;
         padding: 15px;
@@ -577,8 +577,65 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        position: relative; /* Crucial for the tooltip position */
     }
     
+    /* Tooltip Container Styles (NEW) */
+    #info-tooltip-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 10px;
+        /* visibility: hidden; REMOVED to allow smooth transition */
+    }
+
+    /* Tooltip Icon (NEW) */
+    #info-tooltip-icon {
+        cursor: pointer;
+        color: var(--primary-color);
+        font-size: 22px;
+        transition: color 0.2s ease;
+        padding: 5px;
+        border-radius: 50%;
+    }
+    #info-tooltip-icon:hover {
+        background-color: #e0e0e0;
+        color: var(--secondary-color);
+    }
+    
+    /* MODIFICATION FOR HOVER-TRIGGERED TOOLTIP */
+    /* Hide the content by default (invisible, 0 opacity, and slightly offset down) */
+    #info-tooltip-content {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        top: 100%; /* Position below the icon */
+        left: 50%;
+        transform: translateX(-50%) translateY(5px); /* Initial small offset for slide-up effect */
+        min-width: 250px;
+        background-color: var(--font-color-dark);
+        color: white;
+        text-align: center;
+        border-radius: 6px;
+        padding: 10px;
+        z-index: 10;
+        box-shadow: var(--box-shadow-strong);
+        /* Fade-in and Slide-up Effect */
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; 
+        font-size: 0.85rem;
+        font-style: italic;
+        line-height: 1.3;
+        pointer-events: none; /* Allows clicks to pass through if necessary */
+    }
+
+    /* Show the tooltip content on hover of the icon container */
+    #info-tooltip-container:hover #info-tooltip-content {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0); /* Subtle lift on hover */
+    }
+    /* END MODIFICATION */
+
     /* General Loader (Used for both calculation and submission) */
     .loader {
       display: none; 
@@ -933,9 +990,11 @@
         
         <div class="calculation-status-wrapper" id="calculation-status-wrapper">
           <div id="submit-status" class="submit-status">Please fill in all details correctly.</div>
-          <p id="review-info-message" style="display: none; text-align: center; font-style: italic; font-size: 0.9rem; color: #4a5568; margin-top: 10px;">
-              Review and verify all trip information 👁‍🗨
-          </p>
+          
+          <div id="info-tooltip-container" style="visibility: hidden;">
+            <i id="info-tooltip-icon" class="material-icons">info_outline</i>
+            <div id="info-tooltip-content"></div> 
+          </div>
           <div id="calculation-spinner" class="loader"></div>
         </div>
         <div id="loader" class="loader" style="margin-top: 0;"></div>
@@ -1144,6 +1203,7 @@
 
     // **MODIFIED: Logic to find the nearest hub and calculate total distance**
     function calculateTotalDistance(pickup, destination) {
+      if (pickup === destination) return { total: 0, trip: 0, hub: 'N/A' };
       if (!graph[pickup] || !graph[destination]) return { total: null, trip: null, hub: null };
 
       let nearestHub = null;
@@ -1229,8 +1289,11 @@
     const maskedDestination = document.getElementById('masked-destination');
     const tripDetails = document.getElementById('trip-details');
     const masterRevealBtn = document.getElementById('master-reveal-btn'); 
-    // NEW: Review/Verify message element
-    const reviewInfoMessage = document.getElementById('review-info-message'); 
+    
+    // NEW: Tooltip elements
+    const infoTooltipContainer = document.getElementById('info-tooltip-container');
+    const infoTooltipIcon = document.getElementById('info-tooltip-icon');
+    const infoTooltipContent = document.getElementById('info-tooltip-content');
     
     // NEW: Menu button elements
     const menuToggleBtn = document.getElementById('menu-toggle-btn');
@@ -1335,8 +1398,8 @@
           submitBtn.setAttribute('disabled', 'true');
           summaryData = null; 
           displayStatus('Please fill in all details correctly.', 'info');
-          summaryTableSection.classList.add('hidden-section');
-          reviewInfoMessage.style.display = 'none'; 
+          // MODIFICATION: Set visibility to hidden on reset
+          infoTooltipContainer.style.visibility = 'hidden'; 
       }
     }
     
@@ -1380,7 +1443,8 @@
       
       submitBtn.setAttribute('disabled', 'true');
       summaryData = null; 
-      reviewInfoMessage.style.display = 'none'; 
+      // MODIFICATION: Hide the tooltip on reset/pre-calculation
+      infoTooltipContainer.style.visibility = 'hidden'; 
       
       const isOriginValid = places.includes(origin);
       const isDestinationValid = places.includes(destination);
@@ -1428,6 +1492,8 @@
         const nearestHub = distanceObject.hub; // **Retrieve dynamic hub**
         
         if (totalDistance === null || isNaN(totalDistance) || tripDistance === null || isNaN(tripDistance)) {
+          // MODIFIED: Update tooltip content but keep it hidden until success
+          infoTooltipContent.textContent = '';
           displayStatus(`A valid route could not be calculated via any hub. Nearest Hub tried: ${nearestHub || 'N/A'}`, 'failed');
           return;
         }
@@ -1525,9 +1591,12 @@
         toggleText.textContent = 'View Details';
 
 
-        // **UPDATED STATUS MESSAGE**
-        displayStatus(`Trip information calculated via ${nearestHub}.`, 'success');
-        reviewInfoMessage.style.display = 'block'; 
+        // **MODIFIED STATUS MESSAGE: Set to empty string on success, which clears the status div**
+        displayStatus('', 'success');
+        
+        // MODIFIED: Show the tooltip icon and set content
+        infoTooltipContent.innerHTML = `Price calculated via nearest hub: <b>${nearestHub}</b>. <br>Review and verify all trip information 👁‍🗨`;
+        infoTooltipContainer.style.visibility = 'visible';
         
         submitBtn.removeAttribute('disabled'); 
 
@@ -1565,7 +1634,9 @@
       displayStatus('Submitting...', 'info');
       loader.style.display = 'block';
       submitBtn.setAttribute('disabled', 'true');
-      reviewInfoMessage.style.display = 'none'; 
+      // MODIFIED: Hide the tooltip on submission
+      infoTooltipContainer.style.visibility = 'hidden'; 
+
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         body: formBody,
@@ -1591,6 +1662,12 @@
     }
     
     function displayStatus(message, type) {
+      if (message === '') {
+        // Special case: clear the status message
+        submitStatusDiv.innerHTML = '';
+        submitStatusDiv.className = `submit-status ${type}`;
+        return;
+      }
       submitStatusDiv.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : type === 'failed' ? 'error' : 'info'}</span> ${message}`;
       submitStatusDiv.className = `submit-status ${type}`;
     }
@@ -1611,12 +1688,15 @@
             summaryTableSection.classList.add('hidden-section');
             submitBtn.setAttribute('disabled', 'true'); 
             displayStatus('Please fill in all details correctly.', 'info');
-            reviewInfoMessage.style.display = 'none'; 
+            // MODIFIED: Hide the tooltip on invalid phone
+            infoTooltipContainer.style.visibility = 'hidden'; 
             calculationSpinner.style.display = 'none'; 
         }
     }
     
-    // NEW: Menu toggle function
+    // MODIFIED: Removed the toggleInfoTooltip function and click listener as it is now CSS-driven (hover)
+
+    // NEW: Menu toggle function (UNCHANGED)
     function toggleMenuDropdown() {
         // Toggle the display of the menu dropdown
         headerMenuDropdown.style.display = headerMenuDropdown.style.display === 'block' ? 'none' : 'block';
@@ -1644,10 +1724,11 @@
           if (!isClickInsideMenuContainer) {
               headerMenuDropdown.style.display = 'none';
           }
+          
+          // No need to close the tooltip on outside click anymore, as it's hover-driven.
       });
       
-      // **REMOVED** the event listener attachment here as it is now attached via inline onclick="toggleSummaryVisibility(event)"
-      // This is necessary because the target element (toggle-control-fieldset) is always present in the DOM.
+      // NEW: Listener for the tooltip icon click - REMOVED as it's now CSS-driven
       
     });
     
