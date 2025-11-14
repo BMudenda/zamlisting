@@ -1013,8 +1013,8 @@
   motorbikeMinPrice: 10,
 
   // EXTRA ADD-ONS
-  vehicleExtra: 3.00,      // <--- Add this
-  motorbikeExtra: 1.02,    // <--- And this
+  vehicleExtra: 3.00,      // <--- Vehicle Extra Cost (Added to final price)
+  motorbikeExtra: 1.02,    // <--- Motorbike Extra Cost (Added to final price)
 
   avgSpeed: 60
 };
@@ -1508,18 +1508,22 @@
         const timeHours = totalDistance / config.avgSpeed;
         const wholeHours = Math.floor(timeHours);
         const minutes = Math.round((timeHours - wholeHours) * 60);
-        let price = 0;
+        let basePrice = 0;
+        let extraCost = 0;
         
-        // PRICING LOGIC applying the minimum cost
+        // PRICING LOGIC applying the minimum cost AND extra charge
         if (mode === 'Vehicle') {
           let calculatedPrice = totalDistance * config.vehiclePricePerKm; 
-          price = Math.max(calculatedPrice, config.vehicleMinPrice); 
+          basePrice = Math.max(calculatedPrice, config.vehicleMinPrice); 
+          extraCost = config.vehicleExtra; // Get the extra cost
         } else {
           let calculatedPrice = totalDistance * config.motorbikePricePerKm; 
-          price = Math.max(calculatedPrice, config.motorbikeMinPrice); 
+          basePrice = Math.max(calculatedPrice, config.motorbikeMinPrice); 
+          extraCost = config.motorbikeExtra; // Get the extra cost
         }
         
-        price = Math.round(price);
+        // **CRITICAL MODIFICATION: Enforce the extra cost**
+        let price = Math.round(basePrice + extraCost);
 
         // Time formatting
         let timeText = '';
@@ -1567,6 +1571,12 @@
                 <span class="card-label"><span class="material-icons">schedule</span>Time:</span>
                 <span class="card-value">
                     <span class="hidden-value">${timeText}</span>
+                </span>
+            </div>
+            <div class="summary-card full-width">
+                <span class="card-label"><span class="material-icons">add_circle</span>Extra Charge:</span>
+                <span class="card-value">
+                    <span class="hidden-value">K${extraCost.toFixed(2)}</span>
                 </span>
             </div>
         `;
