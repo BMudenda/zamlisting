@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rides Data Dashboard - Login</title>
+    <title>Rides Data Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="manifest" href="manifest2.json"> 
@@ -214,66 +214,7 @@
             gap: 10px;
         }
         #notification.show { top: 0; opacity: 1; }
-
-        /* Login Screen Styles */
-        #login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--background);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .login-box {
-            background: #fff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .login-box h3 {
-            color: var(--dark);
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-        #password-input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        #login-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #login-btn:hover { background-color: #0056b3; }
-        #login-message {
-            color: var(--danger);
-            margin-top: 10px;
-            font-weight: 500;
-        }
         
-        /* Hide main content initially */
-        .dashboard-container { display: none; }
-
-
         /* Media Queries: Ensures stacking on small screens */
         @media(max-width:768px){
             body { padding: 10px; }
@@ -297,15 +238,6 @@
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h3>Luangwa Feira Rides Admin</h3>
-            <p>Enter Password to access the Dashboard.</p>
-            <input type="password" id="password-input" placeholder="Password" autofocus>
-            <button id="login-btn">Login</button>
-            <p id="login-message"></p>
-        </div>
-    </div>
     <div class="dashboard-container" id="dashboard-content">
         <h2>
             <i class="fas fa-chart-line"></i> Rides Data 
@@ -360,46 +292,22 @@
     </div>
 
     <script>
-        // --- NEW LOGIN SCRIPT ---
+        // --- INITIALIZATION SCRIPT (MODIFIED) ---
         document.addEventListener('DOMContentLoaded', () => {
-            const passwordInput = document.getElementById('password-input');
-            const loginBtn = document.getElementById('login-btn');
-            const loginScreen = document.getElementById('login-screen');
             const dashboardContent = document.getElementById('dashboard-content');
-            const loginMessage = document.getElementById('login-message');
             
-            const CORRECT_PASSWORD = 'admin2010'; // <-- The required password
+            // 1. Ensure the dashboard is visible immediately
+            dashboardContent.style.display = 'block';
 
-            const attemptLogin = () => {
-                if (passwordInput.value === CORRECT_PASSWORD) {
-                    loginScreen.style.display = 'none';
-                    dashboardContent.style.display = 'block';
-                    
-                    // --- CRITICAL FIX: Initialize Dashboard after successful login ---
-                    if (window.dashboard && typeof window.dashboard.init === 'function') {
-                        window.dashboard.init();
-                    }
-                    // Optional: Request FCM permission (defined in the module script)
-                    if (window.requestNotificationPermission) {
-                        window.requestNotificationPermission();
-                    }
-                    
-                } else {
-                    loginMessage.textContent = 'Invalid password. Please try again.';
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                }
-            };
+            // 2. Initialize the dashboard immediately
+            if (window.dashboard && typeof window.dashboard.init === 'function') {
+                window.dashboard.init();
+            }
 
-            loginBtn.addEventListener('click', attemptLogin);
-            passwordInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    attemptLogin();
-                }
-            });
-            
-            // Focus on password field when the page loads
-            passwordInput.focus();
+            // 3. Optional: Request FCM permission immediately
+            if (window.requestNotificationPermission) {
+                window.requestNotificationPermission();
+            }
         });
         // ------------------------
 
@@ -444,25 +352,8 @@
           <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
         `;
         
-        const dashboardContent = document.getElementById('dashboard-content');
-
-        // Check if the login screen is showing before appending the install box
-        if (dashboardContent && dashboardContent.style.display === 'block') {
-            // Append if the dashboard is already visible (e.g., if cache retains visibility)
-            document.body.appendChild(installBox);
-        } else {
-            // Wait for successful login to show install prompt
-            const observer = new MutationObserver((mutationsList, observer) => {
-                for(const mutation of mutationsList) {
-                    if (mutation.attributeName === 'style' && dashboardContent.style.display === 'block') {
-                         document.body.appendChild(installBox);
-                         observer.disconnect();
-                    }
-                }
-            });
-            // We observe dashboardContent for the style change (display: block)
-            observer.observe(dashboardContent, { attributes: true });
-        }
+        // Since the dashboard is always visible, append the install box immediately
+        document.body.appendChild(installBox);
 
 
         document.getElementById("installText").addEventListener("click", async () => {
@@ -497,7 +388,7 @@
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
 
-        // Function to request permission and get token (called after successful login)
+        // Function to request permission and get token
         const requestNotificationPermission = () => {
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
@@ -512,15 +403,15 @@
         // Handle foreground messages
         onMessage(messaging, (payload) => {
             console.log('FCM Message received:', payload);
-            // Only handle data if the dashboard is visible (logged in)
-            if (document.getElementById('dashboard-content').style.display === 'block' && window.dashboard && typeof window.dashboard.handleNewData === 'function') {
+            // Dashboard is always visible now, so just check for dashboard module init
+            if (window.dashboard && typeof window.dashboard.handleNewData === 'function') {
                 window.dashboard.handleNewData(payload.notification.title, payload.notification.body);
             } else {
-                 console.warn("FCM received before login or dashboard not initialized.");
+                 console.warn("FCM received but dashboard not initialized.");
             }
         });
         
-        // Expose a function to request permission after login
+        // Expose a function to request permission
         window.requestNotificationPermission = requestNotificationPermission;
     </script>
 
@@ -606,9 +497,7 @@
 
             // Core Data Fetching and Rendering
             const fetchData = async () => {
-                // Do not fetch if the dashboard is hidden
-                if (document.getElementById('dashboard-content').style.display !== 'block') return;
-
+                // Dashboard is always visible now, no need to check display style
                 try {
                     const response = await fetch(SHEET_URL);
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -783,7 +672,7 @@ Price: ${selectedRow.cells[8].textContent}
                 intervalId = setInterval(fetchData, 10000);
             };
 
-            // Initialization (This is called ONCE upon successful login)
+            // Initialization (This is called ONCE upon page load)
             const init = () => {
                 elements.startBtn.addEventListener("click", startFeed);
                 elements.searchInput.addEventListener("input", filterTable); 
@@ -800,21 +689,19 @@ Price: ${selectedRow.cells[8].textContent}
             return {
                 init: init,
                 handleNewData: (title, body) => {
-                    // Only process new data if the feed hasn't been started yet (and only if logged in)
-                    if (document.getElementById('dashboard-content').style.display === 'block') {
-                        playBeep();
-                        showNotification(title, body);
-                        fetchData();
-                    }
+                    // Only process new data if the dashboard is visible (which is always now)
+                    playBeep();
+                    showNotification(title, body);
+                    fetchData();
                 }
             };
         })();
 
-        // Expose the dashboard object globally so the login script can access its init function
+        // Expose the dashboard object globally so the DOMContentLoaded script can access its init function
         window.dashboard = Dashboard; 
         
-        // IMPORTANT: Dashboard.init() is NOT called here. It is called inside the 
-        // successful login function in the first <script> block.
+        // IMPORTANT: Dashboard.init() is now called inside the first <script> block 
+        // upon DOMContentLoaded.
     </script>
 </body>
 </html>
