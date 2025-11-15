@@ -1,28 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Rides Data Dashboard — Luangwa Feira Rides</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <title>Rides Data Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- PWA manifest -->
-    <link rel="manifest" href="manifest2.json" />
-    <meta name="theme-color" content="#2b6ef6" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides" />
-    <link rel="apple-touch-icon" href="lfr.jpg" />
-
-    <!-- Fonts & Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-
+    <link rel="manifest" href="manifest2.json"> 
+    <meta name="theme-color" content="#2b6ef6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+    <link rel="apple-touch-icon" href="lfr.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #007bff;
@@ -34,10 +24,19 @@
             --accent: #17a2b8;
             --background: #f4f6f9;
         }
+
+        /* Base & Typography */
         body { font-family: 'Roboto', sans-serif; background: var(--background); margin: 0; padding: 20px; color: #333; }
         .dashboard-container { max-width: 1200px; margin: 0 auto; }
-        h2 { text-align: center; color: var(--dark); margin-bottom: 25px; font-weight: 700; letter-spacing: 0.5px; position: relative; }
-
+        h2 { 
+            text-align: center; 
+            color: var(--dark); 
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            position: relative; 
+        }
+        
         .controls-panel {
             display: flex;
             justify-content: center;
@@ -47,8 +46,8 @@
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            gap: 20px;
-            flex-wrap: wrap;
+            gap: 20px; 
+            flex-wrap: wrap; 
         }
 
         #startBtn {
@@ -69,6 +68,7 @@
         #startBtn:hover { background-color: #218838; transform: translateY(-1px); }
         #startBtn:active { transform: translateY(1px); }
 
+        /* Search Input Styles */
         #searchInput {
             padding: 10px 15px;
             font-size: 16px;
@@ -77,8 +77,14 @@
             width: 300px;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
-        #searchInput:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
 
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Table Styles (Card Interface) */
         #dataTable {
             width: 100%;
             border-collapse: collapse;
@@ -89,33 +95,45 @@
         }
         th, td {
             padding: 16px 20px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef; 
             text-align: left;
             font-size: 14px;
         }
-        th {
-            background-color: var(--dark);
-            color: #fff;
-            text-transform: uppercase;
+        th { 
+            background-color: var(--dark); 
+            color: #fff; 
+            text-transform: uppercase; 
             font-weight: 500;
             letter-spacing: 0.5px;
         }
         tr:nth-child(even) { background-color: var(--light); }
         tr:last-child td { border-bottom: none; }
+
+        /* Row States */
         tr:hover { background-color: #e2e6ea; cursor: pointer; }
         tr.new-row { background-color: #d4edda; font-weight: 500; animation: flash-new 3s ease-in-out; }
-        tr.selected { background-color: #ffeeba !important; box-shadow: inset 5px 0 0 0 var(--warning); border-color: var(--warning); }
-        @keyframes flash-new { 0%, 100% { background-color: #d4edda; } 50% { background-color: #fff; } }
+        tr.selected { 
+            background-color: #ffeeba !important; 
+            box-shadow: inset 5px 0 0 0 var(--warning); 
+            border-color: var(--warning);
+        }
+        @keyframes flash-new {
+            0%, 100% { background-color: #d4edda; }
+            50% { background-color: #fff; }
+        }
 
+        /* --- FIELDSET ACTION BAR DESIGN CORRECTION --- */
         #actionBar {
-            margin: 25px auto;
+            margin: 25px auto; 
             padding: 15px;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             display: flex;
             align-items: flex-start;
-            gap: 20px;
+            
+            /* CRITICAL: Centers the entire bar and forces non-wrapping side-by-side layout */
+            gap: 20px; 
             max-width: fit-content;
             width: fit-content;
             margin-left: auto;
@@ -124,41 +142,59 @@
         }
 
         fieldset {
-            width: 280px;
+            /* Width calculation for clean alignment */
+            width: 280px; 
+            
             border: 1px solid #dee2e6;
             border-radius: 8px;
             padding: 10px 15px;
             margin: 0;
-            display: flex;
+            display: flex; 
             gap: 10px;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-between; /* Ensures buttons are spread evenly inside */
         }
-        legend { font-weight: 700; color: var(--dark); font-size: 16px; padding: 0 10px; text-transform: uppercase; }
+        legend {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 16px;
+            padding: 0 10px;
+            text-transform: uppercase;
+        }
 
         .action-btn {
-            display: flex;
-            align-items: center;
+            display: flex; 
+            align-items: center; 
             justify-content: center;
-            width: 45px;
-            height: 45px;
+            width: 45px; 
+            height: 45px; 
             padding: 0;
-            font-size: 18px;
+            font-size: 18px; 
             border-radius: 50%;
-            border: none;
-            color: #fff;
-            cursor: pointer;
+            border: none; 
+            color: #fff; 
+            cursor: pointer; 
             transition: all 0.2s ease-in-out;
         }
-        .action-btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+        .action-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed;
+            box-shadow: none;
+        }
         .action-btn i { font-size: 18px; margin: 0; }
-
+        
+        /* Specific Button Colors & Effects */
         .call-btn { background-color: var(--success); box-shadow: 0 4px 6px rgba(40, 167, 69, 0.4); }
         .sms-btn { background-color: var(--primary); box-shadow: 0 4px 6px rgba(0, 123, 255, 0.4); }
         .whatsapp-btn { background-color: #25D366; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.4); }
         .utility-btn { background-color: var(--accent); box-shadow: 0 4px 6px rgba(23, 162, 184, 0.4); }
-        .action-btn:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
+        
+        .action-btn:hover:not(:disabled) { 
+            transform: scale(1.05); 
+            filter: brightness(1.1);
+        }
 
+        /* UI Notification (remains unchanged) */
         #notification {
             position: fixed;
             top: -60px;
@@ -178,7 +214,8 @@
             gap: 10px;
         }
         #notification.show { top: 0; opacity: 1; }
-
+        
+        /* Media Queries: Ensures stacking on small screens */
         @media(max-width:768px){
             body { padding: 10px; }
             th, td { font-size: 11px; padding:10px; }
@@ -186,161 +223,169 @@
             .controls-panel { flex-direction: column; gap: 15px; }
             #startBtn { width: 100%; justify-content: center; }
             #searchInput { width: 100%; }
-            #actionBar { flex-direction: column; width: 100%; max-width: 100%; gap: 10px; }
-            fieldset { width: 100%; box-sizing: border-box; }
+            #actionBar {
+                flex-direction: column; /* Forces stacking */
+                width: 100%; /* Allows bar to fill mobile screen */
+                max-width: 100%;
+                gap: 10px;
+            }
+            fieldset {
+                width: 100%;
+                box-sizing: border-box; /* Include padding/border in width */
+            }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container" id="dashboard-content">
-        <h2><i class="fas fa-chart-line"></i> Rides Data</h2>
 
+    <div class="dashboard-container" id="dashboard-content">
+        <h2>
+            <i class="fas fa-chart-line"></i> Rides Data 
+            </h2>
+        
         <div class="controls-panel">
-            <button id="startBtn"><i class="fas fa-play-circle"></i> Start Live Feed</button>
-            <input type="text" id="searchInput" placeholder="Search table data..." aria-label="Search table data" disabled />
+            <button id="startBtn">
+                <i class="fas fa-play-circle"></i> 
+                Start Live Feed
+            </button>
+            <input type="text" id="searchInput" placeholder="Search table data..." aria-label="Search table data" disabled>
         </div>
 
-        <table id="dataTable" aria-live="polite">
+        <table id="dataTable">
             <thead></thead>
             <tbody></tbody>
         </table>
-
-        <div id="actionBar" role="toolbar" aria-label="Actions">
+        
+        <div id="actionBar">
+            
             <fieldset>
                 <legend><i class="fas fa-share-alt"></i> Share</legend>
-                <button class="action-btn sms-btn" data-action="share_sms" id="shareSmsBtn" title="SMS ride details to dispatch" disabled>
+                <button class="action-btn sms-btn" data-action="share_sms" id="shareSmsBtn" title="SMS ride details to 0966423229" disabled>
                     <i class="fas fa-sms"></i>
                 </button>
-                <button class="action-btn whatsapp-btn" data-action="share_whatsapp" id="shareWhatsappBtn" title="WhatsApp ride details to dispatch" disabled>
+                <button class="action-btn whatsapp-btn" data-action="share_whatsapp" id="shareWhatsappBtn" title="WhatsApp ride details to 0966423229" disabled>
                     <i class="fab fa-whatsapp"></i>
                 </button>
             </fieldset>
-
+            
             <fieldset>
                 <legend><i class="fas fa-headset"></i> Contact</legend>
                 <button class="action-btn call-btn" data-action="customer_call" id="customerCallBtn" title="Call customer phone" disabled>
                     <i class="fas fa-phone"></i>
                 </button>
-                <button class="action-btn sms-btn" data-action="customer_sms" id="customerSmsBtn" title="Send SMS to customer" disabled>
+                <button class="action-btn sms-btn" data-action="customer_sms" id="customerSmsBtn" title="Send predefined SMS to customer" disabled>
                     <i class="fas fa-sms"></i>
                 </button>
-                <button class="action-btn whatsapp-btn" data-action="customer_whatsapp" id="customerWhatsappBtn" title="Send WhatsApp to customer" disabled>
+                <button class="action-btn whatsapp-btn" data-action="customer_whatsapp" id="customerWhatsappBtn" title="Send predefined WhatsApp to customer" disabled>
                     <i class="fab fa-whatsapp"></i>
                 </button>
-                <button class="action-btn utility-btn" data-action="utility" id="utilityBtn" title="View trip details" disabled>
+                <button class="action-btn utility-btn" data-action="utility" id="utilityBtn" title="View basic trip details" disabled>
                     <i class="fas fa-eye"></i>
                 </button>
             </fieldset>
         </div>
+        <div id="notification" role="alert" aria-live="assertive"></div>
 
-        <div id="notification" role="status" aria-live="polite"></div>
-
-        <audio id="beepSound" preload="auto" aria-hidden="true">
-            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
+        <audio id="beepSound" preload="auto">
+            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
         </audio>
     </div>
 
     <script>
-    // ---------- PWA + Service Worker + Install UI ----------
-    (function() {
-        // Keep global deferredPrompt so installation box can trigger it
-        window.deferredPrompt = null;
+        // --- INITIALIZATION SCRIPT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const dashboardContent = document.getElementById('dashboard-content');
+            
+            // 1. Ensure the dashboard is visible immediately
+            dashboardContent.style.display = 'block';
 
-        // Register service worker (assumes sw2.js is at site root). If your files are in a subfolder, adjust the path.
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    // Register with scope set to root so install works correctly across pages
-                    const reg = await navigator.serviceWorker.register('/sw2.js', { scope: '/' });
-                    console.log('ServiceWorker registered with scope:', reg.scope);
-                } catch (err) {
-                    console.warn('ServiceWorker registration failed:', err);
-                }
-            });
-        }
+            // 2. Initialize the dashboard immediately
+            if (window.dashboard && typeof window.dashboard.init === 'function') {
+                window.dashboard.init();
+            }
 
-        // Handle beforeinstallprompt to create an in-page install button
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            // store the event
-            window.deferredPrompt = e;
-
-            // Avoid creating multiple install boxes
-            if (document.getElementById('pwa-install-box')) return;
-
-            const installBox = document.createElement('div');
-            installBox.id = 'pwa-install-box';
-            installBox.style.position = 'fixed';
-            installBox.style.top = '15px';
-            installBox.style.right = '15px';
-            installBox.style.background = '#2b6ef6';
-            installBox.style.color = '#fff';
-            installBox.style.borderRadius = '8px';
-            installBox.style.padding = '8px 14px';
-            installBox.style.fontFamily = 'system-ui, sans-serif';
-            installBox.style.fontSize = '14px';
-            installBox.style.cursor = 'pointer';
-            installBox.style.boxShadow = '0 3px 8px rgba(0,0,0,0.2)';
-            installBox.style.zIndex = '9999';
-            installBox.style.display = 'flex';
-            installBox.style.alignItems = 'center';
-            installBox.style.gap = '8px';
-            installBox.innerHTML = `
-                <span id="installText" style="font-weight:600;">Install App</span>
-                <button id="closeInstall" aria-label="Close install prompt" style="cursor:pointer;font-weight:bold;border:none;background:transparent;color:#fff;font-size:18px;">×</button>
-            `;
-
-            document.body.appendChild(installBox);
-
-            document.getElementById('installText').addEventListener('click', async () => {
-                // Show the native prompt
-                try {
-                    installBox.remove();
-                    const promptEvent = window.deferredPrompt;
-                    if (!promptEvent) return;
-                    promptEvent.prompt();
-                    const choiceResult = await promptEvent.userChoice;
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                } catch (err) {
-                    console.warn('Install prompt failed:', err);
-                } finally {
-                    window.deferredPrompt = null;
-                }
-            });
-
-            document.getElementById('closeInstall').addEventListener('click', () => {
-                const box = document.getElementById('pwa-install-box');
-                if (box) box.remove();
-                window.deferredPrompt = null;
-            });
-        });
-
-        // Show a toast when the app installs
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('PWA installed', evt);
-            const notif = document.getElementById('notification');
-            if (notif) {
-                notif.innerHTML = '<i class="fas fa-check-circle"></i> App installed successfully';
-                notif.style.backgroundColor = 'var(--success)';
-                notif.classList.add('show');
-                setTimeout(()=> notif.classList.remove('show'), 3000);
+            // 3. Optional: Request FCM permission immediately
+            if (window.requestNotificationPermission) {
+                window.requestNotificationPermission();
             }
         });
-    })();
-    </script>
+        // ------------------------
 
-    <!-- Firebase messaging module (deferred, as module) -->
+        // Register Service Worker and install wba script
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", function() {
+            // *** FIX: Set the scope explicitly for subdirectory hosting (/install/) ***
+            navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
+              function(reg) {
+                console.log("ServiceWorker registered with scope:", reg.scope);
+              },
+              function(err) {
+                console.log("ServiceWorker registration failed:", err);
+              }
+            );
+          });
+        }
+
+        // Show simple install button (SIMPLIFIED AND CORRECTED LOGIC)
+        let deferredPrompt; // Global variable to store the event
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+          // Prevent the default browser prompt
+          e.preventDefault();
+          // Stash the event so it can be triggered later.
+          deferredPrompt = e;
+
+          const installBox = document.createElement("div");
+          installBox.id = 'pwa-install-box'; // Add ID for easier selection
+          installBox.style.position = "fixed";
+          installBox.style.top = "15px";
+          installBox.style.right = "15px";
+          installBox.style.background = "#2b6ef6";
+          installBox.style.color = "#fff";
+          installBox.style.borderRadius = "8px";
+          installBox.style.padding = "8px 14px";
+          installBox.style.fontFamily = "system-ui, sans-serif";
+          installBox.style.fontSize = "14px";
+          installBox.style.cursor = "pointer";
+          installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+          installBox.style.zIndex = "9999";
+          installBox.style.display = "flex";
+          installBox.style.alignItems = "center";
+          installBox.style.gap = "8px";
+          installBox.innerHTML = `
+            <span id="installText">Install App</span>
+            <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
+          `;
+          
+          // Append the install prompt box immediately, as there is no login screen
+          document.body.appendChild(installBox);
+
+
+          // Use event delegation or target the element after it's appended
+          document.getElementById("installText").addEventListener("click", async () => {
+            installBox.remove();
+            // Show the prompt
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            if (choiceResult.outcome === "accepted") {
+              console.log("User accepted install prompt");
+            }
+            deferredPrompt = null; // Clear the deferred prompt variable
+          });
+
+          document.getElementById("closeInstall").addEventListener("click", () => {
+            installBox.remove();
+            deferredPrompt = null; // User dismissed the prompt
+          });
+        });
+    </script>
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
 
-        // Replace with your actual Firebase config
+        // IMPORTANT: Replace placeholders with your actual keys.
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY_HERE",
+            apiKey: "YOUR_FIREBASE_API_KEY_HERE", 
             authDomain: "livenoti-1c991.firebaseapp.com",
             projectId: "livenoti-1c991",
             storageBucket: "livenoti-1c991.firebasestorage.app",
@@ -349,349 +394,318 @@
             measurementId: "G-K6MZ7CTLCW"
         };
 
-        // Initialize Firebase
-        try {
-            const app = initializeApp(firebaseConfig);
-            const messaging = getMessaging(app);
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
 
-            // Expose request function
-            window.requestNotificationPermission = () => {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
-                        // replace with your VAPID key
-                        getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' })
-                            .then(token => console.log('FCM Token:', token))
-                            .catch(err => console.warn('getToken error', err));
+        // Function to request permission and get token
+        const requestNotificationPermission = () => {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted' && firebaseConfig.apiKey !== 'YOUR_FIREBASE_API_KEY_HERE') {
+                    // IMPORTANT: Replace this placeholder with your actual VAPID key
+                    getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' }) 
+                        .then(token => console.log('FCM Token:', token))
+                        .catch(console.error);
+                }
+            });
+        };
+        
+        // Handle foreground messages
+        onMessage(messaging, (payload) => {
+            console.log('FCM Message received:', payload);
+            if (window.dashboard && typeof window.dashboard.handleNewData === 'function') {
+                window.dashboard.handleNewData(payload.notification.title, payload.notification.body);
+            } else {
+                 console.warn("FCM received but dashboard not initialized.");
+            }
+        });
+        
+        // Expose a function to request permission
+        window.requestNotificationPermission = requestNotificationPermission;
+    </script>
+
+    <script defer>
+        /**
+         * Live Dashboard Module (IIFE)
+         */
+        const Dashboard = (() => {
+            // CRITICAL: Replace this URL with your published Google Apps Script Web App URL for data fetching
+            const SHEET_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+            const DISPATCH_NUMBER = "0966423229";
+            
+            let lastRowCount = 0;
+            let selectedRow = null;
+            let selectedPhone = null; // Customer's phone number
+            let intervalId = null; // To hold the interval timer
+
+            // DOM Elements
+            const elements = {
+                tableHead: document.querySelector("#dataTable thead"),
+                tableBody: document.querySelector("#dataTable tbody"),
+                startBtn: document.getElementById("startBtn"),
+                searchInput: document.getElementById("searchInput"),
+                shareSmsBtn: document.getElementById("shareSmsBtn"),
+                shareWhatsappBtn: document.getElementById("shareWhatsappBtn"),
+                customerCallBtn: document.getElementById("customerCallBtn"),
+                customerSmsBtn: document.getElementById("customerSmsBtn"),
+                customerWhatsappBtn: document.getElementById("customerWhatsappBtn"),
+                utilityBtn: document.getElementById("utilityBtn"),
+                beep: document.getElementById("beepSound"),
+                notification: document.getElementById("notification"),
+            };
+
+            // Utility Functions
+            const formatTimestamp = (value) => {
+                if (!value) return "";
+                const dateObj = new Date(value);
+                if (isNaN(dateObj)) return value;
+                // Formats to: M/D/YYYY, H:MM:SS AM/PM
+                return dateObj.toLocaleString('en-US', { hour12: true });
+            };
+
+            const showNotification = (title, body, isError = false) => {
+                const message = `${title || 'Notification'}: ${body || 'Table Updated.'}`;
+                elements.notification.innerHTML = `<i class="fas fa-bell"></i> ${message}`;
+                elements.notification.style.backgroundColor = isError ? 'var(--danger)' : 'var(--accent)';
+                elements.notification.classList.add('show');
+                setTimeout(() => {
+                    elements.notification.classList.remove('show');
+                }, 4000);
+            };
+
+            const playBeep = () => {
+                elements.beep.currentTime = 0;
+                elements.beep.play().catch(e => console.warn("Audio playback failed:", e));
+            };
+
+            const updateActionButtons = (phone) => {
+                const isDisabled = !phone;
+                
+                // All buttons are disabled if no row with a phone number is selected
+                elements.shareSmsBtn.disabled = isDisabled;
+                elements.shareWhatsappBtn.disabled = isDisabled;
+                elements.customerCallBtn.disabled = isDisabled;
+                elements.customerSmsBtn.disabled = isDisabled;
+                elements.customerWhatsappBtn.disabled = isDisabled;
+                elements.utilityBtn.disabled = isDisabled;
+            };
+            
+            const filterTable = () => {
+                const filter = elements.searchInput.value.toUpperCase();
+                const rows = elements.tableBody.querySelectorAll("tr");
+
+                rows.forEach(row => {
+                    let textContent = row.textContent || row.innerText;
+                    if (textContent.toUpperCase().indexOf(filter) > -1) {
+                        row.style.display = ""; 
                     } else {
-                        console.warn('Notification permission not granted or config placeholder present');
+                        row.style.display = "none"; 
                     }
                 });
             };
 
-            onMessage(messaging, (payload) => {
-                console.log('FCM Message received:', payload);
-                // If dashboard exists, pass notification to it
-                if (window.dashboard && typeof window.dashboard.handleNewData === 'function') {
-                    const title = payload?.notification?.title || 'Notification';
-                    const body = payload?.notification?.body || '';
-                    window.dashboard.handleNewData(title, body);
-                }
-            });
-        } catch (err) {
-            console.warn('Firebase init error:', err);
-        }
-    </script>
-
-    <script>
-    /**
-     * Dashboard Module — full logic (cleaned and robust)
-     */
-    const Dashboard = (() => {
-        // Replace with your published Google Apps Script / data endpoint
-        const SHEET_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-        const DISPATCH_NUMBER = "0966423229";
-
-        let lastRowCount = 0;
-        let selectedRow = null;
-        let selectedPhone = null;
-        let intervalId = null;
-
-        const elements = {
-            tableHead: document.querySelector("#dataTable thead"),
-            tableBody: document.querySelector("#dataTable tbody"),
-            startBtn: document.getElementById("startBtn"),
-            searchInput: document.getElementById("searchInput"),
-            shareSmsBtn: document.getElementById("shareSmsBtn"),
-            shareWhatsappBtn: document.getElementById("shareWhatsappBtn"),
-            customerCallBtn: document.getElementById("customerCallBtn"),
-            customerSmsBtn: document.getElementById("customerSmsBtn"),
-            customerWhatsappBtn: document.getElementById("customerWhatsappBtn"),
-            utilityBtn: document.getElementById("utilityBtn"),
-            beep: document.getElementById("beepSound"),
-            notification: document.getElementById("notification"),
-        };
-
-        const formatTimestamp = (value) => {
-            if (!value) return "";
-            // If it's a number (epoch), convert
-            if (!isNaN(value) && String(value).length >= 10) {
-                const num = Number(value);
-                // Some sheets return numbers like 44600 — best-effort: try Date parse, fallback to value
-                const d = new Date(num > 1e12 ? num : num * 86400000 - 2209161600000); // best-effort conversion for serial dates
-                if (!isNaN(d)) return d.toLocaleString('en-US', { hour12: true });
-            }
-            const dateObj = new Date(value);
-            if (isNaN(dateObj)) return value;
-            return dateObj.toLocaleString('en-US', { hour12: true });
-        };
-
-        const showNotification = (title, body, isError = false) => {
-            const message = `${title || 'Notification'}: ${body || 'Table Updated.'}`;
-            if (!elements.notification) return;
-            elements.notification.innerHTML = `<i class="fas fa-bell"></i> ${message}`;
-            elements.notification.style.backgroundColor = isError ? 'var(--danger)' : 'var(--accent)';
-            elements.notification.classList.add('show');
-            setTimeout(() => { elements.notification.classList.remove('show'); }, 4000);
-        };
-
-        const playBeep = () => {
-            if (!elements.beep) return;
-            try {
-                elements.beep.currentTime = 0;
-                elements.beep.play().catch(e => console.warn("Audio playback failed:", e));
-            } catch (e) { console.warn(e); }
-        };
-
-        const updateActionButtons = (phone) => {
-            const isDisabled = !phone;
-            elements.shareSmsBtn.disabled = isDisabled;
-            elements.shareWhatsappBtn.disabled = isDisabled;
-            elements.customerCallBtn.disabled = isDisabled;
-            elements.customerSmsBtn.disabled = isDisabled;
-            elements.customerWhatsappBtn.disabled = isDisabled;
-            elements.utilityBtn.disabled = isDisabled;
-        };
-
-        const filterTable = () => {
-            if (!elements.searchInput) return;
-            const filter = elements.searchInput.value.trim().toUpperCase();
-            const rows = elements.tableBody.querySelectorAll("tr");
-            rows.forEach(row => {
-                let textContent = row.textContent || row.innerText || '';
-                if (filter === '' || textContent.toUpperCase().indexOf(filter) > -1) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        };
-
-        // Robust phone normalizer: returns digits only and ensures country code (Zambia -> 260)
-        const normalizePhoneForWhatsApp = (raw) => {
-            if (!raw) return null;
-            let digits = String(raw).replace(/\D/g, '');
-            if (!digits) return null;
-            // If it's already international (starts with 260), return as-is
-            if (digits.startsWith('260')) return digits;
-            // If starts with '0' followed by rest, remove leading 0 and add 260
-            if (digits.startsWith('0')) return '260' + digits.slice(1);
-            // If it appears to be local without 0, prepend 260
-            if (digits.length === 9 || digits.length === 7 || digits.length === 8) {
-                return '260' + digits;
-            }
-            // fallback: return digits
-            return digits;
-        };
-
-        const fetchData = async () => {
-            try {
-                const response = await fetch(SHEET_URL, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                const rows = data.rows || [];
-                if (!rows || rows.length === 0) {
-                    elements.tableHead.innerHTML = '<tr><th>No Data Available</th></tr>';
-                    elements.tableBody.innerHTML = '';
-                    elements.searchInput.disabled = true;
-                    return;
-                }
-
-                elements.searchInput.disabled = false;
-                const newDataAdded = rows.length > lastRowCount;
-                const prevSelectedPhone = selectedPhone;
-
-                // Clear table
-                elements.tableHead.innerHTML = '';
-                elements.tableBody.innerHTML = '';
-
-                // Render headers (object keys from first row)
-                const firstRowKeys = Object.keys(rows[0]);
-                const headerRow = document.createElement('tr');
-                firstRowKeys.forEach(header => {
-                    const th = document.createElement('th');
-                    th.textContent = header;
-                    headerRow.appendChild(th);
-                });
-                elements.tableHead.appendChild(headerRow);
-
-                rows.forEach((row, index) => {
-                    const tr = document.createElement('tr');
-                    let currentRowPhone = null;
-
-                    firstRowKeys.forEach(key => {
-                        const td = document.createElement('td');
-                        const lowerKey = key.toLowerCase();
-                        const value = row[key] !== undefined && row[key] !== null ? row[key] : '';
-
-                        if (lowerKey.includes('time') || lowerKey.includes('date')) {
-                            td.textContent = formatTimestamp(value);
-                        } else {
-                            td.textContent = value;
-                        }
-
-                        if (lowerKey.includes('phone')) {
-                            currentRowPhone = String(value);
-                        }
-                        tr.appendChild(td);
-                    });
-
-                    // If it's the last row and it's new, highlight and scroll into view
-                    if (index === rows.length - 1 && newDataAdded) {
-                        tr.classList.add('new-row');
-                        setTimeout(() => tr.classList.remove('new-row'), 3500);
-                        tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Core Data Fetching and Rendering
+            const fetchData = async () => {
+                try {
+                    const response = await fetch(SHEET_URL);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const data = await response.json();
+                    const rows = data.rows;
+                    if (!rows || rows.length === 0) {
+                        elements.tableHead.innerHTML = '<tr><th>No Data Available</th></tr>';
+                        elements.tableBody.innerHTML = '';
+                        elements.searchInput.disabled = true; 
+                        return;
                     }
 
-                    // Re-select previously selected row if phone matches
-                    if (currentRowPhone && prevSelectedPhone && currentRowPhone === prevSelectedPhone) {
-                        tr.classList.add('selected');
-                        selectedRow = tr;
-                        selectedPhone = prevSelectedPhone;
-                    }
+                    elements.searchInput.disabled = false; 
+                    const newDataAdded = rows.length > lastRowCount;
+                    const prevSelectedPhone = selectedPhone;
+                    
+                    elements.tableHead.innerHTML = "";
+                    elements.tableBody.innerHTML = "";
 
-                    // Click selection
-                    tr.addEventListener('click', () => {
-                        if (selectedRow) selectedRow.classList.remove('selected');
-                        tr.classList.add('selected');
-                        selectedRow = tr;
-                        selectedPhone = currentRowPhone || null;
-                        updateActionButtons(selectedPhone);
+                    // Render Headers
+                    const headerRow = document.createElement("tr");
+                    Object.keys(rows[0]).forEach(header => {
+                        const th = document.createElement("th");
+                        th.textContent = header;
+                        headerRow.appendChild(th);
                     });
+                    elements.tableHead.appendChild(headerRow);
 
-                    elements.tableBody.appendChild(tr);
-                });
+                    // Render Body Rows
+                    rows.forEach((row, index) => {
+                        const tr = document.createElement("tr");
+                        let currentRowPhone = null;
 
-                if (newDataAdded) {
-                    playBeep();
-                    showNotification(`New Entry (${rows.length})`, 'Table updated with new data.');
+                        Object.entries(row).forEach(([key, value]) => {
+                            const td = document.createElement("td");
+                            const lowerKey = key.toLowerCase();
+
+                            if (lowerKey.includes("time") || lowerKey.includes("date")) {
+                                td.textContent = formatTimestamp(value);
+                            } else {
+                                td.textContent = value;
+                            }
+                            
+                            if (lowerKey.includes("phone")) {
+                                currentRowPhone = String(value);
+                            }
+
+                            tr.appendChild(td);
+                        });
+
+                        // Highlight New Row and Scroll
+                        if (index === rows.length - 1 && newDataAdded) {
+                            tr.classList.add("new-row");
+                            tr.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                        }
+
+                        // Re-select previously selected row
+                        if (currentRowPhone && currentRowPhone === prevSelectedPhone) {
+                            tr.classList.add("selected");
+                            selectedRow = tr;
+                            selectedPhone = prevSelectedPhone;
+                        }
+
+                        // Add click listener
+                        tr.addEventListener("click", () => {
+                            if (selectedRow) selectedRow.classList.remove("selected");
+                            tr.classList.add("selected");
+                            selectedRow = tr;
+                            selectedPhone = currentRowPhone || null; 
+                            updateActionButtons(selectedPhone);
+                        });
+
+                        elements.tableBody.appendChild(tr);
+                    });
+                    
+                    if(newDataAdded) {
+                        playBeep();
+                        showNotification(`New Entry (${rows.length})`, 'Table updated with new data.');
+                    }
+                    
+                    lastRowCount = rows.length;
+                    updateActionButtons(selectedPhone); 
+                    filterTable();
+                } catch (err) {
+                    console.error("Error fetching data:", err);
+                    showNotification("Data Error", "Failed to load data from server.", true);
+                    elements.searchInput.disabled = true; 
                 }
+            };
+            
 
-                lastRowCount = rows.length;
-                updateActionButtons(selectedPhone);
-                filterTable();
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                showNotification("Data Error", "Failed to load data from server.", true);
-                elements.searchInput.disabled = true;
-            }
-        };
+            // Action Handler
+            const handleAction = (event) => {
+                const method = event.currentTarget.dataset.action;
 
-        const handleAction = (event) => {
-            event.stopPropagation();
-            const method = event.currentTarget.dataset.action;
-            if (!selectedRow) {
-                return showNotification("Action Required", "Select a ride row first.", true);
-            }
-
-            const customerDigits = selectedPhone ? String(selectedPhone).replace(/\D/g, '') : '';
-            const msgToCustomer = "Thank you for requesting a Ride with Luangwa Feira Rides /www.zamlisting.com/luangwa. See you in the next few minutes";
-
-            // Compose dispatch message safely using cells if available
-            const getCellText = (idx) => (selectedRow.cells[idx] ? selectedRow.cells[idx].textContent : '');
-
-            const dispatchMessage = `*NEW RIDE ALERT*
+                if (!selectedRow) {
+                    return showNotification("Action Required", "Select a ride row first.", true);
+                }
+                
+                // Get customer phone for validation/action
+                const customerDigits = selectedPhone ? selectedPhone.replace(/\D/g, '') : '';
+                
+                // --- MESSAGE DEFINITIONS (Based on column indices) ---
+                const dispatchMessage = `*NEW RIDE ALERT*
 Phone: ${customerDigits}
-Mode: ${getCellText(0)}
-From: ${getCellText(3)}
-To: ${getCellText(4)}
-Price: ${getCellText(8)}
+Mode: ${selectedRow.cells[0].textContent}
+From: ${selectedRow.cells[3].textContent}
+To: ${selectedRow.cells[4].textContent}
+Price: ${selectedRow.cells[8].textContent}
 (Shared from Dashboard)`;
+                
+                const customerPredefinedMessage = "Thank you for requesting a Ride with Luangwa Feira Rides /www.zamlisting.com/luangwa. See you in the next few minutes";
 
-            let targetNumber = null;
-            let messageBody = '';
-            let isCall = false;
 
-            switch (method) {
-                case 'share_sms':
-                case 'share_whatsapp':
-                    targetNumber = DISPATCH_NUMBER;
-                    messageBody = dispatchMessage;
-                    break;
-                case 'customer_call':
-                    if (!customerDigits) return showNotification("Call Failed", "Customer phone number is missing.", true);
-                    targetNumber = customerDigits;
-                    isCall = true;
-                    break;
-                case 'customer_sms':
-                case 'customer_whatsapp':
-                    if (!customerDigits) return showNotification("Message Failed", "Customer phone number is missing.", true);
-                    targetNumber = customerDigits;
-                    messageBody = msgToCustomer;
-                    break;
-                case 'utility':
-                    return showNotification("Trip Details", `Trip: ${getCellText(3)} to ${getCellText(4)}.`, false);
-                default:
-                    return;
-            }
+                // --- LOGIC BASED ON ACTION TYPE ---
+                let targetNumber;
+                let messageBody;
+                let isCall = false;
 
-            // Execution
-            if (isCall) {
-                window.location.href = `tel:${targetNumber}`;
-                return;
-            }
+                switch (method) {
+                    // 1. SHARE RIDE DETAILS TO DISPATCH NUMBER
+                    case 'share_sms':
+                    case 'share_whatsapp':
+                        targetNumber = DISPATCH_NUMBER;
+                        messageBody = dispatchMessage;
+                        break;
 
-            const encodedMessage = encodeURIComponent(messageBody || '');
-            if (method.includes('sms')) {
-                // Use sms: URI. Different platforms may behave differently.
-                window.location.href = `sms:${targetNumber}?body=${encodedMessage}`;
-            } else if (method.includes('whatsapp')) {
-                const waNumber = normalizePhoneForWhatsApp(targetNumber);
-                if (!waNumber) return showNotification("WhatsApp Failed", "Invalid phone number for WhatsApp.", true);
-                const waUrl = `https://wa.me/${waNumber}?text=${encodedMessage}`;
-                window.open(waUrl, "_blank");
-            }
-        };
+                    // 2. CONTACT CUSTOMER
+                    case 'customer_call':
+                        if (!customerDigits) return showNotification("Call Failed", "Customer phone number is missing.", true);
+                        targetNumber = customerDigits;
+                        isCall = true;
+                        break;
+                    case 'customer_sms':
+                    case 'customer_whatsapp':
+                        if (!customerDigits) return showNotification("Message Failed", "Customer phone number is missing.", true);
+                        targetNumber = customerDigits;
+                        messageBody = customerPredefinedMessage;
+                        break;
 
-        const startFeed = () => {
-            elements.startBtn.style.display = 'none';
-            elements.searchInput.disabled = false;
-            showNotification("Live Feed Started", "Data is now updating every 10 seconds.");
-            fetchData();
-            if (intervalId) clearInterval(intervalId);
-            intervalId = setInterval(fetchData, 10000);
-        };
+                    case 'utility':
+                         showNotification("View Details", `Trip: ${selectedRow.cells[3].textContent} to ${selectedRow.cells[4].textContent}.`, false);
+                         return; // Utility action completes here
+                    default:
+                        return;
+                }
 
-        const init = () => {
-            // Wire UI events
-            elements.startBtn.addEventListener('click', startFeed);
-            elements.searchInput.addEventListener('input', filterTable);
+                // --- EXECUTION ---
+                if (isCall) {
+                    window.location.href = `tel:${targetNumber}`;
+                } else {
+                    const encodedMessage = encodeURIComponent(messageBody);
+                    
+                    if (method.includes('sms')) {
+                        window.location.href = `sms:${targetNumber}?body=${encodedMessage}`;
+                    } else if (method.includes('whatsapp')) {
+                         // Format WhatsApp number (e.g., handles country code/leading 0)
+                         const whatsappNumber = targetNumber.startsWith('260') ? targetNumber : `260${targetNumber.substring(1).replace(/\D/g, '')}`;
+                         window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, "_blank");
+                    }
+                }
+            };
 
-            // Attach action listeners to buttons
-            document.querySelectorAll('.action-btn').forEach(button => {
-                button.addEventListener('click', handleAction);
-            });
-
-            // Initialize state
-            updateActionButtons(null);
-
-            // Optional: auto-start feed if desired (commented out)
-            // startFeed();
-        };
-
-        // Expose public API
-        return {
-            init,
-            handleNewData: (title, body) => {
-                playBeep();
-                showNotification(title, body);
-                // refresh data
+            const startFeed = () => {
+                elements.startBtn.style.display = "none";
+                elements.searchInput.disabled = false; 
+                showNotification("Live Feed Started", "Data is now updating every 10 seconds.");
                 fetchData();
-            }
-        };
-    })();
+                // Start the polling interval (10 seconds)
+                if (intervalId) clearInterval(intervalId); // Clear any existing interval
+                intervalId = setInterval(fetchData, 10000);
+            };
 
-    // Make dashboard accessible to other modules (like FCM script)
-    window.dashboard = Dashboard;
+            // Initialization (This is called ONCE upon page load)
+            const init = () => {
+                elements.startBtn.addEventListener("click", startFeed);
+                elements.searchInput.addEventListener("input", filterTable); 
 
-    // Initialize on DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-        const dashboardContent = document.getElementById('dashboard-content');
-        if (dashboardContent) dashboardContent.style.display = 'block';
-        if (window.dashboard && typeof window.dashboard.init === 'function') window.dashboard.init();
+                // Attach event listener to all action buttons
+                document.querySelectorAll('.action-btn').forEach(button => {
+                    button.addEventListener('click', handleAction);
+                });
+                
+                updateActionButtons(null);
+            };
+            
+            // Public Interface
+            return {
+                init: init,
+                handleNewData: (title, body) => {
+                    playBeep();
+                    showNotification(title, body);
+                    fetchData();
+                }
+            };
+        })();
 
-        // Optionally prompt for notifications right away (uncomment if desired)
-        // if (window.requestNotificationPermission) window.requestNotificationPermission();
-    });
+        // Expose the dashboard object globally so the DOMContentLoaded script can access its init function
+        window.dashboard = Dashboard; 
+        
     </script>
 </body>
 </html>
