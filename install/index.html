@@ -292,7 +292,7 @@
     </div>
 
     <script>
-        // --- INITIALIZATION SCRIPT ---
+        // --- INITIALIZATION SCRIPT (MODIFIED) ---
         document.addEventListener('DOMContentLoaded', () => {
             const dashboardContent = document.getElementById('dashboard-content');
             
@@ -311,73 +311,64 @@
         });
         // ------------------------
 
-        // Register Service Worker and install wba script
-        if ("serviceWorker" in navigator) {
-          window.addEventListener("load", function() {
-            // *** FIX: Set the scope explicitly for subdirectory hosting (/install/) ***
-            navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
-              function(reg) {
-                console.log("ServiceWorker registered with scope:", reg.scope);
-              },
-              function(err) {
-                console.log("ServiceWorker registration failed:", err);
-              }
-            );
-          });
-        }
-
-        // Show simple install button (SIMPLIFIED AND CORRECTED LOGIC)
-        let deferredPrompt; // Global variable to store the event
-
-        window.addEventListener("beforeinstallprompt", (e) => {
-          // Prevent the default browser prompt
-          e.preventDefault();
-          // Stash the event so it can be triggered later.
-          deferredPrompt = e;
-
-          const installBox = document.createElement("div");
-          installBox.id = 'pwa-install-box'; // Add ID for easier selection
-          installBox.style.position = "fixed";
-          installBox.style.top = "15px";
-          installBox.style.right = "15px";
-          installBox.style.background = "#2b6ef6";
-          installBox.style.color = "#fff";
-          installBox.style.borderRadius = "8px";
-          installBox.style.padding = "8px 14px";
-          installBox.style.fontFamily = "system-ui, sans-serif";
-          installBox.style.fontSize = "14px";
-          installBox.style.cursor = "pointer";
-          installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-          installBox.style.zIndex = "9999";
-          installBox.style.display = "flex";
-          installBox.style.alignItems = "center";
-          installBox.style.gap = "8px";
-          installBox.innerHTML = `
-            <span id="installText">Install App</span>
-            <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
-          `;
-          
-          // Append the install prompt box immediately, as there is no login screen
-          document.body.appendChild(installBox);
-
-
-          // Use event delegation or target the element after it's appended
-          document.getElementById("installText").addEventListener("click", async () => {
-            installBox.remove();
-            // Show the prompt
-            deferredPrompt.prompt();
-            const choiceResult = await deferredPrompt.userChoice;
-            if (choiceResult.outcome === "accepted") {
-              console.log("User accepted install prompt");
+      // Register Service Worker and install wba script
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function() {
+          // *** FIX: Set the scope explicitly for subdirectory hosting (/install/) ***
+          navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
+            function(reg) {
+              console.log("ServiceWorker registered with scope:", reg.scope);
+            },
+            function(err) {
+              console.log("ServiceWorker registration failed:", err);
             }
-            deferredPrompt = null; // Clear the deferred prompt variable
-          });
-
-          document.getElementById("closeInstall").addEventListener("click", () => {
-            installBox.remove();
-            deferredPrompt = null; // User dismissed the prompt
-          });
+          );
         });
+      }
+
+      // Show simple install button
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        const deferredPrompt = e;
+
+        const installBox = document.createElement("div");
+        installBox.style.position = "fixed";
+        installBox.style.top = "15px";
+        installBox.style.right = "15px";
+        installBox.style.background = "#2b6ef6";
+        installBox.style.color = "#fff";
+        installBox.style.borderRadius = "8px";
+        installBox.style.padding = "8px 14px";
+        installBox.style.fontFamily = "system-ui, sans-serif";
+        installBox.style.fontSize = "14px";
+        installBox.style.cursor = "pointer";
+        installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+        installBox.style.zIndex = "9999";
+        installBox.style.display = "flex";
+        installBox.style.alignItems = "center";
+        installBox.style.gap = "8px";
+        installBox.innerHTML = `
+          <span id="installText">Install</span>
+          <span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>
+        `;
+        
+        // Since the dashboard is always visible, append the install box immediately
+        document.body.appendChild(installBox);
+
+
+        document.getElementById("installText").addEventListener("click", async () => {
+          installBox.remove();
+          deferredPrompt.prompt();
+          const choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult.outcome === "accepted") {
+            console.log("User accepted install prompt");
+          }
+        });
+
+        document.getElementById("closeInstall").addEventListener("click", () => {
+          installBox.remove();
+        });
+      });
     </script>
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -412,6 +403,7 @@
         // Handle foreground messages
         onMessage(messaging, (payload) => {
             console.log('FCM Message received:', payload);
+            // Dashboard is always visible now, so just check for dashboard module init
             if (window.dashboard && typeof window.dashboard.handleNewData === 'function') {
                 window.dashboard.handleNewData(payload.notification.title, payload.notification.body);
             } else {
@@ -505,6 +497,7 @@
 
             // Core Data Fetching and Rendering
             const fetchData = async () => {
+                // Dashboard is always visible now, no need to check display style
                 try {
                     const response = await fetch(SHEET_URL);
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -696,6 +689,7 @@ Price: ${selectedRow.cells[8].textContent}
             return {
                 init: init,
                 handleNewData: (title, body) => {
+                    // Only process new data if the dashboard is visible (which is always now)
                     playBeep();
                     showNotification(title, body);
                     fetchData();
@@ -706,6 +700,8 @@ Price: ${selectedRow.cells[8].textContent}
         // Expose the dashboard object globally so the DOMContentLoaded script can access its init function
         window.dashboard = Dashboard; 
         
+        // IMPORTANT: Dashboard.init() is now called inside the first <script> block 
+        // upon DOMContentLoaded.
     </script>
 </body>
 </html>
