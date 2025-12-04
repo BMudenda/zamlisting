@@ -28,6 +28,7 @@
             --shadow-heavy: rgba(0,0,0,0.12);
         }
 
+        /* Base & Layout */
         * { box-sizing: border-box; }
         html,body { height: 100%; }
         body {
@@ -49,6 +50,7 @@
             min-height: 100vh;
         }
 
+        /* --- Header (live + search) --- */
         header.app-header {
             display:flex;
             align-items:center;
@@ -59,9 +61,9 @@
             border-radius:10px;
             box-shadow:0 6px 18px var(--shadow-light);
             position:sticky;
-            top:12px;
+            top:12px; /* Slight offset for better visibility of sticky header */
             z-index:50;
-            border: 1px solid #eee;
+            border: 1px solid #eee; /* Added border for definition */
         }
 
         .brand {
@@ -126,13 +128,15 @@
             color:#9aa7b2;
         }
 
+        /* --- Table View --- */
         .table-container {
-            flex-grow: 1;
+            flex-grow: 1; /* Allows the table to fill the space */
             background:#fff;
             border-radius:12px;
             padding:10px;
             box-shadow:0 12px 24px var(--shadow-light);
             overflow:hidden;
+            position: relative;
         }
         .table-scroll {
             width:100%;
@@ -143,7 +147,7 @@
             width:100%;
             border-collapse:collapse;
             min-width:720px; 
-            table-layout:auto;
+            table-layout:auto; /* Use auto layout for variable column widths */
         }
         table#dataTable thead th {
             background:var(--dark);
@@ -151,12 +155,14 @@
             text-transform:uppercase;
             font-size:12px;
             padding:12px 10px;
+            /* No need for sticky top:0 if table is in scroll container */
         }
         table#dataTable th, table#dataTable td {
             padding:12px 10px;
             border-bottom:1px solid #eef2f6;
             vertical-align:middle;
             font-size:13px;
+            /* Keep nowrap for horizontal scroll */
             white-space:nowrap; 
         }
         table#dataTable tbody tr:nth-child(even) { background:var(--light); }
@@ -166,21 +172,22 @@
             box-shadow: inset 5px 0 0 0 var(--warning); 
         }
 
+        /* --- Footer action bar --- */
         footer.footer-bar {
-            margin-top:auto;
+            margin-top:auto; /* Pushes footer to the bottom */
             padding:12px;
             background:#fff;
             border-radius:10px;
-            box-shadow:0 -6px 18px var(--shadow-light);
+            box-shadow:0 -6px 18px var(--shadow-light); /* Shadow direction change */
             display:flex;
             gap:14px;
             justify-content:center;
             align-items:flex-start;
             flex-wrap:wrap;
             position:sticky;
-            bottom:12px;
+            bottom:12px; /* Slight offset for better visibility of sticky footer */
             z-index:40;
-            border: 1px solid #eee;
+            border: 1px solid #eee; /* Added border for definition */
         }
 
         fieldset {
@@ -210,6 +217,127 @@
         .whatsapp-btn { background:#25D366; }
         .utility-btn { background:var(--accent); }
 
+        /* View Details Card */
+        .view-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 0;
+            border: 2px solid var(--accent);
+        }
+
+        .view-card.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .view-card-header {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            padding: 20px;
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-card-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-card-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .view-card-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .view-card-body {
+            padding: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark);
+            min-width: 120px;
+        }
+
+        .detail-value {
+            color: #555;
+            text-align: right;
+            flex: 1;
+            padding-left: 15px;
+        }
+
+        .highlight-value {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(0,123,255,0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .card-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Notification */
         #notification {
             position:fixed; top:-80px; left:50%; transform:translateX(-50%);
             padding:10px 18px; border-radius:0 0 10px 10px; color:#fff; font-weight:600;
@@ -218,84 +346,29 @@
         }
         #notification.show { top:10px; opacity:1; }
 
-        #detailsModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.65);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
+        /* Responsive tweaks */
+        @media (max-width:900px) {
+            fieldset { width:48%; }
         }
-        #detailsModal.show { display: flex; }
-
-        .modal-content {
-            background: #fff;
-            border-radius: 14px;
-            width: 100%;
-            max-width: 520px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: modalPop 0.3s ease-out;
-        }
-        @keyframes modalPop {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal-header {
-            padding: 18px 20px;
-            background: var(--primary);
-            color: #fff;
-            border-radius: 14px 14px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-header h2 { margin: 0; font-size: 18px; }
-        .modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        .modal-close:hover { background: rgba(255,255,255,0.2); }
-
-        .modal-body { padding: 20px; }
-        .detail-row {
-            display: flex;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-label { font-weight: 600; width: 140px; color: var(--dark); }
-        .detail-value { flex: 1; word-break: break-word; }
-
-        @media (max-width:900px) { fieldset { width:48%; } }
         @media (max-width:640px) {
             .dashboard-container { padding:12px; gap:10px; }
-            header.app-header { flex-direction:column; align spoor-items:stretch; gap:10px; top:10px; }
+            header.app-header { flex-direction:column; align-items:stretch; gap:10px; top:10px; }
             .header-controls { width:100%; flex-direction:row; gap:8px; }
             fieldset { width:100%; box-sizing:border-box; }
             table#dataTable { min-width:650px; }
             footer.footer-bar { bottom:10px; padding:10px; gap:8px; }
             table#dataTable th, table#dataTable td { padding:10px 8px; font-size:12px; white-space:nowrap; }
-            .modal-content { max-width: 96%; }
+            .view-card { width: 95%; max-height: 90vh; }
+            .detail-row { flex-direction: column; gap: 5px; }
+            .detail-label { min-width: auto; }
+            .detail-value { text-align: left; padding-left: 0; }
         }
+
         @media (max-width:420px) {
             .action-btn { width:40px; height:40px; font-size:14px; }
             #startBtn { width:100%; justify-content:center; }
             .header-controls { flex-direction:column; gap:8px; }
             .brand h1 { font-size:16px; }
-            .detail-label { width: 120px; }
         }
     </style>
 </head>
@@ -336,7 +409,7 @@
 
         <footer class="footer-bar" role="contentinfo" aria-label="Share and Contact Actions">
             <fieldset>
-                <legend>Share</legend>
+                <legend><i class="fas fa-share-alt" aria-hidden="true"></i> Share</legend>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <button class="action-btn sms-btn" data-action="share_sms" id="shareSmsBtn" title="SMS ride details to dispatch" disabled aria-label="Share via SMS">
                         <i class="fas fa-sms"></i>
@@ -348,38 +421,37 @@
             </fieldset>
 
             <fieldset>
-                <legend>Contact</legend>
+                <legend><i class="fas fa-headset" aria-hidden="true"></i> Contact</legend>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <button class="action-btn call-btn" data-action="customer_call" id="customerCallBtn" title="Call customer phone" disabled aria-label="Call Customer"><i class="fas fa-phone"></i></button>
                     <button class="action-btn sms-btn" data-action="customer_sms" id="customerSmsBtn" title="Send SMS to customer" disabled aria-label="SMS Customer"><i class="fas fa-sms"></i></button>
                     <button class="action-btn whatsapp-btn" data-action="customer_whatsapp" id="customerWhatsappBtn" title="Send WhatsApp to customer" disabled aria-label="WhatsApp Customer"><i class="fab fa-whatsapp"></i></button>
-                    <button class="action-btn utility-btn" data-action="utility" id="utilityBtn" title="View full trip details" disabled aria-label="View Trip Details"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn utility-btn" data-action="view_details" id="viewDetailsBtn" title="View full trip details" disabled aria-label="View Trip Details"><i class="fas fa-eye"></i></button>
                 </div>
             </fieldset>
         </footer>
 
-        <div id="detailsModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Ride Details</h2>
-                    <button class="modal-close" aria-label="Close details">×</button>
-                </div>
-                <div class="modal-body" id="modalBody"></div>
+        <!-- View Details Card -->
+        <div class="card-overlay" id="cardOverlay"></div>
+        <div class="view-card" id="viewCard">
+            <div class="view-card-header">
+                <h3><i class="fas fa-tripadvisor"></i> Trip Details</h3>
+                <button class="view-card-close" id="closeCard" aria-label="Close details">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="view-card-body" id="cardBody">
+                <!-- Details will be populated dynamically -->
             </div>
         </div>
 
         <div id="notification" role="alert" aria-live="assertive"></div>
-
-        <!-- BETTER, CLEAR & PROFESSIONAL NOTIFICATION SOUND -->
         <audio id="beepSound" preload="auto">
-            <source src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-notification-2579.mp3" type="audio/mpeg">
-            <source src="https://cdn.jsdelivr.net/gh/naptha/tesseract.js@master/test/audio/notify.mp3" type="audio/mpeg">
-            <source src="https://freesound.org/data/previews/657/657984_11675262-lq.mp3" type="audio/mpeg">
-            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.wav" type="audio/wav">
         </audio>
     </div>
 
-    <!-- All scripts below are 100% unchanged -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dashboardContent = document.getElementById('dashboard-content');
@@ -387,10 +459,15 @@
             if (window.dashboard && typeof window.dashboard.init === 'function') {
                 window.dashboard.init();
             }
+            if (window.requestNotificationPermission) {
+                // If you want to auto-prompt for notifications, uncomment the line below:
+                // window.requestNotificationPermission();
+            }
         });
 
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", function() {
+                // Assuming sw2.js is in the root or a known path. Adjust scope if necessary.
                 navigator.serviceWorker.register("sw2.js", { scope: "/install/" }).then(
                     function(reg) { console.log("ServiceWorker registered with scope:", reg.scope); },
                     function(err) { console.log("ServiceWorker registration failed:", err); }
@@ -475,12 +552,14 @@
 
     <script defer>
         const Dashboard = (() => {
+            // Replace with your published Google Apps Script Web App URL for data fetching
             const SHEET_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
             const DISPATCH_NUMBER = "0966423229";
 
             let lastRowCount = 0;
             let selectedRow = null;
             let selectedPhone = null;
+            let selectedRowData = null;
             let intervalId = null;
             let isFeedRunning = false;
 
@@ -496,24 +575,33 @@
                 customerCallBtn: document.getElementById("customerCallBtn"),
                 customerSmsBtn: document.getElementById("customerSmsBtn"),
                 customerWhatsappBtn: document.getElementById("customerWhatsappBtn"),
-                utilityBtn: document.getElementById("utilityBtn"),
+                viewDetailsBtn: document.getElementById("viewDetailsBtn"),
                 beep: document.getElementById("beepSound"),
                 notification: document.getElementById("notification"),
                 tableScroll: document.getElementById("tableScroll"),
-                detailsModal: document.getElementById("detailsModal"),
-                modalBody: document.getElementById("modalBody"),
-                modalClose: document.querySelector(".modal-close")
+                viewCard: document.getElementById("viewCard"),
+                cardOverlay: document.getElementById("cardOverlay"),
+                cardBody: document.getElementById("cardBody"),
+                closeCard: document.getElementById("closeCard")
             };
 
             const formatTimestamp = (value) => {
                 if (!value) return "";
                 const dateObj = new Date(value);
-                if (isNaN(dateObj.getTime())) return value;
-                return dateObj.toLocaleString('en-US', { hour12: true });
+                if (isNaN(dateObj.getTime())) return value; // Check if valid date
+                return dateObj.toLocaleString('en-US', { 
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true 
+                });
             };
 
             const showNotification = (title, body, isError = false) => {
-                const message = `\( {title || 'Notification'}: \){body || 'Table Updated.'}`;
+                const message = `${title || 'Notification'}: ${body || 'Table Updated.'}`;
                 elements.notification.innerHTML = `<i class="fas fa-bell"></i> ${message}`;
                 elements.notification.style.backgroundColor = isError ? 'var(--danger)' : 'var(--accent)';
                 elements.notification.classList.add('show');
@@ -523,6 +611,7 @@
             const playBeep = () => {
                 try {
                     elements.beep.currentTime = 0;
+                    elements.beep.volume = 0.3;
                     elements.beep.play();
                 } catch (e) {
                     console.warn("Audio playback failed:", e);
@@ -536,7 +625,7 @@
                 elements.customerCallBtn.disabled = isDisabled;
                 elements.customerSmsBtn.disabled = isDisabled;
                 elements.customerWhatsappBtn.disabled = isDisabled;
-                elements.utilityBtn.disabled = isDisabled;
+                elements.viewDetailsBtn.disabled = isDisabled;
             };
 
             const updateStartButtonState = () => {
@@ -562,37 +651,89 @@
                 });
             };
 
-            const showDetailsModal = () => {
-                if (!selectedRow) {
-                    showNotification("No row selected", "Please select a ride first.", true);
+            const showViewCard = () => {
+                if (!selectedRow || !selectedRowData) {
+                    showNotification("View Details", "Please select a ride row first.", true);
                     return;
                 }
 
-                const headers = Array.from(document.querySelectorAll("#dataTable thead th")).map(th => th.textContent.trim());
-                const cells = selectedRow.querySelectorAll("td");
-
+                // Extract header names
+                const headers = Array.from(elements.tableHead.querySelectorAll('th')).map(th => th.textContent.trim());
+                
+                // Create HTML for the details card
                 let html = '';
-                headers.forEach((header, i) => {
-                    let value = cells[i]?.textContent.trim() || '—';
-                    if (header.toLowerCase().includes("time") || header.toLowerCase().includes("date")) {
-                        value = formatTimestamp(value);
+                
+                // Add key trip information first
+                const importantFields = ['Mode', 'From', 'To', 'Price', 'Phone', 'Time', 'Date', 'Status'];
+                
+                importantFields.forEach(field => {
+                    const matchingHeader = headers.find(h => h.toLowerCase().includes(field.toLowerCase()));
+                    if (matchingHeader) {
+                        const index = headers.indexOf(matchingHeader);
+                        const value = selectedRowData[index] || 'N/A';
+                        html += `
+                            <div class="detail-row">
+                                <span class="detail-label">${matchingHeader}:</span>
+                                <span class="detail-value ${['Price', 'Phone'].includes(field) ? 'highlight-value' : ''}">
+                                    ${field === 'Phone' ? formatPhoneNumber(value) : value}
+                                </span>
+                            </div>
+                        `;
                     }
-                    html += `
-                        <div class="detail-row">
-                            <div class="detail-label">${header}:</div>
-                            <div class="detail-value">${value}</div>
-                        </div>
-                    `;
                 });
 
-                elements.modalBody.innerHTML = html;
-                elements.detailsModal.classList.add("show");
+                // Add remaining fields
+                headers.forEach((header, index) => {
+                    if (!importantFields.some(field => header.toLowerCase().includes(field.toLowerCase()))) {
+                        const value = selectedRowData[index] || 'N/A';
+                        html += `
+                            <div class="detail-row">
+                                <span class="detail-label">${header}:</span>
+                                <span class="detail-value">${value}</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                // Add summary section
+                html += `
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee;">
+                        <div class="detail-row">
+                            <span class="detail-label" style="color: var(--primary); font-size: 14px;">Trip Summary:</span>
+                            <span class="detail-value" style="text-align: left; font-style: italic; color: #666;">
+                                ${selectedRowData[headers.findIndex(h => h.toLowerCase().includes('from'))] || 'Unknown'} 
+                                → ${selectedRowData[headers.findIndex(h => h.toLowerCase().includes('to'))] || 'Unknown'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+                elements.cardBody.innerHTML = html;
+                elements.viewCard.classList.add('active');
+                elements.cardOverlay.classList.add('active');
+                
+                // Prevent body scroll when card is open
+                document.body.style.overflow = 'hidden';
             };
 
-            const closeModal = () => {
-                elements.detailsModal.classList.remove("show");
+            const hideViewCard = () => {
+                elements.viewCard.classList.remove('active');
+                elements.cardOverlay.classList.remove('active');
+                document.body.style.overflow = '';
             };
 
+            const formatPhoneNumber = (phone) => {
+                if (!phone) return 'N/A';
+                const cleaned = phone.replace(/\D/g, '');
+                if (cleaned.length === 12 && cleaned.startsWith('260')) {
+                    return `+${cleaned.substring(0, 3)} ${cleaned.substring(3, 6)} ${cleaned.substring(6, 9)} ${cleaned.substring(9)}`;
+                } else if (cleaned.length === 10 && cleaned.startsWith('0')) {
+                    return `+260 ${cleaned.substring(1, 4)} ${cleaned.substring(4, 7)} ${cleaned.substring(7)}`;
+                }
+                return cleaned;
+            };
+
+            // Core fetch & render
             const fetchData = async () => {
                 try {
                     const response = await fetch(SHEET_URL, {cache: "no-store"});
@@ -614,6 +755,7 @@
                     elements.tableHead.innerHTML = '';
                     elements.tableBody.innerHTML = '';
 
+                    // Get headers from first row keys
                     const headers = Object.keys(rows[0]);
                     const headerRow = document.createElement("tr");
                     headers.forEach(header => {
@@ -623,19 +765,11 @@
                     });
                     elements.tableHead.appendChild(headerRow);
                     
-                    const colMap = {};
-                    headers.forEach((h, i) => {
-                        const lowerH = h.toLowerCase();
-                        if (lowerH.includes("mode")) colMap.mode = i;
-                        if (lowerH.includes("phone")) colMap.phone = i;
-                        if (lowerH.includes("from")) colMap.from = i;
-                        if (lowerH.includes("to")) colMap.to = i;
-                        if (lowerH.includes("price") || lowerH.includes("cost")) colMap.price = i;
-                    });
-                    
+                    // Render rows
                     rows.forEach((row, index) => {
                         const tr = document.createElement("tr");
                         let currentRowPhone = null;
+                        const rowData = [];
 
                         Object.entries(row).forEach(([key, value]) => {
                             const td = document.createElement("td");
@@ -645,8 +779,10 @@
 
                             if (lowerKey.includes("time") || lowerKey.includes("date")) {
                                 td.textContent = formatTimestamp(value);
+                                rowData.push(formatTimestamp(value));
                             } else {
                                 td.textContent = String(value);
+                                rowData.push(String(value));
                             }
 
                             if (lowerKey.includes("phone")) {
@@ -657,6 +793,10 @@
                             tr.appendChild(td);
                         });
 
+                        // Store row data for view card
+                        tr.dataset.rowData = JSON.stringify(rowData);
+
+                        // highlight newest row if newDataAdded
                         if (index === rows.length - 1 && newDataAdded) {
                             tr.classList.add("new-row");
                             setTimeout(() => {
@@ -664,10 +804,12 @@
                             }, 60);
                         }
 
+                        // reselect if phone matches
                         if (currentRowPhone && currentRowPhone === prevSelectedPhone) {
                             tr.classList.add('selected');
                             selectedRow = tr;
                             selectedPhone = prevSelectedPhone;
+                            selectedRowData = rowData;
                         }
 
                         tr.addEventListener('click', () => {
@@ -675,6 +817,7 @@
                             tr.classList.add('selected');
                             selectedRow = tr;
                             selectedPhone = currentRowPhone || null;
+                            selectedRowData = rowData;
                             updateActionButtons(selectedPhone);
                         });
 
@@ -683,7 +826,7 @@
 
                     if (newDataAdded) {
                         playBeep();
-                        showNotification(`New Entry (${rows.length})`, 'Table updated with new data.');
+                        showNotification(`New Entry Added`, 'Table updated with new data.', false);
                     }
 
                     lastRowCount = rows.length;
@@ -697,6 +840,7 @@
                 }
             };
 
+            // Action handling for buttons
             const handleAction = (event) => {
                 event.preventDefault();
                 const method = event.currentTarget.dataset.action;
@@ -705,13 +849,19 @@
                     return showNotification("Action Required", "Select a ride row first.", true);
                 }
 
+                // Get values using the cells array
                 const getValue = (index) => selectedRow.cells[index]?.textContent || 'N/A';
+                
                 const customerDigits = selectedPhone ? selectedPhone.replace(/\D/g, '') : '';
                 
-                const dispatchMessage = `*NEW RIDE ALERT*\nPhone: \( {customerDigits}\nMode: \){getValue(0)}\nFrom: \( {getValue(3)}\nTo: \){getValue(4)}\nPrice: ${getValue(8)}\n(Shared from Dashboard)`;
+                // Assuming column indices are fixed: 0=Mode, 3=From, 4=To, 8=Price (based on original script logic)
+                const dispatchMessage = `*NEW RIDE ALERT*\nPhone: ${customerDigits}\nMode: ${getValue(0)}\nFrom: ${getValue(3)}\nTo: ${getValue(4)}\nPrice: ${getValue(8)}\n(Shared from Dashboard)`;
+
                 const customerPredefinedMessage = "Thank you for requesting a Ride with Luangwa Feira Rides /www.zamlisting.com/luangwa. See you in the next few minutes";
 
-                let targetNumber, messageBody, isCall = false;
+                let targetNumber;
+                let messageBody;
+                let isCall = false;
 
                 switch (method) {
                     case 'share_sms':
@@ -730,23 +880,25 @@
                         targetNumber = customerDigits;
                         messageBody = customerPredefinedMessage;
                         break;
-                    case 'utility':
-                        showDetailsModal();
+                    case 'view_details':
+                        showViewCard();
                         return;
                     default:
                         return;
                 }
 
+                // execute
                 if (isCall) {
                     window.location.href = `tel:${targetNumber}`;
                 } else {
                     const encodedMessage = encodeURIComponent(messageBody || '');
                     if (method.includes('sms')) {
-                        window.location.href = `sms:\( {targetNumber}?body= \){encodedMessage}`;
+                        window.location.href = `sms:${targetNumber}?body=${encodedMessage}`;
                     } else if (method.includes('whatsapp')) {
                         const cleaned = targetNumber.replace(/\D/g, '');
+                        // Simplified WA formatting logic for common Zambian numbers (assumes 260 prefix)
                         const whatsappNumber = cleaned.startsWith('260') ? cleaned : (cleaned.startsWith('0') ? '260' + cleaned.slice(1) : '260' + cleaned);
-                        window.open(`https://wa.me/\( {whatsappNumber}?text= \){encodedMessage}`, '_blank');
+                        window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
                     }
                 }
             };
@@ -776,13 +928,19 @@
                     btn.addEventListener('click', handleAction);
                 });
 
-                elements.modalClose.addEventListener('click', closeModal);
-                elements.detailsModal.addEventListener('click', (e) => {
-                    if (e.target === elements.detailsModal) closeModal();
+                // Close card when clicking overlay or close button
+                elements.cardOverlay.addEventListener('click', hideViewCard);
+                elements.closeCard.addEventListener('click', hideViewCard);
+
+                // Close card with Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && elements.viewCard.classList.contains('active')) {
+                        hideViewCard();
+                    }
                 });
 
                 updateActionButtons(null);
-                updateStartButtonState();
+                updateStartButtonState(); // Set initial button state
             };
 
             return {
