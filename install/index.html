@@ -136,7 +136,6 @@
             padding:10px;
             box-shadow:0 12px 24px var(--shadow-light);
             overflow:hidden;
-            position: relative;
         }
         .table-scroll {
             width:100%;
@@ -217,126 +216,6 @@
         .whatsapp-btn { background:#25D366; }
         .utility-btn { background:var(--accent); }
 
-        /* View Details Card */
-        .view-card {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow-y: auto;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            padding: 0;
-            border: 2px solid var(--accent);
-        }
-
-        .view-card.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .view-card-header {
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            color: white;
-            padding: 20px;
-            border-radius: 14px 14px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .view-card-header h3 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .view-card-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .view-card-close:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .view-card-body {
-            padding: 25px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: var(--dark);
-            min-width: 120px;
-        }
-
-        .detail-value {
-            color: #555;
-            text-align: right;
-            flex: 1;
-            padding-left: 15px;
-        }
-
-        .highlight-value {
-            color: var(--primary);
-            font-weight: 600;
-            background: rgba(0,123,255,0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .card-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .card-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
         /* Notification */
         #notification {
             position:fixed; top:-80px; left:50%; transform:translateX(-50%);
@@ -358,10 +237,6 @@
             table#dataTable { min-width:650px; }
             footer.footer-bar { bottom:10px; padding:10px; gap:8px; }
             table#dataTable th, table#dataTable td { padding:10px 8px; font-size:12px; white-space:nowrap; }
-            .view-card { width: 95%; max-height: 90vh; }
-            .detail-row { flex-direction: column; gap: 5px; }
-            .detail-label { min-width: auto; }
-            .detail-value { text-align: left; padding-left: 0; }
         }
 
         @media (max-width:420px) {
@@ -426,29 +301,14 @@
                     <button class="action-btn call-btn" data-action="customer_call" id="customerCallBtn" title="Call customer phone" disabled aria-label="Call Customer"><i class="fas fa-phone"></i></button>
                     <button class="action-btn sms-btn" data-action="customer_sms" id="customerSmsBtn" title="Send SMS to customer" disabled aria-label="SMS Customer"><i class="fas fa-sms"></i></button>
                     <button class="action-btn whatsapp-btn" data-action="customer_whatsapp" id="customerWhatsappBtn" title="Send WhatsApp to customer" disabled aria-label="WhatsApp Customer"><i class="fab fa-whatsapp"></i></button>
-                    <button class="action-btn utility-btn" data-action="view_details" id="viewDetailsBtn" title="View full trip details" disabled aria-label="View Trip Details"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn utility-btn" data-action="utility" id="utilityBtn" title="View basic trip details" disabled aria-label="View Trip Details"><i class="fas fa-eye"></i></button>
                 </div>
             </fieldset>
         </footer>
 
-        <!-- View Details Card -->
-        <div class="card-overlay" id="cardOverlay"></div>
-        <div class="view-card" id="viewCard">
-            <div class="view-card-header">
-                <h3><i class="fas fa-tripadvisor"></i> Trip Details</h3>
-                <button class="view-card-close" id="closeCard" aria-label="Close details">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="view-card-body" id="cardBody">
-                <!-- Details will be populated dynamically -->
-            </div>
-        </div>
-
         <div id="notification" role="alert" aria-live="assertive"></div>
         <audio id="beepSound" preload="auto">
-            <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
-            <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.wav" type="audio/wav">
+            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
         </audio>
     </div>
 
@@ -559,7 +419,6 @@
             let lastRowCount = 0;
             let selectedRow = null;
             let selectedPhone = null;
-            let selectedRowData = null;
             let intervalId = null;
             let isFeedRunning = false;
 
@@ -575,29 +434,17 @@
                 customerCallBtn: document.getElementById("customerCallBtn"),
                 customerSmsBtn: document.getElementById("customerSmsBtn"),
                 customerWhatsappBtn: document.getElementById("customerWhatsappBtn"),
-                viewDetailsBtn: document.getElementById("viewDetailsBtn"),
+                utilityBtn: document.getElementById("utilityBtn"),
                 beep: document.getElementById("beepSound"),
                 notification: document.getElementById("notification"),
-                tableScroll: document.getElementById("tableScroll"),
-                viewCard: document.getElementById("viewCard"),
-                cardOverlay: document.getElementById("cardOverlay"),
-                cardBody: document.getElementById("cardBody"),
-                closeCard: document.getElementById("closeCard")
+                tableScroll: document.getElementById("tableScroll")
             };
 
             const formatTimestamp = (value) => {
                 if (!value) return "";
                 const dateObj = new Date(value);
                 if (isNaN(dateObj.getTime())) return value; // Check if valid date
-                return dateObj.toLocaleString('en-US', { 
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true 
-                });
+                return dateObj.toLocaleString('en-US', { hour12: true });
             };
 
             const showNotification = (title, body, isError = false) => {
@@ -611,7 +458,6 @@
             const playBeep = () => {
                 try {
                     elements.beep.currentTime = 0;
-                    elements.beep.volume = 0.3;
                     elements.beep.play();
                 } catch (e) {
                     console.warn("Audio playback failed:", e);
@@ -625,7 +471,7 @@
                 elements.customerCallBtn.disabled = isDisabled;
                 elements.customerSmsBtn.disabled = isDisabled;
                 elements.customerWhatsappBtn.disabled = isDisabled;
-                elements.viewDetailsBtn.disabled = isDisabled;
+                elements.utilityBtn.disabled = isDisabled;
             };
 
             const updateStartButtonState = () => {
@@ -649,88 +495,6 @@
                     const textContent = (row.textContent || row.innerText || "").toUpperCase();
                     row.style.display = (filter === "" || textContent.includes(filter)) ? "" : "none";
                 });
-            };
-
-            const showViewCard = () => {
-                if (!selectedRow || !selectedRowData) {
-                    showNotification("View Details", "Please select a ride row first.", true);
-                    return;
-                }
-
-                // Extract header names
-                const headers = Array.from(elements.tableHead.querySelectorAll('th')).map(th => th.textContent.trim());
-                
-                // Create HTML for the details card
-                let html = '';
-                
-                // Add key trip information first
-                const importantFields = ['Mode', 'From', 'To', 'Price', 'Phone', 'Time', 'Date', 'Status'];
-                
-                importantFields.forEach(field => {
-                    const matchingHeader = headers.find(h => h.toLowerCase().includes(field.toLowerCase()));
-                    if (matchingHeader) {
-                        const index = headers.indexOf(matchingHeader);
-                        const value = selectedRowData[index] || 'N/A';
-                        html += `
-                            <div class="detail-row">
-                                <span class="detail-label">${matchingHeader}:</span>
-                                <span class="detail-value ${['Price', 'Phone'].includes(field) ? 'highlight-value' : ''}">
-                                    ${field === 'Phone' ? formatPhoneNumber(value) : value}
-                                </span>
-                            </div>
-                        `;
-                    }
-                });
-
-                // Add remaining fields
-                headers.forEach((header, index) => {
-                    if (!importantFields.some(field => header.toLowerCase().includes(field.toLowerCase()))) {
-                        const value = selectedRowData[index] || 'N/A';
-                        html += `
-                            <div class="detail-row">
-                                <span class="detail-label">${header}:</span>
-                                <span class="detail-value">${value}</span>
-                            </div>
-                        `;
-                    }
-                });
-
-                // Add summary section
-                html += `
-                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee;">
-                        <div class="detail-row">
-                            <span class="detail-label" style="color: var(--primary); font-size: 14px;">Trip Summary:</span>
-                            <span class="detail-value" style="text-align: left; font-style: italic; color: #666;">
-                                ${selectedRowData[headers.findIndex(h => h.toLowerCase().includes('from'))] || 'Unknown'} 
-                                → ${selectedRowData[headers.findIndex(h => h.toLowerCase().includes('to'))] || 'Unknown'}
-                            </span>
-                        </div>
-                    </div>
-                `;
-
-                elements.cardBody.innerHTML = html;
-                elements.viewCard.classList.add('active');
-                elements.cardOverlay.classList.add('active');
-                
-                // Prevent body scroll when card is open
-                document.body.style.overflow = 'hidden';
-            };
-
-            const hideViewCard = () => {
-                elements.viewCard.classList.remove('active');
-                elements.cardOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            };
-
-            const formatPhoneNumber = (phone) => {
-                if (!phone) return 'N/A';
-                const cleaned = phone.replace(/\D/g, '');
-                if (cleaned.length === 12 && cleaned.startsWith('260')) {
-                    return `+${cleaned.substring(0, 3)} ${cleaned.substring(3, 6)} ${cleaned.substring(6, 9)} ${cleaned.substring(9)}`;
-                } else if (cleaned.length === 10 && cleaned.startsWith('0')) {
-                    return `+260 ${cleaned.substring(1, 4)} ${cleaned.substring(4, 7)} ${cleaned.substring(7)}`;
-                }
-                return cleaned;
             };
 
             // Core fetch & render
@@ -765,11 +529,21 @@
                     });
                     elements.tableHead.appendChild(headerRow);
                     
+                    // --- Map the required columns to indices for action messages ---
+                    const colMap = {};
+                    headers.forEach((h, i) => {
+                        const lowerH = h.toLowerCase();
+                        if (lowerH.includes("mode")) colMap.mode = i;
+                        if (lowerH.includes("phone")) colMap.phone = i;
+                        if (lowerH.includes("from")) colMap.from = i;
+                        if (lowerH.includes("to")) colMap.to = i;
+                        if (lowerH.includes("price") || lowerH.includes("cost")) colMap.price = i;
+                    });
+                    
                     // Render rows
                     rows.forEach((row, index) => {
                         const tr = document.createElement("tr");
                         let currentRowPhone = null;
-                        const rowData = [];
 
                         Object.entries(row).forEach(([key, value]) => {
                             const td = document.createElement("td");
@@ -779,10 +553,8 @@
 
                             if (lowerKey.includes("time") || lowerKey.includes("date")) {
                                 td.textContent = formatTimestamp(value);
-                                rowData.push(formatTimestamp(value));
                             } else {
                                 td.textContent = String(value);
-                                rowData.push(String(value));
                             }
 
                             if (lowerKey.includes("phone")) {
@@ -792,9 +564,6 @@
 
                             tr.appendChild(td);
                         });
-
-                        // Store row data for view card
-                        tr.dataset.rowData = JSON.stringify(rowData);
 
                         // highlight newest row if newDataAdded
                         if (index === rows.length - 1 && newDataAdded) {
@@ -809,7 +578,6 @@
                             tr.classList.add('selected');
                             selectedRow = tr;
                             selectedPhone = prevSelectedPhone;
-                            selectedRowData = rowData;
                         }
 
                         tr.addEventListener('click', () => {
@@ -817,7 +585,6 @@
                             tr.classList.add('selected');
                             selectedRow = tr;
                             selectedPhone = currentRowPhone || null;
-                            selectedRowData = rowData;
                             updateActionButtons(selectedPhone);
                         });
 
@@ -826,7 +593,7 @@
 
                     if (newDataAdded) {
                         playBeep();
-                        showNotification(`New Entry Added`, 'Table updated with new data.', false);
+                        showNotification(`New Entry (${rows.length})`, 'Table updated with new data.');
                     }
 
                     lastRowCount = rows.length;
@@ -880,8 +647,8 @@
                         targetNumber = customerDigits;
                         messageBody = customerPredefinedMessage;
                         break;
-                    case 'view_details':
-                        showViewCard();
+                    case 'utility':
+                        showNotification("View Details", `Trip: ${getValue(3)} to ${getValue(4)}`, false);
                         return;
                     default:
                         return;
@@ -926,17 +693,6 @@
 
                 document.querySelectorAll('.action-btn').forEach(btn => {
                     btn.addEventListener('click', handleAction);
-                });
-
-                // Close card when clicking overlay or close button
-                elements.cardOverlay.addEventListener('click', hideViewCard);
-                elements.closeCard.addEventListener('click', hideViewCard);
-
-                // Close card with Escape key
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && elements.viewCard.classList.contains('active')) {
-                        hideViewCard();
-                    }
                 });
 
                 updateActionButtons(null);
