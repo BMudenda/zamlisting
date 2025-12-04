@@ -225,65 +225,131 @@
         }
         #notification.show { top:10px; opacity:1; }
 
-        /* --- Summary Card (added) --- */
+        /* --- Summary Card (redesigned) --- */
+        /* Backdrop element (separate element with class .summary-backdrop) */
+        .summary-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(12, 18, 28, 0.48);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+            z-index: 10000;
+            display: none;
+        }
+        .summary-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+            display: block;
+        }
+
         .summary-card {
             position: fixed;
-            right: 20px;
-            bottom: 110px;
-            width: 340px;
-            max-width: calc(100% - 40px);
-            background: #fff;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(.98);
+            width: min(720px, calc(100% - 48px));
+            background: linear-gradient(180deg, #ffffff, #fbfdff);
             border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 18px 40px rgba(23, 43, 77, 0.12);
+            padding: 18px;
+            box-shadow: 0 24px 60px rgba(23, 43, 77, 0.18);
             z-index: 10001;
             border: 1px solid #e6eef8;
             font-size: 14px;
             color: #222;
             display: none;
-            max-height: 60vh;
+            max-height: 80vh;
             overflow: auto;
+            transition: transform .18s ease, opacity .18s ease;
+            opacity: 0;
+            will-change: transform, opacity;
         }
-        .summary-card.show { display: block; animation: slideUp .18s ease-out; }
-        @keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .summary-card.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
 
         .summary-card header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         .summary-card header h3 {
             margin: 0;
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 800;
             color: var(--dark);
         }
         .summary-card .close-summary {
             background: transparent;
             border: none;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             color: #666;
+            padding: 8px;
+            line-height: 1;
+            border-radius: 6px;
         }
-        .summary-card .fields { display:block; }
+        .summary-card .close-summary:hover { background: #f1f5f9; }
+
+        /* Grid layout for fields */
+        .summary-card .fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 18px;
+            align-items: start;
+        }
         .summary-card .field {
             display:flex;
-            justify-content:space-between;
-            gap:8px;
-            padding:8px 0;
-            border-bottom: 1px solid #f1f5f9;
-            align-items:center;
+            flex-direction:column;
+            gap:6px;
+            padding:10px;
+            background: linear-gradient(180deg,#fff,#fcfdff);
+            border-radius:8px;
+            border: 1px solid #f1f5f9;
+            min-height:46px;
             word-break: break-word;
         }
-        .summary-card .field .label { color: #577; font-weight:600; font-size:13px; opacity:0.85; }
-        .summary-card .field .value { color:#111; font-weight:500; text-align:right; font-size:13px; }
+        .summary-card .field .label { color: #4b5563; font-weight:700; font-size:12px; opacity:0.9; text-transform:uppercase; letter-spacing:0.6px; }
+        .summary-card .field .value { color:#111; font-weight:600; text-align:left; font-size:14px; overflow-wrap:anywhere; }
+
+        /* Full width field (e.g. notes) */
+        .summary-card .field.full {
+            grid-column: 1 / -1;
+        }
+
+        /* Action row inside the card */
+        .summary-card .actions {
+            display:flex;
+            gap:10px;
+            margin-top: 12px;
+            justify-content:flex-end;
+            grid-column: 1 / -1;
+        }
+        .summary-card .card-action-btn {
+            display:inline-flex;
+            gap:8px;
+            align-items:center;
+            padding:8px 12px;
+            border-radius:8px;
+            border:1px solid #e6eef8;
+            background:#fff;
+            color:var(--dark);
+            cursor:pointer;
+            font-weight:700;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+            transition: transform .08s ease;
+        }
+        .summary-card .card-action-btn:hover { transform: translateY(-2px); }
+        .summary-card .card-action-btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
 
         /* Responsive tweaks */
         @media (max-width:900px) {
             fieldset { width:48%; }
-            .summary-card { right: 12px; left: 12px; width: auto; bottom: 120px; }
+            .summary-card { left: 50%; top: 60%; width: calc(100% - 32px); transform: translate(-50%, -50%); }
         }
         @media (max-width:640px) {
             .dashboard-container { padding:12px; gap:10px; }
@@ -293,7 +359,8 @@
             table#dataTable { min-width:650px; }
             footer.footer-bar { bottom:10px; padding:10px; gap:8px; }
             table#dataTable th, table#dataTable td { padding:10px 8px; font-size:12px; white-space:nowrap; }
-            .summary-card { bottom: 140px; }
+            .summary-card { top: 60%; bottom: auto; max-height: 70vh; }
+            .summary-card .fields { grid-template-columns: 1fr; }
         }
 
         @media (max-width:420px) {
@@ -301,7 +368,7 @@
             #startBtn { width:100%; justify-content:center; }
             .header-controls { flex-direction:column; gap:8px; }
             .brand h1 { font-size:16px; }
-            .summary-card { width: auto; right: 10px; left: 10px; bottom: 150px; }
+            .summary-card { width: calc(100% - 20px); left: 50%; top: 58%; transform: translate(-50%, -50%); }
         }
     </style>
 </head>
@@ -356,21 +423,43 @@
             <fieldset>
                 <legend><i class="fas fa-headset" aria-hidden="true"></i> Contact</legend>
                 <div style="display:flex;gap:8px;align-items:center;">
-                    <button class="action-btn call-btn" data-action="customer_call" id="customerCallBtn" title="Call customer phone" disabled aria-label="Call Customer"><i class="fas fa-phone"></i></button>
-                    <button class="action-btn sms-btn" data-action="customer_sms" id="customerSmsBtn" title="Send SMS to customer" disabled aria-label="SMS Customer"><i class="fas fa-sms"></i></button>
-                    <button class="action-btn whatsapp-btn" data-action="customer_whatsapp" id="customerWhatsappBtn" title="Send WhatsApp to customer" disabled aria-label="WhatsApp Customer"><i class="fab fa-whatsapp"></i></button>
-                    <button class="action-btn utility-btn" data-action="utility" id="utilityBtn" title="View basic trip details" disabled aria-label="View Trip Details"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn call-btn" data-action="customer_call" id="customerCallBtn" title="Call customer phone" disabled aria-label="Call Customer">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="action-btn sms-btn" data-action="customer_sms" id="customerSmsBtn" title="Send SMS to customer" disabled aria-label="SMS Customer">
+                        <i class="fas fa-sms"></i>
+                    </button>
+                    <button class="action-btn whatsapp-btn" data-action="customer_whatsapp" id="customerWhatsappBtn" title="Send WhatsApp to customer" disabled aria-label="WhatsApp Customer">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button class="action-btn utility-btn" data-action="utility" id="utilityBtn" title="View basic trip details" disabled aria-label="View Trip Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
             </fieldset>
         </footer>
 
+        <!-- Backdrop for the summary card -->
+        <div id="summaryBackdrop" class="summary-backdrop" aria-hidden="true"></div>
+
         <!-- Summary card that shows selected row details when utility/view (unhide) button is clicked -->
-        <aside id="summaryCard" class="summary-card" role="dialog" aria-label="Selected ride summary" aria-hidden="true">
+        <aside id="summaryCard" class="summary-card" role="dialog" aria-label="Selected ride summary" aria-hidden="true" aria-modal="true">
             <header>
                 <h3>Ride Summary</h3>
                 <button class="close-summary" id="closeSummaryBtn" aria-label="Close summary">&times;</button>
             </header>
+
             <div class="fields" id="summaryFields" tabindex="0"></div>
+
+            <!-- Actions (kept simple — these are visual affordances) -->
+            <div class="actions" id="summaryCardActions">
+                <button class="card-action-btn" id="copySummaryBtn" title="Copy summary" aria-label="Copy summary">
+                    <i class="fa fa-copy" aria-hidden="true"></i><span style="display:inline-block;width:6px;"></span>Copy
+                </button>
+                <button class="card-action-btn primary" id="closeSummaryActionBtn" title="Close" aria-label="Close summary action">
+                    <i class="fa fa-times" aria-hidden="true"></i><span style="display:inline-block;width:6px;"></span>Close
+                </button>
+            </div>
         </aside>
 
         <div id="notification" role="alert" aria-live="assertive"></div>
@@ -507,7 +596,10 @@
                 tableScroll: document.getElementById("tableScroll"),
                 summaryCard: document.getElementById("summaryCard"),
                 summaryFields: document.getElementById("summaryFields"),
-                closeSummaryBtn: document.getElementById("closeSummaryBtn")
+                closeSummaryBtn: document.getElementById("closeSummaryBtn"),
+                summaryBackdrop: document.getElementById("summaryBackdrop"),
+                copySummaryBtn: document.getElementById("copySummaryBtn"),
+                closeSummaryActionBtn: document.getElementById("closeSummaryActionBtn")
             };
 
             const formatTimestamp = (value) => {
@@ -532,11 +624,19 @@
                 const headers = Array.from(document.querySelectorAll('#dataTable thead th')).map(th => th.textContent || th.innerText || '');
                 const cells = Array.from(row.cells);
                 elements.summaryFields.innerHTML = '';
+
+                // Create structured fields: label/value pairs
                 headers.forEach((h, i) => {
                     const label = h || `Col ${i+1}`;
                     const value = (cells[i] && cells[i].textContent) ? cells[i].textContent : '';
                     const field = document.createElement('div');
                     field.className = 'field';
+                    // Put larger fields like "Notes" or "Details" full width
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes("note") || lowerLabel.includes("details") || lowerLabel.includes("address") || lowerLabel.length > 18) {
+                        field.classList.add('full');
+                    }
+
                     const spanLabel = document.createElement('div');
                     spanLabel.className = 'label';
                     spanLabel.textContent = label;
@@ -547,6 +647,9 @@
                     field.appendChild(spanValue);
                     elements.summaryFields.appendChild(field);
                 });
+
+                // Show backdrop and card
+                elements.summaryBackdrop.classList.add('show');
                 elements.summaryCard.setAttribute('aria-hidden', 'false');
                 elements.summaryCard.classList.add('show');
                 // Focus body for accessibility
@@ -556,6 +659,7 @@
             const hideSummary = () => {
                 elements.summaryCard.setAttribute('aria-hidden', 'true');
                 elements.summaryCard.classList.remove('show');
+                elements.summaryBackdrop.classList.remove('show');
                 elements.summaryFields.innerHTML = '';
             };
 
@@ -805,8 +909,25 @@
                     e.preventDefault();
                     hideSummary();
                 });
+                elements.closeSummaryActionBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    hideSummary();
+                });
 
-                // Close summary when clicking outside (but allow clicking the utility button)
+                // Copy summary content to clipboard
+                elements.copySummaryBtn && elements.copySummaryBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try {
+                        const text = elements.summaryFields.innerText || elements.summaryFields.textContent || '';
+                        navigator.clipboard && navigator.clipboard.writeText(text);
+                        showNotification("Copied", "Summary copied to clipboard.");
+                    } catch (err) {
+                        console.warn("Copy failed", err);
+                        showNotification("Copy Failed", "Unable to copy summary.", true);
+                    }
+                });
+
+                // Close summary when clicking backdrop or outside (but allow clicking the utility button)
                 document.addEventListener('click', (e) => {
                     if (!elements.summaryCard.classList.contains('show')) return;
                     const path = e.composedPath ? e.composedPath() : (e.path || []);
@@ -818,6 +939,11 @@
                 // Prevent clicks inside summary from bubbling up
                 elements.summaryCard.addEventListener('click', (e) => {
                     e.stopPropagation();
+                });
+
+                // Allow clicking backdrop to close
+                elements.summaryBackdrop.addEventListener('click', (e) => {
+                    hideSummary();
                 });
 
                 updateActionButtons(null);
