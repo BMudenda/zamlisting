@@ -225,9 +225,65 @@
         }
         #notification.show { top:10px; opacity:1; }
 
+        /* --- Summary Card (added) --- */
+        .summary-card {
+            position: fixed;
+            right: 20px;
+            bottom: 110px;
+            width: 340px;
+            max-width: calc(100% - 40px);
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 18px 40px rgba(23, 43, 77, 0.12);
+            z-index: 10001;
+            border: 1px solid #e6eef8;
+            font-size: 14px;
+            color: #222;
+            display: none;
+            max-height: 60vh;
+            overflow: auto;
+        }
+        .summary-card.show { display: block; animation: slideUp .18s ease-out; }
+        @keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .summary-card header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .summary-card header h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .summary-card .close-summary {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #666;
+        }
+        .summary-card .fields { display:block; }
+        .summary-card .field {
+            display:flex;
+            justify-content:space-between;
+            gap:8px;
+            padding:8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            align-items:center;
+            word-break: break-word;
+        }
+        .summary-card .field .label { color: #577; font-weight:600; font-size:13px; opacity:0.85; }
+        .summary-card .field .value { color:#111; font-weight:500; text-align:right; font-size:13px; }
+
         /* Responsive tweaks */
         @media (max-width:900px) {
             fieldset { width:48%; }
+            .summary-card { right: 12px; left: 12px; width: auto; bottom: 120px; }
         }
         @media (max-width:640px) {
             .dashboard-container { padding:12px; gap:10px; }
@@ -237,6 +293,7 @@
             table#dataTable { min-width:650px; }
             footer.footer-bar { bottom:10px; padding:10px; gap:8px; }
             table#dataTable th, table#dataTable td { padding:10px 8px; font-size:12px; white-space:nowrap; }
+            .summary-card { bottom: 140px; }
         }
 
         @media (max-width:420px) {
@@ -244,6 +301,7 @@
             #startBtn { width:100%; justify-content:center; }
             .header-controls { flex-direction:column; gap:8px; }
             .brand h1 { font-size:16px; }
+            .summary-card { width: auto; right: 10px; left: 10px; bottom: 150px; }
         }
     </style>
 </head>
@@ -305,6 +363,15 @@
                 </div>
             </fieldset>
         </footer>
+
+        <!-- Summary card that shows selected row details when utility/view (unhide) button is clicked -->
+        <aside id="summaryCard" class="summary-card" role="dialog" aria-label="Selected ride summary" aria-hidden="true">
+            <header>
+                <h3>Ride Summary</h3>
+                <button class="close-summary" id="closeSummaryBtn" aria-label="Close summary">&times;</button>
+            </header>
+            <div class="fields" id="summaryFields" tabindex="0"></div>
+        </aside>
 
         <div id="notification" role="alert" aria-live="assertive"></div>
         <audio id="beepSound" preload="auto">
@@ -437,7 +504,10 @@
                 utilityBtn: document.getElementById("utilityBtn"),
                 beep: document.getElementById("beepSound"),
                 notification: document.getElementById("notification"),
-                tableScroll: document.getElementById("tableScroll")
+                tableScroll: document.getElementById("tableScroll"),
+                summaryCard: document.getElementById("summaryCard"),
+                summaryFields: document.getElementById("summaryFields"),
+                closeSummaryBtn: document.getElementById("closeSummaryBtn")
             };
 
             const formatTimestamp = (value) => {
@@ -453,6 +523,40 @@
                 elements.notification.style.backgroundColor = isError ? 'var(--danger)' : 'var(--accent)';
                 elements.notification.classList.add('show');
                 setTimeout(() => elements.notification.classList.remove('show'), 4200);
+            };
+
+            // Build and display summary card content from the selected row
+            const showSummaryFromRow = (row) => {
+                if (!row) return;
+                // Get headers (fallback to "Column X" if header missing)
+                const headers = Array.from(document.querySelectorAll('#dataTable thead th')).map(th => th.textContent || th.innerText || '');
+                const cells = Array.from(row.cells);
+                elements.summaryFields.innerHTML = '';
+                headers.forEach((h, i) => {
+                    const label = h || `Col ${i+1}`;
+                    const value = (cells[i] && cells[i].textContent) ? cells[i].textContent : '';
+                    const field = document.createElement('div');
+                    field.className = 'field';
+                    const spanLabel = document.createElement('div');
+                    spanLabel.className = 'label';
+                    spanLabel.textContent = label;
+                    const spanValue = document.createElement('div');
+                    spanValue.className = 'value';
+                    spanValue.textContent = value;
+                    field.appendChild(spanLabel);
+                    field.appendChild(spanValue);
+                    elements.summaryFields.appendChild(field);
+                });
+                elements.summaryCard.setAttribute('aria-hidden', 'false');
+                elements.summaryCard.classList.add('show');
+                // Focus body for accessibility
+                try { elements.summaryFields.focus(); } catch (e) {}
+            };
+
+            const hideSummary = () => {
+                elements.summaryCard.setAttribute('aria-hidden', 'true');
+                elements.summaryCard.classList.remove('show');
+                elements.summaryFields.innerHTML = '';
             };
 
             const playBeep = () => {
@@ -648,7 +752,8 @@
                         messageBody = customerPredefinedMessage;
                         break;
                     case 'utility':
-                        showNotification("View Details", `Trip: ${getValue(3)} to ${getValue(4)}`, false);
+                        // When the utility (unhide/view) button is clicked, summarize the selected row in the card
+                        showSummaryFromRow(selectedRow);
                         return;
                     default:
                         return;
@@ -693,6 +798,26 @@
 
                 document.querySelectorAll('.action-btn').forEach(btn => {
                     btn.addEventListener('click', handleAction);
+                });
+
+                // Close summary button
+                elements.closeSummaryBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    hideSummary();
+                });
+
+                // Close summary when clicking outside (but allow clicking the utility button)
+                document.addEventListener('click', (e) => {
+                    if (!elements.summaryCard.classList.contains('show')) return;
+                    const path = e.composedPath ? e.composedPath() : (e.path || []);
+                    if (!path.includes(elements.summaryCard) && !path.includes(elements.utilityBtn)) {
+                        hideSummary();
+                    }
+                });
+
+                // Prevent clicks inside summary from bubbling up
+                elements.summaryCard.addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
 
                 updateActionButtons(null);
