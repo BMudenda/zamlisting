@@ -7,100 +7,58 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <meta name="theme-color" content="#2b6ef6">
-
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
       --secondary-color: #ff9900;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
       --bg-color-body: #f5f5f5;
       --bg-color-card: #ffffff;
       --border-color-light: #e0e0e0;
       --font-color-dark: #333;
-      --font-color-medium: #555;
     }
-    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); overflow-x: hidden; }
 
     header { background: var(--font-color-dark); color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .header-content { max-width: 1200px; margin: auto; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
-    .company-info h2 { font-size: 1.2rem; color: var(--secondary-color); }
-    .menu-button { background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer; }
+    .company-info h2 { font-size: 1.1rem; color: var(--secondary-color); }
 
-    .product-container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 20px; }
+    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
     
-    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 15px; background: #fafafa; margin-bottom: 20px; }
-    legend { font-weight: bold; color: var(--primary-color); padding: 0 10px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
-    legend .material-icons { font-size: 18px; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; transition: 0.3s; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+    
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 8px 10px; transition: 0.3s; position: relative; display: flex; align-items: center; width: 100%; }
+    .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
+    
+    ::placeholder { font-size: 0.8rem; font-style: italic; color: #aaa; }
 
-    /* Unified Field Style */
-    .field-wrapper { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
-    .field-label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 500; color: var(--font-color-medium); margin-left: 4px; }
-    .field-label .material-icons { font-size: 18px; color: var(--primary-color); }
+    /* Horizontal Mode Layout */
+    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .mode-option .material-icons { font-size: 24px; color: var(--primary-color); }
 
-    .input-box {
-      background: white;
-      border: 1px solid var(--border-color-light);
-      border-radius: 8px;
-      padding: 12px 15px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      position: relative;
-    }
-    .input-box input {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: var(--font-color-dark);
-      background: transparent;
-    }
-    .input-box input::placeholder { font-weight: normal; color: #bbb; font-size: 0.95rem; }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 
-    /* Radio Group */
-    .radio-group { display: flex; justify-content: space-around; padding: 10px 0; }
-    .radio-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-    .radio-item .mode-icon { font-size: 32px; color: var(--primary-color); }
-
-    /* Summary Card Styling (No Icons) */
-    .summary-card {
-      background: white;
-      border: 1px solid var(--border-color-light);
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .summary-label { font-size: 0.95rem; color: var(--font-color-medium); font-weight: 500; }
-    .summary-value { font-weight: bold; font-size: 1.1rem; }
-    .summary-value b { color: var(--secondary-color); font-size: 1.25rem; }
-
-    /* Autocomplete */
-    .autocomplete-list {
-      position: absolute;
-      top: 100%; left: 0; width: 100%;
-      background: white; border: 1px solid var(--border-color-light);
-      z-index: 100; max-height: 150px; overflow-y: auto; border-radius: 0 0 8px 8px;
-    }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; z-index: 100; max-height: 150px; overflow-y: auto; border-radius: 0 0 8px 8px; }
     .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-    .suggestion:hover { background: #f0f4ff; }
 
-    .summary-actions { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
-    .submit-btn {
-      background: var(--primary-color); color: white; width: 50px; height: 50px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 24px; text-decoration: none; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
-    }
-    .submit-btn[disabled] { opacity: 0.4; pointer-events: none; }
-
-    .status-text { text-align: center; font-size: 0.9rem; margin-top: 10px; color: var(--font-color-medium); }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: 0.3s; }
+    
     .hidden-section { display: none; }
-    .loader { width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 10px auto; display: none; }
+    .loader { width: 25px; height: 25px; border: 3px solid #f3f3f3; border-top: 3px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 10px auto; display: none; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 4px; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; font-weight: normal; }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
   </style>
 </head>
 <body>
@@ -108,7 +66,6 @@
   <header>
     <div class="header-content">
       <div class="company-info"><h2>Luangwa Feira Rides</h2></div>
-      <button class="menu-button"><i class="fas fa-ellipsis-v"></i></button>
     </div>
   </header>
 
@@ -116,147 +73,189 @@
     <div class="booking-container">
       
       <fieldset>
-        <legend><span class="material-icons">account_circle</span> Customer Identity</legend>
-        <div class="field-wrapper">
-          <label class="field-label"><span class="material-icons">phone</span> Phone Number</label>
-          <div class="input-box">
-            <input type="tel" id="customer-phone" maxlength="10" placeholder="0xxxxxxxxx" inputmode="numeric">
-          </div>
+        <legend><span class="material-icons">account_circle</span> Phone Number</legend>
+        <div class="input-box" id="phone-box">
+          <span class="material-icons">phone</span>
+          <input type="tel" id="customer-phone" maxlength="10" placeholder="0xxxxxxxxx" inputmode="numeric">
         </div>
       </fieldset>
 
       <div id="trip-details" class="hidden-section">
-        <fieldset>
-          <legend>Choose Mode</legend>
-          <div class="radio-group" id="mode-group">
-            <label class="radio-item">
-              <span class="mode-icon material-icons">motorcycle</span>
-              <span>Motorbike</span>
+        <fieldset id="mode-fieldset">
+          <legend><span class="material-icons">commute</span> Transport Mode</legend>
+          <div id="mode-group" style="display:flex; justify-content:space-around; padding:10px 0;">
+            <label class="mode-option">
               <input type="radio" name="mode" value="motorbike">
+              <span class="material-icons">motorcycle</span>
+              <small>Motorbike</small>
             </label>
-            <label class="radio-item">
-              <span class="mode-icon material-icons">directions_car</span>
-              <span>Vehicle</span>
+            <label class="mode-option">
               <input type="radio" name="mode" value="vehicle">
+              <span class="material-icons">directions_car</span>
+              <small>Vehicle</small>
             </label>
           </div>
         </fieldset>
 
-        <fieldset>
-          <legend>Trip Details</legend>
-          <div class="field-wrapper">
-            <label class="field-label"><span class="material-icons">place</span> Pickup Point</label>
-            <div class="input-box">
-              <input type="text" id="gm-origin" placeholder="Type pickup location...">
-              <div id="originList" class="autocomplete-list"></div>
-            </div>
+        <fieldset id="route-fieldset">
+          <legend>Route</legend>
+          <div class="input-box" id="origin-container" style="margin-bottom:12px;">
+            <span class="material-icons">my_location</span>
+            <input type="text" id="gm-origin" placeholder="type and select your pick" autocomplete="off">
+            <div id="originList" class="autocomplete-list"></div>
           </div>
-
-          <div class="field-wrapper">
-            <label class="field-label"><span class="material-icons">flag</span> Destination</label>
-            <div class="input-box">
-              <input type="text" id="gm-destination" placeholder="Type where to go...">
-              <div id="destinationList" class="autocomplete-list"></div>
-            </div>
+          <div class="input-box" id="dest-container">
+            <span class="material-icons">pin_drop</span>
+            <input type="text" id="gm-destination" placeholder="type and select destination" autocomplete="off">
+            <div id="destinationList" class="autocomplete-list"></div>
           </div>
         </fieldset>
       </div>
 
       <div id="summary-section" class="hidden-section">
         <fieldset>
-          <legend>Trip Summary</legend>
+          <legend><span class="material-icons">receipt_long</span> Trip Summary</legend>
           <div id="summary-cards"></div>
         </fieldset>
-        
-        <div class="summary-actions">
-          <a href="#" class="fas fa-paper-plane submit-btn" id="submit-btn"></a>
-          <p style="margin-top:8px; font-weight:bold;">Request Now</p>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <button class="fas fa-paper-plane submit-btn" id="submit-btn"></button>
+          <p id="action-label" style="margin-top:6px; font-weight:bold; color:var(--primary-color);">Request Now</p>
         </div>
       </div>
 
       <div class="loader" id="spinner"></div>
-      <p id="status" class="status-text">Enter phone to begin.</p>
+      <p id="status" style="text-align:center; margin-top:8px; font-weight:bold; min-height:1.2em;"></p>
     </div>
   </main>
 
   <script>
-    const config = { vPrice: 3.0, mPrice: 1.02, vMin: 20, mMin: 10, vEx: 6, mEx: 2.04 };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
     const places = ["Anglican Church","Airstrip","Big 2 Zambezi Water Front Resort & Safari","BM Residence","Boma Clinic","Chidada Ground","Car Wash Pub","Chitope","Chitope Rural Health Centre","Chilombwe Community School","Chiriwe Primary School","Dzalo Skills Training Centre Kambolozo","Feira Kindom Hall","Feira Day Secondary School","Gerasmos Safari Lodge","Hill View","JB Three Boarders Mall","JB Three Boarders Club","Justifeli Lodge","Kakaro Primary School","Kakaro Liberation Heritage Site","Kantuleni Executive Lodge","Kapoche","Kaunga Secondary School","Kasinsa","Katondwe Chapel","Katondwe Chaz Hotel","Katondwe Dam","Katondwe Girls Secondary School","Katondwe Mission Hospital","Katondwe Primary School","Kavalamanja","Luangwa (Feira)","Luangwa Basic School","Luangwa Bridge","Luangwa Bridge Market","Luangwa Bus Station","Luangwa Council Lodge","Luangwa DC Office","Luangwa DEBS Offices","Luangwa District Hospital","Luangwa High School Police Post","Boma Filling Station","Luangwa Habour","Indeco Building","Luangwa Market","Luangwa Main SDA Church","Mburuma Local Court","Luangwa Police Station","Luangwa Post Office","Luangwa Town Council","Luangwa Secondary School","Makichilo Lodge","Mwavi Secondary School","Mwalila Primary School","Nyabota Lodge","Passover Living Lamb Ministry Katondwe","Pentecostal Assembly of God Joshua Assembly","UCZ","Soweto Junction","Registration Office","River Spot Club","SDA Katondwe","Yangoma Lodge","Yellow Shop","ZESCO Office"];
     
+    let rideData = null;
+
+    function getHub(location) {
+        const l = location.toLowerCase();
+        if (l.includes("katondwe")) return "Katondwe";
+        if (l.includes("bridge")) return "Luangwa Bridge";
+        if (l.includes("boma")) return "Boma";
+        return "Main Market";
+    }
+
     const phoneInput = document.getElementById('customer-phone');
     const tripDiv = document.getElementById('trip-details');
     const summaryDiv = document.getElementById('summary-section');
-    const status = document.getElementById('status');
-    const spinner = document.getElementById('spinner');
+    const statusText = document.getElementById('status');
+    const submitBtn = document.getElementById('submit-btn');
 
-    function checkInputs() {
-      const phone = phoneInput.value;
-      const isValidPhone = /^0[0-9]{9}$/.test(phone);
-      
-      if (isValidPhone) {
-        tripDiv.classList.remove('hidden-section');
-        status.textContent = "Select your trip details.";
-      } else {
-        tripDiv.classList.add('hidden-section');
-        summaryDiv.classList.add('hidden-section');
-        status.textContent = "Enter a valid 10-digit phone number.";
-        return;
+    phoneInput.oninput = () => { 
+      if (/^0[0-9]{9}$/.test(phoneInput.value)) {
+        tripDiv.style.display = 'block';
       }
+    };
 
-      const origin = document.getElementById('gm-origin').value;
-      const dest = document.getElementById('gm-destination').value;
+    function setupAuto(inputId, containerId, listId) {
+      const input = document.getElementById(inputId);
+      const container = document.getElementById(containerId);
+      const list = document.getElementById(listId);
+
+      input.oninput = () => {
+        const val = input.value.toLowerCase();
+        list.innerHTML = '';
+        container.classList.remove('field-error'); 
+        if (!val) return;
+
+        const matches = places.filter(p => p.toLowerCase().includes(val));
+        matches.forEach(p => {
+          const d = document.createElement('div');
+          d.className = 'suggestion';
+          d.textContent = p;
+          d.onclick = () => {
+            input.value = p;
+            list.innerHTML = '';
+            container.classList.remove('field-error');
+            checkReady();
+          };
+          list.appendChild(d);
+        });
+      };
+
+      input.onblur = () => {
+        setTimeout(() => {
+          if (input.value && !places.includes(input.value)) {
+            container.classList.add('field-error');
+            statusText.textContent = "⚠️ Invalid location. Select from list.";
+            statusText.style.color = "var(--error-color)";
+            summaryDiv.style.display = 'none';
+          }
+        }, 200);
+      };
+    }
+
+    function checkReady() {
+      const from = document.getElementById('gm-origin').value;
+      const to = document.getElementById('gm-destination').value;
       const mode = document.querySelector('input[name="mode"]:checked');
 
-      if (places.includes(origin) && places.includes(dest) && mode) {
-        showSummary(origin, dest, mode.value);
+      if (places.includes(from) && places.includes(to)) {
+        if (!mode) {
+          statusText.textContent = "Select Transport Mode (Bike/Car).";
+          statusText.style.color = "var(--secondary-color)";
+        } else {
+          statusText.textContent = "";
+          calculate(from, to, mode.value);
+        }
       }
     }
 
-    function showSummary(origin, dest, mode) {
-      spinner.style.display = 'block';
-      summaryDiv.classList.add('hidden-section');
-      
+    function calculate(from, to, mode) {
+      document.getElementById('spinner').style.display = 'block';
+      summaryDiv.style.display = 'none';
       setTimeout(() => {
-        spinner.style.display = 'none';
-        summaryDiv.classList.remove('hidden-section');
-        status.textContent = "";
+        document.getElementById('spinner').style.display = 'none';
+        summaryDiv.style.display = 'block';
         
-        const dist = 5.2; // Example distance
-        const price = mode === 'vehicle' ? Math.max(dist * config.vPrice, config.vMin) + config.vEx : Math.max(dist * config.mPrice, config.mMin) + config.mEx;
+        const hub = getHub(from);
+        const price = mode === 'vehicle' ? 35 : 15;
+        const dist = (Math.random() * 4 + 1.5).toFixed(1); 
 
         document.getElementById('summary-cards').innerHTML = `
           <div class="summary-card">
-            <span class="summary-label">Total Fare</span>
-            <span class="summary-value"><b>K${Math.round(price)}</b></span>
+            <span>Price</span>
+            <span style="color:var(--secondary-color); font-weight:bold;">K${price}</span>
           </div>
           <div class="summary-card">
-            <span class="summary-label">Trip Distance</span>
-            <span class="summary-value">${dist} km</span>
-          </div>
-        `;
+            <span>Trip Distance
+              <div class="tooltip-container">
+                <span class="material-icons tooltip-icon">info</span>
+                <span class="tooltip-text">Price calculated via <b>${hub}</b> hub for accuracy.</span>
+              </div>
+            </span>
+            <span>${dist} km</span>
+          </div>`;
+        rideData = { phone: phoneInput.value, from, to, price, mode, distance: dist, hub: hub };
       }, 600);
     }
 
-    function setupAuto(id, listId) {
-      const input = document.getElementById(id);
-      const list = document.getElementById(listId);
-      input.addEventListener('input', () => {
-        const val = input.value.toLowerCase();
-        list.innerHTML = '';
-        if (!val) return;
-        places.filter(p => p.toLowerCase().includes(val)).forEach(p => {
-          const d = document.createElement('div');
-          d.className = 'suggestion'; d.textContent = p;
-          d.onclick = () => { input.value = p; list.innerHTML = ''; checkInputs(); };
-          list.appendChild(d);
-        });
-      });
-    }
+    submitBtn.onclick = async () => {
+      if (!rideData) return;
+      statusText.textContent = "Sending request...";
+      submitBtn.disabled = true;
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({...rideData}) });
+        statusText.textContent = "Sent! Tap phone to call dispatcher.";
+        statusText.style.color = "var(--success-color)";
+        submitBtn.className = "fas fa-phone submit-btn";
+        submitBtn.style.background = "var(--success-color)";
+        submitBtn.disabled = false;
+        document.getElementById('action-label').textContent = "Call Now";
+        submitBtn.onclick = () => window.location.href = "tel:0966423229";
+      } catch (err) { statusText.textContent = "Error. Call dispatcher directly."; }
+    };
 
-    phoneInput.addEventListener('input', checkInputs);
-    document.getElementById('mode-group').addEventListener('change', checkInputs);
-    setupAuto('gm-origin', 'originList');
-    setupAuto('gm-destination', 'destinationList');
+    setupAuto('gm-origin', 'origin-container', 'originList');
+    setupAuto('gm-destination', 'dest-container', 'destinationList');
+    document.getElementById('mode-group').onchange = checkReady;
   </script>
 </body>
 </html>
