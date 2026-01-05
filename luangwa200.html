@@ -23,60 +23,85 @@
     body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
     header { background: var(--font-color-dark); color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .company-info h2 { font-size: 1.1rem; color: var(--secondary-color); }
 
+    /* --- DROPDOWN STYLES --- */
+    .menu-btn { background: none; border: none; color: white; cursor: pointer; padding: 5px; outline: none; }
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 35px;
+      background-color: white;
+      min-width: 180px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      z-index: 1000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .dropdown-content a {
+      color: #333;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .dropdown-content a:hover { background-color: #f5f5f5; }
+    .show { display: block; }
+
+    /* --- RESTORED TOOLTIP STYLES --- */
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { 
+      visibility: hidden; 
+      width: 160px; 
+      background-color: #333; 
+      color: #fff; 
+      text-align: center; 
+      border-radius: 6px; 
+      padding: 8px; 
+      position: absolute; 
+      z-index: 9999; 
+      bottom: 125%; 
+      left: 50%; 
+      margin-left: -80px; 
+      opacity: 0; 
+      transition: opacity 0.3s; 
+      font-size: 0.7rem; 
+      font-weight: normal; 
+      line-height: 1.3;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    /* Layout Styles */
     .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
     .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
-    
     fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; transition: 0.3s; }
     legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-    
     .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; transition: 0.3s; position: relative; display: flex; align-items: center; width: 100%; }
     .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
     .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
-    
-    /* Small and Italic Placeholders */
-    input::placeholder {
-      font-size: 0.8rem;
-      font-style: italic;
-      color: #999;
-      font-weight: normal;
-    }
-
+    input::placeholder { font-size: 0.8rem; font-style: italic; color: #999; font-weight: normal; }
     .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .mode-option .material-icons { font-size: 24px; color: var(--primary-color); }
-
     .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-
     .autocomplete-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; z-index: 100; max-height: 150px; overflow-y: auto; border-radius: 0 0 8px 8px; }
     .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     .suggestion:hover { background: #f0f7ff; }
-
     .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-    
     .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
-    .submit-btn:disabled { opacity: 0.8; cursor: not-allowed; }
-    
-    .btn-loader {
-      width: 28px; height: 28px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-top: 3px solid #fff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: none;
-    }
-
+    .btn-loader { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
     .hidden-section { display: none; }
     .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
-    
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 4px; }
-    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
-    .tooltip-text { visibility: hidden; width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 10px; position: absolute; z-index: 999; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; font-weight: normal; line-height: 1.4; }
-    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
   </style>
 </head>
 <body>
@@ -84,6 +109,20 @@
   <header>
     <div class="header-content">
       <div class="company-info"><h2>Luangwa Feira Rides</h2></div>
+      
+      <div class="dropdown">
+        <button onclick="toggleDropdown()" class="menu-btn">
+          <i class="fas fa-ellipsis-v fa-lg"></i>
+        </button>
+        <div id="navDropdown" class="dropdown-content">
+          <a href="#"><i class="fas fa-info-circle"></i> About</a>
+          <a href="tel:0966423229"><i class="fas fa-phone-alt"></i> Call Us</a>
+          <a href="https://wa.me/260966423229"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+          <a href="sms:0966423229"><i class="fas fa-comment"></i> SMS</a>
+          <a href="https://facebook.com"><i class="fab fa-facebook"></i> Facebook</a>
+          <a href="https://tiktok.com"><i class="fab fa-tiktok"></i> TikTok</a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -132,7 +171,13 @@
 
       <div id="summary-section" class="hidden-section">
         <fieldset>
-          <legend><span class="material-icons">receipt_long</span> Trip Summary</legend>
+          <legend>
+            <span class="material-icons">receipt_long</span> Trip Summary
+            <span class="tooltip-container">
+              <span class="material-icons tooltip-icon">help_outline</span>
+              <span class="tooltip-text" id="hub-tooltip">Calculated via nearest hub</span>
+            </span>
+          </legend>
           <div id="summary-cards"></div>
         </fieldset>
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
@@ -150,11 +195,60 @@
   </main>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-    
-    // Logic remains the same as the Dijkstra implementation provided earlier
-    const places = ["Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic", "Chidada Ground", "Car Wash Pub", "Chitope", "Chitope Rural Health Centre", "Chilombwe Community School", "Chiriwe Primary School", "Dzalo Skills Training Centre Kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", "Justifeli Lodge", "Kakaro Primary School", "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kaunga Secondary School", "Kasinsa", "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", "Katondwe Girls Secondary School", "Katondwe Mission Hospital", "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices", "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", "Luangwa Habour", "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School", "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly", "UCZ", "Soweto Junction", "Registration Office", "River Spot Club","SDA Katondwe", "Yangoma Lodge", "Yellow Shop", "ZESCO Office"];
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("sw.js").then(
+          function(reg) { console.log("ServiceWorker registered"); },
+          function(err) { console.log("ServiceWorker registration failed:", err); }
+        );
+      });
+    }
 
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      const deferredPrompt = e;
+      const installBox = document.createElement("div");
+      installBox.style.position = "fixed";
+      installBox.style.top = "15px";
+      installBox.style.right = "15px";
+      installBox.style.background = "#2b6ef6";
+      installBox.style.color = "#fff";
+      installBox.style.borderRadius = "8px";
+      installBox.style.padding = "8px 14px";
+      installBox.style.fontFamily = "system-ui, sans-serif";
+      installBox.style.fontSize = "14px";
+      installBox.style.cursor = "pointer";
+      installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+      installBox.style.zIndex = "9999";
+      installBox.style.display = "flex";
+      installBox.style.alignItems = "center";
+      installBox.style.gap = "8px";
+      installBox.innerHTML = `<span id="installText">Install</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>`;
+      document.body.appendChild(installBox);
+
+      document.getElementById("installText").addEventListener("click", async () => {
+        installBox.remove();
+        deferredPrompt.prompt();
+      });
+      document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+    });
+
+    function toggleDropdown() {
+      document.getElementById("navDropdown").classList.toggle("show");
+    }
+    window.onclick = function(event) {
+      if (!event.target.matches('.menu-btn') && !event.target.matches('.fa-ellipsis-v')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+          if (dropdowns[i].classList.contains('show')) dropdowns[i].classList.remove('show');
+        }
+      }
+    }
+  </script>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+    const places = ["Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic", "Chidada Ground", "Car Wash Pub", "Chitope", "Chitope Rural Health Centre", "Chilombwe Community School", "Chiriwe Primary School", "Dzalo Skills Training Centre Kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", "Justifeli Lodge", "Kakaro Primary School", "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kaunga Secondary School", "Kasinsa", "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", "Katondwe Girls Secondary School", "Katondwe Mission Hospital", "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices", "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", "Luangwa Habour", "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School", "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly", "UCZ", "Soweto Junction", "Registration Office", "River Spot Club","SDA Katondwe", "Yangoma Lodge", "Yellow Shop", "ZESCO Office"];
     const segments = [{ from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 }, { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 }, { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 }, { from: 'Katondwe Mission Hospital', to: 'Mburuma Local Court', distance: 7 }, { from: 'Mburuma Local Court', to: 'Mwavi Secondary School', distance: 0.65 }, { from: 'Mburuma Local Court', to: 'Katondwe Mission Hospital', distance: 7.8 }, { from: 'Mwavi Secondary School', to: 'Chitope Rural Health Centre', distance: 2 }, { from: 'Chitope Rural Health Centre', to: 'Mwalila Primary School', distance: 6 }, { from: 'Mwalila Primary School', to: 'Kaunga Secondary School', distance: 5 }, { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 }, { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 }, { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 }, { from: "Car Wash Pub", to: "Luangwa Town Council", distance: 1.00 }, { from: "Car Wash Pub", to: "Soweto Junction", distance: 2.75 }, { from: "Car Wash Pub", to: "BM Residence", distance: 1.00 }, { from: "Soweto Junction", to: "Airstrip", distance: 1.7 }, { from: "Soweto Junction", to: "ZESCO Office", distance: 0.3 }, { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 }, { from: "ZESCO Office", to: "Luangwa Main SDA Church", distance: 0.65 }, { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 }, { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 }, { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 }, { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 }, { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 }, { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 }, { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 }, { from: "Kantuleni Executive Lodge", to: "Luangwa Habour", distance: 0.09 }, { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 }, { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 }, { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 }, { from: "Luangwa Police Station", to: "Luangwa DEBS Offices", distance: 0.1 }, { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 }, { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 }, { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 }, { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 }, { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 }, { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 }, { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 }, { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo", distance: 0.60 }, { from: "Luangwa Town Council", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 3.2 }, { from: "Big 2 Zambezi Water Front Resort & Safari", to: "Chilombwe Community School", distance: 9.8 }, { from: "Registration Office", to: "Chidada Ground", distance: 0.49 }, { from: "Chidada Ground", to: "Yangoma Lodge", distance: 2.34 }, { from: "Luangwa Town Council", to: "Hill View", distance: 0.40 }, { from: "Hill View", to: "BM Residence", distance: 1.00 }, { from: "BM Residence", to: "Feira Day Secondary School", distance: 1.10 }, { from: "Feira Kindom Hall", to: "Anglican Church", distance: 0.08 }, { from: "Feira Kindom Hall", to: "Luangwa (Feira)", distance: 0.7 }, { from: "Luangwa (Feira)", to: "Luangwa Bus Station", distance: 0.1 }, { from: "Dzalo Skills Training Centre Kambolozo", to: "Justifeli Lodge", distance: 0.26 }, { from: "Luangwa Market", to: "Makichilo Lodge", distance: 0.4 }, { from: "Makichilo Lodge", to: "Gerasmos Safari Lodge", distance: 0.3 }, { from: "Makichilo Lodge", to: "UCZ", distance: 0.5 }, { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.02 }, { from: "UCZ", to: "Pentecostal Assembly of God Joshua Assembly", distance: 0.08 }, { from: "Chitope", to: "Kasinsa", distance: 10.0 }, { from: "Chitope", to: "Mwavi Secondary School", distance: 1.1 }, { from: "Kasinsa", to: "Luangwa Secondary School", distance: 14.0 }, { from: "Luangwa High School Police Post", to: "Chiriwe Primary School", distance: 2.1 }, { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 }, { from: "Kapoche", to: "Chiriwe Primary School", distance: 19.7 }, { from: "Luangwa High School Police Post", to: "SDA Katondwe", distance: 1.0 }, { from: "Katondwe Mission Hospital", to: "Katondwe Primary School", distance: 0.55 }, { from: "Katondwe Chapel", to: "Katondwe Primary School", distance: 0.05 }, { from: "Katondwe Primary School", to: "Katondwe Girls Secondary School", distance: 0.0 }, { from: "Katondwe Girls Secondary School", to: "Katondwe Chaz Hotel", distance: 0.45 }, { from: "Katondwe Chaz Hotel", to: "Passover Living Lamb Ministry Katondwe", distance: 0.4 }, { from: "Passover Living Lamb Ministry Katondwe", to: "Katondwe Dam", distance: 0.1 }, { from: "Kakaro Primary School", to: "Kakaro Liberation Heritage Site", distance: 1.2 }, { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23.0 }];
 
     const hubs = ["Luangwa Bus Station", "Chitope", "Luangwa Bridge Market"];
@@ -238,6 +332,10 @@
         const res = calculateTotalDistance(from, to);
         if (res.total === null) { statusText.textContent = "Route error."; return; }
         summaryDiv.style.display = 'block';
+        
+        // Update Tooltip with specific Hub
+        document.getElementById('hub-tooltip').textContent = "Price calculated based on nearest service hub: " + res.hub;
+
         const rate = (mode === 'vehicle') ? 5 : 2; const price = Math.max(15, Math.ceil(res.total * rate));
         document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Price</span><span style="color:var(--secondary-color); font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
         rideData = { preferredMode: mode, phone: phoneInput.value, hub: res.hub, from, to, tripDistance: res.trip.toFixed(2), totalDistance: res.total.toFixed(2), price: price };
