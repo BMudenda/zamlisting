@@ -102,11 +102,14 @@
         color: #e53935;
     }
 
-    /* INPUTS */
-    input[type="tel"],
-    input[type="text"] {
+    /* INPUTS WITH ICONS */
+    .input-icon {
+        position: relative;
+    }
+
+    .input-icon input {
         width: 100%;
-        padding: 14px;
+        padding: 14px 14px 14px 36px; /* space for icon */
         border-radius: 12px;
         border: 1px solid #ccc;
         font-size: 16px;
@@ -114,25 +117,28 @@
         margin-bottom: 12px;
         display: block;
         box-sizing: border-box;
-        font-style: italic;      
-    }
-
-    input::placeholder {
-        font-size: 13px;         
         font-style: italic;
     }
 
-    input:last-child {
-        margin-bottom: 0;
+    .input-icon input::placeholder {
+        font-size: 13px;
+        font-style: italic;
     }
 
-    input:focus {
+    .input-icon input:focus {
         outline: none;
         border-color: #e53935;
         font-style: normal;
     }
 
-    /* Labels for From/To */
+    .input-icon .icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 16px;
+    }
+
     .trip-label {
         font-weight: bold;
         font-size: 14px;
@@ -276,7 +282,10 @@
 
         <fieldset>
             <legend>Phone Number</legend>
-            <input type="tel" id="phone" placeholder="0XXXXXXXXX" maxlength="10">
+            <div class="input-icon">
+                <span class="icon">📞</span>
+                <input type="tel" id="phone" placeholder="0XXXXXXXXX" maxlength="10">
+            </div>
         </fieldset>
 
         <div id="section2" class="hidden">
@@ -296,11 +305,18 @@
 
             <fieldset>
                 <legend>Trip Locations</legend>
+
                 <label class="trip-label" for="from">From</label>
-                <input type="text" id="from" placeholder="Type & select location">
+                <div class="input-icon">
+                    <span class="icon">📍</span>
+                    <input type="text" id="from" placeholder="Type & select location">
+                </div>
 
                 <label class="trip-label" for="to">To</label>
-                <input type="text" id="to" placeholder="Type & select destination">
+                <div class="input-icon">
+                    <span class="icon">🏁</span>
+                    <input type="text" id="to" placeholder="Type & select destination">
+                </div>
             </fieldset>
 
             <fieldset>
@@ -352,7 +368,6 @@
     const loader = document.getElementById("loader");
     const notification = document.getElementById("notification");
 
-    // Show main section after phone input
     phoneInput.addEventListener("input", () => {
         if (phoneInput.value.length === 10 && section2.classList.contains("hidden")) {
             section2.classList.remove("hidden");
@@ -361,7 +376,6 @@
         }
     });
 
-    // Autocomplete
     function autocomplete(input) {
         input.addEventListener("input", () => {
             const val = input.value.toLowerCase();
@@ -374,7 +388,6 @@
     autocomplete(fromInput);
     autocomplete(toInput);
 
-    // Calculate distance & price
     function calculate() {
         const selectedMode = document.querySelector("input[name='preferredMode']:checked");
         if (!fromInput.value || !toInput.value || !selectedMode) return;
@@ -403,7 +416,6 @@
     toInput.addEventListener("change", calculate);
     document.querySelectorAll("input[name='preferredMode']").forEach(radio => radio.addEventListener("change", calculate));
 
-    // Send data
     sendBtn.addEventListener("click", () => {
         loader.style.display = "inline-block";
         sendBtn.disabled = true;
@@ -440,7 +452,6 @@
         });
     });
 
-    // Header dropdown
     function toggleMenu() {
         const menu = document.getElementById("menuDropdown");
         menu.style.display = menu.style.display === "block" ? "none" : "block";
