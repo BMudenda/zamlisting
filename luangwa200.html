@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zamlisting Rides</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f4f7;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* HEADER */
+    .header {
+        background: #e53935;
+        color: #fff;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .header-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .menu-wrapper {
+        position: relative;
+    }
+
+    .menu-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    .dropdown {
+        position: absolute;
+        right: 0;
+        top: 36px;
+        background: #fff;
+        color: #333;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        min-width: 120px;
+        display: none;
+        overflow: hidden;
+    }
+
+    .dropdown button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .dropdown button:hover {
+        background: #f5f5f5;
+    }
+
+    .container {
+        max-width: 420px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    fieldset {
+        border: 1px solid #e0e0e0;
+        border-radius: 14px;
+        padding: 15px;
+        margin-bottom: 18px;
+    }
+
+    legend {
+        font-size: 13px;
+        padding: 0 8px;
+        color: #e53935;
+    }
+
+    /* INPUTS */
+    input[type="tel"],
+    input[type="text"] {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        margin-top: 8px;
+        margin-bottom: 12px;
+        display: block;
+        box-sizing: border-box;
+        font-style: italic;      
+    }
+
+    input::placeholder {
+        font-size: 13px;         
+        font-style: italic;
+    }
+
+    input:last-child {
+        margin-bottom: 0;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #e53935;
+        font-style: normal;
+    }
+
+    /* Labels for From/To */
+    .trip-label {
+        font-weight: bold;
+        font-size: 14px;
+        margin-top: 6px;
+        margin-bottom: 4px;
+        display: block;
+        color: #333;
+    }
+
+    /* Profile */
+    .profile {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .avatar {
+        width: 34px;
+        height: 34px;
+        background: #e53935;
+        border-radius: 50%;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    /* Transport mode */
+    .transport-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid #e53935;
+        border-radius: 12px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    .transport-option input {
+        accent-color: #e53935;
+        margin: 0;
+    }
+
+    /* Trip summary */
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 15px;
+    }
+
+    .summary-value {
+        font-weight: bold;
+        color: #e53935;
+    }
+
+    /* Submit button */
+    .submit-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .send-btn {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        border: none;
+        background: #e53935;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        position: relative;
+    }
+
+    .send-btn:hover {
+        background: #c62828;
+    }
+
+    .merge-card {
+        margin-top: 0;
+        box-shadow: none;
+        padding-top: 0;
+    }
+
+    /* Loader */
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #e53935;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        display: none;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .notification {
+        text-align: center;
+        color: green;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-title">zamlisting Rides</div>
+    <div class="menu-wrapper">
+        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+        <div class="dropdown" id="menuDropdown">
+            <button onclick="alert('zamlisting Rides\nReliable & affordable transport services.')">
+                About
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card" id="section1">
+        <div class="profile">
+            <div class="avatar">👤</div>
+        </div>
+
+        <h2>Enter Details</h2>
+
+        <fieldset>
+            <legend>Phone Number</legend>
+            <input type="tel" id="phone" placeholder="0XXXXXXXXX" maxlength="10">
+        </fieldset>
+
+        <div id="section2" class="hidden">
+            <h2>Book a Ride</h2>
+
+            <fieldset>
+                <legend>Transport Mode</legend>
+                <label class="transport-option">
+                    <input type="radio" name="preferredMode" value="Motorbike">
+                    🏍 Motorbike
+                </label>
+                <label class="transport-option">
+                    <input type="radio" name="preferredMode" value="Vehicle">
+                    🚗 Vehicle
+                </label>
+            </fieldset>
+
+            <fieldset>
+                <legend>Trip Locations</legend>
+                <label class="trip-label" for="from">From</label>
+                <input type="text" id="from" placeholder="Type & select location">
+
+                <label class="trip-label" for="to">To</label>
+                <input type="text" id="to" placeholder="Type & select destination">
+            </fieldset>
+
+            <fieldset>
+                <legend>Trip Summary</legend>
+                <div class="summary-row">
+                    <span>Distance</span>
+                    <span class="summary-value" id="distance">-- km</span>
+                </div>
+                <div class="summary-row">
+                    <span>Estimated Price</span>
+                    <span class="summary-value" id="price">ZMW --</span>
+                </div>
+            </fieldset>
+
+            <div class="submit-wrapper">
+                <button class="send-btn" id="sendBtn">Send</button>
+                <span id="loader" class="loader"></span>
+            </div>
+            <div class="notification" id="notification"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const config = {
+        vehiclePricePerKm: 3.00,
+        motorbikePricePerKm: 1.02,
+        vehicleMinPrice: 20,
+        motorbikeMinPrice: 10,
+        vehicleExtra: 6.00,
+        motorbikeExtra: 2.04,
+        avgSpeed: 60
+    };
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+
+    const places = [
+        "Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic",
+        "Chidada Ground", "Car Wash Pub", "Chitope", "Chitope Rural Health Centre", "Chilombwe Community School", "Chiriwe Primary School",
+        "Dzalo Skills Training Centre Kambolozo"
+    ];
+
+    const phoneInput = document.getElementById("phone");
+    const section2 = document.getElementById("section2");
+    const fromInput = document.getElementById("from");
+    const toInput = document.getElementById("to");
+    const distanceEl = document.getElementById("distance");
+    const priceEl = document.getElementById("price");
+    const sendBtn = document.getElementById("sendBtn");
+    const loader = document.getElementById("loader");
+    const notification = document.getElementById("notification");
+
+    // Show main section after phone input
+    phoneInput.addEventListener("input", () => {
+        if (phoneInput.value.length === 10 && section2.classList.contains("hidden")) {
+            section2.classList.remove("hidden");
+            section2.classList.add("merge-card");
+            section2.scrollIntoView({ behavior: "smooth" });
+        }
+    });
+
+    // Autocomplete
+    function autocomplete(input) {
+        input.addEventListener("input", () => {
+            const val = input.value.toLowerCase();
+            const suggestion = places.filter(p => p.toLowerCase().includes(val));
+            if (suggestion.length === 1 && suggestion[0].toLowerCase() === val) {
+                input.value = suggestion[0];
+            }
+        });
+    }
+    autocomplete(fromInput);
+    autocomplete(toInput);
+
+    // Calculate distance & price
+    function calculate() {
+        const selectedMode = document.querySelector("input[name='preferredMode']:checked");
+        if (!fromInput.value || !toInput.value || !selectedMode) return;
+        loader.style.display = "inline-block";
+        notification.textContent = "";
+
+        setTimeout(() => {
+            loader.style.display = "none";
+
+            const distance = Math.floor(Math.random() * 10) + 1;
+            distanceEl.textContent = distance + " km";
+
+            let price = 0;
+            if (selectedMode.value === "Motorbike") {
+                price = distance * config.motorbikePricePerKm + config.motorbikeExtra;
+                if (price < config.motorbikeMinPrice) price = config.motorbikeMinPrice;
+            } else {
+                price = distance * config.vehiclePricePerKm + config.vehicleExtra;
+                if (price < config.vehicleMinPrice) price = config.vehicleMinPrice;
+            }
+            priceEl.textContent = "ZMW " + price.toFixed(2);
+        }, 800);
+    }
+
+    fromInput.addEventListener("change", calculate);
+    toInput.addEventListener("change", calculate);
+    document.querySelectorAll("input[name='preferredMode']").forEach(radio => radio.addEventListener("change", calculate));
+
+    // Send data
+    sendBtn.addEventListener("click", () => {
+        loader.style.display = "inline-block";
+        sendBtn.disabled = true;
+
+        const data = {
+            phone: phoneInput.value,
+            from: fromInput.value,
+            to: toInput.value,
+            mode: document.querySelector("input[name='preferredMode']:checked")?.value || "",
+            distance: distanceEl.textContent,
+            price: priceEl.textContent
+        };
+
+        fetch(GOOGLE_SCRIPT_URL + "?phone=" + encodeURIComponent(data.phone) +
+            "&from=" + encodeURIComponent(data.from) +
+            "&to=" + encodeURIComponent(data.to) +
+            "&mode=" + encodeURIComponent(data.mode) +
+            "&distance=" + encodeURIComponent(data.distance) +
+            "&price=" + encodeURIComponent(data.price))
+        .then(res => res.text())
+        .then(res => {
+            loader.style.display = "none";
+            notification.textContent = "Booking submitted successfully!";
+            sendBtn.textContent = "Call";
+            sendBtn.style.background = "green";
+            sendBtn.style.color = "#fff";
+            sendBtn.disabled = false;
+            sendBtn.onclick = () => { window.location.href = "tel:0966423229"; };
+        })
+        .catch(err => {
+            loader.style.display = "none";
+            sendBtn.disabled = false;
+            notification.textContent = "Error sending data!";
+        });
+    });
+
+    // Header dropdown
+    function toggleMenu() {
+        const menu = document.getElementById("menuDropdown");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".menu-wrapper")) {
+            document.getElementById("menuDropdown").style.display = "none";
+        }
+    });
+</script>
+</body>
+</html>
