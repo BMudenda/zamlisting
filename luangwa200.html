@@ -314,6 +314,46 @@
   </main>
 
   <script>
+    // --- RESTORED INSTALL LOGIC ---
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("sw.js").then(
+          function(reg) { console.log("ServiceWorker registered"); },
+          function(err) { console.log("ServiceWorker registration failed:", err); }
+        );
+      });
+    }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      const deferredPrompt = e;
+      const installBox = document.createElement("div");
+      installBox.style.position = "fixed";
+      installBox.style.top = "15px";
+      installBox.style.right = "15px";
+      installBox.style.background = "#2b6ef6";
+      installBox.style.color = "#fff";
+      installBox.style.borderRadius = "8px";
+      installBox.style.padding = "8px 14px";
+      installBox.style.fontFamily = "system-ui, sans-serif";
+      installBox.style.fontSize = "14px";
+      installBox.style.cursor = "pointer";
+      installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+      installBox.style.zIndex = "9999";
+      installBox.style.display = "flex";
+      installBox.style.alignItems = "center";
+      installBox.style.gap = "8px";
+      installBox.innerHTML = `<span id="installText">Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
+      document.body.appendChild(installBox);
+
+      document.getElementById("installText").addEventListener("click", async () => {
+        installBox.remove();
+        deferredPrompt.prompt();
+      });
+      document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+    });
+
+    // --- DROPDOWN & MENU ---
     function toggleDropdown() {
       const menu = document.getElementById("header-menu-dropdown");
       menu.classList.toggle("show");
@@ -329,6 +369,7 @@
       }
     }
 
+    // --- CONFIG & DATA ---
     const config = {
       vehiclePricePerKm: 3.00,
       motorbikePricePerKm: 1.02,
@@ -391,9 +432,7 @@
     const btnLoader = document.getElementById('btn-loader');
 
     phoneInput.oninput = () => { 
-      if (/^0[0-9]{9}$/.test(phoneInput.value)) {
-        tripDiv.style.display = 'block'; 
-      }
+      if (/^0[0-9]{9}$/.test(phoneInput.value)) { tripDiv.style.display = 'block'; }
     };
 
     function setupAuto(inputId, containerId, listId) {
@@ -442,7 +481,6 @@
         
         rideData = { preferredMode: mode, phone: phoneInput.value, hub: res.hub, from, to, tripDistance: res.trip.toFixed(2), totalDistance: res.total.toFixed(2), price: price };
         
-        // Reset button state
         submitBtn.style.background = "var(--primary-color)"; 
         btnIcon.className = "fas fa-paper-plane"; 
         btnIcon.style.display = "block"; 
@@ -460,7 +498,6 @@
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) });
         statusText.textContent = "Sent! Call dispatcher."; statusText.style.color = "var(--success-color)";
         
-        // TRANSITION TO CALL
         btnLoader.style.display = "none"; 
         btnIcon.style.display = "block"; 
         btnIcon.className = "fas fa-phone"; 
