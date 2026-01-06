@@ -485,7 +485,26 @@
         let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
         document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Price</span><span style="color:var(--secondary-color); font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
         
-        rideData = { preferredMode: mode, phone: phoneInput.value, hub: res.hub, from, to, tripDistance: res.trip.toFixed(2), totalDistance: res.total.toFixed(2), price: price };
+        // --- CALC ESTIMATED TIME ---
+        const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
+
+        // --- FORMAT PHONE TO +260 ---
+        let formattedPhone = phoneInput.value;
+        if (formattedPhone.startsWith('0')) {
+          formattedPhone = '+260' + formattedPhone.substring(1);
+        }
+        
+        rideData = { 
+          preferredMode: mode, 
+          phone: formattedPhone, 
+          hub: res.hub, 
+          from, 
+          to, 
+          tripDistance: res.trip.toFixed(2), 
+          totalDistance: res.total.toFixed(2), 
+          price: price,
+          estimatedTime: timeVal + " mins" 
+        };
         
         submitBtn.style.background = "var(--primary-color)"; 
         btnIcon.className = "fas fa-paper-plane"; 
