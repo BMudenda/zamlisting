@@ -25,7 +25,7 @@
     header { background: var(--font-color-dark); color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .company-info h2 { font-size: 1.1rem; color: var(--secondary-color); }
-/* --- UPDATED & EXPANDED DROPDOWN STYLES --- */
+
 .menu-dropdown-container { 
     position: relative; 
     display: inline-block; 
@@ -50,7 +50,7 @@
     top: 40px;
     background-color: white;
     width: 290px;
-    max-height: 85vh; /* Prevents menu from going off-screen on mobile */
+    max-height: 85vh; 
     overflow-y: auto;
     box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
     z-index: 1000;
@@ -60,12 +60,10 @@
     border: 1px solid #e0e0e0;
 }
 
-/* Toggle Class */
 .menu-dropdown.show { 
     display: block; 
 }
 
-/* Section Containers */
 .dropdown-content-section { 
     margin-bottom: 20px; 
 }
@@ -82,7 +80,6 @@
     font-weight: 700;
 }
 
-/* Text Content within Sections */
 .dropdown-content-section p { 
     font-size: 0.85rem; 
     line-height: 1.5; 
@@ -90,7 +87,6 @@
     color: #4b5563; 
 }
 
-/* Links & Action Items */
 .dropdown-content-section a {
     display: flex;
     align-items: center;
@@ -115,32 +111,21 @@
     font-size: 1.1rem;
 }
 
-/* Secondary Labels (Phone Numbers/Emails) - HIDDEN as requested */
 .contact-label-text {
     display: flex;
     flex-direction: column;
 }
 
 .contact-detail-hidden { 
-    display: none; /* This hides the actual digits/email address while keeping label */
+    display: none; 
 }
 
-/* Divider Line */
 .menu-divider { 
     height: 1px; 
     background: #e5e7eb; 
     margin: 12px 0; 
 }
 
-/* Footer text in menu */
-.menu-footer-text {
-    margin-top: 10px; 
-    text-align: center; 
-    font-size: 0.75rem; 
-    color: #9ca3af;
-}
-
-    /* --- RESTORED TOOLTIP STYLES --- */
     .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
     .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
     .tooltip-text { 
@@ -166,7 +151,6 @@
     }
     .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-    /* Layout Styles */
     .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
     .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
     fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; transition: 0.3s; }
@@ -203,7 +187,6 @@
       </button>
 
       <div id="header-menu-dropdown" class="menu-dropdown">
-        
         <div class="dropdown-content-section">
           <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
           <p><strong>Location:</strong> Dedicated service provider within the Luangwa Feira area and surrounding locations in Zambia. 🇿🇲</p>
@@ -263,10 +246,8 @@
   </div>
 </header>
 
-  
   <main class="product-container">
     <div class="booking-container">
-      
       <fieldset>
         <legend><span class="material-icons">account_circle</span> Phone Number</legend>
         <div class="input-box" id="phone-box">
@@ -333,66 +314,31 @@
   </main>
 
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function() {
-        navigator.serviceWorker.register("sw.js").then(
-          function(reg) { console.log("ServiceWorker registered"); },
-          function(err) { console.log("ServiceWorker registration failed:", err); }
-        );
-      });
+    function toggleDropdown() {
+      const menu = document.getElementById("header-menu-dropdown");
+      menu.classList.toggle("show");
     }
 
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      const deferredPrompt = e;
-      const installBox = document.createElement("div");
-      installBox.style.position = "fixed";
-      installBox.style.top = "15px";
-      installBox.style.right = "15px";
-      installBox.style.background = "#2b6ef6";
-      installBox.style.color = "#fff";
-      installBox.style.borderRadius = "8px";
-      installBox.style.padding = "8px 14px";
-      installBox.style.fontFamily = "system-ui, sans-serif";
-      installBox.style.fontSize = "14px";
-      installBox.style.cursor = "pointer";
-      installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-      installBox.style.zIndex = "9999";
-      installBox.style.display = "flex";
-      installBox.style.alignItems = "center";
-      installBox.style.gap = "8px";
-      installBox.innerHTML = `<span id="installText">Install</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;">×</span>`;
-      document.body.appendChild(installBox);
-
-      document.getElementById("installText").addEventListener("click", async () => {
-        installBox.remove();
-        deferredPrompt.prompt();
-      });
-      document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
-    });
-
-    // 1. The new toggle function using your updated ID
-function toggleDropdown() {
-  const menu = document.getElementById("header-menu-dropdown");
-  menu.classList.toggle("show");
-}
-
-// 2. The improved "Click Outside" logic
-window.onclick = function(event) {
-  const menu = document.getElementById("header-menu-dropdown");
-  const btn = document.getElementById("menu-toggle-btn");
-
-  // Check if the click was OUTSIDE the menu and OUTSIDE the toggle button
-  if (menu.classList.contains('show')) {
-    if (!menu.contains(event.target) && !btn.contains(event.target)) {
-      menu.classList.remove('show');
+    window.onclick = function(event) {
+      const menu = document.getElementById("header-menu-dropdown");
+      const btn = document.getElementById("menu-toggle-btn");
+      if (menu && menu.classList.contains('show')) {
+        if (!menu.contains(event.target) && !btn.contains(event.target)) {
+          menu.classList.remove('show');
+        }
+      }
     }
-  }
-}
 
-  </script>
+    const config = {
+      vehiclePricePerKm: 3.00,
+      motorbikePricePerKm: 1.02,
+      vehicleMinPrice: 20,
+      motorbikeMinPrice: 10,
+      vehicleExtra: 6.00,      
+      motorbikeExtra: 2.04,    
+      avgSpeed: 60
+    };
 
-  <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
     const places = ["Anglican Church", "Airstrip", "Big 2 Zambezi Water Front Resort & Safari", "BM Residence", "Boma Clinic", "Chidada Ground", "Car Wash Pub", "Chitope", "Chitope Rural Health Centre", "Chilombwe Community School", "Chiriwe Primary School", "Dzalo Skills Training Centre Kambolozo", "Feira Kindom Hall", "Feira Day Secondary School", "Gerasmos Safari Lodge", "Hill View", "JB Three Boarders Mall", "JB Three Boarders Club", "Justifeli Lodge", "Kakaro Primary School", "Kakaro Liberation Heritage Site", "Kantuleni Executive Lodge", "Kapoche", "Kaunga Secondary School", "Kasinsa", "Katondwe Chapel", "Katondwe Chaz Hotel", "Katondwe Dam", "Katondwe Girls Secondary School", "Katondwe Mission Hospital", "Katondwe Primary School", "Kavalamanja", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Bridge Market", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa DC Office", "Luangwa DEBS Offices", "Luangwa District Hospital", "Luangwa High School Police Post", "Boma Filling Station", "Luangwa Habour", "Indeco Building", "Luangwa Market", "Luangwa Main SDA Church", "Mburuma Local Court", "Luangwa Police Station", "Luangwa Post Office", "Luangwa Town Council", "Luangwa Secondary School", "Makichilo Lodge", "Mwavi Secondary School", "Mwalila Primary School", "Nyabota Lodge", "Passover Living Lamb Ministry Katondwe", "Pentecostal Assembly of God Joshua Assembly", "UCZ", "Soweto Junction", "Registration Office", "River Spot Club","SDA Katondwe", "Yangoma Lodge", "Yellow Shop", "ZESCO Office"];
     const segments = [{ from: 'Kakaro Primary School', to: 'Kapoche', distance: 16 }, { from: 'Kapoche', to: 'Luangwa Secondary School', distance: 21 }, { from: 'Luangwa Secondary School', to: 'Katondwe Mission Hospital', distance: 5 }, { from: 'Katondwe Mission Hospital', to: 'Mburuma Local Court', distance: 7 }, { from: 'Mburuma Local Court', to: 'Mwavi Secondary School', distance: 0.65 }, { from: 'Mburuma Local Court', to: 'Katondwe Mission Hospital', distance: 7.8 }, { from: 'Mwavi Secondary School', to: 'Chitope Rural Health Centre', distance: 2 }, { from: 'Chitope Rural Health Centre', to: 'Mwalila Primary School', distance: 6 }, { from: 'Mwalila Primary School', to: 'Kaunga Secondary School', distance: 5 }, { from: 'Kaunga Secondary School', to: 'Luangwa Bridge Market', distance: 14 }, { from: 'Luangwa Bridge Market', to: 'Luangwa Bridge', distance: 3 }, { from: "Luangwa District Hospital", to: "Soweto Junction", distance: 2.5 }, { from: "Car Wash Pub", to: "Luangwa Town Council", distance: 1.00 }, { from: "Car Wash Pub", to: "Soweto Junction", distance: 2.75 }, { from: "Car Wash Pub", to: "BM Residence", distance: 1.00 }, { from: "Soweto Junction", to: "Airstrip", distance: 1.7 }, { from: "Soweto Junction", to: "ZESCO Office", distance: 0.3 }, { from: "Kakaro Primary School", to: "Luangwa District Hospital", distance: 7.1 }, { from: "ZESCO Office", to: "Luangwa Main SDA Church", distance: 0.65 }, { from: "Luangwa Main SDA Church", to: "Indeco Building", distance: 0.7 }, { from: "Indeco Building", to: "JB Three Boarders Club", distance: 0.1 }, { from: "JB Three Boarders Club", to: "Yellow Shop", distance: 0.45 }, { from: "Yellow Shop", to: "Luangwa Bus Station", distance: 0.19 }, { from: "Luangwa Bus Station", to: "JB Three Boarders Mall", distance: 0.24 }, { from: "JB Three Boarders Mall", to: "Boma Filling Station", distance: 0.35 }, { from: "Boma Filling Station", to: "Kantuleni Executive Lodge", distance: 0.19 }, { from: "Kantuleni Executive Lodge", to: "Luangwa Habour", distance: 0.09 }, { from: "Kantuleni Executive Lodge", to: "Luangwa Council Lodge", distance: 0.09 }, { from: "Luangwa Council Lodge", to: "Luangwa DC Office", distance: 0.3 }, { from: "Luangwa DC Office", to: "Luangwa Police Station", distance: 0.3 }, { from: "Luangwa Police Station", to: "Luangwa DEBS Offices", distance: 0.1 }, { from: "Luangwa DEBS Offices", to: "Yangoma Lodge", distance: 0.4 }, { from: "Yangoma Lodge", to: "Boma Clinic", distance: 0.5 }, { from: "JB Three Boarders Mall", to: "Nyabota Lodge", distance: 0.25 }, { from: "Nyabota Lodge", to: "Luangwa Basic School", distance: 0.18 }, { from: "JB Three Boarders Mall", to: "River Spot Club", distance: 0.03 }, { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 }, { from: "Luangwa Town Council", to: "Registration Office", distance: 0.49 }, { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo", distance: 0.60 }, { from: "Luangwa Town Council", to: "Big 2 Zambezi Water Front Resort & Safari", distance: 3.2 }, { from: "Big 2 Zambezi Water Front Resort & Safari", to: "Chilombwe Community School", distance: 9.8 }, { from: "Registration Office", to: "Chidada Ground", distance: 0.49 }, { from: "Chidada Ground", to: "Yangoma Lodge", distance: 2.34 }, { from: "Luangwa Town Council", to: "Hill View", distance: 0.40 }, { from: "Hill View", to: "BM Residence", distance: 1.00 }, { from: "BM Residence", to: "Feira Day Secondary School", distance: 1.10 }, { from: "Feira Kindom Hall", to: "Anglican Church", distance: 0.08 }, { from: "Feira Kindom Hall", to: "Luangwa (Feira)", distance: 0.7 }, { from: "Luangwa (Feira)", to: "Luangwa Bus Station", distance: 0.1 }, { from: "Dzalo Skills Training Centre Kambolozo", to: "Justifeli Lodge", distance: 0.26 }, { from: "Luangwa Market", to: "Makichilo Lodge", distance: 0.4 }, { from: "Makichilo Lodge", to: "Gerasmos Safari Lodge", distance: 0.3 }, { from: "Makichilo Lodge", to: "UCZ", distance: 0.5 }, { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.02 }, { from: "UCZ", to: "Pentecostal Assembly of God Joshua Assembly", distance: 0.08 }, { from: "Chitope", to: "Kasinsa", distance: 10.0 }, { from: "Chitope", to: "Mwavi Secondary School", distance: 1.1 }, { from: "Kasinsa", to: "Luangwa Secondary School", distance: 14.0 }, { from: "Luangwa High School Police Post", to: "Chiriwe Primary School", distance: 2.1 }, { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 }, { from: "Kapoche", to: "Chiriwe Primary School", distance: 19.7 }, { from: "Luangwa High School Police Post", to: "SDA Katondwe", distance: 1.0 }, { from: "Katondwe Mission Hospital", to: "Katondwe Primary School", distance: 0.55 }, { from: "Katondwe Chapel", to: "Katondwe Primary School", distance: 0.05 }, { from: "Katondwe Primary School", to: "Katondwe Girls Secondary School", distance: 0.0 }, { from: "Katondwe Girls Secondary School", to: "Katondwe Chaz Hotel", distance: 0.45 }, { from: "Katondwe Chaz Hotel", to: "Passover Living Lamb Ministry Katondwe", distance: 0.4 }, { from: "Passover Living Lamb Ministry Katondwe", to: "Katondwe Dam", distance: 0.1 }, { from: "Kakaro Primary School", to: "Kakaro Liberation Heritage Site", distance: 1.2 }, { from: "Kavalamanja", to: "Luangwa District Hospital", distance: 23.0 }];
@@ -444,7 +390,11 @@ window.onclick = function(event) {
     const btnIcon = document.getElementById('btn-icon');
     const btnLoader = document.getElementById('btn-loader');
 
-    phoneInput.oninput = () => { if (/^0[0-9]{9}$/.test(phoneInput.value)) tripDiv.style.display = 'block'; };
+    phoneInput.oninput = () => { 
+      if (/^0[0-9]{9}$/.test(phoneInput.value)) {
+        tripDiv.style.display = 'block'; 
+      }
+    };
 
     function setupAuto(inputId, containerId, listId) {
       const input = document.getElementById(inputId);
@@ -478,27 +428,53 @@ window.onclick = function(event) {
         const res = calculateTotalDistance(from, to);
         if (res.total === null) { statusText.textContent = "Route error."; return; }
         summaryDiv.style.display = 'block';
-        
-        // Update Tooltip with specific Hub
-        document.getElementById('hub-tooltip').textContent = "Price calculated based on nearest service hub: " + res.hub;
+        document.getElementById('hub-tooltip').textContent = "Price calculated via: " + res.hub;
 
-        const rate = (mode === 'vehicle') ? 5 : 2; const price = Math.max(15, Math.ceil(res.total * rate));
+        let rate, minPrice, extra;
+        if (mode === 'vehicle') {
+          rate = config.vehiclePricePerKm; minPrice = config.vehicleMinPrice; extra = config.vehicleExtra;
+        } else {
+          rate = config.motorbikePricePerKm; minPrice = config.motorbikeMinPrice; extra = config.motorbikeExtra;
+        }
+
+        let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
         document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Price</span><span style="color:var(--secondary-color); font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
+        
         rideData = { preferredMode: mode, phone: phoneInput.value, hub: res.hub, from, to, tripDistance: res.trip.toFixed(2), totalDistance: res.total.toFixed(2), price: price };
-        submitBtn.style.background = "var(--primary-color)"; btnIcon.className = "fas fa-paper-plane"; btnIcon.style.display = "block"; btnLoader.style.display = "none"; document.getElementById('action-label').textContent = "Request Now";
+        
+        // Reset button state
+        submitBtn.style.background = "var(--primary-color)"; 
+        btnIcon.className = "fas fa-paper-plane"; 
+        btnIcon.style.display = "block"; 
+        btnLoader.style.display = "none"; 
+        document.getElementById('action-label').textContent = "Request Now";
         submitBtn.onclick = handleRequest;
       }, 600);
     }
 
     async function handleRequest() {
       submitBtn.disabled = true; btnIcon.style.display = "none"; btnLoader.style.display = "block";
-      const payload = { ...rideData, estimatedTime: "Calculating...", timestamp: new Date().toLocaleString() };
+      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
+      
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) });
         statusText.textContent = "Sent! Call dispatcher."; statusText.style.color = "var(--success-color)";
-        btnLoader.style.display = "none"; btnIcon.style.display = "block"; btnIcon.className = "fas fa-phone"; submitBtn.style.background = "var(--success-color)"; submitBtn.disabled = false; document.getElementById('action-label').textContent = "Call Now";
-        submitBtn.onclick = () => window.location.href = "tel:0966423229";
-      } catch (err) { statusText.textContent = "Error. Please call."; submitBtn.disabled = false; btnLoader.style.display = "none"; btnIcon.style.display = "block"; }
+        
+        // TRANSITION TO CALL
+        btnLoader.style.display = "none"; 
+        btnIcon.style.display = "block"; 
+        btnIcon.className = "fas fa-phone"; 
+        submitBtn.style.background = "var(--success-color)"; 
+        submitBtn.disabled = false; 
+        document.getElementById('action-label').textContent = "Call Now";
+        
+        submitBtn.onclick = function() { window.location.href = "tel:0966423229"; };
+      } catch (err) { 
+        statusText.textContent = "Error. Please call directly."; 
+        submitBtn.disabled = false; 
+        btnLoader.style.display = "none"; 
+        btnIcon.style.display = "block"; 
+      }
     }
 
     setupAuto('gm-origin', 'origin-container', 'originList');
