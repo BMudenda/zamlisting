@@ -3,29 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zamlisting | Transport</title>
-
-  <!-- Fonts & Icons -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <title>zamlisting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2b6ef6" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides" />
-  <link rel="apple-touch-icon" href="lfr.jpg" />
-
+  
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b6ef6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+<link rel="apple-touch-icon" href="lfr.jpg">
   <style>
-    /* ──────────────── RESET ──────────────── */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
       --secondary-color: #ff9900;
@@ -36,15 +26,20 @@
       --border-color-light: #e0e0e0;
       --font-color-dark: #333;
     }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      background-color: var(--bg-color-body);
-      color: var(--font-color-dark);
-      line-height: 1.5;
-    }
+   .corner-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-right: 10px; /* spacing between logo and title */
+  }
+  .company-info {
+  display: flex;
+  align-items: center; /* vertical alignment */
+  gap: 10px;           /* space between logo and text */
+   }
 
-    /* ──────────────── HEADER ──────────────── */
     header {
       background: var(--primary-color);
       color: white;
@@ -53,34 +48,12 @@
       z-index: 100;
       box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
-
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 12px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-    }
-
-    /* Logo (top-left corner) */
-    .corner-logo {
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      z-index: 10;
-    }
-
-    /* Brand name */
+    
+    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+    /* ================= BRAND ================= */
     .company-info h2 {
       font-size: 1.15rem;
       line-height: 1.2;
-      padding-left: 48px;          /* space for logo */
-      margin: 0;
     }
 
     .zam {
@@ -89,9 +62,9 @@
     }
 
     /* Zambia flag colors */
-    .z-green  { color: #198754; }
-    .z-red    { color: #dc3545; }
-    .z-black  { color: #000000; }
+    .z-green { color: #198754; }
+    .z-red { color: #dc3545; }
+    .z-black { color: #000000; }
     .z-orange { color: #ff9900; }
 
     .transport-sub {
@@ -100,314 +73,234 @@
       font-weight: 400;
       color: #e5e7eb;
       margin-top: 2px;
-    }
+    }.menu-dropdown-container { 
+    position: relative; 
+    display: inline-block; 
+}
 
-    /* ──────────────── MENU BUTTON & DROPDOWN ──────────────── */
-    .menu-dropdown-container {
-      position: relative;
-    }
+.menu-button { 
+    background: none; 
+    border: none; 
+    color: white; 
+    cursor: pointer; 
+    padding: 5px; 
+    outline: none; 
+    font-size: 1.2rem; 
+    display: flex;
+    align-items: center;
+}
 
-    .menu-button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 8px;
-      font-size: 1.3rem;
-      display: flex;
-      align-items: center;
-    }
+.menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background-color: white;
+    width: 290px;
+    max-height: 85vh; 
+    overflow-y: auto;
+    box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
+    z-index: 1000;
+    border-radius: 12px;
+    color: #333;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+}
 
-    .menu-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 44px;
-      background-color: white;
-      width: 290px;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-      z-index: 1000;
-      border-radius: 12px;
-      color: #333;
-      padding: 16px;
-      border: 1px solid #e0e0e0;
-    }
+.menu-dropdown.show { 
+    display: block; 
+}
 
-    .menu-dropdown.show {
-      display: block;
-    }
+.dropdown-content-section { 
+    margin-bottom: 20px; 
+}
 
-    .dropdown-content-section {
-      margin-bottom: 20px;
-    }
+.dropdown-content-section h4 { 
+    color: #2563eb; 
+    border-bottom: 1px solid #f0f0f0; 
+    padding-bottom: 6px; 
+    margin-bottom: 10px; 
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
 
-    .dropdown-content-section h4 {
-      color: var(--primary-color);
-      border-bottom: 1px solid #f0f0f0;
-      padding-bottom: 6px;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+.dropdown-content-section p { 
+    font-size: 0.85rem; 
+    line-height: 1.5; 
+    margin-bottom: 10px; 
+    color: #4b5563; 
+}
 
-    .dropdown-content-section p {
-      font-size: 0.85rem;
-      line-height: 1.5;
-      margin-bottom: 10px;
-      color: #4b5563;
-    }
+.dropdown-content-section a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    margin-bottom: 2px;
+}
 
-    .dropdown-content-section a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      text-decoration: none;
-      color: #1f2937;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      transition: background 0.2s ease;
-      margin-bottom: 2px;
-    }
+.dropdown-content-section a:hover { 
+    background-color: #f3f4f6; 
+}
 
-    .dropdown-content-section a:hover {
-      background-color: #f3f4f6;
-    }
+.dropdown-content-section a i { 
+    width: 20px; 
+    color: #2563eb; 
+    text-align: center; 
+    font-size: 1.1rem;
+}
 
-    .dropdown-content-section a i {
-      width: 20px;
-      color: var(--primary-color);
-      text-align: center;
-      font-size: 1.1rem;
-    }
+.contact-label-text {
+    display: flex;
+    flex-direction: column;
+}
 
-    .contact-label-text {
-      display: flex;
-      flex-direction: column;
-    }
+.contact-detail-hidden { 
+    display: none; 
+}
 
-    .contact-detail-hidden {
-      display: none;
-      font-size: 0.85rem;
-      color: #666;
-    }
+.menu-divider { 
+    height: 1px; 
+    background: #e5e7eb; 
+    margin: 12px 0; 
+}
 
-    .menu-divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 12px 0;
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { 
+      visibility: hidden; 
+      width: 160px; 
+      background-color: #333; 
+      color: #fff; 
+      text-align: center; 
+      border-radius: 6px; 
+      padding: 8px; 
+      position: absolute; 
+      z-index: 9999; 
+      bottom: 125%; 
+      left: 50%; 
+      margin-left: -80px; 
+      opacity: 0; 
+      transition: opacity 0.3s; 
+      font-size: 0.7rem; 
+      font-weight: normal; 
+      line-height: 1.3;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-    /* ──────────────── FORM & UI ELEMENTS (kept from your code) ──────────────── */
-    .product-container {
-      max-width: 500px;
-      margin: 15px auto;
-      padding: 0 10px;
-    }
-
-    .booking-container {
-      background: var(--bg-color-card);
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      padding: 15px;
-    }
-
-    fieldset {
-      border: 1px solid var(--border-color-light);
-      border-radius: 10px;
-      padding: 12px;
-      background: #fafafa;
-      margin-bottom: 15px;
-      width: 100%;
-    }
-
-    legend {
-      font-weight: bold;
-      color: var(--primary-color);
-      padding: 0 8px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .input-box {
-      background: white;
-      border: 1.5px solid var(--border-color-light);
-      border-radius: 8px;
-      padding: 10px;
-      transition: 0.3s;
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
-
-    .input-box .material-icons {
-      color: var(--primary-color);
-      font-size: 20px;
-      margin-right: 10px;
-    }
-
-    .input-box input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      font-weight: bold;
-      background: transparent;
-    }
-
-    input::placeholder {
-      font-size: 0.8rem;
-      font-style: italic;
-      color: #999;
-      font-weight: normal;
-    }
-
-    .submit-btn {
-      background: var(--primary-color);
-      color: white;
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: 0.3s;
-    }
-
-    .btn-loader {
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-top: 3px solid white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: none;
-    }
-
-    @keyframes spin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Add more of your later styles here as needed */
+    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; transition: 0.3s; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; transition: 0.3s; position: relative; display: flex; align-items: center; width: 100%; }
+    .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
+    input::placeholder { font-size: 0.8rem; font-style: italic; color: #999; font-weight: normal; }
+    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .mode-option .material-icons { font-size: 24px; color: var(--primary-color); }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; z-index: 100; max-height: 150px; overflow-y: auto; border-radius: 0 0 8px 8px; }
+    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+    .suggestion:hover { background: #f0f7ff; }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
+    .btn-loader { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    .hidden-section { display: none; }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-
 <body>
-
 <header>
   <div class="header-content">
-
-    <!-- Brand -->
     <div class="company-info">
-      <h2>
-        <span class="zam">
-          <span class="z-green">Z</span><span class="z-red">a</span><span class="z-black">m</span><span class="z-orange">L</span>isting
-        </span>
-        <span class="transport-sub">🏍️🚗 Transport</span>
-      </h2>
-    </div>
+  <img src="lfr.jpg" alt="Luangwa Feira Rides Logo" class="corner-logo">
+  <h2>
+    <span class="zam">
+      <span class="z-green">Z</span><span class="z-red">a</span><span class="z-black">m</span><span class="z-orange">L</span>isting
+    </span>
+    <span class="transport-sub">Book Your Ride</span>
+  </h2>
+</div>
 
-    <!-- Menu -->
+
     <div class="menu-dropdown-container">
-      <button id="menu-toggle-btn" class="menu-button" title="Menu">
+      <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu">
         <i class="fas fa-ellipsis-v"></i>
       </button>
 
       <div id="header-menu-dropdown" class="menu-dropdown">
-
         <div class="dropdown-content-section">
           <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-          <p><strong>Location:</strong> Dedicated service provider within the Luangwa and Luanshya District area and surrounding locations in Zambia.</p>
+          <p><strong>Location:</strong> Dedicated service provider within the Luangwa and Luanshya Districts area and surrounding locations in Zambia.</p>
           <p><strong>Affordable:</strong> Pricing is <strong>cheap and fixed as shown</strong>, calculated fairly based on distance.</p>
           <p><strong>Reliable:</strong> We are committed to <strong>reliable and safe transport</strong>, ensuring you reach your destination efficiently.</p>
           <p>
-            <strong>Stations:</strong><br>
-            Luangwa: Bus Station, Chitope, Luangwa Market Bridge<br>
-            Luanshya: Mpatamatu, Roan Station, Luanshya Town —<br>
-            (more nearby hubs coming soon)
-          </p>
+  
+
         </div>
 
         <div class="dropdown-content-section">
           <h4><i class="fas fa-headset"></i> Quick Contact</h4>
-          <p style="margin-bottom: 10px;"><strong>For inquiries or collaborations:</strong></p>
-
-          <a href="mailto:zamlisting@gmail.com">
+          <p style="margin-bottom: 8px;"><strong>For inquiries or collaborations, contact us:</strong></p>
+          <a href="mailto:zamlisting@gmail.com" title="Send Email">
             <i class="fas fa-envelope"></i>
-            <span class="contact-label-text">Email <span class="contact-detail-hidden">zamlisting@gmail.com</span></span>
+            <span class="contact-label-text">
+              Email Us <span class="contact-detail-hidden">zamlisting@gmail.com</span>
+            </span>
           </a>
-
-          <a href="tel:+260966423229">
+          <a href="tel:0966423229" title="Call Now">
             <i class="fas fa-phone"></i>
-            <span class="contact-label-text">Call <span class="contact-detail-hidden">0966 423 229</span></span>
+            <span class="contact-label-text">
+              Call Us <span class="contact-detail-hidden">0966423229</span>
+            </span>
           </a>
-
-          <a href="https://wa.me/260966423229" target="_blank">
+          
+          <a href="https://wa.me/260966423229" target="_blank" title="Chat on WhatsApp">
             <i class="fab fa-whatsapp"></i>
-            <span class="contact-label-text">WhatsApp <span class="contact-detail-hidden">+260 966 423 229</span></span>
+            <span class="contact-label-text">
+              WhatsApp Us <span class="contact-detail-hidden">+260966423229</span>
+            </span>
           </a>
-
-          <a href="sms:+260966423229">
+          
+          <a href="sms:0966423229" title="Send SMS">
             <i class="fas fa-sms"></i>
-            <span class="contact-label-text">SMS <span class="contact-detail-hidden">0966 423 229</span></span>
+            <span class="contact-label-text">
+              Send SMS <span class="contact-detail-hidden">0966423229</span>
+            </span>
           </a>
+          
+          
 
           <div class="menu-divider"></div>
 
-          <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank">
-            <i class="fab fa-facebook"></i> Facebook Page
+          <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank" title="Visit Facebook">
+            <i class="fab fa-facebook"></i>
+            <span class="contact-label-text">Facebook Page</span>
           </a>
-
-          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank">
-            <i class="fab fa-tiktok"></i> TikTok
+          
+          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank" title="Visit TikTok">
+            <i class="fab fa-tiktok"></i>
+            <span class="contact-label-text">TikTok</span>
           </a>
-
-          <p style="margin-top: 20px; text-align: center; font-size: 0.75rem; color: #888;">
-            © 2024 Luangwa Feira Rides
-          </p>
+          
+          <p style="margin-top: 15px; text-align: center; font-size: 0.75rem; color: #aaa;">&copy; 2024 Luangwa Feira Rides.</p>
         </div>
-
       </div>
     </div>
-
-    <!-- Corner logo -->
-    <img src="lfr.jpg" alt="Luangwa Feira Rides Logo" class="corner-logo">
-
+    
   </div>
-</header>
-
-<script>
-// Toggle dropdown
-document.getElementById('menu-toggle-btn').addEventListener('click', function(e) {
-  e.stopPropagation();
-  document.getElementById('header-menu-dropdown').classList.toggle('show');
-});
-
-// Close when clicking outside
-document.addEventListener('click', function(e) {
-  const dropdown = document.getElementById('header-menu-dropdown');
-  if (!e.target.closest('.menu-dropdown-container')) {
-    dropdown.classList.remove('show');
-  }
-});
-</script>
-
-
-
-  
 </header>
 
   <main class="product-container">
@@ -416,7 +309,7 @@ document.addEventListener('click', function(e) {
         <legend><span class="material-icons">account_circle</span> Login</legend>
         <div class="input-box" id="phone-box">
           <span class="material-icons">phone</span>
-          <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter phone number to login eg 0xxxxxxxxx" inputmode="numeric">
+          <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
         </div>
       </fieldset>
 
@@ -1036,6 +929,7 @@ document.addEventListener('click', function(e) {
 
 
     const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market","Luanshya Town Roundabout","Mpatamatu Bus Stop, Luanshya"];
+
     const graph = {};
     segments.forEach(({ from, to, distance }) => {
       if (!graph[from]) graph[from] = []; if (!graph[to]) graph[to] = [];
@@ -1190,13 +1084,3 @@ document.addEventListener('click', function(e) {
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
