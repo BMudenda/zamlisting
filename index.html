@@ -1,1 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZamListing Rides</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b6ef6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+<link rel="apple-touch-icon" href="lfr.jpg">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #ff9900;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --border-color-light: #e0e0e0;
+      --font-color-dark: #333;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+
+   .corner-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-right: 10px; /* spacing between logo and title */
+  }
+  .company-info {
+  display: flex;
+  align-items: center; /* vertical alignment */
+  gap: 10px;           /* space between logo and text */
+   }
+
+    header {
+      background: var(--primary-color);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+    
+    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+    /* ================= BRAND ================= */
+    .company-info h2 {
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .zam {
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    /* Zambia flag colors */
+    .z-green { color: #198754; }
+    .z-red { color: #dc3545; }
+    .z-black { color: #000000; }
+    .z-orange { color: #ff9900; }
+
+    .transport-sub {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #e5e7eb;
+      margin-top: 2px;
+    }.menu-dropdown-container { 
+    position: relative; 
+    display: inline-block; 
+}
+
+.menu-button { 
+    background: none; 
+    border: none; 
+    color: white; 
+    cursor: pointer; 
+    padding: 5px; 
+    outline: none; 
+    font-size: 1.2rem; 
+    display: flex;
+    align-items: center;
+}
+
+.menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background-color: white;
+    width: 290px;
+    max-height: 85vh; 
+    overflow-y: auto;
+    box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
+    z-index: 1000;
+    border-radius: 12px;
+    color: #333;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+}
+
+.menu-dropdown.show { 
+    display: block; 
+}
+
+.dropdown-content-section { 
+    margin-bottom: 20px; 
+}
+
+.dropdown-content-section h4 { 
+    color: #2563eb; 
+    border-bottom: 1px solid #f0f0f0; 
+    padding-bottom: 6px; 
+    margin-bottom: 10px; 
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.dropdown-content-section p { 
+    font-size: 0.85rem; 
+    line-height: 1.5; 
+    margin-bottom: 10px; 
+    color: #4b5563; 
+}
+
+.dropdown-content-section a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.dropdown-content-section a:hover { 
+    background-color: #f3f4f6; 
+}
+
+.dropdown-content-section a i { 
+    width: 20px; 
+    color: #2563eb; 
+    text-align: center; 
+    font-size: 1.1rem;
+}
+
+.contact-label-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-detail-hidden { 
+    display: none; 
+}
+
+.menu-divider { 
+    height: 1px; 
+    background: #e5e7eb; 
+    margin: 12px 0; 
+}
+
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { 
+      visibility: hidden; 
+      width: 160px; 
+      background-color: #333; 
+      color: #fff; 
+      text-align: center; 
+      border-radius: 6px; 
+      padding: 8px; 
+      position: absolute; 
+      z-index: 9999; 
+      bottom: 125%; 
+      left: 50%; 
+      margin-left: -80px; 
+      opacity: 0; 
+      transition: opacity 0.3s; 
+      font-size: 0.7rem; 
+      font-weight: normal; 
+      line-height: 1.3;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; transition: 0.3s; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; transition: 0.3s; position: relative; display: flex; align-items: center; width: 100%; }
+    .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
+    input::placeholder { font-size: 0.8rem; font-style: italic; color: #999; font-weight: normal; }
+    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .mode-option .material-icons { font-size: 24px; color: var(--primary-color); }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; z-index: 100; max-height: 150px; overflow-y: auto; border-radius: 0 0 8px 8px; }
+    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+    .suggestion:hover { background: #f0f7ff; }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
+    .btn-loader { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    .hidden-section { display: none; }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-content">
+    <div class="company-info">
+  <img src="lfr.jpg" alt="Luangwa Feira Rides Logo" class="corner-logo">
+  <h2>
+    <span class="zam">
+      ZamListing Rides
+    </span>
+    
+  </h2>
+</div>
+
+
+    <div class="menu-dropdown-container">
+      <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+
+      <div id="header-menu-dropdown" class="menu-dropdown">
+        <div class="dropdown-content-section">
+          <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+          <p><strong>Location:</strong> Dedicated service provider within the Luangwa and Luanshya Districts area and surrounding locations in Zambia.</p>
+          <p><strong>Affordable:</strong> Pricing is <strong>cheap and fixed as shown</strong>, calculated fairly based on distance.</p>
+          <p><strong>Reliable:</strong> We are committed to <strong>reliable and safe transport</strong>, ensuring you reach your destination efficiently.</p>
+          <p>
+  
+
+        </div>
+
+        <div class="dropdown-content-section">
+          <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+          <p style="margin-bottom: 8px;"><strong>For inquiries or collaborations, contact us:</strong></p>
+          <a href="mailto:zamlisting@gmail.com" title="Send Email">
+            <i class="fas fa-envelope"></i>
+            <span class="contact-label-text">
+              Email Us <span class="contact-detail-hidden">zamlisting@gmail.com</span>
+            </span>
+          </a>
+          <a href="tel:0978167546" title="Call Now">
+            <i class="fas fa-phone"></i>
+            <span class="contact-label-text">
+              Call Us <span class="contact-detail-hidden">0978167546</span>
+            </span>
+          </a>
+          
+          <a href="https://wa.me/260978167546" target="_blank" title="Chat on WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+            <span class="contact-label-text">
+              WhatsApp Us <span class="contact-detail-hidden">+260978167546</span>
+            </span>
+          </a>
+          
+          <a href="sms:0978167546" title="Send SMS">
+            <i class="fas fa-sms"></i>
+            <span class="contact-label-text">
+              Send SMS <span class="contact-detail-hidden">0978167546</span>
+            </span>
+          </a>
+          
+          
+
+          <div class="menu-divider"></div>
+
+          <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank" title="Visit Facebook">
+            <i class="fab fa-facebook"></i>
+            <span class="contact-label-text">Facebook Page</span>
+          </a>
+          
+          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank" title="Visit TikTok">
+            <i class="fab fa-tiktok"></i>
+            <span class="contact-label-text">TikTok</span>
+          </a>
+          
+          <p style="margin-top: 15px; text-align: center; font-size: 0.75rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides.</p>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</header>
+
+  <main class="product-container">
+    <div class="booking-container">
+      <fieldset>
+        <legend><span class="material-icons">account_circle</span> Login</legend>
+        <div class="input-box" id="phone-box">
+          <span class="material-icons">phone</span>
+          <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
+        </div>
+      </fieldset>
+
+      <div id="trip-details" class="hidden-section">
+        <fieldset id="mode-fieldset">
+          <legend><span class="material-icons">commute</span> Transport Mode</legend>
+          <div id="mode-group" style="display:flex; justify-content:space-around; padding:10px 0;">
+            <label class="mode-option">
+              <input type="radio" name="mode" value="motorbike">
+              <span class="material-icons">two_wheeler</span>
+              <small>Motorbike</small>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="mode" value="vehicle">
+              <span class="material-icons">directions_car</span>
+              <small>Car</small>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset id="route-fieldset">
+          <legend>Route</legend>
+          <div class="input-box" id="origin-container" style="margin-bottom:12px;">
+            <span class="material-icons">my_location</span>
+            <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
+            <div id="originList" class="autocomplete-list"></div>
+          </div>
+          <div class="input-box" id="dest-container">
+            <span class="material-icons">pin_drop</span>
+            <input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off">
+            <div id="destinationList" class="autocomplete-list"></div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div id="summary-section" class="hidden-section">
+        <fieldset>
+          <legend>
+            <span class="material-icons">receipt_long</span> Trip Summary
+            <span class="tooltip-container">
+              <span class="material-icons tooltip-icon">help_outline</span>
+              <span class="tooltip-text" id="hub-tooltip">Calculated via nearest hub</span>
+            </span>
+          </legend>
+          <div id="summary-cards"></div>
+        </fieldset>
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
+          <button class="submit-btn" id="submit-btn">
+            <i class="fas fa-paper-plane" id="btn-icon"></i>
+            <div class="btn-loader" id="btn-loader"></div>
+          </button>
+          <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
+        </div>
+      </div>
+
+      <div class="calc-loader" id="spinner"></div>
+      <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height:1.2em;"></p>
+    </div>
+  </main>
+
+  <script>
+    // --- RESTORED INSTALL LOGIC ---
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("sw.js").then(
+          function(reg) { console.log("ServiceWorker registered"); },
+          function(err) { console.log("ServiceWorker registration failed:", err); }
+        );
+      });
+    }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      const deferredPrompt = e;
+      const installBox = document.createElement("div");
+      installBox.style.position = "fixed";
+      installBox.style.top = "15px";
+      installBox.style.right = "15px";
+      installBox.style.background = "#2b6ef6";
+      installBox.style.color = "#fff";
+      installBox.style.borderRadius = "8px";
+      installBox.style.padding = "8px 14px";
+      installBox.style.fontFamily = "system-ui, sans-serif";
+      installBox.style.fontSize = "14px";
+      installBox.style.cursor = "pointer";
+      installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+      installBox.style.zIndex = "9999";
+      installBox.style.display = "flex";
+      installBox.style.alignItems = "center";
+      installBox.style.gap = "8px";
+      installBox.innerHTML = `<span id="installText">Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
+      document.body.appendChild(installBox);
+
+      document.getElementById("installText").addEventListener("click", async () => {
+        installBox.remove();
+        deferredPrompt.prompt();
+      });
+      document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+    });
+
+    // --- DROPDOWN & MENU ---
+    function toggleDropdown() {
+      const menu = document.getElementById("header-menu-dropdown");
+      menu.classList.toggle("show");
+    }
+
+    window.onclick = function(event) {
+      const menu = document.getElementById("header-menu-dropdown");
+      const btn = document.getElementById("menu-toggle-btn");
+      if (menu && menu.classList.contains('show')) {
+        if (!menu.contains(event.target) && !btn.contains(event.target)) {
+          menu.classList.remove('show');
+        }
+      }
+    }
+
+    // --- CONFIG & DATA ---
+    const config = {
+      vehiclePricePerKm: 3.00,
+      motorbikePricePerKm: 1.02,
+      vehicleMinPrice: 20,
+      motorbikeMinPrice: 10,
+      vehicleExtra: 6.00,      
+      motorbikeExtra: 2.04,    
+      avgSpeed: 60
+    };
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+    const places = [
+  // =======================
+  // LUANGWA PLACES
+  // =======================
+ "Anglican Church,Luangwa",
+  "Airstrip,Luangwa",
+
+  "Big 2 Zambezi Water Front Resort & Safari, Luangwa",
+  "BM Residence, Luangwa",
+  "Boma Clinic, Luangwa",
+  "Chidada Ground, Luangwa",
+  "Car Wash Pub, Luangwa",
+  "Chitope, Luangwa",
+  "Chitope Rural Health Centre, Luangwa",
+  "Chilombwe Community School, Luangwa",
+  "Chiriwe Primary School, Luangwa",
+  "Dzalo Skills Training Centre Kambolozo, Luangwa",
+  "Feira Kindom Hall, Luangwa",
+  "Feira Day Secondary School, Luangwa",
+  "Feira Day Community, Luangwa",
+  "Gerasmos Safari Lodge, Luangwa",
+
+  "Hill View Pub, Luangwa",
+  "JB Three Boarders Mall, Luangwa",
+  "JB Three Boarders Club, Luangwa",
+  "Justifeli Lodge, Luangwa",
+  "Kakaro Primary School, Luangwa",
+  "Kakaro Liberation Heritage Site, Luangwa",
+  "Kantuleni Executive Lodge, Luangwa",
+  "Kapoche, Luangwa",
+  "Kaunga Secondary School, Luangwa",
+  "Kasinsa, Luangwa",
+  "Katondwe Chapel, Luangwa",
+  "Katondwe Chaz Hotel, Luangwa",
+  "Katondwe Dam, Luangwa",
+  "Katondwe Girls Secondary School, Luangwa",
+  "Katondwe Mission Hospital, Luangwa",
+  "Katondwe Primary School, Luangwa",
+  "Kavalamanja, Luangwa",
+  "Luangwa (Feira)",
+  "Luangwa Basic School",
+  "Luangwa Bridge",
+  "Luangwa Bridge Market",
+  "Luangwa Bus Station",
+  "Luangwa Council Lodge",
+  "District Commissioner,Luangwa",
+  "District Education Board Secretary,Luangwa",
+  "Luangwa District Hospital",
+  "Luangwa High School Police Post",
+  "Boma Filling Station, Luangwa",
+  "Luangwa Harbour",
+  "Indeco Building, Luangwa",
+  "Luangwa Market",
+  "Luangwa Main SDA Church",
+  "Mburuma Local Court, Luangwa",
+  "Luangwa Police Station",
+  "Luangwa Post Office",
+  "Luangwa Town Council",
+  "Luangwa Secondary School",
+  "Makichilo Lodge, Luangwa",
+  "Mwavi Secondary School, Luangwa",
+  "Mwalila Primary School, Luangwa",
+  "Nyabota Lodge, Luangwa",
+  "Passover Living Lamb Ministry Katondwe, Luangwa",
+  "Pentecostal Assembly of God Joshua Assembly, Luangwa",
+
+  "UCZ Feira, Luangwa",
+
+
+  "National Registration Office,Luangwa",
+  "River Spot Club, Luangwa",
+  "SDA Katondwe, Luangwa",
+  "Yangoma Lodge, Luangwa",
+  "Yellow Shop, Luangwa",
+  "Zambia Electricity Supply Corporation, Luangwa",
+
+  "Zambia Revenue Authority – Luangwa Customs Services, Luangwa",
+  "Feira Gardens, Luangwa",
+  "ZICB Luangwa Branch, Luangwa",
+  "Luangwa Immigration Border Post, Luangwa",
+  "UCZ Feira, Luangwa",
+  "Soweto Junction, Luangwa",
+
+
+"Chidada Community, Luangwa",
+"Mandombe Community, Luangwa",
+"Kamoba Community, Luangwa",
+"Soweto Community, Luangwa",
+"Kambolozo Community, Luangwa",
+"Indeco Community, Luangwa",
+ 
+];
+
+    const segments = [
+
+// ==========================================
+// HUB: LUANGWA BUS STATION DIRECT SEGMENTS
+// ==========================================
+{ from: "Luangwa Bus Station", to: "Luangwa Market", distance: 0.1 },
+{ from: "Luangwa Bus Station", to: "Luangwa (Feira)", distance: 0.1 },
+{ from: "Luangwa Bus Station", to: "Yellow Shop, Luangwa", distance: 0.19 },
+{ from: "Luangwa Bus Station", to: "JB Three Boarders Mall, Luangwa", distance: 0.24 },
+{ from: "Luangwa Bus Station", to: "Feira Gardens, Luangwa", distance: 0.6 },
+{ from: "Luangwa Bus Station", to: "Makichilo Lodge, Luangwa", distance: 0.9 },
+{ from: "Luangwa Bus Station", to: "Gerasmos Safari Lodge, Luangwa", distance: 1.2 },
+{ from: "Luangwa Bus Station", to: "Justifeli Lodge, Luangwa", distance: 1.4 },
+{ from: "Luangwa Bus Station", to: "Kambolozo Community, Luangwa", distance: 1.5 },
+{ from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.16 },
+{ from: "Luangwa Bus Station", to: "BM Residence, Luangwa", distance: 2.2 },
+{ from: "Luangwa Bus Station", to: "Soweto Junction, Luangwa", distance: 2.39 },
+{ from: "Luangwa Bus Station", to: "Chidada Ground, Luangwa", distance: 3.0 },
+{ from: "Luangwa Bus Station", to: "Chidada Community, Luangwa", distance: 3.0 },
+{ from: "Luangwa Bus Station", to: "Kamoba Community, Luangwa", distance: 3.0 },
+{ from: "Luangwa Bus Station", to: "Soweto Community, Luangwa", distance: 3.0 },
+{ from: "Luangwa Bus Station", to: "Indeco Community, Luangwa", distance: 3.0 },
+{ from: "Luangwa Bus Station", to: "Airstrip, Luangwa", distance: 3.5 },
+{ from: "Luangwa Bus Station", to: "Feira Day Community, Luangwa", distance: 4.0 },
+{ from: "Luangwa Bus Station", to: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", distance: 4.1 },
+{ from: "Luangwa Bus Station", to: "Mandombe Community, Luangwa", distance: 5.0 },
+{ from: "Luangwa Bus Station", to: "Kakaro Primary School, Luangwa", distance: 10.8 },
+{ from: "Luangwa Bus Station", to: "Kavalamanja, Luangwa", distance: 21.0 },
+{ from: "Luangwa Bus Station", to: "Luangwa Secondary School", distance: 47.8 },
+{ from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62.7 },
+{ from: "Luangwa Bus Station", to: "Luangwa Bridge", distance: 87.1 },
+
+// ==========================================
+// TOWN CORE & ADJACENCY
+// ==========================================
+{ from: "Luangwa Market", to: "Makichilo Lodge, Luangwa", distance: 0.4 },
+{ from: "Makichilo Lodge, Luangwa", to: "Gerasmos Safari Lodge, Luangwa", distance: 0.3 },
+{ from: "Makichilo Lodge, Luangwa", to: "UCZ Feira, Luangwa", distance: 0.5 },
+{ from: "UCZ Feira, Luangwa", to: "Pentecostal Assembly of God Joshua Assembly, Luangwa", distance: 0.08 },
+{ from: "Zambia Electricity Supply Corporation, Luangwa", to: "Luangwa Main SDA Church", distance: 0.65 },
+{ from: "Luangwa Main SDA Church", to: "Indeco Building, Luangwa", distance: 0.7 },
+{ from: "Indeco Building, Luangwa", to: "JB Three Boarders Club, Luangwa", distance: 0.1 },
+{ from: "JB Three Boarders Club, Luangwa", to: "Yellow Shop, Luangwa", distance: 0.45 },
+{ from: "Indeco Building, Luangwa", to: "Indeco Community, Luangwa", distance: 1.3 },
+
+// ==========================================
+// BOMA / HARBOUR CORRIDOR
+// ==========================================
+{ from: "JB Three Boarders Mall, Luangwa", to: "Boma Filling Station, Luangwa", distance: 0.35 },
+{ from: "JB Three Boarders Mall, Luangwa", to: "Nyabota Lodge, Luangwa", distance: 0.25 },
+{ from: "JB Three Boarders Mall, Luangwa", to: "River Spot Club, Luangwa", distance: 0.03 },
+{ from: "Boma Filling Station, Luangwa", to: "Kantuleni Executive Lodge, Luangwa", distance: 0.19 },
+{ from: "Kantuleni Executive Lodge, Luangwa", to: "Luangwa Harbour", distance: 0.09 },
+{ from: "Kantuleni Executive Lodge, Luangwa", to: "Luangwa Council Lodge", distance: 0.09 },
+{ from: "Luangwa Council Lodge", to: "District Commissioner, Luangwa", distance: 0.3 },
+{ from: "District Commissioner, Luangwa", to: "Luangwa Police Station", distance: 0.3 },
+{ from: "District Commissioner, Luangwa", to: "Luangwa Post Office", distance: 0.1 },
+{ from: "Luangwa Police Station", to: "District Education Board Secretary, Luangwa", distance: 0.1 },
+{ from: "District Education Board Secretary, Luangwa", to: "Yangoma Lodge, Luangwa", distance: 0.4 },
+{ from: "Yangoma Lodge, Luangwa", to: "Boma Clinic, Luangwa", distance: 0.5 },
+{ from: "Nyabota Lodge, Luangwa", to: "Luangwa Basic School", distance: 0.18 },
+
+// ==========================================
+// TOWN COUNCIL & EDUCATION CORRIDOR
+// ==========================================
+{ from: "Justifeli Lodge, Luangwa", to: "Luangwa Town Council", distance: 0.5 },
+{ from: "Luangwa Town Council", to: "National Registration Office, Luangwa", distance: 0.49 },
+{ from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo, Luangwa", distance: 0.6 },
+{ from: "Dzalo Skills Training Centre Kambolozo, Luangwa", to: "Kambolozo Community, Luangwa", distance: 1.3 },
+{ from: "Luangwa Town Council", to: "Hill View Pub, Luangwa", distance: 0.4 },
+{ from: "Luangwa Town Council", to: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", distance: 3.2 },
+{ from: "National Registration Office, Luangwa", to: "Chidada Ground, Luangwa", distance: 0.49 },
+{ from: "Chidada Ground, Luangwa", to: "Chidada Community, Luangwa", distance: 1.3 },
+{ from: "Chidada Ground, Luangwa", to: "Yangoma Lodge, Luangwa", distance: 2.34 },
+{ from: "Hill View Pub, Luangwa", to: "BM Residence, Luangwa", distance: 1.0 },
+{ from: "BM Residence, Luangwa", to: "Feira Day Secondary School, Luangwa", distance: 1.1 },
+{ from: "Feira Day Secondary School, Luangwa", to: "Feira Day Community, Luangwa", distance: 1.3 },
+
+// ==========================================
+// SOWETO & HOSPITAL CLUSTER
+// ==========================================
+{ from: "Luangwa District Hospital", to: "Soweto Junction, Luangwa", distance: 2.5 },
+{ from: "Luangwa District Hospital", to: "Mandombe Community, Luangwa", distance: 1.3 },
+{ from: "Luangwa District Hospital", to: "Kamoba Community, Luangwa", distance: 1.3 },
+{ from: "Soweto Junction, Luangwa", to: "Airstrip, Luangwa", distance: 1.7 },
+{ from: "Soweto Junction, Luangwa", to: "Zambia Electricity Supply Corporation, Luangwa", distance: 0.3 },
+{ from: "Soweto Junction, Luangwa", to: "Car Wash Pub, Luangwa", distance: 1.25 },
+{ from: "Soweto Junction, Luangwa", to: "Soweto Community, Luangwa", distance: 1.3 },
+{ from: "Car Wash Pub, Luangwa", to: "Luangwa Town Council", distance: 1.0 },
+{ from: "Car Wash Pub, Luangwa", to: "BM Residence, Luangwa", distance: 1.0 },
+
+// ==========================================
+// FEIRA & CUSTOMS CORRIDOR
+// ==========================================
+{ from: "Feira Kingdom Hall, Luangwa", to: "Anglican Church, Luangwa", distance: 0.08 },
+{ from: "Feira Kingdom Hall, Luangwa", to: "Luangwa (Feira)", distance: 0.7 },
+{ from: "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", to: "Feira Gardens, Luangwa", distance: 0.7 },
+{ from: "Feira Gardens, Luangwa", to: "ZICB Luangwa Branch, Luangwa", distance: 0.85 },
+{ from: "ZICB Luangwa Branch, Luangwa", to: "Luangwa Immigration Border Post, Luangwa", distance: 0.28 },
+{ from: "Luangwa Immigration Border Post, Luangwa", to: "Yellow Shop, Luangwa", distance: 1.4 },
+{ from: "Luangwa Immigration Border Post, Luangwa", to: "District Commissioner, Luangwa", distance: 0.5 },
+
+// ==========================================
+// OUTLYING CORRIDORS
+// ==========================================
+{ from: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", to: "Chilombwe Community School, Luangwa", distance: 9.8 },
+{ from: "Chitope, Luangwa", to: "Mwavi Secondary School, Luangwa", distance: 1.1 },
+{ from: "Mwavi Secondary School, Luangwa", to: "Chitope Rural Health Centre, Luangwa", distance: 2.0 },
+{ from: "Chitope Rural Health Centre, Luangwa", to: "Mwalila Primary School, Luangwa", distance: 6.0 },
+{ from: "Mwalila Primary School, Luangwa", to: "Kaunga Secondary School, Luangwa", distance: 5.0 },
+{ from: "Chitope, Luangwa", to: "Kasinsa, Luangwa", distance: 10.0 },
+{ from: "Kasinsa, Luangwa", to: "Luangwa Secondary School", distance: 14.0 },
+{ from: "Luangwa Secondary School", to: "Kapoche, Luangwa", distance: 21.0 },
+{ from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 },
+{ from: "Luangwa Secondary School", to: "Katondwe Mission Hospital, Luangwa", distance: 5.0 },
+{ from: "Luangwa High School Police Post", to: "Chiriwe Primary School, Luangwa", distance: 2.1 },
+{ from: "Luangwa High School Police Post", to: "SDA Katondwe, Luangwa", distance: 1.0 },
+{ from: "Katondwe Mission Hospital, Luangwa", to: "Katondwe Primary School, Luangwa", distance: 0.55 },
+{ from: "Katondwe Chapel, Luangwa", to: "Katondwe Primary School, Luangwa", distance: 0.05 },
+{ from: "Katondwe Primary School, Luangwa", to: "Katondwe Girls Secondary School, Luangwa", distance: 0.0 },
+{ from: "Katondwe Girls Secondary School, Luangwa", to: "Katondwe Chaz Hotel, Luangwa", distance: 0.45 },
+{ from: "Katondwe Chaz Hotel, Luangwa", to: "Passover Living Lamb Ministry, Luangwa", distance: 0.4 },
+{ from: "Passover Living Lamb Ministry, Luangwa", to: "Katondwe Dam, Luangwa", distance: 0.1 },
+{ from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 3.0 },
+{ from: "Kakaro Primary School, Luangwa", to: "Kakaro Liberation Heritage Site, Luangwa", distance: 1.2 },
+{ from: "Kakaro Primary School, Luangwa", to: "Luangwa District Hospital", distance: 7.1 }
+
+  
+];
+
+
+    const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market","Luanshya Town Roundabout","Mpatamatu Bus Stop, Luanshya"];
+
+    const graph = {};
+    segments.forEach(({ from, to, distance }) => {
+      if (!graph[from]) graph[from] = []; if (!graph[to]) graph[to] = [];
+      graph[from].push({ node: to, distance }); graph[to].push({ node: from, distance }); 
+    });
+
+    function findShortestDistance(start, end) { 
+      if (start === end) return 0; if (!graph[start] || !graph[end]) return null;
+      const distances = {}; const unvisited = new Set(Object.keys(graph));
+      for (const node of unvisited) distances[node] = Infinity;
+      distances[start] = 0;
+      while (unvisited.size) {
+        let current = null; for (const node of unvisited) { if (current === null || distances[node] < distances[current]) current = node; }
+        if (current === null || distances[current] === Infinity) break; 
+        if (current === end) return distances[end]; unvisited.delete(current);
+        for (const neighbor of graph[current]) {
+          const newDist = distances[current] + neighbor.distance;
+          if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
+        }
+      }
+      return null;
+    }
+
+    function calculateTotalDistance(pickup, destination) {
+      if (pickup === destination) return { total: 0, trip: 0, hub: 'N/A' };
+      let nearestHub = null, minD1 = Infinity;
+      for (const hub of hubs) {
+        const d = findShortestDistance(pickup, hub);
+        if (d !== null && d < minD1) { minD1 = d; nearestHub = hub; }
+      }
+      if (!nearestHub) return { total: null, trip: null, hub: null };
+      const d2 = findShortestDistance(pickup, destination);
+      const d3 = findShortestDistance(destination, nearestHub);
+      if (d2 === null || d3 === null) return { total: null, trip: null, hub: nearestHub };
+      return { total: minD1 + d2 + d3, trip: d2, hub: nearestHub };
+    }
+
+    let rideData = null;
+    const phoneInput = document.getElementById('customer-phone');
+    const tripDiv = document.getElementById('trip-details');
+    const summaryDiv = document.getElementById('summary-section');
+    const statusText = document.getElementById('status');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnIcon = document.getElementById('btn-icon');
+    const btnLoader = document.getElementById('btn-loader');
+
+    phoneInput.oninput = () => { 
+      if (/^0[0-9]{9}$/.test(phoneInput.value)) { tripDiv.style.display = 'block'; }
+    };
+
+    function setupAuto(inputId, containerId, listId) {
+      const input = document.getElementById(inputId);
+      const container = document.getElementById(containerId);
+      const list = document.getElementById(listId);
+      input.oninput = () => {
+        const val = input.value.toLowerCase(); list.innerHTML = ''; container.classList.remove('field-error'); statusText.textContent = ""; 
+        if (!val) return;
+        places.filter(p => p.toLowerCase().includes(val)).forEach(p => {
+          const d = document.createElement('div'); d.className = 'suggestion'; d.textContent = p;
+          d.onclick = () => { input.value = p; list.innerHTML = ''; checkReady(); };
+          list.appendChild(d);
+        });
+      };
+      input.onblur = () => { setTimeout(() => { if (input.value && !places.includes(input.value)) { container.classList.add('field-error'); statusText.textContent = "⚠️ Select from list."; summaryDiv.style.display = 'none'; } }, 250); };
+    }
+
+    function checkReady() {
+      const from = document.getElementById('gm-origin').value; const to = document.getElementById('gm-destination').value;
+      const mode = document.querySelector('input[name="mode"]:checked');
+      if (places.includes(from) && places.includes(to)) {
+        if (!mode) { statusText.textContent = "Select Mode."; }
+        else { statusText.textContent = ""; calculate(from, to, mode.value); }
+      }
+    }
+
+    function calculate(from, to, mode) {
+      document.getElementById('spinner').style.display = 'block'; summaryDiv.style.display = 'none';
+      setTimeout(() => {
+        document.getElementById('spinner').style.display = 'none';
+        const res = calculateTotalDistance(from, to);
+        if (res.total === null) { statusText.textContent = "Route error."; return; }
+        summaryDiv.style.display = 'block';
+        document.getElementById('hub-tooltip').textContent = "Price calculated via: " + res.hub;
+
+        let rate, minPrice, extra;
+        if (mode === 'vehicle') {
+          rate = config.vehiclePricePerKm; minPrice = config.vehicleMinPrice; extra = config.vehicleExtra;
+        } else {
+          rate = config.motorbikePricePerKm; minPrice = config.motorbikeMinPrice; extra = config.motorbikeExtra;
+        }
+
+        let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
+        document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Price</span><span style="color:var(--secondary-color); font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
+        
+        // --- CALC ESTIMATED TIME ---
+        const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
+
+        // --- FORMAT PHONE TO +260 ---
+        let formattedPhone = phoneInput.value;
+        if (formattedPhone.startsWith('0')) {
+          formattedPhone = '+260' + formattedPhone.substring(1);
+        }
+        
+        rideData = { 
+          preferredMode: mode, 
+          phone: formattedPhone, 
+          hub: res.hub, 
+          from, 
+          to, 
+          tripDistance: res.trip.toFixed(2), 
+          totalDistance: res.total.toFixed(2), 
+          price: price,
+          estimatedTime: timeVal + " mins" 
+        };
+        
+        submitBtn.style.background = "var(--primary-color)"; 
+        btnIcon.className = "fas fa-paper-plane"; 
+        btnIcon.style.display = "block"; 
+        btnLoader.style.display = "none"; 
+        document.getElementById('action-label').textContent = "Request Now";
+        submitBtn.onclick = handleRequest;
+      }, 600);
+    }
+
+    async function handleRequest() {
+      submitBtn.disabled = true; btnIcon.style.display = "none"; btnLoader.style.display = "block";
+      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
+      
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) });
+        statusText.textContent = "Sent! You will be contacted or Quickly Call."; statusText.style.color = "var(--success-color)";
+        
+        btnLoader.style.display = "none"; 
+        btnIcon.style.display = "block"; 
+        btnIcon.className = "fas fa-phone"; 
+        submitBtn.style.background = "var(--success-color)"; 
+        submitBtn.disabled = false; 
+        document.getElementById('action-label').textContent = "Call Now";
+        
+        submitBtn.onclick = function() { window.location.href = "tel:0978167546"; };
+      } catch (err) { 
+        statusText.textContent = "Failed to Submit. Please call directly."; 
+        submitBtn.disabled = false; 
+        btnLoader.style.display = "none"; 
+        btnIcon.style.display = "block"; 
+        btnIcon.className = "fas fa-phone"; 
+        submitBtn.style.background = "var(--success-color)"; 
+        submitBtn.disabled = false; 
+        document.getElementById('action-label').textContent = "Call Now";
+        
+        submitBtn.onclick = function() { window.location.href = "tel:0978167546"; };
+      }
+    }
+
+    setupAuto('gm-origin', 'origin-container', 'originList');
+    setupAuto('gm-destination', 'dest-container', 'destinationList');
+    document.getElementById('mode-group').onchange = checkReady;
+  </script>
+</body>
+  </html>
