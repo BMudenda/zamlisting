@@ -791,33 +791,67 @@
     }
 
     async function handleRequest() {
-      submitBtn.disabled = true; btnIcon.style.display = "none"; btnLoader.style.display = "block";
+      submitBtn.disabled = true;
+      btnIcon.style.display = "none";
+      btnLoader.style.display = "block";
+      statusText.textContent = "";           // Clear old message
+      statusText.style.color = "inherit";    // Reset color
+
       const payload = { ...rideData, timestamp: new Date().toLocaleString() };
-      
+
+      // ─── Timeout setup (10 seconds) ───
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) });
-        statusText.textContent = "Sent! You will be contacted or Quickly Call."; statusText.style.color = "var(--success-color)";
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: new URLSearchParams(payload),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        // Success
+        statusText.textContent = "Sent! You will be contacted or Quickly Call.";
+        statusText.style.color = "var(--success-color)";
+
+        finishRequestUI("success");
+
+      } catch (err) {
+        clearTimeout(timeoutId);
+
+        let message = "Failed to Submit. Please call directly.";
         
-        btnLoader.style.display = "none"; 
-        btnIcon.style.display = "block"; 
-        btnIcon.className = "fas fa-phone"; 
-        submitBtn.style.background = "var(--success-color)"; 
-        submitBtn.disabled = false; 
-        document.getElementById('action-label').textContent = "Call Now";
-        
-        submitBtn.onclick = function() { window.location.href = "tel:0978167546"; };
-      } catch (err) { 
-        statusText.textContent = "Failed to Submit. Please call directly."; 
-        submitBtn.disabled = false; 
-        btnLoader.style.display = "none"; 
-        btnIcon.style.display = "block"; 
-        btnIcon.className = "fas fa-phone"; 
-        submitBtn.style.background = "var(--success-color)"; 
-        submitBtn.disabled = false; 
-        document.getElementById('action-label').textContent = "Call Now";
-        
-        submitBtn.onclick = function() { window.location.href = "tel:0978167546"; };
+        if (err.name === 'AbortError') {
+          message = "Request timed out after 10 seconds. Please call directly.";
+        } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
+          message = "Network issue. Please check connection or call directly.";
+        }
+
+        statusText.textContent = message;
+        statusText.style.color = "var(--error-color)";   // ← define --error-color in CSS if not already
+
+        finishRequestUI("fail");
       }
+    }
+
+    // Shared reset logic for both success & failure
+    function finishRequestUI(outcome) {
+      btnLoader.style.display = "none";
+      btnIcon.style.display = "block";
+      btnIcon.className = "fas fa-phone";
+      
+      // You can make background different for fail if you want:
+      // submitBtn.style.background = (outcome === "success") ? "var(--success-color)" : "var(--warning-color || var(--success-color))";
+      submitBtn.style.background = "var(--success-color)";   // ← keeping same as your original
+
+      submitBtn.disabled = false;
+      document.getElementById('action-label').textContent = "Call Now";
+
+      submitBtn.onclick = function() {
+        window.location.href = "tel:0978167546";
+      };
     }
 
     setupAuto('gm-origin', 'origin-container', 'originList');
