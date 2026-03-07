@@ -728,7 +728,8 @@
  
   
 
-    const hubs = [
+    
+  const hubs = [
   "Luangwa Bus Station",
   "Chitope, Luangwa",
   "Luangwa Bridge Market",
@@ -736,25 +737,38 @@
   "Mpatamatu Bus Stop, Luanshya"
 ];
 
+/* Build graph from existing segments */
 const graph = {};
 
 segments.forEach(({ from, to, distance }) => {
+
   if (!graph[from]) graph[from] = [];
   if (!graph[to]) graph[to] = [];
 
   graph[from].push({ node: to, distance });
   graph[to].push({ node: from, distance });
+
 });
 
 
+/* Shortest Distance Function (Direct Route Priority) */
 function findShortestDistance(start, end) {
+
   if (start === end) return 0;
   if (!graph[start] || !graph[end]) return null;
 
+  // Check direct road first
+  const direct = graph[start].find(n => n.node === end);
+  if (direct) return direct.distance;
+
+  // Otherwise run Dijkstra shortest path
   const distances = {};
   const unvisited = new Set(Object.keys(graph));
 
-  for (const node of unvisited) distances[node] = Infinity;
+  for (const node of unvisited) {
+    distances[node] = Infinity;
+  }
+
   distances[start] = 0;
 
   while (unvisited.size) {
@@ -774,6 +788,7 @@ function findShortestDistance(start, end) {
     unvisited.delete(current);
 
     for (const neighbor of graph[current]) {
+
       const newDist = distances[current] + neighbor.distance;
 
       if (newDist < distances[neighbor.node]) {
@@ -786,6 +801,7 @@ function findShortestDistance(start, end) {
 }
 
 
+/* Total Distance Calculation (Hub → A → B → Hub) */
 function calculateTotalDistance(pickup, destination) {
 
   if (pickup === destination) {
@@ -798,10 +814,10 @@ function calculateTotalDistance(pickup, destination) {
   // Find nearest hub to pickup
   for (const hub of hubs) {
 
-    const distance = findShortestDistance(hub, pickup);
+    const d = findShortestDistance(hub, pickup);
 
-    if (distance !== null && distance < minDistance) {
-      minDistance = distance;
+    if (d !== null && d < minDistance) {
+      minDistance = d;
       nearestHub = hub;
     }
   }
@@ -810,13 +826,8 @@ function calculateTotalDistance(pickup, destination) {
     return { total: null, trip: null, hub: null };
   }
 
-  // Hub → Pickup
   const hubToPickup = findShortestDistance(nearestHub, pickup);
-
-  // Pickup → Destination
   const tripDistance = findShortestDistance(pickup, destination);
-
-  // Destination → Hub
   const destinationToHub = findShortestDistance(destination, nearestHub);
 
   if (hubToPickup === null || tripDistance === null || destinationToHub === null) {
@@ -826,9 +837,9 @@ function calculateTotalDistance(pickup, destination) {
   const totalDistance = hubToPickup + tripDistance + destinationToHub;
 
   return {
-    total: totalDistance,
+    hub: nearestHub,
     trip: tripDistance,
-    hub: nearestHub
+    total: totalDistance
   };
 }
 
