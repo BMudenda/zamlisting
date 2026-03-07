@@ -728,44 +728,109 @@
  
   
 
-    const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market","Luanshya Town Roundabout","Mpatamatu Bus Stop, Luanshya"];
+    const hubs = [
+  "Luangwa Bus Station",
+  "Chitope, Luangwa",
+  "Luangwa Bridge Market",
+  "Luanshya Town Roundabout",
+  "Mpatamatu Bus Stop, Luanshya"
+];
 
-    const graph = {};
-    segments.forEach(({ from, to, distance }) => {
-      if (!graph[from]) graph[from] = []; if (!graph[to]) graph[to] = [];
-      graph[from].push({ node: to, distance }); graph[to].push({ node: from, distance }); 
-    });
+const graph = {};
 
-    function findShortestDistance(start, end) { 
-      if (start === end) return 0; if (!graph[start] || !graph[end]) return null;
-      const distances = {}; const unvisited = new Set(Object.keys(graph));
-      for (const node of unvisited) distances[node] = Infinity;
-      distances[start] = 0;
-      while (unvisited.size) {
-        let current = null; for (const node of unvisited) { if (current === null || distances[node] < distances[current]) current = node; }
-        if (current === null || distances[current] === Infinity) break; 
-        if (current === end) return distances[end]; unvisited.delete(current);
-        for (const neighbor of graph[current]) {
-          const newDist = distances[current] + neighbor.distance;
-          if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
-        }
+segments.forEach(({ from, to, distance }) => {
+  if (!graph[from]) graph[from] = [];
+  if (!graph[to]) graph[to] = [];
+
+  graph[from].push({ node: to, distance });
+  graph[to].push({ node: from, distance });
+});
+
+
+function findShortestDistance(start, end) {
+  if (start === end) return 0;
+  if (!graph[start] || !graph[end]) return null;
+
+  const distances = {};
+  const unvisited = new Set(Object.keys(graph));
+
+  for (const node of unvisited) distances[node] = Infinity;
+  distances[start] = 0;
+
+  while (unvisited.size) {
+
+    let current = null;
+
+    for (const node of unvisited) {
+      if (current === null || distances[node] < distances[current]) {
+        current = node;
       }
-      return null;
     }
 
-    function calculateTotalDistance(pickup, destination) {
-      if (pickup === destination) return { total: 0, trip: 0, hub: 'N/A' };
-      let nearestHub = null, minD1 = Infinity;
-      for (const hub of hubs) {
-        const d = findShortestDistance(pickup, hub);
-        if (d !== null && d < minD1) { minD1 = d; nearestHub = hub; }
+    if (current === null || distances[current] === Infinity) break;
+
+    if (current === end) return distances[end];
+
+    unvisited.delete(current);
+
+    for (const neighbor of graph[current]) {
+      const newDist = distances[current] + neighbor.distance;
+
+      if (newDist < distances[neighbor.node]) {
+        distances[neighbor.node] = newDist;
       }
-      if (!nearestHub) return { total: null, trip: null, hub: null };
-      const d2 = findShortestDistance(pickup, destination);
-      const d3 = findShortestDistance(destination, nearestHub);
-      if (d2 === null || d3 === null) return { total: null, trip: null, hub: nearestHub };
-      return { total: minD1 + d2 + d3, trip: d2, hub: nearestHub };
     }
+  }
+
+  return null;
+}
+
+
+function calculateTotalDistance(pickup, destination) {
+
+  if (pickup === destination) {
+    return { total: 0, trip: 0, hub: "N/A" };
+  }
+
+  let nearestHub = null;
+  let minDistance = Infinity;
+
+  // Find nearest hub to pickup
+  for (const hub of hubs) {
+
+    const distance = findShortestDistance(hub, pickup);
+
+    if (distance !== null && distance < minDistance) {
+      minDistance = distance;
+      nearestHub = hub;
+    }
+  }
+
+  if (!nearestHub) {
+    return { total: null, trip: null, hub: null };
+  }
+
+  // Hub → Pickup
+  const hubToPickup = findShortestDistance(nearestHub, pickup);
+
+  // Pickup → Destination
+  const tripDistance = findShortestDistance(pickup, destination);
+
+  // Destination → Hub
+  const destinationToHub = findShortestDistance(destination, nearestHub);
+
+  if (hubToPickup === null || tripDistance === null || destinationToHub === null) {
+    return { total: null, trip: null, hub: nearestHub };
+  }
+
+  const totalDistance = hubToPickup + tripDistance + destinationToHub;
+
+  return {
+    total: totalDistance,
+    trip: tripDistance,
+    hub: nearestHub
+  };
+}
 
     let rideData = null;
     const phoneInput = document.getElementById('customer-phone');
