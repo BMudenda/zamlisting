@@ -902,68 +902,87 @@ function calculateTotalDistance(pickup, destination) {
     }
 
     async function handleRequest() {
-      submitBtn.disabled = true;
-      btnIcon.style.display = "none";
-      btnLoader.style.display = "block";
-      statusText.textContent = "";           // Clear old message
-      statusText.style.color = "inherit";    // Reset color
+  submitBtn.disabled = true;
+  btnIcon.style.display = "none";
+  btnLoader.style.display = "block"; // keep your spinner if you want, or hide it
+  statusText.textContent = "";
+  statusText.style.color = "inherit";
 
-      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
+  // Show circular loader
+  const loaderCycle = document.getElementById('loader-cycle');
+  const progressCircle = document.getElementById('progress-circle');
+  const percentText = document.getElementById('percent-text');
+  
+  loaderCycle.style.display = "block";
+  progressCircle.style.strokeDashoffset = "175.93"; // full empty
+  percentText.textContent = "0%";
+  loaderCycle.classList.remove("timeout");
 
-      // ─── Timeout setup (10 seconds) ───
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const payload = { ...rideData, timestamp: new Date().toLocaleString() };
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: new URLSearchParams(payload),
-          signal: controller.signal
-        });
+  const controller = new AbortController();
+  const timeoutMs = 10000;
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-        clearTimeout(timeoutId);
+  // ─── Circular progress animation (0% → 100% in 10s) ───
+  const circumference = 175.93; // 2 * π * 28
+  let startTime = Date.now();
 
-        // Success
-        statusText.textContent = "Sent! You will be contacted or Quickly Call.";
-        statusText.style.color = "var(--success-color)";
+  const progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(1, elapsed / timeoutMs);
+    const offset = circumference * (1 - progress);
+    
+    progressCircle.style.strokeDashoffset = offset;
+    percentText.textContent = `${Math.floor(progress * 100)}%`;
 
-        finishRequestUI("success");
+    if (progress >= 1) clearInterval(progressInterval);
+  }, 80); // \~12–13 updates per second – smooth
 
-      } catch (err) {
-        clearTimeout(timeoutId);
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: new URLSearchParams(payload),
+      signal: controller.signal
+    });
 
-        let message = "Failed to Submit. Please call directly.";
-        
-        if (err.name === 'AbortError') {
-          message = "Request timed out after 10 seconds. Please call directly.";
-        } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
-          message = "Network issue. Please check connection or call directly.";
-        }
+    clearTimeout(timeoutId);
+    clearInterval(progressInterval);
+    loaderCycle.style.display = "none";
 
-        statusText.textContent = message;
-        statusText.style.color = "var(--error-color)";   // ← define --error-color in CSS if not already
+    statusText.textContent = "Sent! You will be contacted or Quickly Call.";
+    statusText.style.color = "var(--success-color)";
 
-        finishRequestUI("fail");
-      }
+    finishRequestUI("success");
+
+  } catch (err) {
+    clearTimeout(timeoutId);
+    clearInterval(progressInterval);
+
+    let message = "Failed to Submit. Please call directly.";
+    
+    if (err.name === 'AbortError') {
+      message = "Request timed out after 10 seconds. Please call directly.";
+      // Show complete cycle in red briefly
+      loaderCycle.classList.add("timeout");
+      progressCircle.style.strokeDashoffset = "0"; // full circle
+      percentText.textContent = "100%";
+      setTimeout(() => {
+        loaderCycle.style.display = "none";
+      }, 1800); // show red 100% for \~1.8 seconds
+    } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
+      message = "Network issue. Please check connection or call directly.";
+      loaderCycle.style.display = "none";
+    } else {
+      loaderCycle.style.display = "none";
     }
 
-    // Shared reset logic for both success & failure
-    function finishRequestUI(outcome) {
-      btnLoader.style.display = "none";
-      btnIcon.style.display = "block";
-      btnIcon.className = "fas fa-phone";
-      
-      // You can make background different for fail if you want:
-      // submitBtn.style.background = (outcome === "success") ? "var(--success-color)" : "var(--warning-color || var(--success-color))";
-      submitBtn.style.background = "var(--success-color)";   // ← keeping same as your original
+    statusText.textContent = message;
+    statusText.style.color = "var(--error-color)";
 
-      submitBtn.disabled = false;
-      document.getElementById('action-label').textContent = "Call Now";
-
-      submitBtn.onclick = function() {
-        window.location.href = "tel:0978167546";
-      };
-    }
+    finishRequestUI("fail");
+  }
+}
 
     setupAuto('gm-origin', 'origin-container', 'originList');
     setupAuto('gm-destination', 'dest-container', 'destinationList');
@@ -971,4 +990,5 @@ function calculateTotalDistance(pickup, destination) {
   </script>
 </body>
 </html>
+
 
