@@ -168,21 +168,7 @@
 .contact-detail-hidden { 
     display: none; 
 }
-#loader-cycle {
-  transition: opacity 0.3s;
-}
 
-#progress-circle {
-  transition: stroke-dashoffset 0.3s linear, stroke 0.5s;
-}
-
-.timeout #progress-circle {
-  stroke: var(--error-color) !important;
-}
-
-.timeout #percent-text {
-  color: var(--error-color) !important;
-}
 .menu-divider { 
     height: 1px; 
     background: #e5e7eb; 
@@ -374,32 +360,6 @@
         </fieldset>
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
           <button class="submit-btn" id="submit-btn">
-            <div id="loader-cycle" style="display: none; position: relative; width: 60px; height: 60px; margin: 0 auto;">
-  <!-- Background circle -->
-  <svg width="60" height="60" viewBox="0 0 60 60">
-    <circle cx="30" cy="30" r="28" fill="none" stroke="#e0e0e0" stroke-width="4"/>
-  </svg>
-  
-  <!-- Progress circle -->
-  <svg id="progress-svg" width="60" height="60" viewBox="0 0 60 60" style="position: absolute; top: 0; left: 0;">
-    <circle 
-      id="progress-circle" 
-      cx="30" cy="30" r="28" 
-      fill="none" 
-      stroke="var(--primary-color)" 
-      stroke-width="4" 
-      stroke-linecap="round"
-      stroke-dasharray="175.93" 
-      stroke-dashoffset="175.93"
-      transform="rotate(-90 30 30)"
-    />
-  </svg>
-  
-  <!-- Percentage text in center -->
-  <div id="percent-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; font-weight: bold; color: var(--primary-color);">
-    0%
-  </div>
-</div>
             <i class="fas fa-paper-plane" id="btn-icon"></i>
             <div class="btn-loader" id="btn-loader"></div>
           </button>
@@ -942,87 +902,68 @@ function calculateTotalDistance(pickup, destination) {
     }
 
     async function handleRequest() {
-  submitBtn.disabled = true;
-  btnIcon.style.display = "none";
-  btnLoader.style.display = "block"; // keep your spinner if you want, or hide it
-  statusText.textContent = "";
-  statusText.style.color = "inherit";
+      submitBtn.disabled = true;
+      btnIcon.style.display = "none";
+      btnLoader.style.display = "block";
+      statusText.textContent = "";           // Clear old message
+      statusText.style.color = "inherit";    // Reset color
 
-  // Show circular loader
-  const loaderCycle = document.getElementById('loader-cycle');
-  const progressCircle = document.getElementById('progress-circle');
-  const percentText = document.getElementById('percent-text');
-  
-  loaderCycle.style.display = "block";
-  progressCircle.style.strokeDashoffset = "175.93"; // full empty
-  percentText.textContent = "0%";
-  loaderCycle.classList.remove("timeout");
+      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
 
-  const payload = { ...rideData, timestamp: new Date().toLocaleString() };
+      // ─── Timeout setup (10 seconds) ───
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-  const controller = new AbortController();
-  const timeoutMs = 10000;
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: new URLSearchParams(payload),
+          signal: controller.signal
+        });
 
-  // ─── Circular progress animation (0% → 100% in 10s) ───
-  const circumference = 175.93; // 2 * π * 28
-  let startTime = Date.now();
+        clearTimeout(timeoutId);
 
-  const progressInterval = setInterval(() => {
-    const elapsed = Date.now() - startTime;
-    const progress = Math.min(1, elapsed / timeoutMs);
-    const offset = circumference * (1 - progress);
-    
-    progressCircle.style.strokeDashoffset = offset;
-    percentText.textContent = `${Math.floor(progress * 100)}%`;
+        // Success
+        statusText.textContent = "Sent! You will be contacted or Quickly Call.";
+        statusText.style.color = "var(--success-color)";
 
-    if (progress >= 1) clearInterval(progressInterval);
-  }, 80); // \~12–13 updates per second – smooth
+        finishRequestUI("success");
 
-  try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: new URLSearchParams(payload),
-      signal: controller.signal
-    });
+      } catch (err) {
+        clearTimeout(timeoutId);
 
-    clearTimeout(timeoutId);
-    clearInterval(progressInterval);
-    loaderCycle.style.display = "none";
+        let message = "Failed to Submit. Please call directly.";
+        
+        if (err.name === 'AbortError') {
+          message = "Request timed out after 10 seconds. Please call directly.";
+        } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
+          message = "Network issue. Please check connection or call directly.";
+        }
 
-    statusText.textContent = "Sent! You will be contacted or Quickly Call.";
-    statusText.style.color = "var(--success-color)";
+        statusText.textContent = message;
+        statusText.style.color = "var(--error-color)";   // ← define --error-color in CSS if not already
 
-    finishRequestUI("success");
-
-  } catch (err) {
-    clearTimeout(timeoutId);
-    clearInterval(progressInterval);
-
-    let message = "Failed to Submit. Please call directly.";
-    
-    if (err.name === 'AbortError') {
-      message = "Request timed out after 10 seconds. Please call directly.";
-      // Show complete cycle in red briefly
-      loaderCycle.classList.add("timeout");
-      progressCircle.style.strokeDashoffset = "0"; // full circle
-      percentText.textContent = "100%";
-      setTimeout(() => {
-        loaderCycle.style.display = "none";
-      }, 1800); // show red 100% for \~1.8 seconds
-    } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
-      message = "Network issue. Please check connection or call directly.";
-      loaderCycle.style.display = "none";
-    } else {
-      loaderCycle.style.display = "none";
+        finishRequestUI("fail");
+      }
     }
 
-    statusText.textContent = message;
-    statusText.style.color = "var(--error-color)";
+    // Shared reset logic for both success & failure
+    function finishRequestUI(outcome) {
+      btnLoader.style.display = "none";
+      btnIcon.style.display = "block";
+      btnIcon.className = "fas fa-phone";
+      
+      // You can make background different for fail if you want:
+      // submitBtn.style.background = (outcome === "success") ? "var(--success-color)" : "var(--warning-color || var(--success-color))";
+      submitBtn.style.background = "var(--success-color)";   // ← keeping same as your original
 
-    finishRequestUI("fail");
-  }
-}
+      submitBtn.disabled = false;
+      document.getElementById('action-label').textContent = "Call Now";
+
+      submitBtn.onclick = function() {
+        window.location.href = "tel:0978167546";
+      };
+    }
 
     setupAuto('gm-origin', 'origin-container', 'originList');
     setupAuto('gm-destination', 'dest-container', 'destinationList');
@@ -1030,7 +971,3 @@ function calculateTotalDistance(pickup, destination) {
   </script>
 </body>
 </html>
-
-
-
-
