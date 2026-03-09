@@ -876,148 +876,108 @@ function calculateTotalDistance(pickup, destination) {
         let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
         document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Price</span><span style="color:var(--secondary-color); font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
          // --- CALC ESTIMATED TIME ---
-const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
+        // --- CALC ESTIMATED TIME ---
+        const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
 
-// --- FORMAT PHONE TO +260 ---
-let formattedPhone = phoneInput.value.trim();
-
-if (formattedPhone.startsWith('0')) {
-  formattedPhone = '+260' + formattedPhone.substring(1);
-} else if (!formattedPhone.startsWith('+260')) {
-  formattedPhone = '+260' + formattedPhone;
-}
-
-// --- STORE RIDE DATA ---
-rideData = { 
-  preferredMode: mode,
-  phone: formattedPhone,
-  hub: res.hub,
-  from,
-  to,
-  tripDistance: res.trip.toFixed(2),
-  totalDistance: res.total.toFixed(2),
-  price: price,
-  estimatedTime: timeVal + " mins"
-};
-
-// --- ENABLE REQUEST BUTTON ---
-submitBtn.style.background = "var(--primary-color)";
-btnIcon.className = "fas fa-paper-plane";
-btnIcon.style.display = "block";
-btnLoader.style.display = "none";
-
-document.getElementById('action-label').textContent = "Request Now";
-
-submitBtn.onclick = handleRequest;
-
-
-
-// ===============================
-// REQUEST HANDLER
-// ===============================
-async function handleRequest() {
-
-  submitBtn.disabled = true;
-
-  btnIcon.style.display = "none";
-  btnLoader.style.display = "flex";
-
-  const percentText = document.getElementById("loaderPercent");
-  percentText.textContent = "0%";
-
-  statusText.textContent = "";
-  statusText.style.color = "inherit";
-
-  const payload = { ...rideData, timestamp: new Date().toLocaleString() };
-
-  // --- 10 SECOND COUNTDOWN ---
-  let percent = 0;
-
-  const progressInterval = setInterval(() => {
-
-    percent++;
-
-    if (percent > 100) percent = 100;
-
-    percentText.textContent = percent + "%";
-
-  }, 100); // 100 × 100ms = 10 seconds
-
-
-  // --- TIMEOUT CONTROLLER ---
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-  try {
-
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: new URLSearchParams(payload),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-    clearInterval(progressInterval);
-
-    percentText.textContent = "100%";
-
-    statusText.textContent = "Sent! You will be contacted or Quickly Call 0978167546.";
-    statusText.style.color = "var(--success-color)";
-
-    finishRequestUI("success");
-
-  } catch (err) {
-
-    clearTimeout(timeoutId);
-    clearInterval(progressInterval);
-
-    let message = "Failed to Submit. Please call 0978167546.";
-
-    if (err.name === "AbortError") {
-      message = "Request timed out after 10 seconds. Please call 0978167546.";
-    } 
-    else if (err.message?.includes("Failed to fetch")) {
-      message = "Network issue. Please check connection or call 0978167546.";
+        // --- FORMAT PHONE TO +260 ---
+        let formattedPhone = phoneInput.value;
+        if (formattedPhone.startsWith('0')) {
+          formattedPhone = '+260' + formattedPhone.substring(1);
+        }
+        
+        rideData = { 
+          preferredMode: mode, 
+          phone: formattedPhone, 
+          hub: res.hub, 
+          from, 
+          to, 
+          tripDistance: res.trip.toFixed(2), 
+          totalDistance: res.total.toFixed(2), 
+          price: price,
+          estimatedTime: timeVal + " mins" 
+        };
+        
+        submitBtn.style.background = "var(--primary-color)"; 
+        btnIcon.className = "fas fa-paper-plane"; 
+        btnIcon.style.display = "block"; 
+        btnLoader.style.display = "none"; 
+        document.getElementById('action-label').textContent = "Request Now";
+        submitBtn.onclick = handleRequest;
+      }, 600);
     }
 
-    statusText.textContent = message;
-    statusText.style.color = "var(--error-color)";
+    async function handleRequest() {
+      submitBtn.disabled = true;
+      btnIcon.style.display = "none";
+      btnLoader.style.display = "block";
+      statusText.textContent = "";           // Clear old message
+      statusText.style.color = "inherit";    // Reset color
 
-    finishRequestUI("fail");
-  }
-}
+      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
 
+      // ─── Timeout setup (10 seconds) ───
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-// ===============================
-// RESET BUTTON AFTER REQUEST
-// ===============================
-function finishRequestUI(outcome) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: new URLSearchParams(payload),
+          signal: controller.signal
+        });
 
-  btnLoader.style.display = "none";
-  btnIcon.style.display = "block";
+        clearTimeout(timeoutId);
 
-  btnIcon.className = "fas fa-phone";
+        // Success
+        statusText.textContent = "Sent! You will be contacted or Quickly Call.";
+        statusText.style.color = "var(--success-color)";
 
-  submitBtn.style.background = "var(--success-color)";
-  submitBtn.disabled = false;
+        finishRequestUI("success");
 
-  document.getElementById('action-label').textContent = "Call Now 0978167546";
+      } catch (err) {
+        clearTimeout(timeoutId);
 
-  submitBtn.onclick = function() {
-    window.location.href = "tel:0978167546";
-  };
-}
+        let message = "Failed to Submit. Please call directly.";
+        
+        if (err.name === 'AbortError') {
+          message = "Request timed out after 10 seconds. Please call directly.";
+        } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
+          message = "Network issue. Please check connection or call directly.";
+        }
 
+        statusText.textContent = message;
+        statusText.style.color = "var(--error-color)";   // ← define --error-color in CSS if not already
 
-// --- AUTOCOMPLETE SETUP ---
-setupAuto('gm-origin', 'origin-container', 'originList');
-setupAuto('gm-destination', 'dest-container', 'destinationList');
+        finishRequestUI("fail");
+      }
+    }
 
-document.getElementById('mode-group').onchange = checkReady;
-       
- </script>
+    // Shared reset logic for both success & failure
+    function finishRequestUI(outcome) {
+      btnLoader.style.display = "none";
+      btnIcon.style.display = "block";
+      btnIcon.className = "fas fa-phone";
+      
+      // You can make background different for fail if you want:
+      // submitBtn.style.background = (outcome === "success") ? "var(--success-color)" : "var(--warning-color || var(--success-color))";
+      submitBtn.style.background = "var(--success-color)";   // ← keeping same as your original
+
+      submitBtn.disabled = false;
+      document.getElementById('action-label').textContent = "Call Now";
+
+      submitBtn.onclick = function() {
+        window.location.href = "tel:0978167546";
+      };
+    }
+
+    setupAuto('gm-origin', 'origin-container', 'originList');
+    setupAuto('gm-destination', 'dest-container', 'destinationList');
+    document.getElementById('mode-group').onchange = checkReady;
+  </script>
 </body>
 </html>
+        
+
 
 
 
