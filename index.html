@@ -217,7 +217,10 @@
     .suggestion:hover { background: #f0f7ff; }
     .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
-    .btn-loader { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    
+    .btn-loader{ width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite;display: none; position: relative;}
+
+#loaderPercent{ position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px; font-weight:bold;color:white;animation:none; }
     .hidden-section { display: none; }
     .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -361,7 +364,9 @@
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
           <button class="submit-btn" id="submit-btn">
             <i class="fas fa-paper-plane" id="btn-icon"></i>
-            <div class="btn-loader" id="btn-loader"></div>
+            <div class="btn-loader" id="btn-loader">
+            <span id="loaderPercent">0%</span> </div>
+            
           </button>
           <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
         </div>
@@ -902,72 +907,118 @@ function calculateTotalDistance(pickup, destination) {
     }
 
     async function handleRequest() {
-      submitBtn.disabled = true;
-      btnIcon.style.display = "none";
-      btnLoader.style.display = "block";
-      statusText.textContent = "";           // Clear old message
-      statusText.style.color = "inherit";    // Reset color
 
-      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
+  submitBtn.style.background = "var(--primary-color)";
+btnIcon.className = "fas fa-paper-plane";
+btnIcon.style.display = "block";
+btnLoader.style.display = "none";
+document.getElementById('action-label').textContent = "Request Now";
+submitBtn.onclick = handleRequest;
 
-      // ─── Timeout setup (10 seconds) ───
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+}, 600);
+}
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: new URLSearchParams(payload),
-          signal: controller.signal
-        });
+async function handleRequest() {
 
-        clearTimeout(timeoutId);
+  submitBtn.disabled = true;
 
-        // Success
-        statusText.textContent = "Sent! You will be contacted or Quickly Call.";
-        statusText.style.color = "var(--success-color)";
+  btnIcon.style.display = "none";
+  btnLoader.style.display = "flex";
 
-        finishRequestUI("success");
+  const percentText = document.getElementById("loaderPercent");
+  percentText.textContent = "0%";
 
-      } catch (err) {
-        clearTimeout(timeoutId);
+  statusText.textContent = "";
+  statusText.style.color = "inherit";
 
-        let message = "Failed to Submit. Please call directly.";
-        
-        if (err.name === 'AbortError') {
-          message = "Request timed out after 10 seconds. Please call directly.";
-        } else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
-          message = "Network issue. Please check connection or call directly.";
-        }
+  const payload = { ...rideData, timestamp: new Date().toLocaleString() };
 
-        statusText.textContent = message;
-        statusText.style.color = "var(--error-color)";   // ← define --error-color in CSS if not already
+  // ─── 10 SECOND COUNTDOWN LOADER ───
+  let percent = 0;
 
-        finishRequestUI("fail");
-      }
+  const progressInterval = setInterval(() => {
+
+    percent++;
+
+    if (percent > 100) percent = 100;
+
+    percentText.textContent = percent + "%";
+
+    if (percent === 100) {
+      clearInterval(progressInterval);
     }
 
-    // Shared reset logic for both success & failure
-    function finishRequestUI(outcome) {
-      btnLoader.style.display = "none";
-      btnIcon.style.display = "block";
-      btnIcon.className = "fas fa-phone";
-      
-      // You can make background different for fail if you want:
-      // submitBtn.style.background = (outcome === "success") ? "var(--success-color)" : "var(--warning-color || var(--success-color))";
-      submitBtn.style.background = "var(--success-color)";   // ← keeping same as your original
+  }, 100); // 100ms × 100 = 10 seconds
 
-      submitBtn.disabled = false;
-      document.getElementById('action-label').textContent = "Call Now";
 
-      submitBtn.onclick = function() {
-        window.location.href = "tel:0978167546";
-      };
+  // ─── Timeout setup (10 seconds) ───
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: new URLSearchParams(payload),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    clearInterval(progressInterval);
+
+    percentText.textContent = "100%";
+
+    // SUCCESS MESSAGE
+    statusText.textContent = "Sent! You will be contacted or Quickly Call 0978167546.";
+    statusText.style.color = "var(--success-color)";
+
+    finishRequestUI("success");
+
+  } catch (err) {
+
+    clearTimeout(timeoutId);
+    clearInterval(progressInterval);
+
+    let message = "Failed to Submit. Please call 0978167546 directly.";
+
+    if (err.name === 'AbortError') {
+      message = "Request timed out after 10 seconds. Please call 0978167546.";
+    }
+    else if (err.message?.includes('network') || err.message?.includes('Failed to fetch')) {
+      message = "Network issue. Please check connection or call 0978167546.";
     }
 
+    statusText.textContent = message;
+    statusText.style.color = "var(--error-color)";
+
+    finishRequestUI("fail");
+  }
+}
+
+
+// ─── Reset button after request ───
+function finishRequestUI(outcome) {
+
+  btnLoader.style.display = "none";
+  btnIcon.style.display = "block";
+
+  btnIcon.className = "fas fa-phone";
+
+  submitBtn.style.background = "var(--success-color)";
+
+  submitBtn.disabled = false;
+
+  document.getElementById('action-label').textContent = "Call Now 0978167546";
+
+  submitBtn.onclick = function() {
+    window.location.href = "tel:0978167546";
+  };
+
+}
     setupAuto('gm-origin', 'origin-container', 'originList');
     setupAuto('gm-destination', 'dest-container', 'destinationList');
     document.getElementById('mode-group').onchange = checkReady;
   </script>
 </body>
 </html>
+
