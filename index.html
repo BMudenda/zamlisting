@@ -711,19 +711,19 @@
       statusText.textContent = "";           
       statusText.style.color = "inherit";    
 
-      // Percentage logic
-      let currentProgress = 0;
+      const startTime = Date.now();
+      const duration = 10000; // 10 seconds
+
       const progressInterval = setInterval(() => {
-        if (currentProgress < 95) {
-          currentProgress += Math.floor(Math.random() * 15) + 5;
-          if (currentProgress > 95) currentProgress = 95;
-          progressText.textContent = currentProgress + "%";
-        }
-      }, 200);
+        const elapsed = Date.now() - startTime;
+        let progress = Math.floor((elapsed / duration) * 98); // Slow down at 98%
+        if (progress > 98) progress = 98;
+        progressText.textContent = progress + "%";
+      }, 100);
 
       const payload = { ...rideData, timestamp: new Date().toLocaleString() };
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), duration);
 
       try {
         await fetch(SCRIPT_URL, {
