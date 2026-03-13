@@ -6,391 +6,201 @@
   <title>ZamListing — Products</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
-    /* --- Basic page / header --- */
+    /* --- Styles (Kept as per your design) --- */
     :root {
-      --green: #006400; /* Zambia green */
-      --black: #000;
-      --red: #ff0000;
-      --orange: #ff7f00;
-      --light-blue: #007bff; 
-      --whatsapp-green: #25D366; 
-      --dark-green: #004d00;
-      --yellow-taxi: #FFD700;
-      --eshop-blue: #0056b3;
-      --eshop-dark-blue: #003366;
+      --green: #006400; --black: #000; --red: #ff0000; --orange: #ff7f00;
+      --light-blue: #007bff; --whatsapp-green: #25D366; --dark-green: #004d00;
+      --yellow-taxi: #FFD700; --eshop-blue: #0056b3; --eshop-dark-blue: #003366;
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      background: #f4f6f8;
-      color: #222;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    header {
-      background: var(--eshop-blue);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 30;
-    }
-
-    .header-content { display: flex; flex-direction: column; gap: 5px; }
-    .logo-and-subtitle { display: flex; flex-direction: column; gap: 5px; }
-    .logo { font-weight: 700; font-size: 20px; display: flex; gap: 6px; align-items: center; }
-    .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
-    .logo .a { color: var(--black); }
-    .logo .m { color: var(--red); }
-    .logo .listing { color: var(--orange); }
-    .header-subtitle { font-size: 14px; font-weight: 400; margin: 0; color: rgba(255, 255, 255, 0.85); }
-    
-    .header-controls { display:flex; align-items:center; gap:16px; position: relative; }
-
-    .cart-icon { cursor: pointer; position: relative; font-size: 20px; user-select: none; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #f4f6f8; color: #222; }
+    header { background: var(--eshop-blue); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; position: sticky; top: 0; z-index: 30; }
+    .logo { font-weight: 700; font-size: 20px; display: flex; gap: 6px; }
+    .logo .z { background:#fff; color: var(--green); padding:2px 6px; border-radius:4px; }
+    .header-subtitle { font-size: 14px; color: rgba(255, 255, 255, 0.85); margin: 0; }
+    .cart-icon { cursor: pointer; position: relative; font-size: 20px; }
     .cart-count { position: absolute; top: -8px; right: -10px; background: red; color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 50%; min-width: 20px; text-align: center; }
     
-    /* --- Modal CSS --- */
-    .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.75); justify-content: center; align-items: center; padding: 20px; }
+    /* --- Modals --- */
+    .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; padding: 20px; }
     .modal.show { display: flex; }
-    .modal-content { background-color: #fefefe; padding: 20px; border-radius: 10px; max-width: 900px; width: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; max-height: 90vh; }
-    .modal-close { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 30px; font-weight: bold; cursor: pointer; }
-    .modal-close:hover { color: #000; }
-    .modal-body { display: flex; gap: 20px; flex-wrap: wrap; overflow-y: auto; padding-top: 20px; }
-    .modal-slider-container { position: relative; flex: 1 1 400px; min-height: 250px; overflow: hidden; }
-    .modal-slider { position: relative; height: 100%; background: #ddd; }
-    .modal-slides { display: flex; transition: transform 0.45s ease; height: 100%; }
-    .modal-slides img { width: 100%; object-fit: contain; flex-shrink: 0; height: auto; transition: transform 0.3s ease-in-out; cursor: zoom-in; }
-    .modal-slides img.zoomed { transform: scale(1.8); cursor: zoom-out; }
-    .modal-slider .prev, .modal-slider .next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,.45); color: #fff; border: 0; padding: 6px 8px; border-radius: 50%; cursor: pointer; z-index: 2; }
-    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
-    .modal-details { flex: 1 1 300px; display: flex; flex-direction: column; }
-    .modal-price { color: green; font-weight: 700; font-size: 20px; margin-top: 8px; }
-    .modal-controls { display: flex; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; flex-wrap: wrap; }
-    .modal-bid-section { display:none; flex-direction: column; gap: 10px; margin-top: 20px; }
-    .modal-bid-section input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%; }
-
-    /* --- Button Icon Styling --- */
-    .btn { 
-        padding: 10px 14px; 
-        border-radius: 8px; 
-        border: 0; 
-        cursor: pointer; 
-        font-size: 13px; 
-        text-decoration: none; 
-        text-align: center; 
-        display: inline-flex; 
-        align-items: center; 
-        justify-content: center; 
-        gap: 8px; 
-        font-weight: 600;
-        transition: opacity 0.2s;
-    }
-    .btn:hover { opacity: 0.9; }
-    .btn-primary { background: var(--green); color: #fff; }
-    .btn-accent { background: var(--orange); color: #fff; }
-    .btn-call { background: var(--light-blue); color: #fff; }
-    .btn-whatsapp { background: var(--whatsapp-green); color: #fff; }
-    .btn-sms { background: #6c757d; color: #fff; }
-
-    /* --- Filters & Search --- */
-    .filters-search { padding: 12px 20px; background: #e9ecef; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #dee2e6; }
-    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
-    .filter-btn { padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 14px; }
-    .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
-    .search-box { display: flex; gap: 8px; }
-    .search-box input { flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; }
-
-    /* --- Taxi Promo --- */
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
-    .taxi-promo { background: linear-gradient(135deg, #4facfe 0%, #1c6ed5 100%); color: #fff; border-radius: 15px; margin: 25px auto; padding: 25px 35px; max-width: 1000px; transition: all 0.3s ease; }
-    .taxi-promo a { display: flex; align-items: center; gap: 30px; text-decoration: none; color: inherit; width: 100%; }
-    .taxi-promo .taxi-image { width: 140px; height: 140px; border-radius: 50%; border: 5px solid var(--yellow-taxi); overflow: hidden; animation: float 4s ease-in-out infinite; flex-shrink: 0; }
-    .taxi-promo .taxi-image img { width: 100%; height: 100%; object-fit: cover; }
-    .btn-taxi { background: var(--yellow-taxi); color: #1a1a1a; padding: 12px 30px; border-radius: 30px; font-weight: 700; display: inline-block; }
-
-    /* --- Product Grid --- */
-    main { flex: 1; padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
-    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
-    .product-card { background:#fff; border-radius:10px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); overflow:hidden; display:flex; flex-direction:column; cursor: pointer; }
-    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
-    .slides { display:flex; transition:transform .45s ease; height:100%; }
-    .slides img { width:100%; height:180px; object-fit:contain; flex-shrink:0; }
-    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
-    .slider .prev{ left:8px } .slider .next{ right:8px }
-    .product-details { padding: 12px; }
-    .price { color:green; font-weight:700; margin-bottom:6px; }
-    .location { color:#666; font-size:13px; margin-bottom:8px; }
-    .tappable-content { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.4s ease; }
-    .product-card.tapped .tappable-content { max-height: 600px; opacity: 1; padding-top: 10px; }
-    .controls { display:flex; gap:8px; margin-top:10px; flex-wrap: wrap; }
-    .bid-section { display:none; margin-top:10px; gap:6px; flex-direction: column; }
-    .bid-section .bid-actions { display: flex; gap: 8px; }
-    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:100%; margin-bottom: 5px; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 10px; max-width: 800px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
+    .modal-close { position: absolute; top: 10px; right: 20px; font-size: 24px; cursor: pointer; font-weight: bold; }
     
-    .footer { padding: 20px; text-align: center; background: #f4f6f8; border-top: 1px solid #ddd; }
-    .fa-icon { font-size: 18px; }
+    /* --- Product Grid --- */
+    main { padding: 18px; max-width: 1100px; margin: 0 auto; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+    .product-card { background:#fff; border-radius:10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow:hidden; cursor: pointer; }
+    .slider { position:relative; height:200px; overflow:hidden; background:#eee; }
+    .slides { display:flex; transition:transform .4s ease; height:100%; }
+    .slides img { width:100%; height:100%; object-fit: cover; flex-shrink:0; }
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); color:#fff; border:0; border-radius:50%; cursor:pointer; padding: 5px 10px; }
+    .product-details { padding: 15px; }
+    .price { color: var(--green); font-weight: bold; font-size: 1.1rem; }
+    
+    /* --- Buttons --- */
+    .btn { padding: 10px 15px; border-radius: 6px; border: 0; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; justify-content: center; }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-whatsapp { background: var(--whatsapp-green); color: white; }
+    .btn-sms { background: #6c757d; color: white; }
+    .btn-call { background: var(--light-blue); color: white; }
+    .btn-accent { background: var(--orange); color: white; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="header-content">
-      <div class="logo-and-subtitle">
-          <div class="logo">
-            <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
-          </div>
-          <h2 class="header-subtitle">e-Shop Luangwa</h2>
-      </div>
+    <div class="logo-and-subtitle">
+      <div class="logo"><span class="z">Z</span>amListing</div>
+      <h2 class="header-subtitle">e-Shop Luangwa</h2>
     </div>
-    <div class="header-controls">
-      <div class="cart-icon" id="cart-icon">
-        <i class="fa fa-shopping-cart"></i>
-        <span class="cart-count" id="cart-count">0</span>
-      </div>
+    <div class="cart-icon" id="cart-icon">
+      <i class="fa fa-shopping-cart"></i>
+      <span class="cart-count" id="cart-count">0</span>
     </div>
   </header>
 
-  <div class="filters-search">
-    <div class="filters" id="category-filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="electronics">Electronics</button>
-      <button class="filter-btn" data-filter="stationary">Stationary</button>
-      <button class="filter-btn" data-filter="amasampo">Amasampo</button>
-    </div>
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Search for products..." />
-    </div>
-  </div>
-  
-  <div class="taxi-promo">
-    <a href="https://zamlisting.com/luangwa" target="_blank">
-      <div class="taxi-content">
-        <h3>Book a Ride with Luangwa Feira Rides 🏍️🚗</h3>
-        <p>50% Discount Promo! Safe and convenient trips within Luangwa, Zambia.</p>
-        <span class="btn-taxi">Click Here to Book</span>
-      </div>
-      <div class="taxi-image"><img src="lfr.jpg" alt="LFR"></div>
-    </a>
-  </div>
-  
   <main>
-    <div class="products" id="product-list">
-      <article class="product-card" data-id="p_trekstor116" data-name="Trekstor - 11.6-inch 2-in-1 Laptop" data-price="1200" data-category="electronics amasampo" data-phonenumber="0978167546" data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350. ZMK800 starting." data-listed-date="2026-03-13T08:30:00Z">
+    <div class="products">
+      <article class="product-card" data-id="p1" data-name="Trekstor Laptop" data-price="1200" data-phone="0978167546" data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350.">
         <div class="slider">
-          <div class="slides"><img src="L1.jpeg"><img src="L2.jpeg"></div>
-          <button class="prev">&#10094;</button><button class="next">&#10095;</button>
+          <div class="slides"><img src="https://via.placeholder.com/300x200?text=Laptop+1"><img src="https://via.placeholder.com/300x200?text=Laptop+2"></div>
+          <button class="prev" onclick="moveSlide(this, -1, event)">&#10094;</button>
+          <button class="next" onclick="moveSlide(this, 1, event)">&#10095;</button>
         </div>
         <div class="product-details">
           <h4>Trekstor Laptop</h4>
           <div class="price">ZMW 1,200</div>
-          <div class="location">Luangwa, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="tappable-content">
-            <div class="controls">
-              <button class="btn btn-primary" onclick="addToCartBtn(this)"><i class="fa fa-cart-plus"></i> Add to Cart</button>
-              <a class="btn btn-call" href="tel:0978167546"><i class="fa fa-phone"></i> Call</a>
-              <button class="btn btn-accent" onclick="toggleBid(this)"><i class="fa fa-tag"></i> Make Offer</button>
-            </div>
-            <div class="bid-section">
-              <input type="number" placeholder="Bid Amount" />
-              <div class="bid-actions">
-                <button class="btn btn-whatsapp" onclick="submitBid(this, 'whatsapp')"><i class="fa fa-whatsapp"></i> WhatsApp</button>
-                <button class="btn btn-sms" onclick="submitBid(this, 'sms')"><i class="fa fa-commenting"></i> SMS</button>
-              </div>
-            </div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCart(event, 'p1', 'Trekstor Laptop', 1200)"><i class="fa fa-cart-plus"></i> Add</button>
+            <a class="btn btn-call" href="tel:0978167546"><i class="fa fa-phone"></i> Call</a>
           </div>
         </div>
       </article>
 
-      <article class="product-card" data-id="p1" data-name="Samsung Galaxy S24" data-price="1000" data-category="electronics" data-phonenumber="0978167546" data-details="Broken screen-needs screen replacement." data-listed-date="2026-03-13T14:00:00Z">
+      <article class="product-card" data-id="p2" data-name="Samsung Galaxy S24" data-price="1000" data-phone="0978167546" data-details="Broken screen-needs replacement.">
         <div class="slider">
-          <div class="slides"><img src="S241.webp"><img src="S242.webp"></div>
-          <button class="prev">&#10094;</button><button class="next">&#10095;</button>
+          <div class="slides"><img src="https://via.placeholder.com/300x200?text=S24+1"><img src="https://via.placeholder.com/300x200?text=S24+2"></div>
+          <button class="prev" onclick="moveSlide(this, -1, event)">&#10094;</button>
+          <button class="next" onclick="moveSlide(this, 1, event)">&#10095;</button>
         </div>
         <div class="product-details">
           <h4>Samsung Galaxy S24</h4>
-          <div class="price">ZMK 1,000</div>
-          <div class="location">Luangwa, Zambia</div>
-          <div class="listing-time"></div>
-          <div class="tappable-content">
-            <div class="controls">
-              <button class="btn btn-primary" onclick="addToCartBtn(this)"><i class="fa fa-cart-plus"></i> Add to Cart</button>
-              <a class="btn btn-call" href="tel:0978167546"><i class="fa fa-phone"></i> Call</a>
-              <button class="btn btn-accent" onclick="toggleBid(this)"><i class="fa fa-tag"></i> Make Offer</button>
-            </div>
-            <div class="bid-section">
-              <input type="number" placeholder="Bid Amount" />
-              <div class="bid-actions">
-                <button class="btn btn-whatsapp" onclick="submitBid(this, 'whatsapp')"><i class="fa fa-whatsapp"></i> WhatsApp</button>
-                <button class="btn btn-sms" onclick="submitBid(this, 'sms')"><i class="fa fa-commenting"></i> SMS</button>
-              </div>
-            </div>
+          <div class="price">ZMW 1,000</div>
+          <div class="controls">
+            <button class="btn btn-primary" onclick="addToCart(event, 'p2', 'Samsung Galaxy S24', 1000)"><i class="fa fa-cart-plus"></i> Add</button>
+            <a class="btn btn-call" href="tel:0978167546"><i class="fa fa-phone"></i> Call</a>
           </div>
         </div>
       </article>
-
-      </div>
+    </div>
   </main>
 
-  <div id="productModal" class="modal">
-    <div class="modal-content">
-      <span class="modal-close">&times;</span>
-      <div class="modal-body">
-        <div class="modal-slider-container">
-          <div class="modal-slider"><div class="modal-slides"></div><button class="prev">&#10094;</button><button class="next">&#10095;</button></div>
-        </div>
-        <div class="modal-details">
-          <h4 id="modalProductName"></h4>
-          <div class="modal-price" id="modalProductPrice"></div>
-          <p id="modalProductDescription"></p>
-          <div class="modal-controls">
-            <button class="btn btn-primary" id="modalAddToCart"><i class="fa fa-cart-plus"></i> Add to Cart</button>
-            <a class="btn btn-call" id="modalCallLink" href="#"><i class="fa fa-phone"></i> Call Now</a>
-            <button class="btn btn-accent" id="modalMakeOffer"><i class="fa fa-tag"></i> Make an Offer</button>
-          </div>
-          <div class="modal-bid-section" id="modalBidSection">
-            <input type="number" id="modalBidInput" placeholder="Enter bid amount" />
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-whatsapp" onclick="submitModalBid('whatsapp')"><i class="fa fa-whatsapp"></i> WhatsApp</button>
-                <button class="btn btn-sms" onclick="submitModalBid('sms')"><i class="fa fa-commenting"></i> SMS</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div id="cartModal" class="modal">
-    <div class="modal-content" style="max-width:500px">
-      <span class="modal-close">&times;</span>
-      <h3>Your Cart</h3>
-      <ul id="cart-items" style="list-style:none; padding:0;"></ul>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; font-weight:bold;">
-        <span id="cart-total">Total: ZMK 0</span>
-        <button class="btn" style="background:#ff4d4f; color:#fff" id="cart-clear">Clear Cart</button>
+    <div class="modal-content" style="max-width:450px;">
+      <span class="modal-close" onclick="closeModals()">&times;</span>
+      <h3><i class="fa fa-shopping-cart"></i> Your Cart</h3>
+      <div id="cart-items-list" style="margin: 20px 0;"></div>
+      <div style="font-weight: bold; font-size: 1.2rem; border-top: 2px solid #eee; padding-top: 10px; display: flex; justify-content: space-between;">
+        <span>Total:</span>
+        <span id="cart-total-amount">ZMW 0</span>
       </div>
-      <div style="margin-top:20px; display:flex; gap:10px;">
-        <button class="btn btn-whatsapp" style="flex:1" onclick="sendCartViaWhatsApp()"><i class="fa fa-whatsapp"></i> Send Order</button>
-        <button class="btn btn-sms" style="flex:1" onclick="sendCartViaSMS()"><i class="fa fa-commenting"></i> Send SMS</button>
+      <div class="controls" style="margin-top: 20px;">
+        <button class="btn btn-whatsapp" style="flex:1" onclick="checkout('whatsapp')">Order via WhatsApp</button>
+        <button class="btn btn-sms" onclick="clearCart()">Clear</button>
       </div>
     </div>
   </div>
-
-  <footer class="footer">
-    <p>&copy; 2026 ZamListing</p>
-    <div style="font-size:24px; gap:15px; display:flex; justify-content:center;">
-        <a href="#"><i class="fa fa-facebook-square" style="color:#3b5998"></i></a>
-        <a href="#"><i class="fa fa-instagram" style="color:#e4405f"></i></a>
-        <a href="#"><i class="fa fa-twitter" style="color:#1da1f2"></i></a>
-    </div>
-  </footer>
 
   <script>
-    const FMT = (v) => Number(v).toLocaleString();
-    const cartPhoneNumber = '0978167546';
     let cart = [];
+    const ADMIN_PHONE = "260978167546";
 
     // --- Cart Logic ---
-    function renderCart() {
-      const listEl = document.getElementById('cart-items');
-      const totalEl = document.getElementById('cart-total');
-      const countEl = document.getElementById('cart-count');
-      listEl.innerHTML = cart.length ? '' : '<li>Cart is empty</li>';
-      let total = 0;
-      cart.forEach(item => {
-        total += item.price * item.qty;
-        listEl.innerHTML += `<li style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0">
-            <span>${item.name} (x${item.qty})</span>
-            <span>ZMK ${FMT(item.price * item.qty)}</span>
-        </li>`;
-      });
-      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
-      countEl.textContent = cart.reduce((a, b) => a + b.qty, 0);
-    }
-
-    function addToCartBtn(btn) {
-      const card = btn.closest('.product-card');
-      const id = card.dataset.id;
-      const name = card.dataset.name;
-      const price = Number(card.dataset.price);
-      const exists = cart.find(i => i.id === id);
-      if (exists) exists.qty++;
-      else cart.push({id, name, price, qty: 1});
-      renderCart();
+    function addToCart(event, id, name, price) {
+      if(event) event.stopPropagation(); // Prevents opening product detail modal if clicking button
+      
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id, name, price, qty: 1 });
+      }
+      
+      updateCartUI();
       document.getElementById('cartModal').classList.add('show');
     }
 
-    // --- Bid Logic ---
-    function toggleBid(btn) {
-      const section = btn.closest('.product-details').querySelector('.bid-section');
-      section.style.display = section.style.display === 'flex' ? 'none' : 'flex';
+    function updateCartUI() {
+      const countEl = document.getElementById('cart-count');
+      const listEl = document.getElementById('cart-items-list');
+      const totalEl = document.getElementById('cart-total-amount');
+      
+      let total = 0;
+      let count = 0;
+      listEl.innerHTML = cart.length === 0 ? '<p>Your cart is empty.</p>' : '';
+
+      cart.forEach((item, index) => {
+        total += item.price * item.qty;
+        count += item.qty;
+        listEl.innerHTML += `
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>${item.name} (x${item.qty})</span>
+            <span>ZMW ${item.price * item.qty}</span>
+          </div>`;
+      });
+
+      countEl.textContent = count;
+      totalEl.textContent = `ZMW ${total.toLocaleString()}`;
     }
 
-    function submitBid(btn, type) {
-      const card = btn.closest('.product-card');
-      const bid = btn.closest('.bid-section').querySelector('input').value;
-      if(!bid) return alert("Enter bid amount");
-      const msg = `Offer for ${card.dataset.name}: ZMK ${bid}`;
-      const phone = card.dataset.phonenumber;
-      if(type === 'whatsapp') window.location.href = `https://wa.me/260${phone.substring(1)}?text=${encodeURIComponent(msg)}`;
-      else window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+    function clearCart() {
+      cart = [];
+      updateCartUI();
+      closeModals();
     }
 
-    // --- Modal Logic ---
-    let currentCard = null;
-    function openProductModal(card) {
-        currentCard = card;
-        document.getElementById('modalProductName').textContent = card.dataset.name;
-        document.getElementById('modalProductPrice').textContent = `ZMK ${FMT(card.dataset.price)}`;
-        document.getElementById('modalProductDescription').textContent = card.dataset.details;
-        document.getElementById('modalCallLink').href = `tel:${card.dataset.phonenumber}`;
-        
-        const slides = document.querySelector('.modal-slides');
-        slides.innerHTML = '';
-        card.querySelectorAll('.slider img').forEach(img => slides.appendChild(img.cloneNode()));
-        
-        document.getElementById('productModal').classList.add('show');
+    // --- Checkout Logic ---
+    function checkout(type) {
+      if (cart.length === 0) return alert("Cart is empty");
+
+      let message = "*New Order from ZamListing*\n------------------\n";
+      let total = 0;
+      cart.forEach(item => {
+        message += `• ${item.name} (x${item.qty}) - ZMW ${item.price * item.qty}\n`;
+        total += item.price * item.qty;
+      });
+      message += `------------------\n*Total: ZMW ${total}*`;
+
+      if (type === 'whatsapp') {
+        window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+      }
     }
 
-    function submitModalBid(type) {
-        const bid = document.getElementById('modalBidInput').value;
-        if(!bid) return alert("Enter bid amount");
-        const msg = `Offer for ${currentCard.dataset.name}: ZMK ${bid}`;
-        const phone = currentCard.dataset.phonenumber;
-        if(type === 'whatsapp') window.location.href = `https://wa.me/260${phone.substring(1)}?text=${encodeURIComponent(msg)}`;
-        else window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+    // --- UI Helpers ---
+    function closeModals() {
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
     }
 
-    // --- Listeners ---
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            if(!e.target.closest('button, a, input')) openProductModal(card);
-        });
-    });
+    function moveSlide(btn, direction, event) {
+      event.stopPropagation();
+      const slides = btn.parentElement.querySelector('.slides');
+      const totalSlides = slides.children.length;
+      let current = Math.abs(parseInt(slides.style.transform.replace(/[^\d-]/g, '')) || 0) / 100;
+      
+      current = (current + direction + totalSlides) % totalSlides;
+      slides.style.transform = `translateX(-${current * 100}%)`;
+    }
 
-    document.querySelectorAll('.modal-close').forEach(b => b.onclick = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('show')));
-    document.getElementById('cart-icon').onclick = () => document.getElementById('cartModal').classList.add('show');
-    document.getElementById('cart-clear').onclick = () => { cart = []; renderCart(); };
-    document.getElementById('modalMakeOffer').onclick = () => document.getElementById('modalBidSection').style.display = 'block';
-    
-    // Sliders
-    document.querySelectorAll('.next, .prev').forEach(btn => {
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            const slides = btn.parentElement.querySelector('.slides, .modal-slides');
-            const count = slides.children.length;
-            let current = Math.abs(parseInt(slides.style.transform.replace(/[^\d-]/g, '')) || 0) / 100;
-            current = btn.classList.contains('next') ? (current + 1) % count : (current - 1 + count) % count;
-            slides.style.transform = `translateX(-${current * 100}%)`;
-        };
-    });
+    document.getElementById('cart-icon').onclick = () => {
+      document.getElementById('cartModal').classList.add('show');
+    };
+
+    // Close on outside click
+    window.onclick = (event) => {
+      if (event.target.classList.contains('modal')) closeModals();
+    };
   </script>
 </body>
 </html>
