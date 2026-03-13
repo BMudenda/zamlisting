@@ -6,265 +6,666 @@
   <title>ZamListing — Products</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
+    /* --- Basic page / header --- */
     :root {
-      --green: #006400; --black: #000; --red: #ff0000; --orange: #ff7f00;
-      --light-blue: #007bff; --whatsapp-green: #25D366; --eshop-blue: #0056b3;
+      --green: #006400; /* Zambia green */
+      --black: #000;
+      --red: #ff0000;
+      --orange: #ff7f00;
+      --light-blue: #007bff; /* For SMS/Taxi button */
+      --whatsapp-green: #25D366; /* For WhatsApp button */
+      --dark-green: #004d00;
       --yellow-taxi: #FFD700;
+      --eshop-blue: #0056b3;
+      --eshop-dark-blue: #003366;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, sans-serif; background: #f4f6f8; color: #222; display: flex; flex-direction: column; min-height: 100vh; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #f4f6f8;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-    header { background: var(--eshop-blue); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; position: sticky; top: 0; z-index: 30; }
-    .logo { font-weight: 700; font-size: 20px; display: flex; gap: 6px; align-items: center; }
+    header {
+      background: var(--eshop-blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .logo-and-subtitle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
     .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
     .logo .listing { color: var(--orange); }
-    .header-subtitle { font-size: 14px; margin: 0; color: rgba(255, 255, 255, 0.85); }
 
-    .cart-icon { cursor: pointer; position: relative; font-size: 20px; }
-    .cart-count { position: absolute; top: -8px; right: -10px; background: red; color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 50%; min-width: 20px; text-align: center; }
-
-    /* Slider Fixes */
-    .slider { position:relative; height:220px; overflow:hidden; background:#eee; border-bottom: 1px solid #ddd; }
-    .slides { display:flex; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); height:100%; width: 100%; }
-    .slides img { width:100%; height:100%; object-fit: cover; flex-shrink:0; cursor: zoom-in; transition: transform 0.3s ease; }
+    .header-subtitle {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.85);
+    }
     
-    /* Zoom Class */
-    .slides img.zoomed { transform: scale(2.5); z-index: 10; cursor: zoom-out; object-fit: contain; background: rgba(0,0,0,0.8); }
+    .header-controls {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      position: relative;
+    }
 
-    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,0.5); color:#fff; border:0; padding:12px 10px; cursor:pointer; z-index: 5; border-radius: 4px; }
-    .slider .prev{ left:0; } .slider .next{ right:0; }
+    .cart-icon {
+      cursor: pointer;
+      position: relative;
+      font-size: 20px;
+      user-select: none;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: red;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      min-width: 20px;
+      text-align: center;
+    }
+    
+    /* --- Modal CSS --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal.show {
+        display: flex;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 60;
+    }
+    .modal-close:hover { color: #000; }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden;
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #eee;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: 100%;
+        transition: transform 0.3s ease;
+        cursor: zoom-in;
+    }
+    /* Zoom Utility Class */
+    .zoomed {
+        transform: scale(2.5);
+        cursor: zoom-out !important;
+    }
 
-    /* Grid & Cards */
-    main { flex: 1; padding: 15px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 10px 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 { margin: 0; font-size: 24px; }
+    .modal-price { color: green; font-weight: 700; font-size: 20px; margin-top: 8px; }
+    .modal-location { color: #666; font-size: 14px; margin-bottom: 12px; }
+    .modal-description { margin-top: 15px; }
+    .modal-description p { margin: 0; line-height: 1.6; }
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .modal-controls .btn { flex: 1; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .modal-bid-section { display:none; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .modal-bid-section input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%; }
+
+    /* --- Cart Modal Specific CSS --- */
+    #cartModal .modal-content { max-width: 500px; padding: 30px; }
+    #cartModal .modal-body { flex-direction: column; padding: 0; }
+    #cartModal h3 { margin: 0 0 15px 0; font-size: 24px; text-align: center; }
+    #cartModal .cart-items { max-height: 300px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+    #cartModal .cart-items li { display:flex; justify-content: space-between; gap:8px; padding: 12px 0; border-bottom: 1px solid #eee; align-items:center; font-size: 16px; }
+    #cartModal .cart-items .left { display:flex; gap:12px; align-items:center; }
+    #cartModal .cart-total { font-weight:700; font-size: 18px; }
+    #cartModal .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #cartModal .btn-share { flex: 1; padding: 12px 18px; border-radius: 8px; border: none; color: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
+    #cartModal .btn-sms { background: var(--light-blue); }
+    #cartModal .btn-whatsapp { background: var(--whatsapp-green); }
+
+    /* --- filters and search --- */
+    .filters-search { padding: 12px 20px; background: #e9ecef; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #dee2e6; }
+    .filters-search .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filters-search .filter-btn { padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 14px; transition: all 0.2s ease; }
+    .filters-search .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .filters-search .search-box { display: flex; gap: 8px; }
+    .filters-search .search-box input { flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; }
+
+    /* --- taxi booking section --- */
+    @keyframes float {
+        0% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        50% { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        100% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    }
+    .taxi-promo {
+      background: linear-gradient(135deg, #4facfe 0%, #1c6ed5 100%);
+      color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+      margin: 25px auto;
+      padding: 25px 35px;
+      max-width: 1000px;
+      transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .taxi-promo a { display: flex; align-items: center; gap: 30px; text-decoration: none; color: inherit; width: 100%; }
+    .taxi-promo .taxi-content h3 { margin: 0 0 10px 0; font-size: 1.8rem; font-weight: 800; color: var(--yellow-taxi); }
+    .taxi-promo .taxi-image { flex-shrink: 0; width: 160px; height: 160px; border-radius: 50%; overflow: hidden; border: 5px solid var(--yellow-taxi); animation: float 4s ease-in-out infinite; }
+    .taxi-promo .taxi-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* --- products grid --- */
+    main { flex: 1; padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
     .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
-    .product-card { background:#fff; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow:hidden; display:flex; flex-direction:column; cursor: pointer; }
-    .product-details { padding: 12px; }
-    .price { color:green; font-weight:700; font-size: 1.1em; }
+    .product-card { background:#fff; border-radius:10px; box-shadow: 0 6px 18px rgba(10,10,10,0.06); overflow:hidden; display:flex; flex-direction:column; cursor: pointer; }
     
-    .tappable-content { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.4s ease; }
-    .product-card.tapped .tappable-content { max-height: 600px; opacity: 1; padding-top: 10px; }
+    /* Image Slider Container */
+    .slider { position:relative; height:220px; overflow:hidden; background:#eee; }
+    .slides { display:flex; transition:transform .45s cubic-bezier(0.4, 0, 0.2, 1); height:100%; }
+    .slides img { width:100%; height:220px; object-fit:contain; flex-shrink:0; cursor: zoom-in; transition: transform 0.3s ease; }
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:8px 10px; border-radius:50%; cursor:pointer; z-index: 5; }
+    .slider .prev{ left:8px } .slider .next{ right:8px }
+    
+    .product-details { padding: 12px; }
+    .product-details h4 { margin:0 0 6px 0; font-size:16px; }
+    .price { color:green; font-weight:700; margin-bottom:6px; }
+    .location { color:#666; font-size:13px; margin-bottom:8px; }
+    
+    .product-details .tappable-content { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; }
+    .product-card.tapped .tappable-content { max-height: 800px; opacity: 1; }
 
     .controls { display:flex; gap:8px; margin-top:10px; }
-    .btn { padding:10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; font-weight: 600; flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .btn-primary { background:#28a745; color:#fff; }
     .btn-accent { background:#ff9800; color:#fff; }
     .btn-call { background: #007bff; color: #fff; }
-
-    .bid-section { display:none; margin-top:10px; gap:6px; flex-wrap: wrap; }
-    .bid-section input { flex: 1; padding:10px; border-radius:6px; border:1px solid #ccc; }
-
-    /* Modals */
-    .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
-    .modal.show { display: flex; }
-    .modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; position: relative; }
-    .modal-close { position: absolute; right: 15px; top: 10px; font-size: 28px; cursor: pointer; }
     
-    .cart-items { list-style: none; padding: 0; margin: 15px 0; max-height: 250px; overflow-y: auto; }
-    .cart-items li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #fff; flex: 1; }
+    .bid-btn-sms { background: var(--light-blue); }
+    .bid-btn-whatsapp { background: var(--whatsapp-green); }
+    
+    .details-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 14px; line-height: 1.5; }
+    .listing-time { font-size: 12px; color: #888; margin-top: 4px; }
+    
+    .footer { background: #f4f6f8; color: #555; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 20px; }
+    .fa-footer { padding: 10px; font-size: 20px; width: 40px; text-align: center; text-decoration: none; margin: 5px 5px; border-radius: 50%; color: white; }
+    .fa-facebook { background: #3b5998; }
+    .fa-twitter { background: #55acee; }
+    .fa-envelope { background: #dd4b39; }
 
-    .filters-search { padding: 15px; background: #fff; border-bottom: 1px solid #ddd; }
-    .filter-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: #fff; cursor: pointer; margin-bottom: 5px; }
-    .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
-    .search-box input { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ccc; margin-top: 10px; }
-
-    .footer { padding: 30px; text-align: center; background: #eee; margin-top: 20px; }
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .taxi-promo a { flex-direction: column; text-align: center; }
+      .taxi-promo .taxi-image { width: 120px; height: 120px; }
+    }
   </style>
 </head>
 <body>
-
-<header>
-  <div>
-    <div class="logo"><span class="z">Z</span>am<span class="listing">Listing</span></div>
-    <h2 class="header-subtitle">e-Shop Luangwa</h2>
-  </div>
-  <div class="cart-icon" id="cart-icon">
-    <i class="fa fa-shopping-cart"></i>
-    <span class="cart-count" id="cart-count">0</span>
-  </div>
-</header>
-
-<div class="filters-search">
-  <div class="filters" id="category-filters">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="electronics">Electronics</button>
-    <button class="filter-btn" data-filter="stationary">Stationary</button>
-    <button class="filter-btn" data-filter="amasampo">Amasampo</button>
-  </div>
-  <div class="search-box">
-    <input type="text" id="search-input" placeholder="Search products..." />
-  </div>
-</div>
-
-<main>
-  <div class="products" id="product-list">
-    
-    <article class="product-card" data-id="p1" data-category="electronics amasampo" data-name="Trekstor Laptop" data-price="1200" data-phone="0978167546">
-      <div class="slider">
-        <div class="slides" data-idx="0">
-          <img src="L1.jpeg" alt="Img 1">
-          <img src="L2.jpeg" alt="Img 2">
-          <img src="L3.jpeg" alt="Img 3">
-        </div>
-        <button class="prev" onclick="moveSlide(this, -1, event)">&#10094;</button>
-        <button class="next" onclick="moveSlide(this, 1, event)">&#10095;</button>
-      </div>
-      <div class="product-details">
-        <h4>Trekstor 11.6" 2-in-1 Laptop</h4>
-        <div class="price">ZMW 1,200</div>
-        <div class="tappable-content">
-          <p>Intel Celeron, 4GB RAM, Touchscreen.</p>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this, event)">Add to Cart</button>
-            <a class="btn btn-call" href="tel:0978167546" onclick="event.stopPropagation()">Call</a>
-            <button class="btn btn-accent" onclick="toggleBid(this, event)">Offer</button>
+  <header>
+    <div class="header-content">
+      <div class="logo-and-subtitle">
+          <div class="logo">
+            <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
           </div>
-          <div class="bid-section">
-            <input type="number" placeholder="Bid ZMW">
-            <button class="btn btn-primary" onclick="submitBid(this, 'whatsapp', event)">Send</button>
-          </div>
-        </div>
+          <h2 class="header-subtitle">e-Shop Luangwa</h2>
       </div>
-    </article>
-
-    <article class="product-card" data-id="p2" data-category="electronics" data-name="Hisense 55 TV" data-price="2300" data-phone="0978167546">
-      <div class="slider">
-        <div class="slides" data-idx="0">
-          <img src="Hi1.png" alt="TV 1">
-          <img src="Hi2.png" alt="TV 2">
-        </div>
-        <button class="prev" onclick="moveSlide(this, -1, event)">&#10094;</button>
-        <button class="next" onclick="moveSlide(this, 1, event)">&#10095;</button>
+    </div>
+    <div class="header-controls">
+      <div class="cart-icon" id="cart-icon" title="View cart">
+        <i class="fa fa-shopping-cart"></i>
+        <span class="cart-count" id="cart-count">0</span>
       </div>
-      <div class="product-details">
-        <h4>Hisense 55" Smart TV</h4>
-        <div class="price">ZMW 2,300</div>
-        <div class="tappable-content">
-          <p>Needs screen replacement. 4K HDR.</p>
-          <div class="controls">
-            <button class="btn btn-primary" onclick="addToCartBtn(this, event)">Add to Cart</button>
-            <a class="btn btn-call" href="tel:0978167546" onclick="event.stopPropagation()">Call</a>
-          </div>
-        </div>
-      </div>
-    </article>
+    </div>
+  </header>
 
-  </div>
-</main>
-
-<div id="cartModal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close" onclick="closeModal('cartModal')">&times;</span>
-    <h3>Your Shopping Cart</h3>
-    <ul class="cart-items" id="cart-items"></ul>
-    <div style="font-weight: bold; font-size: 1.2em; margin-bottom: 15px;">Total: ZMW <span id="cart-total">0</span></div>
-    <div class="controls">
-        <button class="btn btn-primary" onclick="sendCart('whatsapp')">WhatsApp Order</button>
-        <button class="btn btn-accent" onclick="clearCart()">Clear</button>
+  <div class="filters-search">
+    <div class="filters" id="category-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="electronics">Electronics</button>
+      <button class="filter-btn" data-filter="stationary">Stationary</button>
+      <button class="filter-btn" data-filter="amasampo">Amasampo</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products..." />
     </div>
   </div>
-</div>
+  
+  <div class="taxi-promo">
+    <a href="https://zamlisting.com/luangwa" target="_blank">
+      <div class="taxi-content">
+        <h3>Book a Ride with Luangwa Feira Rides 🏍️</h3>
+        <p>50% Discount Promo! Safe and convenient trips within Luangwa.</p>
+        <span style="background: var(--yellow-taxi); color:#000; padding:8px 15px; border-radius:20px; font-weight:700;">Start Booking</span>
+      </div>
+      <div class="taxi-image">
+           <img src="lfr.jpg" alt="LFR logo">
+      </div>
+    </a>
+  </div>
+  
+  <main>
+    <div class="products" id="product-list">
+      <article class="product-card" data-id="p1" data-name="Trekstor 11.6 Laptop" data-price="1200" data-category="electronics amasampo" data-phonenumber="0978167546" data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron, 4GB RAM, 64GB eMMC. Touchscreen.">
+        <div class="slider">
+          <div class="slides">
+            <img src="L1.jpeg" alt="Laptop 1">
+            <img src="L2.jpeg" alt="Laptop 2">
+            <img src="L3.jpeg" alt="Laptop 3">
+          </div>
+          <button class="prev" onclick="moveSlide(this, -1)">&#10094;</button>
+          <button class="next" onclick="moveSlide(this, 1)">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Trekstor - 11.6-inch 2-in-1 Laptop</h4>
+          <div class="price">ZMW 1,200</div>
+          <div class="location">Luangwa, Zambia</div>
+          <div class="tappable-content">
+            <div class="controls">
+              <button class="btn btn-primary" onclick="addToCartBtn(this)"><i class="fa fa-cart-plus"></i> Add</button>
+              <button class="btn btn-accent" onclick="toggleBid(this)">Offer</button>
+              <a class="btn btn-call" href="tel:0978167546">Call</a>
+            </div>
+            <div class="bid-section">
+                <input type="number" placeholder="Bid" />
+                <button class="bid-btn-social bid-btn-whatsapp" onclick="submitBid(this, 'whatsapp')">WA</button>
+            </div>
+            <div class="details-section">
+                <p class="product-description"></p>
+            </div>
+          </div>
+        </div>
+      </article>
 
-<footer class="footer">
+      <article class="product-card" data-id="p2" data-name="Hisense 55 Smart TV" data-price="2300" data-category="electronics" data-phonenumber="0978167546" data-details="UHD Smart TV 55 inch. Note: Needs screen replacement.">
+        <div class="slider">
+          <div class="slides">
+            <img src="Hi1.png" alt="TV 1">
+            <img src="Hi2.png" alt="TV 2">
+            <img src="Hi3.png" alt="TV 3">
+          </div>
+          <button class="prev" onclick="moveSlide(this, -1)">&#10094;</button>
+          <button class="next" onclick="moveSlide(this, 1)">&#10095;</button>
+        </div>
+        <div class="product-details">
+          <h4>Hisense 55" Smart TV</h4>
+          <div class="price">ZMW 2,300</div>
+          <div class="location">Luangwa, Zambia</div>
+          <div class="tappable-content">
+            <div class="controls">
+              <button class="btn btn-primary" onclick="addToCartBtn(this)">Add</button>
+              <button class="btn btn-accent" onclick="toggleBid(this)">Offer</button>
+            </div>
+            <div class="bid-section">
+                <input type="number" placeholder="Bid" />
+                <button class="bid-btn-social bid-btn-sms" onclick="submitBid(this, 'sms')">SMS</button>
+            </div>
+            <div class="details-section">
+                <p class="product-description"></p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-id="p3" data-name="Giant Stapler" data-price="130" data-category="stationary" data-phonenumber="0978167546" data-details="Heavy duty giant stapler. Excellent condition.">
+        <div class="slider">
+          <div class="slides">
+            <img src="stepp2.jpg" alt="Stapler">
+          </div>
+        </div>
+        <div class="product-details">
+          <h4>Giant Stapler</h4>
+          <div class="price">ZMW 130</div>
+          <div class="location">Luangwa, Zambia</div>
+          <div class="tappable-content">
+            <div class="controls">
+              <button class="btn btn-primary" onclick="addToCartBtn(this)">Add</button>
+              <button class="btn btn-accent" onclick="toggleBid(this)">Offer</button>
+            </div>
+            <div class="details-section">
+                <p class="product-description"></p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('productModal')">&times;</span>
+      <div class="modal-body">
+        <div class="modal-slider-container">
+          <div class="modal-slider">
+            <div class="modal-slides" id="modalSlides"></div>
+            <button class="prev" onclick="moveModalSlide(-1)">&#10094;</button>
+            <button class="next" onclick="moveModalSlide(1)">&#10095;</button>
+          </div>
+        </div>
+        <div class="modal-details">
+          <h4 id="modalProductName"></h4>
+          <div class="modal-price" id="modalProductPrice"></div>
+          <div class="modal-location" id="modalProductLocation"></div>
+          <p id="modalProductDescription" style="font-size:14px; color:#444;"></p>
+          <div class="modal-controls">
+            <button class="btn btn-primary" id="modalAddToCart">Add to Cart</button>
+            <a class="btn btn-call" id="modalCallLink">Call</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cartModal" class="modal">
+      <div class="modal-content">
+          <span class="modal-close" onclick="closeModal('cartModal')">&times;</span>
+          <h3>Your Cart</h3>
+          <div class="modal-body">
+              <ul class="cart-items" id="cart-items"></ul>
+              <div class="cart-actions">
+                  <div class="cart-total" id="cart-total">Total: ZMW 0</div>
+                  <button class="cart-clear" onclick="clearCart()">Clear</button>
+              </div>
+              <div class="cart-share">
+                  <button class="btn-share btn-whatsapp" onclick="sendCartViaWhatsApp()">WhatsApp</button>
+                  <button class="btn-share btn-sms" onclick="sendCartViaSMS()">SMS</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <footer class="footer">
     <p>&copy; 2026 ZamListing Luangwa</p>
-</footer>
+    <div>
+        <a href="#" class="fa fa-footer fa-facebook"></a>
+        <a href="mailto:info@zamlisting.com" class="fa fa-footer fa-envelope"></a>
+    </div>
+  </footer>
 
-<script>
-  let cart = [];
+  <script>
+    /* --- Globals --- */
+    const cartPhoneNumber = '0978167546';
+    let cart = [];
+    let modalSlideIndex = 0;
 
-  // 1. SLIDING LOGIC (Left to Right)
-  function moveSlide(btn, dir, event) {
-    event.stopPropagation(); // Prevents card from closing/opening
-    const container = btn.parentElement.querySelector('.slides');
-    const images = container.querySelectorAll('img');
-    let idx = parseInt(container.getAttribute('data-idx')) || 0;
-    
-    idx += dir;
-    if (idx < 0) idx = images.length - 1;
-    if (idx >= images.length) idx = 0;
-    
-    container.style.transform = `translateX(-${idx * 100}%)`;
-    container.setAttribute('data-idx', idx);
-  }
-
-  // 2. ZOOM LOGIC (Double click to zoom)
-  document.querySelectorAll('.slides img').forEach(img => {
-    img.addEventListener('dblclick', function(e) {
-      e.stopPropagation();
-      this.classList.toggle('zoomed');
+    /* --- SLIDER LOGIC --- */
+    // Initialize slider data for grid cards
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.setAttribute('data-current-slide', 0);
     });
-  });
 
-  // 3. CARD EXPANSION
-  document.querySelectorAll('.product-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (!e.target.closest('button, a, input')) {
-        card.classList.toggle('tapped');
-      }
+    function moveSlide(btn, direction) {
+        event.stopPropagation(); // Prevent card tap toggle
+        const card = btn.closest('.product-card');
+        const slidesContainer = card.querySelector('.slides');
+        const totalSlides = slidesContainer.querySelectorAll('img').length;
+        let currentIndex = parseInt(card.getAttribute('data-current-slide'));
+
+        currentIndex = (currentIndex + direction + totalSlides) % totalSlides;
+        card.setAttribute('data-current-slide', currentIndex);
+        slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    function moveModalSlide(direction) {
+        const container = document.getElementById('modalSlides');
+        const total = container.querySelectorAll('img').length;
+        modalSlideIndex = (modalSlideIndex + direction + total) % total;
+        container.style.transform = `translateX(-${modalSlideIndex * 100}%)`;
+    }
+
+    /* --- ZOOM FEATURE (Double Tap/Click) --- */
+    function handleZoom(e) {
+        const img = e.currentTarget;
+        if (img.classList.contains('zoomed')) {
+            img.classList.remove('zoomed');
+            img.style.transformOrigin = `center center`;
+        } else {
+            // Calculate tap/click position for centered zoom
+            const rect = img.getBoundingClientRect();
+            const x = ((e.clientX || e.touches[0].clientX) - rect.left) / rect.width * 100;
+            const y = ((e.clientY || e.touches[0].clientY) - rect.top) / rect.height * 100;
+            
+            img.style.transformOrigin = `${x}% ${y}%`;
+            img.classList.add('zoomed');
+        }
+    }
+
+    // Double click listener for all slider images
+    document.addEventListener('dblclick', function(e) {
+        if (e.target.tagName === 'IMG' && e.target.closest('.slides, .modal-slides')) {
+            handleZoom(e);
+        }
     });
-  });
 
-  // 4. CART LOGIC
-  function addToCartBtn(btn, e) {
-    e.stopPropagation();
-    const card = btn.closest('.product-card');
-    const item = {
-      id: card.dataset.id,
-      name: card.dataset.name,
-      price: parseInt(card.dataset.price)
+    // Mobile Double Tap handling
+    let lastTap = 0;
+    document.addEventListener('touchstart', function(e) {
+        if (e.target.tagName === 'IMG' && e.target.closest('.slides, .modal-slides')) {
+            const now = new Date().getTime();
+            const timesince = now - lastTap;
+            if (timesince < 300 && timesince > 0) {
+                handleZoom(e);
+                e.preventDefault();
+            }
+            lastTap = now;
+        }
+    });
+
+    /* --- MODAL Logic --- */
+    function openProductModal(card) {
+        const name = card.dataset.name;
+        const price = card.dataset.price;
+        const details = card.dataset.details;
+        const images = card.querySelectorAll('.slides img');
+        
+        document.getElementById('modalProductName').textContent = name;
+        document.getElementById('modalProductPrice').textContent = `ZMW ${Number(price).toLocaleString()}`;
+        document.getElementById('modalProductDescription').textContent = details;
+        
+        const modalSlides = document.getElementById('modalSlides');
+        modalSlides.innerHTML = '';
+        modalSlideIndex = 0;
+        modalSlides.style.transform = `translateX(0)`;
+
+        images.forEach(img => {
+            const newImg = document.createElement('img');
+            newImg.src = img.src;
+            modalSlides.appendChild(newImg);
+        });
+
+        document.getElementById('productModal').classList.add('show');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('show');
+        // Reset any zooms when closing
+        document.querySelectorAll('.zoomed').forEach(el => el.classList.remove('zoomed'));
+    }
+
+    /* --- CART & UI LOGIC --- */
+    function renderCart() {
+      const listEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      const countEl = document.getElementById('cart-count');
+      listEl.innerHTML = cart.length ? '' : '<li>Cart is empty</li>';
+      
+      let total = 0;
+      cart.forEach((item, idx) => {
+        total += (item.price * item.qty);
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item.name} (x${item.qty})</span> <span>ZMW ${item.price * item.qty}</span>`;
+        listEl.appendChild(li);
+      });
+      
+      totalEl.textContent = `Total: ZMW ${total.toLocaleString()}`;
+      countEl.textContent = cart.reduce((a, b) => a + b.qty, 0);
+    }
+
+    function addToCartBtn(btn) {
+      const card = btn.closest('.product-card');
+      const id = card.dataset.id;
+      const existing = cart.find(i => i.id === id);
+      if(existing) existing.qty++;
+      else cart.push({ id, name: card.dataset.name, price: parseInt(card.dataset.price), qty: 1 });
+      renderCart();
+      openModal('cartModal');
+    }
+
+    function clearCart() { cart = []; renderCart(); }
+
+    function toggleBid(btn) {
+      const section = btn.closest('.product-details').querySelector('.bid-section');
+      section.style.display = section.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function submitBid(btn, type) {
+        const val = btn.closest('.bid-section').querySelector('input').value;
+        const name = btn.closest('.product-card').dataset.name;
+        if(!val) return alert("Enter amount");
+        const msg = `Bid for ${name}: ZMW ${val}`;
+        if(type === 'whatsapp') window.open(`https://wa.me/260${cartPhoneNumber.substring(1)}?text=${encodeURIComponent(msg)}`);
+        else window.location.href = `sms:${cartPhoneNumber}?body=${msg}`;
+    }
+
+    // Card tapping logic
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.querySelector('.product-description').textContent = card.dataset.details;
+        card.addEventListener('click', (e) => {
+            // If user clicks on buttons or slider arrows, don't expand card
+            if (e.target.closest('button, a, input')) return;
+            
+            // If user clicks image, open modal. Otherwise, toggle expand
+            if (e.target.tagName === 'IMG') {
+                openProductModal(card);
+            } else {
+                card.classList.toggle('tapped');
+            }
+        });
+    });
+
+    // Cart icon
+    document.getElementById('cart-icon').onclick = () => openModal('cartModal');
+
+    // Filter Logic
+    document.getElementById('category-filters').onclick = (e) => {
+        if(!e.target.classList.contains('filter-btn')) return;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        const filter = e.target.dataset.filter;
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.display = (filter === 'all' || card.dataset.category.includes(filter)) ? 'flex' : 'none';
+        });
     };
-    cart.push(item);
-    updateCartUI();
-    openModal('cartModal');
-  }
 
-  function updateCartUI() {
-    const list = document.getElementById('cart-items');
-    const total = document.getElementById('cart-total');
-    const count = document.getElementById('cart-count');
-    
-    list.innerHTML = cart.map(i => `<li><span>${i.name}</span> <b>ZMW ${i.price}</b></li>`).join('');
-    const sum = cart.reduce((a, b) => a + b.price, 0);
-    total.innerText = sum.toLocaleString();
-    count.innerText = cart.length;
-  }
-
-  function clearCart() { cart = []; updateCartUI(); }
-
-  function sendCart(type) {
-    if (cart.length === 0) return alert("Cart is empty");
-    const text = "New Order: " + cart.map(i => i.name).join(', ');
-    window.open(`https://wa.me/260978167546?text=${encodeURIComponent(text)}`);
-  }
-
-  // 5. BID LOGIC
-  function toggleBid(btn, e) {
-    e.stopPropagation();
-    const section = btn.closest('.product-details').querySelector('.bid-section');
-    section.style.display = section.style.display === 'flex' ? 'none' : 'flex';
-  }
-
-  function submitBid(btn, type, e) {
-    e.stopPropagation();
-    const card = btn.closest('.product-card');
-    const val = btn.previousElementSibling.value;
-    if(!val) return alert("Enter amount");
-    const msg = `I want to offer ZMW ${val} for ${card.dataset.name}`;
-    window.open(`https://wa.me/260${card.dataset.phone.substring(1)}?text=${encodeURIComponent(msg)}`);
-  }
-
-  // 6. MODAL UTILS
-  function openModal(id) { document.getElementById(id).classList.add('show'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-  document.getElementById('cart-icon').onclick = () => openModal('cartModal');
-
-  // 7. SEARCH
-  document.getElementById('search-input').oninput = (e) => {
-    const q = e.target.value.toLowerCase();
-    document.querySelectorAll('.product-card').forEach(c => {
-      c.style.display = c.dataset.name.toLowerCase().includes(q) ? 'flex' : 'none';
-    });
-  };
-</script>
-
+    // Search Logic
+    document.getElementById('search-input').oninput = (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(card => {
+            const visible = card.innerText.toLowerCase().includes(term);
+            card.style.display = visible ? 'flex' : 'none';
+        });
+    };
+  </script>
 </body>
 </html>
