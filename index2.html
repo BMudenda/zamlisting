@@ -1858,22 +1858,26 @@ On one side of the device, you will find a micro USB charging port while on the 
 
     renderCart();
     
-    /**********************
-     * New Filter & Search Logic
-     **********************/
-    const allProducts = document.querySelectorAll('.product-card');
-    const categoryFilters = document.getElementById('category-filters');
-    const searchInput = document.getElementById('search-input');
-    
-    function filterProducts(category) {
-      allProducts.forEach(product => {
-        if (category === 'all' || product.dataset.category === category) {
-          product.style.display = 'flex';
-        } else {
-          product.style.display = 'none';
-        }
-      });
+/**********************
+ * New Filter & Search Logic
+ **********************/
+const allProducts = document.querySelectorAll('.product-card');
+const categoryFilters = document.getElementById('category-filters');
+const searchInput = document.getElementById('search-input');
+
+function filterProducts(category) {
+  allProducts.forEach(product => {
+
+    const categories = product.dataset.category.split(" ");
+
+    if (category === 'all' || categories.includes(category)) {
+      product.style.display = 'flex';
+    } else {
+      product.style.display = 'none';
     }
+
+  });
+}
 
     function searchProducts(query) {
       const lowerCaseQuery = query.toLowerCase();
@@ -2172,4 +2176,5 @@ On one side of the device, you will find a micro USB charging port while on the 
   </script>
 </body>
 </html>
+
 
