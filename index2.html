@@ -1610,165 +1610,373 @@ On one side of the device, you will find a micro USB charging port while on the 
   </footer>
 
   <script>
-    const FMT = (v) => Number(v).toLocaleString();
-    const safeNumber = (str) => Number(String(str).replace(/,/g, '').trim()) || 0;
-    const cartPhoneNumber = '0978167546';
-    let cart = [];
 
-    function renderCart() {
-      const listEl = document.getElementById('cart-items');
-      const totalEl = document.getElementById('cart-total');
-      const countEl = document.getElementById('cart-count');
-      listEl.innerHTML = '';
-      if (cart.length === 0) {
-        listEl.innerHTML = '<li>No items in cart</li>';
-      } else {
-        cart.forEach(item => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <div class="left">
-              <div class="name">${item.name}</div>
-              <div class="meta">${item.qty} x ZMK ${FMT(item.price)}</div>
-            </div>
-            <div style="text-align:right">
-              <div>ZMK ${FMT(item.price * item.qty)}</div>
-              <button onclick="removeFromCart('${item.id}')" style="background:none; border:none; color:red; cursor:pointer; font-size:12px">Remove</button>
-            </div>`;
-          listEl.appendChild(li);
-        });
-      }
-      totalEl.textContent = `Total: ZMK ${FMT(cart.reduce((s, it) => s + (it.price * it.qty), 0))}`;
-      countEl.textContent = String(cart.reduce((s, it) => s + it.qty, 0));
-    }
+const FMT = (v) => Number(v).toLocaleString();
+const safeNumber = (str) => Number(String(str).replace(/,/g,'').trim()) || 0;
+const cartPhoneNumber = '0978167546';
 
-    function addToCart(productId, productName, productPrice, qty = 1) {
-      const existing = cart.find(i => i.id === productId);
-      if (existing) existing.qty += qty;
-      else cart.push({ id: productId, name: productName, price: productPrice, qty });
-      renderCart();
-    }
+let cart = [];
 
-    function removeFromCart(productId) {
-      cart = cart.filter(i => i.id !== productId);
-      renderCart();
-    }
+/* ---------------- CART ---------------- */
 
-    function clearCart() { cart = []; renderCart(); }
+function renderCart(){
 
-    function sendCartViaSMS() {
-      const msg = cart.map(i => `${i.name} x${i.qty}`).join(', ');
-      window.location.href = `sms:${cartPhoneNumber}?body=Order: ${msg}`;
-    }
+const listEl = document.getElementById('cart-items');
+const totalEl = document.getElementById('cart-total');
+const countEl = document.getElementById('cart-count');
 
-    function sendCartViaWhatsApp() {
-      const msg = cart.map(i => `${i.name} x${i.qty}`).join(', ');
-      window.location.href = `https://wa.me/260${cartPhoneNumber.substring(1)}?text=Order: ${encodeURIComponent(msg)}`;
-    }
+listEl.innerHTML='';
 
-    function addToCartBtn(btn) {
-      const card = btn.closest('.product-card');
-      addToCart(card.dataset.id, card.dataset.name, safeNumber(card.dataset.price));
-      openModal('cartModal');
-    }
+if(cart.length===0){
+listEl.innerHTML='<li>No items in cart</li>';
+}else{
 
-    function toggleBid(btn) {
-      const bid = btn.closest('.tappable-content').querySelector('.bid-section');
-      bid.style.display = bid.style.display === 'flex' ? 'none' : 'flex';
-    }
+cart.forEach(item=>{
 
-    function submitBid(btn, type) {
-      const card = btn.closest('.product-card');
-      const bid = btn.closest('.bid-section').querySelector('input').value;
-      if(!bid) return alert("Enter bid");
-      const msg = `Bid on ${card.dataset.name}: ZMW ${bid}`;
-      if(type==='sms') window.location.href=`sms:${card.dataset.phonenumber}?body=${msg}`;
-      else window.location.href=`https://wa.me/260${card.dataset.phonenumber.substring(1)}?text=${encodeURIComponent(msg)}`;
-    }
+const li=document.createElement('li');
 
-    // Modal Logic
-    function openModal(id) { document.getElementById(id).classList.add('show'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    document.querySelectorAll('.modal-close').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
-    document.getElementById('cart-icon').onclick = () => openModal('cartModal');
-    document.getElementById('cart-clear').onclick = clearCart;
+li.innerHTML=`
+<div class="left">
+<div class="name">${item.name}</div>
+<div class="meta">${item.qty} x ZMK ${FMT(item.price)}</div>
+</div>
 
-    // Filter and Search Logic
-    const searchInput = document.getElementById('search-input');
-    searchInput.oninput = () => {
-      const q = searchInput.value.toLowerCase();
-      document.querySelectorAll('.product-card').forEach(c => {
-        const text = c.innerText.toLowerCase();
-        c.style.display = text.includes(q) ? 'flex' : 'none';
-      });
-    };
+<div style="text-align:right">
+<div>ZMK ${FMT(item.price*item.qty)}</div>
+<button onclick="removeFromCart('${item.id}')" style="background:none;border:none;color:red;cursor:pointer;font-size:12px">Remove</button>
+</div>`;
 
-    document.getElementById('category-filters').onclick = (e) => {
-        if(!e.target.classList.contains('filter-btn')) return;
-        const filter = e.target.dataset.filter;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        document.querySelectorAll('.product-card').forEach(c => {
-            c.style.display = (filter === 'all' || c.dataset.category.includes(filter)) ? 'flex' : 'none';
-        });
-    };
-
-    // Card Details Display Logic
-    document.querySelectorAll('.product-card').forEach(card => {
-        const desc = card.querySelector('.product-description');
-        if (desc) desc.textContent = card.dataset.details;
-        card.onclick = (e) => {
-            if(!e.target.closest('button, a, input')) card.classList.toggle('tapped');
-        };
-    });
-
-    // Slider Logic for all product cards
-document.querySelectorAll('.slider').forEach(slider => {
-  const slides = slider.querySelector('.slides');
-  const imgCount = slides.querySelectorAll('img').length;
-  let index = 0;
-
-  slider.querySelector('.next').onclick = (e) => {
-    e.stopPropagation(); // Prevents card from expanding/closing
-    if (index < imgCount - 1) index++;
-    else index = 0; // Loop back
-    slides.style.transform = `translateX(${-index * 100}%)`;
-  };
-
-  slider.querySelector('.prev').onclick = (e) => {
-    e.stopPropagation();
-    if (index > 0) index--;
-    else index = imgCount - 1; // Loop to end
-    slides.style.transform = `translateX(${-index * 100}%)`;
-  };
-});
-
-let lastTap = 0;
-
-document.querySelectorAll('.slides img').forEach(img => {
-
-  img.addEventListener("touchend", function(e){
-
-    const now = new Date().getTime();
-    const tapLength = now - lastTap;
-
-    if(tapLength < 300 && tapLength > 0){
-
-      const slides = img.closest('.slides');
-
-      slides.querySelectorAll('img').forEach(i=>{
-        if(i!==img) i.classList.remove('zoomed');
-      });
-
-      img.classList.toggle('zoomed');
-
-    }
-
-    lastTap = now;
-
-  });
+listEl.appendChild(li);
 
 });
 
-  </script>
+}
+
+totalEl.textContent=`Total: ZMK ${FMT(cart.reduce((s,it)=>s+(it.price*it.qty),0))}`;
+countEl.textContent=String(cart.reduce((s,it)=>s+it.qty,0));
+
+}
+
+function addToCart(productId,productName,productPrice,qty=1){
+
+const existing=cart.find(i=>i.id===productId);
+
+if(existing) existing.qty+=qty;
+else cart.push({id:productId,name:productName,price:productPrice,qty});
+
+renderCart();
+
+}
+
+function removeFromCart(productId){
+
+cart=cart.filter(i=>i.id!==productId);
+renderCart();
+
+}
+
+function clearCart(){cart=[];renderCart();}
+
+function sendCartViaSMS(){
+
+const msg=cart.map(i=>`${i.name} x${i.qty}`).join(', ');
+window.location.href=`sms:${cartPhoneNumber}?body=Order: ${msg}`;
+
+}
+
+function sendCartViaWhatsApp(){
+
+const msg=cart.map(i=>`${i.name} x${i.qty}`).join(', ');
+window.location.href=`https://wa.me/260${cartPhoneNumber.substring(1)}?text=${encodeURIComponent(msg)}`;
+
+}
+
+function addToCartBtn(btn){
+
+const card=btn.closest('.product-card');
+
+addToCart(
+card.dataset.id,
+card.dataset.name,
+safeNumber(card.dataset.price)
+);
+
+openModal('cartModal');
+
+}
+
+/* ---------------- BIDS ---------------- */
+
+function toggleBid(btn){
+
+const bid=btn.closest('.tappable-content').querySelector('.bid-section');
+
+bid.style.display=bid.style.display==='flex'?'none':'flex';
+
+}
+
+function submitBid(btn,type){
+
+const card=btn.closest('.product-card');
+const bid=btn.closest('.bid-section').querySelector('input').value;
+
+if(!bid) return alert("Enter bid");
+
+const msg=`Bid on ${card.dataset.name}: ZMW ${bid}`;
+
+if(type==='sms')
+window.location.href=`sms:${card.dataset.phonenumber}?body=${msg}`;
+else
+window.location.href=`https://wa.me/260${card.dataset.phonenumber.substring(1)}?text=${encodeURIComponent(msg)}`;
+
+}
+
+/* ---------------- MODAL ---------------- */
+
+function openModal(id){
+document.getElementById(id).classList.add('show');
+}
+
+function closeModal(id){
+document.getElementById(id).classList.remove('show');
+}
+
+document.querySelectorAll('.modal-close').forEach(b=>{
+b.onclick=()=>closeModal(b.closest('.modal').id);
+});
+
+document.getElementById('cart-icon').onclick=()=>openModal('cartModal');
+document.getElementById('cart-clear').onclick=clearCart;
+
+/* ---------------- SEARCH ---------------- */
+
+const searchInput=document.getElementById('search-input');
+
+searchInput.oninput=()=>{
+
+const q=searchInput.value.toLowerCase();
+
+document.querySelectorAll('.product-card').forEach(c=>{
+
+const text=c.innerText.toLowerCase();
+
+c.style.display=text.includes(q)?'flex':'none';
+
+});
+
+};
+
+/* ---------------- FILTERS ---------------- */
+
+document.getElementById('category-filters').onclick=(e)=>{
+
+if(!e.target.classList.contains('filter-btn')) return;
+
+const filter=e.target.dataset.filter;
+
+document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+e.target.classList.add('active');
+
+document.querySelectorAll('.product-card').forEach(c=>{
+
+c.style.display=(filter==='all'||c.dataset.category.includes(filter))?'flex':'none';
+
+});
+
+};
+
+/* ---------------- CARD DETAILS ---------------- */
+
+document.querySelectorAll('.product-card').forEach(card=>{
+
+const desc=card.querySelector('.product-description');
+
+if(desc) desc.textContent=card.dataset.details;
+
+card.onclick=(e)=>{
+
+if(!e.target.closest('button,a,input'))
+card.classList.toggle('tapped');
+
+};
+
+});
+
+/* ---------------- IMAGE SLIDER ---------------- */
+
+document.querySelectorAll('.slider').forEach(slider=>{
+
+const slides=slider.querySelector('.slides');
+const images=slides.querySelectorAll('img');
+
+let index=0;
+const imgCount=images.length;
+
+function resetZoom(){
+
+images.forEach(img=>{
+img.classList.remove('zoomed');
+img.style.transform='scale(1)';
+});
+
+}
+
+slider.querySelector('.next').onclick=(e)=>{
+
+e.stopPropagation();
+
+if(slides.querySelector('.zoomed')) return;
+
+resetZoom();
+
+index=(index<imgCount-1)?index+1:0;
+
+slides.style.transform=`translateX(${-index*100}%)`;
+
+};
+
+slider.querySelector('.prev').onclick=(e)=>{
+
+e.stopPropagation();
+
+if(slides.querySelector('.zoomed')) return;
+
+resetZoom();
+
+index=(index>0)?index-1:imgCount-1;
+
+slides.style.transform=`translateX(${-index*100}%)`;
+
+};
+
+});
+
+/* ---------------- AMAZON STYLE IMAGE ZOOM ---------------- */
+
+let lastTap=0;
+
+document.querySelectorAll('.slides img').forEach(img=>{
+
+let isDragging=false;
+let startX,startY;
+let currentX=0,currentY=0;
+
+/* DOUBLE CLICK (Desktop) */
+
+img.addEventListener("dblclick",(e)=>{
+
+e.stopPropagation();
+
+const slides=img.closest('.slides');
+
+slides.querySelectorAll('img').forEach(i=>{
+if(i!==img)i.classList.remove('zoomed');
+});
+
+img.classList.toggle('zoomed');
+
+if(!img.classList.contains('zoomed')){
+img.style.transform='scale(1)';
+currentX=0;
+currentY=0;
+}
+
+});
+
+/* DOUBLE TAP (Mobile) */
+
+img.addEventListener("touchend",(e)=>{
+
+const now=new Date().getTime();
+const tapLength=now-lastTap;
+
+if(tapLength<300&&tapLength>0){
+
+const slides=img.closest('.slides');
+
+slides.querySelectorAll('img').forEach(i=>{
+if(i!==img)i.classList.remove('zoomed');
+});
+
+img.classList.toggle('zoomed');
+
+if(!img.classList.contains('zoomed')){
+img.style.transform='scale(1)';
+currentX=0;
+currentY=0;
+}
+
+}
+
+lastTap=now;
+
+});
+
+/* DRAG PAN DESKTOP */
+
+img.addEventListener("mousedown",(e)=>{
+
+if(!img.classList.contains("zoomed"))return;
+
+isDragging=true;
+startX=e.clientX-currentX;
+startY=e.clientY-currentY;
+
+});
+
+document.addEventListener("mousemove",(e)=>{
+
+if(!isDragging)return;
+
+currentX=e.clientX-startX;
+currentY=e.clientY-startY;
+
+img.style.transform=`scale(2) translate(${currentX}px,${currentY}px)`;
+
+});
+
+document.addEventListener("mouseup",()=>{
+
+isDragging=false;
+
+});
+
+/* TOUCH DRAG MOBILE */
+
+img.addEventListener("touchstart",(e)=>{
+
+if(!img.classList.contains("zoomed"))return;
+
+const touch=e.touches[0];
+
+isDragging=true;
+
+startX=touch.clientX-currentX;
+startY=touch.clientY-currentY;
+
+});
+
+img.addEventListener("touchmove",(e)=>{
+
+if(!isDragging)return;
+
+const touch=e.touches[0];
+
+currentX=touch.clientX-startX;
+currentY=touch.clientY-startY;
+
+img.style.transform=`scale(2) translate(${currentX}px,${currentY}px)`;
+
+});
+
+img.addEventListener("touchend",()=>{
+
+isDragging=false;
+
+});
+
+});
+
+</script>
 </body>
 </html>
