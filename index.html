@@ -148,7 +148,7 @@
       position: relative;
       flex: 1 1 400px;
       min-height: 250px;
-      overflow: hidden;
+      overflow: hidden; /* Prevent zoomed image from leaking out */
     }
     .modal-slider {
       position: relative;
@@ -167,11 +167,11 @@
         height: auto;
         transition: transform 0.3s ease-in-out;
         cursor: zoom-in;
+        transform-origin: center center; /* Ensures zoom stays centered */
     }
     .modal-slides img.zoomed {
-        transform: scale(1.8);
+        transform: scale(2.0); /* Increased scale slightly for better visibility */
         cursor: zoom-out;
-        transform-origin: center center;
     }
     .modal-slider .prev, .modal-slider .next {
         position: absolute;
@@ -308,6 +308,7 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="header-content">
@@ -1719,6 +1720,36 @@ On one side of the device, you will find a micro USB charging port while on the 
             if(!e.target.closest('button, a, input')) card.classList.toggle('tapped');
         };
     });
+
+    // Slider Logic for all product cards
+document.querySelectorAll('.slider').forEach(slider => {
+  const slides = slider.querySelector('.slides');
+  const imgCount = slides.querySelectorAll('img').length;
+  let index = 0;
+
+  slider.querySelector('.next').onclick = (e) => {
+    e.stopPropagation(); // Prevents card from expanding/closing
+    if (index < imgCount - 1) index++;
+    else index = 0; // Loop back
+    slides.style.transform = `translateX(${-index * 100}%)`;
+  };
+
+  slider.querySelector('.prev').onclick = (e) => {
+    e.stopPropagation();
+    if (index > 0) index--;
+    else index = imgCount - 1; // Loop to end
+    slides.style.transform = `translateX(${-index * 100}%)`;
+  };
+});
+
+// Zoom Logic
+document.querySelectorAll('.slides img').forEach(img => {
+  img.onclick = (e) => {
+    e.stopPropagation(); // Don't trigger the card expansion
+    img.classList.toggle('zoomed');
+  };
+});
+
   </script>
 </body>
 </html>
