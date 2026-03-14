@@ -1852,59 +1852,47 @@ slides.style.transform=`translateX(${-index*100}%)`;
 });
 
 /* ---------------- AMAZON STYLE IMAGE ZOOM ---------------- */
+document.querySelectorAll('.slides, .modal-slides').forEach(slides=>{
 
-let lastTap=0;
+const images = slides.querySelectorAll('img');
 
-document.querySelectorAll('.slides img').forEach(img=>{
+images.forEach(img=>{
 
-let isDragging=false;
-let startX,startY;
-let currentX=0,currentY=0;
+let isZoomed = false;
+let startX=0,startY=0;
+let moveX=0,moveY=0;
+let dragging=false;
 
-/* DOUBLE CLICK (Desktop) */
+/* DESKTOP DOUBLE CLICK */
 
 img.addEventListener("dblclick",(e)=>{
 
 e.stopPropagation();
 
-const slides=img.closest('.slides');
+resetZoom();
 
-slides.querySelectorAll('img').forEach(i=>{
-if(i!==img)i.classList.remove('zoomed');
-});
-
-img.classList.toggle('zoomed');
-
-if(!img.classList.contains('zoomed')){
-img.style.transform='scale(1)';
-currentX=0;
-currentY=0;
-}
+isZoomed = true;
+img.classList.add("zoomed");
+img.style.transform="scale(2)";
 
 });
 
-/* DOUBLE TAP (Mobile) */
+/* MOBILE DOUBLE TAP */
+
+let lastTap=0;
 
 img.addEventListener("touchend",(e)=>{
 
-const now=new Date().getTime();
-const tapLength=now-lastTap;
+const now = new Date().getTime();
+const diff = now-lastTap;
 
-if(tapLength<300&&tapLength>0){
+if(diff<300 && diff>0){
 
-const slides=img.closest('.slides');
+resetZoom();
 
-slides.querySelectorAll('img').forEach(i=>{
-if(i!==img)i.classList.remove('zoomed');
-});
-
-img.classList.toggle('zoomed');
-
-if(!img.classList.contains('zoomed')){
-img.style.transform='scale(1)';
-currentX=0;
-currentY=0;
-}
+isZoomed=true;
+img.classList.add("zoomed");
+img.style.transform="scale(2)";
 
 }
 
@@ -1912,70 +1900,71 @@ lastTap=now;
 
 });
 
-/* DRAG PAN DESKTOP */
+/* DRAG START */
 
 img.addEventListener("mousedown",(e)=>{
-
-if(!img.classList.contains("zoomed"))return;
-
-isDragging=true;
-startX=e.clientX-currentX;
-startY=e.clientY-currentY;
-
+if(!isZoomed) return;
+dragging=true;
+startX=e.clientX-moveX;
+startY=e.clientY-moveY;
 });
 
 document.addEventListener("mousemove",(e)=>{
+if(!dragging) return;
 
-if(!isDragging)return;
+moveX=e.clientX-startX;
+moveY=e.clientY-startY;
 
-currentX=e.clientX-startX;
-currentY=e.clientY-startY;
-
-img.style.transform=`scale(2) translate(${currentX}px,${currentY}px)`;
-
+img.style.transform=`scale(2) translate(${moveX}px,${moveY}px)`;
 });
 
 document.addEventListener("mouseup",()=>{
-
-isDragging=false;
-
+dragging=false;
 });
 
-/* TOUCH DRAG MOBILE */
+/* TOUCH DRAG */
 
 img.addEventListener("touchstart",(e)=>{
-
-if(!img.classList.contains("zoomed"))return;
-
-const touch=e.touches[0];
-
-isDragging=true;
-
-startX=touch.clientX-currentX;
-startY=touch.clientY-currentY;
-
+if(!isZoomed) return;
+dragging=true;
+const t=e.touches[0];
+startX=t.clientX-moveX;
+startY=t.clientY-moveY;
 });
 
 img.addEventListener("touchmove",(e)=>{
+if(!dragging) return;
 
-if(!isDragging)return;
+const t=e.touches[0];
+moveX=t.clientX-startX;
+moveY=t.clientY-startY;
 
-const touch=e.touches[0];
-
-currentX=touch.clientX-startX;
-currentY=touch.clientY-startY;
-
-img.style.transform=`scale(2) translate(${currentX}px,${currentY}px)`;
-
+img.style.transform=`scale(2) translate(${moveX}px,${moveY}px)`;
 });
 
 img.addEventListener("touchend",()=>{
+dragging=false;
+});
 
-isDragging=false;
+/* RESET FUNCTION */
+
+function resetZoom(){
+
+images.forEach(i=>{
+i.classList.remove("zoomed");
+i.style.transform="scale(1)";
+});
+
+isZoomed=false;
+moveX=0;
+moveY=0;
+
+}
 
 });
 
 });
+
 
 </script>
 </body>
