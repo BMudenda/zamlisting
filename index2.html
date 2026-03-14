@@ -42,114 +42,100 @@
       z-index: 30;
     }
 
-    .logo {
-      font-weight: 700;
-      font-size: 20px;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
+    .header-content { display: flex; flex-direction: column; gap: 5px; }
+    .logo-and-subtitle { display: flex; flex-direction: column; gap: 5px; }
+    .logo { font-weight: 700; font-size: 20px; display: flex; gap: 6px; align-items: center; }
     .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
     .logo .listing { color: var(--orange); }
     .header-subtitle { font-size: 14px; font-weight: 400; margin: 0; color: rgba(255, 255, 255, 0.85); }
     
-    .header-controls { display:flex; align-items:center; gap:16px; }
-    .cart-icon { cursor: pointer; position: relative; font-size: 20px; }
+    .header-controls { display:flex; align-items:center; gap:16px; position: relative; }
+    .cart-icon { cursor: pointer; position: relative; font-size: 20px; user-select: none; }
     .cart-count { position: absolute; top: -8px; right: -10px; background: red; color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 50%; min-width: 20px; text-align: center; }
     
     /* --- Modal CSS --- */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 50;
-        left: 0; top: 0; width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.8);
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
+    .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.75); justify-content: center; align-items: center; padding: 20px; }
     .modal.show { display: flex; }
-    .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 900px;
-        width: 100%;
-        position: relative;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    .modal-close { position: absolute; top: 10px; right: 20px; font-size: 30px; font-weight: bold; cursor: pointer; color: #555; }
+    .modal-content { background-color: #fefefe; padding: 20px; border-radius: 10px; max-width: 900px; width: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; max-height: 90vh; }
+    .modal-close { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 30px; font-weight: bold; cursor: pointer; z-index: 10; }
+    .modal-body { display: flex; gap: 20px; flex-wrap: wrap; overflow-y: auto; padding-top: 20px; }
+    
+    .modal-slider-container { position: relative; flex: 1 1 400px; min-height: 300px; overflow: hidden; background: #eee; border-radius: 8px;}
+    .modal-slider { position: relative; height: 100%; width: 100%; overflow: hidden; }
+    .modal-slides { display: flex; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; width: 100%; }
+    .modal-slides img { width: 100%; height: 100%; object-fit: contain; flex-shrink: 0; transition: transform 0.3s ease; cursor: zoom-in; }
+    .modal-slides img.zoomed { transform: scale(2.5); cursor: zoom-out; }
 
-    /* --- Filters & Search --- */
+    .prev, .next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,.5); color: #fff; border: 0; padding: 10px 12px; border-radius: 50%; cursor: pointer; z-index: 5; transition: background 0.3s; }
+    .prev:hover, .next:hover { background: rgba(0,0,0,0.8); }
+    .prev { left: 10px; } .next { right: 10px; }
+
+    .modal-details { flex: 1 1 300px; display: flex; flex-direction: column; }
+    .modal-price { color: green; font-weight: 700; font-size: 20px; margin: 8px 0; }
+    .modal-description { margin-top: 15px; font-size: 14px; line-height: 1.6; }
+    .modal-controls { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
+    .modal-bid-section { display:none; flex-direction: column; gap: 10px; margin-top: 15px; }
+
+    /* --- Filters and Search --- */
     .filters-search { padding: 12px 20px; background: #e9ecef; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #dee2e6; }
     .filters { display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-btn { padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 14px; }
     .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
-    .search-box input { width: 100%; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; }
+    .search-box input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; }
 
     /* --- Taxi Promo --- */
-    .taxi-promo { background: linear-gradient(135deg, #4facfe 0%, #1c6ed5 100%); color: #fff; border-radius: 15px; margin: 25px auto; padding: 20px; max-width: 1000px; }
-    .taxi-promo a { display: flex; align-items: center; gap: 20px; text-decoration: none; color: inherit; }
-    .taxi-image { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; flex-shrink: 0; }
+    .taxi-promo { background: linear-gradient(135deg, #4facfe 0%, #1c6ed5 100%); color: #fff; border-radius: 15px; margin: 20px; padding: 20px; }
+    .taxi-promo a { display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; gap: 15px; }
+    .taxi-image { width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; flex-shrink: 0; }
     .taxi-image img { width: 100%; height: 100%; object-fit: cover; }
 
     /* --- Products Grid --- */
-    main { padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
-    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
-    .product-card { background:#fff; border-radius:10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow:hidden; display:flex; flex-direction:column; transition: transform 0.2s; }
+    main { padding: 18px; max-width: 1200px; margin: 0 auto; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+    .product-card { background:#fff; border-radius:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow:hidden; display:flex; flex-direction:column; transition: transform 0.2s; position: relative; }
     
-    /* --- SLIDER LOGIC --- */
     .slider { position:relative; height:220px; overflow:hidden; background:#eee; }
-    .slides { display:flex; height:100%; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-    .slides img { 
-        width:100%; height:100%; object-fit:contain; flex-shrink:0; 
-        transition: transform 0.3s ease; cursor: zoom-in; 
-    }
-    /* ZOOM CLASS */
-    .slides img.zoomed {
-        transform: scale(1.8);
-        cursor: zoom-out;
-        z-index: 10;
-    }
-    
-    .slider button { 
-        position:absolute; top:50%; transform:translateY(-50%); 
-        background: rgba(0,0,0,0.5); color:#fff; border:0; 
-        width: 35px; height: 35px; border-radius:50%; cursor:pointer; z-index: 5;
-    }
-    .slider .prev{ left:10px } .slider .next{ right:10px }
-    
-    .product-details { padding: 15px; cursor: pointer; }
+    .slides { display:flex; transition:transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); height:100%; }
+    .slides img { width:100%; height:100%; object-fit: contain; flex-shrink:0; cursor: zoom-in; transition: transform 0.3s ease; }
+    .slides img.zoomed { transform: scale(2); z-index: 10; cursor: zoom-out; }
+
+    .product-details { padding: 15px; }
     .price { color:green; font-weight:700; font-size: 1.1rem; }
+    .location { color:#666; font-size:13px; margin: 5px 0; }
     
     .tappable-content { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.4s ease; }
-    .product-card.tapped .tappable-content { max-height: 800px; opacity: 1; padding-top: 10px; }
+    .product-card.tapped .tappable-content { max-height: 600px; opacity: 1; padding-top: 10px; }
 
-    .btn { padding:10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; font-weight:600; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:5px; }
+    .btn { padding:10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1; text-decoration: none; }
     .btn-primary { background:#28a745; color:#fff; }
     .btn-accent { background:#ff9800; color:#fff; }
     .btn-call { background: #007bff; color: #fff; }
     
     .bid-section { display:none; margin-top:10px; gap:8px; flex-direction: column; }
-    .bid-section input { padding:10px; border-radius:6px; border:1px solid #ccc; width: 100%; }
-    
-    .footer { padding: 40px 20px; text-align: center; background: #333; color: #fff; margin-top: auto; }
-    .fa-footer { font-size: 20px; margin: 0 10px; color: #fff; text-decoration: none; }
+    .bid-inputs { display: flex; gap: 5px; }
+    .bid-section input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
 
-    /* Cart Items */
-    .cart-items { list-style: none; padding: 0; }
-    .cart-items li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .footer { padding: 30px; background: #fff; text-align: center; border-top: 1px solid #eee; margin-top: 40px; }
+    .fa-footer { font-size: 20px; margin: 0 10px; color: #555; }
+
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .modal-content { width: 95%; margin: 10px; }
+      .taxi-promo a { flex-direction: column; text-align: center; }
+    }
   </style>
 </head>
 <body>
-
   <header>
-    <div>
-      <div class="logo">
-        <span class="z">Z</span><span>am</span><span class="listing">Listing</span>
+    <div class="header-content">
+      <div class="logo-and-subtitle">
+          <div class="logo">
+            <span class="z">Z</span><span class="a">a</span><span class="m">m</span><span class="listing">Listing</span>
+          </div>
+          <h2 class="header-subtitle">e-Shop Luangwa</h2>
       </div>
-      <h2 class="header-subtitle">e-Shop Luangwa</h2>
     </div>
     <div class="header-controls">
       <div class="cart-icon" id="cart-icon">
@@ -167,14 +153,25 @@
       <button class="filter-btn" data-filter="amasampo">Amasampo</button>
     </div>
     <div class="search-box">
-      <input type="text" id="search-input" placeholder="Search products..." />
+      <input type="text" id="search-input" placeholder="Search for products..." />
     </div>
   </div>
-
+  
+  <div class="taxi-promo">
+    <a href="https://zamlisting.com/luangwa" target="_blank">
+      <div class="taxi-content">
+        <h3 style="margin:0 0 10px 0; color:var(--yellow-taxi)">Book a Ride 🏍️</h3>
+        <p style="margin:0">Luangwa Feira Rides — 50% Discount Promo!</p>
+      </div>
+      <div class="taxi-image">
+           <img src="lfr.jpg" alt="LFR">
+      </div>
+    </a>
+  </div>
+  
   <main>
     <div class="products" id="product-list">
-      
-      <article class="product-card" data-id="p1" data-name="Trekstor 2-in-1 Laptop" data-price="1200" data-category="electronics amasampo" data-phonenumber="0978167546" data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350, 4GB RAM, 64GB eMMC.">
+      <article class="product-card" data-id="p1" data-name="Trekstor 2-in-1 Laptop" data-price="1200" data-category="electronics amasampo" data-phonenumber="0978167546" data-details="Trekstor 11.6-inch 2-in-1 Laptop with Intel Celeron N3350, 4GB RAM, 64GB eMMC, Touchscreen, Windows 10.">
         <div class="slider">
           <div class="slides">
             <img src="L1.jpeg" alt="Laptop 1">
@@ -184,28 +181,27 @@
           <button class="next">&#10095;</button>
         </div>
         <div class="product-details">
-          <h4>Trekstor - 11.6-inch Laptop</h4>
+          <h4>Trekstor 11.6" Laptop</h4>
           <div class="price">ZMW 1,200</div>
           <div class="location">Luangwa, Zambia</div>
           <div class="tappable-content">
-            <div class="controls" style="display:flex; gap:5px; margin-bottom:10px;">
+            <div class="controls">
               <button class="btn btn-primary" onclick="addToCartBtn(this)"><i class="fa fa-cart-plus"></i> Cart</button>
               <a class="btn btn-call" href="tel:0978167546"><i class="fa fa-phone"></i> Call</a>
-              <button class="btn btn-accent" onclick="toggleBid(this)"><i class="fa fa-tag"></i> Offer</button>
+              <button class="btn btn-accent" onclick="toggleBid(this)">Offer</button>
             </div>
             <div class="bid-section">
-              <input type="number" placeholder="Bid (ZMW)" />
-              <div style="display:flex; gap:5px;">
-                <button class="btn btn-primary" style="background:#25D366; flex:1" onclick="submitBid(this, 'whatsapp')">WhatsApp</button>
-                <button class="btn btn-primary" style="background:#007bff; flex:1" onclick="submitBid(this, 'sms')">SMS</button>
+              <div class="bid-inputs">
+                <input type="number" placeholder="ZMW" />
+                <button class="btn btn-primary" onclick="submitBid(this, 'whatsapp')">WA</button>
               </div>
             </div>
-            <p class="desc-text" style="font-size:13px; color:#555;"></p>
+            <p class="product-description" style="font-size:13px; margin-top:10px;"></p>
           </div>
         </div>
       </article>
 
-      <article class="product-card" data-id="p2" data-name="Hisense 55-inch Smart TV" data-price="2300" data-category="electronics" data-phonenumber="0978167546" data-details="UHD Smart TV 55A6KTUK. Screen needs replacement. Great for parts or repair.">
+      <article class="product-card" data-id="p2" data-name="Hisense 55-inch Smart TV" data-price="2300" data-category="electronics" data-phonenumber="0978167546" data-details="UHD Smart TV 55A6KTUK. Note: Needs screen replacement.">
         <div class="slider">
           <div class="slides">
             <img src="Hi1.png" alt="TV 1">
@@ -220,206 +216,290 @@
           <div class="price">ZMW 2,300</div>
           <div class="location">Luangwa, Zambia</div>
           <div class="tappable-content">
-            <div class="controls" style="display:flex; gap:5px;">
-              <button class="btn btn-primary" onclick="addToCartBtn(this)">+ Cart</button>
+            <div class="controls">
+              <button class="btn btn-primary" onclick="addToCartBtn(this)">Cart</button>
               <button class="btn btn-accent" onclick="toggleBid(this)">Offer</button>
             </div>
             <div class="bid-section">
-              <input type="number" placeholder="Bid (ZMW)" />
-              <button class="btn btn-primary" style="background:#25D366; margin-top:5px" onclick="submitBid(this, 'whatsapp')">WhatsApp Bid</button>
+              <div class="bid-inputs">
+                <input type="number" placeholder="ZMW" />
+                <button class="btn btn-primary" onclick="submitBid(this, 'whatsapp')">WA</button>
+              </div>
             </div>
-            <p class="desc-text" style="font-size:13px; color:#555;"></p>
+            <p class="product-description" style="font-size:13px; margin-top:10px;"></p>
           </div>
         </div>
       </article>
-
+      
       </div>
   </main>
 
-  <div id="cartModal" class="modal">
+  <div id="productModal" class="modal">
     <div class="modal-content">
-      <span class="modal-close" onclick="closeModal('cartModal')">&times;</span>
-      <h3>Shopping Cart</h3>
-      <ul id="cart-items-list" class="cart-items"></ul>
-      <div style="margin-top:20px; font-weight:bold; font-size:1.2rem;" id="cart-total">Total: ZMW 0</div>
-      <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="btn btn-primary" style="flex:1; background:#25D366" onclick="sendOrder('whatsapp')">WhatsApp Order</button>
-        <button class="btn btn-accent" style="flex:1" onclick="clearCart()">Clear Cart</button>
+      <span class="modal-close">&times;</span>
+      <div class="modal-body">
+        <div class="modal-slider-container">
+          <div class="modal-slider">
+            <div class="modal-slides" id="modalSlides"></div>
+            <button class="prev">&#10094;</button>
+            <button class="next">&#10095;</button>
+          </div>
+        </div>
+        <div class="modal-details">
+          <h4 id="modalProductName"></h4>
+          <div class="modal-price" id="modalProductPrice"></div>
+          <div class="modal-location" id="modalProductLocation"></div>
+          <div class="modal-description">
+            <p id="modalProductDescription"></p>
+          </div>
+          <div class="modal-controls">
+            <button class="btn btn-primary" id="modalAddToCart"><i class="fa fa-cart-plus"></i> Add to Cart</button>
+            <a class="btn btn-call" id="modalCallLink" href="#"><i class="fa fa-phone"></i> Call</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
+  <div id="cartModal" class="modal">
+      <div class="modal-content" style="max-width:400px">
+          <span class="modal-close">&times;</span>
+          <h3 style="text-align:center">Your Cart</h3>
+          <ul id="cart-items" style="list-style:none; padding:0; margin: 20px 0;"></ul>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; border-top:1px solid #eee; padding-top:15px">
+              <span id="cart-total">Total: ZMK 0</span>
+              <button class="btn btn-accent" id="cart-clear" style="flex:none; padding:5px 10px">Clear</button>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:20px">
+              <button class="btn btn-primary" style="background:var(--whatsapp-green)" onclick="sendCartViaWhatsApp()">WhatsApp</button>
+              <button class="btn btn-primary" style="background:var(--light-blue)" onclick="sendCartViaSMS()">SMS</button>
+          </div>
+      </div>
+  </div>
+
   <footer class="footer">
+    <div style="margin-bottom:15px">
+        <a href="#" class="fa fa-footer fa-facebook"></a>
+        <a href="#" class="fa fa-footer fa-whatsapp"></a>
+        <a href="mailto:info@zamlisting.com" class="fa fa-footer fa-envelope"></a>
+    </div>
     <p>&copy; 2026 ZamListing Luangwa</p>
-    <a href="#" class="fa fa-footer fa-facebook"></a>
-    <a href="#" class="fa fa-footer fa-whatsapp"></a>
-    <a href="mailto:info@zamlisting.com" class="fa fa-footer fa-envelope"></a>
   </footer>
 
   <script>
-    // --- State Management ---
+    // --- Global State ---
+    const cartPhoneNumber = '0978167546';
     let cart = [];
-    const CART_PHONE = "0978167546";
+    let lastTap = 0;
 
-    // --- Image Slider & Zoom Logic ---
+    // --- Formatters ---
+    const FMT = (v) => Number(v).toLocaleString();
+    const safeNumber = (str) => Number(String(str).replace(/[^0-9.-]+/g, "")) || 0;
+
+    // --- Slider Logic ---
     function initSliders() {
-        document.querySelectorAll('.slider').forEach(slider => {
-            const slides = slider.querySelector('.slides');
-            const images = slides.querySelectorAll('img');
-            let index = 0;
-
-            // Nav Buttons
-            slider.querySelector('.next').onclick = (e) => {
-                e.stopPropagation();
-                if (index < images.length - 1) index++;
-                else index = 0;
-                updateSlider();
-            };
-
-            slider.querySelector('.prev').onclick = (e) => {
-                e.stopPropagation();
-                if (index > 0) index--;
-                else index = images.length - 1;
-                updateSlider();
-            };
-
-            function updateSlider() {
-                slides.style.transform = `translateX(-${index * 100}%)`;
-                // Remove zoom from all when sliding
-                images.forEach(img => img.classList.remove('zoomed'));
-            }
-
-            // Zoom Click
-            images.forEach(img => {
-                img.onclick = (e) => {
-                    e.stopPropagation(); // Prevents card from collapsing/expanding
-                    img.classList.toggle('zoomed');
-                    
-                    // Center the zoom based on click position
-                    if(img.classList.contains('zoomed')) {
-                        const rect = img.getBoundingClientRect();
-                        const x = ((e.clientX - rect.left) / rect.width) * 100;
-                        const y = ((e.clientY - rect.top) / rect.height) * 100;
-                        img.style.transformOrigin = `${x}% ${y}%`;
-                    } else {
-                        img.style.transformOrigin = 'center center';
-                    }
-                };
-            });
-        });
-    }
-
-    // --- Cart & Actions ---
-    function addToCartBtn(btn) {
-        const card = btn.closest('.product-card');
-        const item = {
-            id: card.dataset.id,
-            name: card.dataset.name,
-            price: parseInt(card.dataset.price)
-        };
-        cart.push(item);
-        updateCartUI();
-        openModal('cartModal');
-    }
-
-    function updateCartUI() {
-        const list = document.getElementById('cart-items-list');
-        const count = document.getElementById('cart-count');
-        const totalEl = document.getElementById('cart-total');
+      const sliders = document.querySelectorAll('.slider, .modal-slider');
+      sliders.forEach(slider => {
+        const slides = slider.querySelector('.slides, .modal-slides');
+        const prevBtn = slider.querySelector('.prev');
+        const nextBtn = slider.querySelector('.next');
+        const images = slides.querySelectorAll('img');
         
-        list.innerHTML = cart.map((item, idx) => `
-            <li>
-                <span>${item.name}</span>
-                <span>ZMW ${item.price} <i class="fa fa-trash" style="color:red; cursor:pointer" onclick="removeItem(${idx})"></i></span>
-            </li>
-        `).join('');
-        
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        totalEl.innerText = `Total: ZMW ${total}`;
-        count.innerText = cart.length;
-    }
-
-    function removeItem(idx) {
-        cart.splice(idx, 1);
-        updateCartUI();
-    }
-
-    function clearCart() {
-        cart = [];
-        updateCartUI();
-    }
-
-    function sendOrder(type) {
-        if(cart.length === 0) return alert("Cart is empty");
-        const summary = cart.map(i => i.name).join(', ');
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        const msg = `Order: ${summary}. Total: ZMW ${total}`;
-        
-        if(type === 'whatsapp') {
-            window.open(`https://wa.me/260${CART_PHONE.substring(1)}?text=${encodeURIComponent(msg)}`);
+        if (images.length <= 1) {
+            if(prevBtn) prevBtn.style.display = 'none';
+            if(nextBtn) nextBtn.style.display = 'none';
+            return;
         }
+
+        let index = 0;
+        const updateSlider = () => {
+          const width = slider.clientWidth;
+          slides.style.transform = `translateX(${-index * width}px)`;
+        };
+
+        if(prevBtn) {
+            prevBtn.onclick = (e) => {
+                e.stopPropagation();
+                index = (index > 0) ? index - 1 : images.length - 1;
+                updateSlider();
+            };
+        }
+
+        if(nextBtn) {
+            nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                index = (index < images.length - 1) ? index + 1 : 0;
+                updateSlider();
+            };
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', updateSlider);
+      });
     }
 
-    // --- UI Helpers ---
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    // --- Zoom Logic ---
+    function handleZoom(e) {
+      const img = e.currentTarget;
+      const now = Date.now();
+      const DOUBLE_TAP_DELAY = 300;
+
+      // Handle both dblclick (desktop) and double tap (mobile)
+      if (e.type === 'dblclick' || (now - lastTap < DOUBLE_TAP_DELAY)) {
+        img.classList.toggle('zoomed');
+        e.preventDefault();
+      }
+      lastTap = now;
+    }
+
+    // --- Cart Functions ---
+    function renderCart() {
+      const listEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      const countEl = document.getElementById('cart-count');
+      listEl.innerHTML = cart.length ? '' : '<li>Your cart is empty</li>';
+      
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.qty;
+        const li = document.createElement('li');
+        li.style.cssText = "display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px";
+        li.innerHTML = `<span>${item.name} (x${item.qty})</span> <span>ZMK ${FMT(item.price * item.qty)}</span>`;
+        listEl.appendChild(li);
+      });
+      
+      totalEl.textContent = `Total: ZMK ${FMT(total)}`;
+      countEl.textContent = cart.reduce((acc, i) => acc + i.qty, 0);
+    }
+
+    function addToCart(id, name, price) {
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.qty++;
+      else cart.push({ id, name, price, qty: 1 });
+      renderCart();
+    }
+
+    function addToCartBtn(btn) {
+      const card = btn.closest('.product-card') || document.querySelector('.modal.show');
+      const id = card.dataset.id;
+      const name = card.dataset.name;
+      const price = safeNumber(card.dataset.price);
+      addToCart(id, name, price);
+      openModal('cartModal');
+    }
+
+    // --- Messaging ---
+    function sendCartViaWhatsApp() {
+      const text = cart.map(i => `${i.name} (x${i.qty})`).join('%0A');
+      window.open(`https://wa.me/260${cartPhoneNumber.substring(1)}?text=New%20Order:%0A${text}`, '_blank');
+    }
+    
+    function sendCartViaSMS() {
+      const text = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+      window.location.href = `sms:${cartPhoneNumber}?body=Order: ${text}`;
+    }
+
+    // --- Modal Control ---
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function openProductModal(card) {
+        const modal = document.getElementById('productModal');
+        modal.dataset.id = card.dataset.id;
+        modal.dataset.name = card.dataset.name;
+        modal.dataset.price = card.dataset.price;
+        
+        document.getElementById('modalProductName').textContent = card.dataset.name;
+        document.getElementById('modalProductPrice').textContent = `ZMW ${FMT(card.dataset.price)}`;
+        document.getElementById('modalProductLocation').textContent = "Luangwa, Zambia";
+        document.getElementById('modalProductDescription').textContent = card.dataset.details;
+        document.getElementById('modalCallLink').href = `tel:${card.dataset.phonenumber}`;
+        
+        // Setup Modal Slider
+        const cardImgs = card.querySelectorAll('.slides img');
+        const modalSlides = document.getElementById('modalSlides');
+        modalSlides.innerHTML = '';
+        modalSlides.style.transform = 'translateX(0)';
+        
+        cardImgs.forEach(img => {
+            const newImg = document.createElement('img');
+            newImg.src = img.src;
+            newImg.addEventListener('click', handleZoom);
+            newImg.addEventListener('dblclick', handleZoom);
+            modalSlides.appendChild(newImg);
+        });
+
+        openModal('productModal');
+        initSliders(); // Re-init for modal
+    }
 
     function toggleBid(btn) {
-        const section = btn.closest('.tappable-content').querySelector('.bid-section');
-        section.style.display = section.style.display === 'flex' ? 'none' : 'flex';
+      const bid = btn.closest('.tappable-content').querySelector('.bid-section');
+      bid.style.display = (bid.style.display === 'flex') ? 'none' : 'flex';
     }
 
     function submitBid(btn, type) {
-        const card = btn.closest('.product-card');
-        const bid = btn.closest('.bid-section').querySelector('input').value;
-        if(!bid) return alert("Enter amount");
-        const msg = `Bid for ${card.dataset.name}: ZMW ${bid}`;
-        const phone = card.dataset.phonenumber;
-        
-        if(type === 'whatsapp') window.open(`https://wa.me/260${phone.substring(1)}?text=${encodeURIComponent(msg)}`);
-        else window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+      const card = btn.closest('.product-card');
+      const val = btn.closest('.bid-section').querySelector('input').value;
+      if(!val) return alert("Enter amount");
+      const msg = `Offer for ${card.dataset.name}: ZMW ${val}`;
+      if(type==='whatsapp') window.open(`https://wa.me/260${card.dataset.phonenumber.substring(1)}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // Initialize
-    window.onload = () => {
-        initSliders();
-        
-        // Card Tap Logic
-        document.querySelectorAll('.product-card').forEach(card => {
-            // Fill descriptions
-            card.querySelector('.desc-text').innerText = card.dataset.details;
-            
-            // Expand card on click (if not clicking buttons/images)
-            card.querySelector('.product-details').onclick = (e) => {
-                if(!e.target.closest('button, a, input')) {
-                    card.classList.toggle('tapped');
-                }
-            };
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+      initSliders();
+
+      // Card Click Logic
+      document.querySelectorAll('.product-card').forEach(card => {
+        // Populate description text
+        const desc = card.querySelector('.product-description');
+        if (desc) desc.textContent = card.dataset.details;
+
+        // Image Zoom for cards
+        card.querySelectorAll('.slides img').forEach(img => {
+            img.addEventListener('click', handleZoom);
+            img.addEventListener('dblclick', handleZoom);
         });
 
-        // Filters
-        document.getElementById('category-filters').onclick = (e) => {
-            if(!e.target.classList.contains('filter-btn')) return;
-            const filter = e.target.dataset.filter;
-            
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-
-            document.querySelectorAll('.product-card').forEach(card => {
-                const cats = card.dataset.category;
-                card.style.display = (filter === 'all' || cats.includes(filter)) ? 'flex' : 'none';
-            });
+        card.onclick = (e) => {
+          if (e.target.closest('button, a, input, .prev, .next')) return;
+          if (card.classList.contains('tapped')) {
+              openProductModal(card);
+          } else {
+              card.classList.add('tapped');
+          }
         };
+      });
 
-        // Search
-        document.getElementById('search-input').oninput = (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.product-card').forEach(card => {
-                const name = card.dataset.name.toLowerCase();
-                card.style.display = name.includes(term) ? 'flex' : 'none';
-            });
-        };
-    };
+      // Filter Logic
+      document.getElementById('category-filters').onclick = (e) => {
+        if(!e.target.classList.contains('filter-btn')) return;
+        const filter = e.target.dataset.filter;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        document.querySelectorAll('.product-card').forEach(c => {
+            c.style.display = (filter === 'all' || c.dataset.category.includes(filter)) ? 'flex' : 'none';
+        });
+      };
+
+      // Search Logic
+      document.getElementById('search-input').oninput = (e) => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(c => {
+          c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+        });
+      };
+
+      // General Modal Close
+      document.querySelectorAll('.modal-close').forEach(b => {
+          b.onclick = () => closeModal(b.closest('.modal').id);
+      });
+      
+      document.getElementById('cart-icon').onclick = () => openModal('cartModal');
+      document.getElementById('cart-clear').onclick = () => { cart = []; renderCart(); };
+      document.getElementById('modalAddToCart').onclick = () => addToCartBtn(document.getElementById('modalAddToCart'));
+    });
   </script>
 </body>
 </html>
