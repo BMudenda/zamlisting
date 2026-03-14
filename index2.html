@@ -1742,12 +1742,31 @@ document.querySelectorAll('.slider').forEach(slider => {
   };
 });
 
-// Zoom Logic
+let lastTap = 0;
+
 document.querySelectorAll('.slides img').forEach(img => {
-  img.onclick = (e) => {
-    e.stopPropagation(); // Don't trigger the card expansion
-    img.classList.toggle('zoomed');
-  };
+
+  img.addEventListener("touchend", function(e){
+
+    const now = new Date().getTime();
+    const tapLength = now - lastTap;
+
+    if(tapLength < 300 && tapLength > 0){
+
+      const slides = img.closest('.slides');
+
+      slides.querySelectorAll('img').forEach(i=>{
+        if(i!==img) i.classList.remove('zoomed');
+      });
+
+      img.classList.toggle('zoomed');
+
+    }
+
+    lastTap = now;
+
+  });
+
 });
 
   </script>
