@@ -1633,6 +1633,24 @@
         e.stopPropagation();
       };
     });
+     document.querySelectorAll('.product-card').forEach(card => {
+  const dateStr = card.dataset.listedDate;
+  if (dateStr) {
+    const date = new Date(dateStr);
+    const formatted = date.toLocaleString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+    card.querySelector('.listing-time').textContent = `Listed: ${formatted}`;
+  }
+
+  const views = card.dataset.views || '0';
+  card.querySelector('.view-counter').textContent = `Views: ${views}`;
+
+  const status = card.dataset.status || 'available';
+  const badge = card.querySelector('.status-badge');
+  badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  badge.className = `status-badge status-${status}`;
+});
 
   </script>
 </body>
