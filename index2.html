@@ -1615,6 +1615,7 @@ On one side of the device, you will find a micro USB charging port while on the 
     const cartPhoneNumber = '0978167546';
     let cart = [];
 
+    // --- Cart & Rendering ---
     function renderCart() {
       const listEl = document.getElementById('cart-items');
       const totalEl = document.getElementById('cart-total');
@@ -1655,6 +1656,7 @@ On one side of the device, you will find a micro USB charging port while on the 
 
     function clearCart() { cart = []; renderCart(); }
 
+    // --- Communications ---
     function sendCartViaSMS() {
       const msg = cart.map(i => `${i.name} x${i.qty}`).join(', ');
       window.location.href = `sms:${cartPhoneNumber}?body=Order: ${msg}`;
@@ -1665,6 +1667,7 @@ On one side of the device, you will find a micro USB charging port while on the 
       window.location.href = `https://wa.me/260${cartPhoneNumber.substring(1)}?text=Order: ${encodeURIComponent(msg)}`;
     }
 
+    // --- Button Actions ---
     function addToCartBtn(btn) {
       const card = btn.closest('.product-card');
       addToCart(card.dataset.id, card.dataset.name, safeNumber(card.dataset.price));
@@ -1685,24 +1688,32 @@ On one side of the device, you will find a micro USB charging port while on the 
       else window.location.href=`https://wa.me/260${card.dataset.phonenumber.substring(1)}?text=${encodeURIComponent(msg)}`;
     }
 
-    // Modal Logic
+    // --- Modal Logic ---
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    document.querySelectorAll('.modal-close').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
+    
+    document.querySelectorAll('.modal-close').forEach(b => {
+      b.onclick = () => closeModal(b.closest('.modal').id);
+    });
+    
     document.getElementById('cart-icon').onclick = () => openModal('cartModal');
     document.getElementById('cart-clear').onclick = clearCart;
 
-    // Filter and Search Logic
+    // --- Filter & Search Logic ---
     const searchInput = document.getElementById('search-input');
-    searchInput.oninput = () => {
-      const q = searchInput.value.toLowerCase();
-      document.querySelectorAll('.product-card').forEach(c => {
-        const text = c.innerText.toLowerCase();
-        c.style.display = text.includes(q) ? 'flex' : 'none';
-      });
-    };
+    if (searchInput) {
+      searchInput.oninput = () => {
+        const q = searchInput.value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(c => {
+          const text = c.innerText.toLowerCase();
+          c.style.display = text.includes(q) ? 'flex' : 'none';
+        });
+      };
+    }
 
-    document.getElementById('category-filters').onclick = (e) => {
+    const filters = document.getElementById('category-filters');
+    if (filters) {
+      filters.onclick = (e) => {
         if(!e.target.classList.contains('filter-btn')) return;
         const filter = e.target.dataset.filter;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1710,46 +1721,67 @@ On one side of the device, you will find a micro USB charging port while on the 
         document.querySelectorAll('.product-card').forEach(c => {
             c.style.display = (filter === 'all' || c.dataset.category.includes(filter)) ? 'flex' : 'none';
         });
-    };
+      };
+    }
 
-    // Card Details Display Logic
+    // --- Card Details Display Logic ---
     document.querySelectorAll('.product-card').forEach(card => {
         const desc = card.querySelector('.product-description');
         if (desc) desc.textContent = card.dataset.details;
+        
         card.onclick = (e) => {
-            if(!e.target.closest('button, a, input')) card.classList.toggle('tapped');
+            // Prevent toggling expansion when clicking UI elements or images
+            if(!e.target.closest('button, a, input, img')) {
+                card.classList.toggle('tapped');
+            }
         };
     });
 
-    // Slider Logic for all product cards
-document.querySelectorAll('.slider').forEach(slider => {
-  const slides = slider.querySelector('.slides');
-  const imgCount = slides.querySelectorAll('img').length;
-  let index = 0;
+    // --- Slider Logic for Product Cards ---
+    document.querySelectorAll('.slider').forEach(slider => {
+      const slides = slider.querySelector('.slides');
+      const imgCount = slides.querySelectorAll('img').length;
+      let index = 0;
 
-  slider.querySelector('.next').onclick = (e) => {
-    e.stopPropagation(); // Prevents card from expanding/closing
-    if (index < imgCount - 1) index++;
-    else index = 0; // Loop back
-    slides.style.transform = `translateX(${-index * 100}%)`;
-  };
+      const nextBtn = slider.querySelector('.next');
+      const prevBtn = slider.querySelector('.prev');
 
-  slider.querySelector('.prev').onclick = (e) => {
-    e.stopPropagation();
-    if (index > 0) index--;
-    else index = imgCount - 1; // Loop to end
-    slides.style.transform = `translateX(${-index * 100}%)`;
-  };
-});
+      if (nextBtn) {
+        nextBtn.onclick = (e) => {
+          e.stopPropagation(); 
+          if (index < imgCount - 1) index++;
+          else index = 0; 
+          slides.style.transform = `translateX(${-index * 100}%)`;
+        };
+      }
 
-// Zoom Logic
-document.querySelectorAll('.slides img').forEach(img => {
-  img.ondblclick = (e) => { // Now triggers only on Double Click
-    e.stopPropagation(); 
-    img.classList.toggle('zoomed');
-  };
-});
+      if (prevBtn) {
+        prevBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (index > 0) index--;
+          else index = imgCount - 1; 
+          slides.style.transform = `translateX(${-index * 100}%)`;
+        };
+      }
+    });
 
-  </script>
+    // --- FIXED: Zoom Logic (Activated on Double Click) ---
+    document.querySelectorAll('.slides img').forEach(img => {
+      img.ondblclick = (e) => { 
+        e.stopPropagation(); // Stops card from expanding/closing on dblclick
+        img.classList.toggle('zoomed');
+      };
+      
+      // Optional: Prevent single click from doing anything to the image
+      img.onclick = (e) => {
+        e.stopPropagation();
+      };
+    });
+
+</script>
+
+            
+
+  
 </body>
 </html>
