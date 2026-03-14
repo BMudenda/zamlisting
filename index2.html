@@ -6,492 +6,307 @@
   <title>ZamListing — Products</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
-
-/* --- Basic page / header --- */
-
-:root{
---green:#006400;
---black:#000;
---red:#ff0000;
---orange:#ff7f00;
---light-blue:#007bff;
---whatsapp-green:#25D366;
---dark-green:#004d00;
---yellow-taxi:#FFD700;
---eshop-blue:#0056b3;
---eshop-dark-blue:#003366;
-}
-
-*{box-sizing:border-box}
-
-body{
-margin:0;
-font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-background:#f4f6f8;
-color:#222;
-display:flex;
-flex-direction:column;
-min-height:100vh
-}
-
-/* HEADER */
-
-header{
-background:var(--eshop-blue);
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:12px 20px;
-position:sticky;
-top:0;
-z-index:30
-}
-
-.header-content{
-display:flex;
-flex-direction:column;
-gap:5px
-}
-
-.logo-and-subtitle{
-display:flex;
-flex-direction:column;
-gap:5px
-}
-
-.logo{
-font-weight:700;
-font-size:20px;
-display:flex;
-gap:6px;
-align-items:center
-}
-
-.logo .z{color:var(--green);background:#fff;padding:2px 6px;border-radius:4px;font-weight:800}
-.logo .a{color:var(--black)}
-.logo .m{color:var(--red)}
-.logo .listing{color:var(--orange)}
-
-.header-subtitle{
-font-size:14px;
-font-weight:400;
-margin:0;
-color:rgba(255,255,255,0.85)
-}
-
-.header-controls{
-display:flex;
-align-items:center;
-gap:16px;
-position:relative
-}
-
-.cart-icon{
-cursor:pointer;
-position:relative;
-font-size:20px;
-user-select:none
-}
-
-.cart-count{
-position:absolute;
-top:-8px;
-right:-10px;
-background:red;
-color:#fff;
-font-size:12px;
-padding:2px 6px;
-border-radius:50%;
-min-width:20px;
-text-align:center
-}
-
-/* --- MODAL --- */
-
-.modal{
-display:none;
-position:fixed;
-z-index:50;
-left:0;
-top:0;
-width:100%;
-height:100%;
-background-color:rgba(0,0,0,.75);
-justify-content:center;
-align-items:center;
-padding:20px
-}
-
-.modal.show{display:flex}
-
-.modal-content{
-background:#fff;
-padding:20px;
-border-radius:10px;
-max-width:900px;
-width:100%;
-box-shadow:0 5px 15px rgba(0,0,0,.3);
-position:relative;
-display:flex;
-flex-direction:column;
-max-height:90vh
-}
-
-.modal-close{
-color:#aaa;
-position:absolute;
-top:10px;
-right:20px;
-font-size:30px;
-font-weight:bold;
-cursor:pointer
-}
-
-.modal-close:hover{color:#000}
-
-.modal-body{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-overflow-y:auto;
-padding-top:20px
-}
-
-/* --- MODAL IMAGE SLIDER --- */
-
-.modal-slider-container{
-position:relative;
-flex:1 1 400px;
-min-height:250px;
-overflow:hidden
-}
-
-.modal-slider{
-position:relative;
-height:100%;
-background:#ddd;
-overflow:hidden
-}
-
-.modal-slides{
-display:flex;
-height:100%;
-transition:transform .45s ease
-}
-
-.modal-slides img{
-width:100%;
-height:100%;
-object-fit:contain;
-flex-shrink:0;
-cursor:zoom-in;
-transition:transform .35s ease;
-transform-origin:center center;
-will-change:transform
-}
-
-.modal-slides img.zoomed{
-transform:scale(2);
-cursor:zoom-out;
-position:relative;
-z-index:5
-}
-
-.modal-slider .prev,
-.modal-slider .next{
-position:absolute;
-top:50%;
-transform:translateY(-50%);
-background:rgba(0,0,0,.45);
-color:#fff;
-border:0;
-padding:6px 10px;
-border-radius:50%;
-cursor:pointer;
-z-index:10
-}
-
-.modal-slider .prev{left:8px}
-.modal-slider .next{right:8px}
-
-/* MODAL DETAILS */
-
-.modal-details{
-flex:1 1 300px;
-display:flex;
-flex-direction:column
-}
-
-.modal-details h4{margin:0;font-size:24px}
-
-.modal-price{
-color:green;
-font-weight:700;
-font-size:20px;
-margin-top:8px
-}
-
-.modal-location{
-color:#666;
-font-size:14px;
-margin-bottom:12px
-}
-
-.modal-description{margin-top:15px}
-
-.modal-description p{margin:0;line-height:1.6}
-
-.modal-controls{
-display:flex;
-gap:10px;
-margin-top:auto;
-padding-top:20px;
-border-top:1px solid #eee
-}
-
-.modal-controls .btn{
-flex:1;
-font-size:16px;
-display:flex;
-align-items:center;
-justify-content:center;
-gap:8px
-}
-
-/* --- CART MODAL --- */
-
-#cartModal .modal-content{max-width:500px;padding:30px}
-#cartModal .modal-body{flex-direction:column;padding:0}
-
-#cartModal h3{
-margin:0 0 15px 0;
-font-size:24px;
-text-align:center
-}
-
-#cartModal .cart-items{
-max-height:300px;
-overflow-y:auto;
-padding:0;
-margin:0;
-list-style:none
-}
-
-#cartModal .cart-items li{
-display:flex;
-justify-content:space-between;
-gap:8px;
-padding:12px 0;
-border-bottom:1px solid #eee;
-align-items:center;
-font-size:16px
-}
-
-#cartModal .cart-items .left{
-display:flex;
-gap:12px;
-align-items:center
-}
-
-#cartModal .cart-items .name{font-weight:600}
-#cartModal .cart-items .meta{font-size:14px;color:#555}
-
-#cartModal .cart-actions{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-top:20px
-}
-
-#cartModal .cart-total{font-weight:700;font-size:18px}
-
-#cartModal .cart-clear{
-background:#ff4d4f;
-color:#fff;
-border:none;
-padding:8px 12px;
-border-radius:6px;
-cursor:pointer
-}
-
-/* --- FILTERS --- */
-
-.filters-search{
-padding:12px 20px;
-background:#e9ecef;
-display:flex;
-flex-direction:column;
-gap:12px;
-border-bottom:1px solid #dee2e6
-}
-
-.filters{display:flex;gap:8px;flex-wrap:wrap}
-
-.filter-btn{
-padding:8px 12px;
-border-radius:20px;
-border:1px solid #ccc;
-background:#fff;
-cursor:pointer;
-font-size:14px;
-transition:.2s
-}
-
-.filter-btn.active{
-background:var(--green);
-color:#fff;
-border-color:var(--green)
-}
-
-/* --- PRODUCTS GRID --- */
-
-main{
-flex:1;
-padding:18px;
-max-width:1100px;
-margin:0 auto;
-width:100%
-}
-
-.products{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-gap:18px
-}
-
-.product-card{
-background:#fff;
-border-radius:10px;
-box-shadow:0 6px 18px rgba(10,10,10,.06);
-overflow:hidden;
-display:flex;
-flex-direction:column;
-cursor:pointer
-}
-
-/* PRODUCT IMAGE SLIDER */
-
-.slider{
-position:relative;
-height:180px;
-overflow:hidden;
-background:#ddd
-}
-
-.slides{
-display:flex;
-height:100%;
-transition:transform .45s ease
-}
-
-.slides img{
-width:100%;
-height:100%;
-object-fit:contain;
-flex-shrink:0;
-cursor:zoom-in;
-transition:transform .3s ease;
-will-change:transform
-}
-
-.slides img.zoomed{
-transform:scale(2);
-z-index:3;
-position:relative
-}
-
-.slider button{
-position:absolute;
-top:50%;
-transform:translateY(-50%);
-background:rgba(0,0,0,.45);
-color:#fff;
-border:0;
-padding:6px 8px;
-border-radius:50%;
-cursor:pointer
-}
-
-.slider .prev{left:8px}
-.slider .next{right:8px}
-
-/* PRODUCT DETAILS */
-
-.product-details{padding:12px}
-
-.product-details h4{
-margin:0 0 6px 0;
-font-size:16px
-}
-
-.price{
-color:green;
-font-weight:700;
-margin-bottom:6px
-}
-
-.location{
-color:#666;
-font-size:13px;
-margin-bottom:8px
-}
-
-.controls{
-display:flex;
-gap:8px;
-margin-top:10px
-}
-
-.btn{
-padding:8px 10px;
-border-radius:8px;
-border:0;
-cursor:pointer;
-font-size:13px;
-display:flex;
-align-items:center;
-justify-content:center;
-gap:5px
-}
-
-.btn-primary{background:#28a745;color:#fff}
-.btn-accent{background:#ff9800;color:#fff}
-.btn-call{background:#007bff;color:#fff}
-
-/* FOOTER */
-
-.footer{
-background:#f4f6f8;
-color:#555;
-padding:20px;
-text-align:center;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:15px;
-margin-top:20px
-}
-
-/* MOBILE */
-
-@media (max-width:768px){
-
-.modal-body{flex-direction:column}
-
-.taxi-promo a{
-flex-direction:column;
-text-align:center
-}
-
-.taxi-promo .taxi-image{
-width:120px;
-height:120px
-}
-
-}
-
-</style>
+    /* --- Basic page / header --- */
+    :root {
+      --green: #006400; /* Zambia green */
+      --black: #000;
+      --red: #ff0000;
+      --orange: #ff7f00;
+      --light-blue: #007bff; /* For SMS/Taxi button */
+      --whatsapp-green: #25D366; /* For WhatsApp button */
+      --dark-green: #004d00;
+      --yellow-taxi: #FFD700;
+      --eshop-blue: #0056b3;
+      --eshop-dark-blue: #003366;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: #f4f6f8;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--eshop-blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .logo-and-subtitle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .logo .z { color: var(--green); background:#fff; padding:2px 6px; border-radius:4px; font-weight:800; }
+    .logo .a { color: var(--black); }
+    .logo .m { color: var(--red); }
+    .logo .listing { color: var(--orange); }
+
+    .header-subtitle {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .header-controls {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      position: relative;
+    }
+
+    .cart-icon {
+      cursor: pointer;
+      position: relative;
+      font-size: 20px;
+      user-select: none;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: red;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      min-width: 20px;
+      text-align: center;
+    }
+    
+    /* --- Modal CSS --- */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.75);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal.show {
+        display: flex;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close:hover { color: #000; }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        padding-top: 20px;
+    }
+    .modal-slider-container {
+      position: relative;
+      flex: 1 1 400px;
+      min-height: 250px;
+      overflow: hidden; /* Prevent zoomed image from leaking out */
+    }
+    .modal-slider {
+      position: relative;
+      height: 100%;
+      background: #ddd;
+    }
+    .modal-slides {
+        display: flex;
+        transition: transform 0.45s ease;
+        height: 100%;
+    }
+    .modal-slides img {
+        width: 100%;
+        object-fit: contain;
+        flex-shrink: 0;
+        height: auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: zoom-in;
+        transform-origin: center center; /* Ensures zoom stays centered */
+    }
+    .modal-slides img.zoomed {
+        transform: scale(2.0); /* Increased scale slightly for better visibility */
+        cursor: zoom-out;
+    }
+    .modal-slider .prev, .modal-slider .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,.45);
+        color: #fff;
+        border: 0;
+        padding: 6px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .modal-slider .prev{ left:8px } .modal-slider .next{ right:8px }
+    .modal-details {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-details h4 { margin: 0; font-size: 24px; }
+    .modal-price { color: green; font-weight: 700; font-size: 20px; margin-top: 8px; }
+    .modal-location { color: #666; font-size: 14px; margin-bottom: 12px; }
+    .modal-description { margin-top: 15px; }
+    .modal-description p { margin: 0; line-height: 1.6; }
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .modal-controls .btn { flex: 1; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .modal-bid-section { display:none; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .modal-bid-section input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%; }
+    .modal-bid-section .bid-btn-social { width: 100%; text-align: center; padding: 10px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    /* --- Cart Modal Specific CSS --- */
+    #cartModal .modal-content { max-width: 500px; padding: 30px; }
+    #cartModal .modal-body { flex-direction: column; padding: 0; }
+    #cartModal h3 { margin: 0 0 15px 0; font-size: 24px; text-align: center; }
+    #cartModal .cart-items { max-height: 300px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+    #cartModal .cart-items li { display:flex; justify-content: space-between; gap:8px; padding: 12px 0; border-bottom: 1px solid #eee; align-items:center; font-size: 16px; }
+    #cartModal .cart-items .left { display:flex; gap:12px; align-items:center; }
+    #cartModal .cart-items .name { font-weight:600; }
+    #cartModal .cart-items .meta { font-size: 14px; color:#555; }
+    #cartModal .cart-actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+    #cartModal .cart-total { font-weight:700; font-size: 18px; }
+    #cartModal .cart-clear { background:#ff4d4f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #cartModal .cart-share { display: flex; gap: 10px; margin-top: 15px; }
+    #cartModal .btn-share { flex: 1; padding: 12px 18px; border-radius: 8px; border: none; color: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
+    #cartModal .btn-sms { background: var(--light-blue); }
+    #cartModal .btn-whatsapp { background: var(--whatsapp-green); }
+
+    /* --- filters and search --- */
+    .filters-search { padding: 12px 20px; background: #e9ecef; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #dee2e6; }
+    .filters-search .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filters-search .filter-btn { padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 14px; transition: all 0.2s ease; }
+    .filters-search .filter-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .filters-search .search-box { display: flex; gap: 8px; }
+    .filters-search .search-box input { flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; }
+
+    /* --- taxi booking section --- */
+    @keyframes float {
+        0% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        50% { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        100% { transform: translateY(0px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    }
+    .taxi-promo {
+      background: linear-gradient(135deg, #4facfe 0%, #1c6ed5 100%);
+      color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+      margin: 25px auto;
+      padding: 25px 35px;
+      max-width: 1000px;
+      transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .taxi-promo:hover { transform: rotateY(2deg) rotateX(1deg) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .taxi-promo a { display: flex; align-items: center; gap: 30px; text-decoration: none; color: inherit; width: 100%; }
+    .taxi-promo .taxi-content h3 { margin: 0 0 10px 0; font-size: 1.8rem; font-weight: 800; color: var(--yellow-taxi); text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+    .taxi-promo .taxi-image { flex-shrink: 0; width: 160px; height: 160px; border-radius: 50%; overflow: hidden; border: 5px solid var(--yellow-taxi); animation: float 4s ease-in-out infinite; }
+    .taxi-promo .taxi-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .btn-taxi { display: inline-block; background: var(--yellow-taxi); color: #1a1a1a; padding: 12px 30px; border-radius: 30px; font-weight: 700; font-size: 1.1rem; text-decoration: none; }
+
+    /* --- products grid --- */
+    main { flex: 1; padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .products { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+    .product-card { background:#fff; border-radius:10px; box-shadow: 0 6px 18px rgba(10,10,10,0.06); overflow:hidden; display:flex; flex-direction:column; cursor: pointer; }
+    .slider { position:relative; height:180px; overflow:hidden; background:#ddd; }
+    .slides { display:flex; transition:transform .45s ease; height:100%; }
+    .slides img { width:100%; height:180px; object-fit:contain; flex-shrink:0; cursor: zoom-in; }
+    .slider button { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.45); color:#fff; border:0; padding:6px 8px; border-radius:50%; cursor:pointer; }
+    .slider .prev{ left:8px } .slider .next{ right:8px }
+    
+    .product-details { padding: 12px; }
+    .product-details h4 { margin:0 0 6px 0; font-size:16px; }
+    .price { color:green; font-weight:700; margin-bottom:6px; }
+    .location { color:#666; font-size:13px; margin-bottom:8px; }
+    
+    .product-details .tappable-content { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; }
+    .product-card.tapped .tappable-content { max-height: 500px; opacity: 1; }
+
+    .controls { display:flex; gap:8px; margin-top:10px; }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-size:13px; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .btn-primary { background:#28a745; color:#fff; }
+    .btn-accent { background:#ff9800; color:#fff; }
+    .btn-call { background: #007bff; color: #fff; }
+    
+    .bid-section { display:none; margin-top:10px; gap:6px; align-items:center; flex-wrap: wrap; }
+    .bid-section input { padding:8px; border-radius:6px; border:1px solid #ccc; width:120px; }
+    .bid-btn-social { padding: 8px 10px; border-radius: 8px; border: 0; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #fff; flex: 1; }
+    .bid-btn-sms { background: var(--light-blue); }
+    .bid-btn-whatsapp { background: var(--whatsapp-green); }
+    
+    .details-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 14px; line-height: 1.5; }
+    .listing-time { font-size: 12px; color: #888; margin-top: 4px; }
+    
+    .footer { background: #f4f6f8; color: #555; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 20px; }
+    .footer-link { margin: 0 10px; text-decoration: none; color: #555; font-weight: bold; }
+    .fa-footer { padding: 10px; font-size: 20px; width: 40px; text-align: center; text-decoration: none; margin: 5px 5px; border-radius: 50%; color: white; }
+    .fa-facebook { background: #3b5998; }
+    .fa-twitter { background: #55acee; }
+    .fa-envelope { background: #dd4b39; }
+    .fa-linkedin { background: #007bb5; }
+    .fa-youtube { background: #bb0000; }
+    .fa-instagram { background: #e4405f; }
+
+    @media (max-width:768px){
+      .modal-body { flex-direction: column; }
+      .taxi-promo a { flex-direction: column; text-align: center; }
+      .taxi-promo .taxi-image { width: 120px; height: 120px; }
+    }
+  </style>
 </head>
 
 <body>
@@ -1800,7 +1615,6 @@ On one side of the device, you will find a micro USB charging port while on the 
     const cartPhoneNumber = '0978167546';
     let cart = [];
 
-    // --- Cart & Rendering ---
     function renderCart() {
       const listEl = document.getElementById('cart-items');
       const totalEl = document.getElementById('cart-total');
@@ -1841,7 +1655,6 @@ On one side of the device, you will find a micro USB charging port while on the 
 
     function clearCart() { cart = []; renderCart(); }
 
-    // --- Communications ---
     function sendCartViaSMS() {
       const msg = cart.map(i => `${i.name} x${i.qty}`).join(', ');
       window.location.href = `sms:${cartPhoneNumber}?body=Order: ${msg}`;
@@ -1852,7 +1665,6 @@ On one side of the device, you will find a micro USB charging port while on the 
       window.location.href = `https://wa.me/260${cartPhoneNumber.substring(1)}?text=Order: ${encodeURIComponent(msg)}`;
     }
 
-    // --- Button Actions ---
     function addToCartBtn(btn) {
       const card = btn.closest('.product-card');
       addToCart(card.dataset.id, card.dataset.name, safeNumber(card.dataset.price));
@@ -1873,32 +1685,24 @@ On one side of the device, you will find a micro USB charging port while on the 
       else window.location.href=`https://wa.me/260${card.dataset.phonenumber.substring(1)}?text=${encodeURIComponent(msg)}`;
     }
 
-    // --- Modal Logic ---
+    // Modal Logic
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    
-    document.querySelectorAll('.modal-close').forEach(b => {
-      b.onclick = () => closeModal(b.closest('.modal').id);
-    });
-    
+    document.querySelectorAll('.modal-close').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
     document.getElementById('cart-icon').onclick = () => openModal('cartModal');
     document.getElementById('cart-clear').onclick = clearCart;
 
-    // --- Filter & Search Logic ---
+    // Filter and Search Logic
     const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-      searchInput.oninput = () => {
-        const q = searchInput.value.toLowerCase();
-        document.querySelectorAll('.product-card').forEach(c => {
-          const text = c.innerText.toLowerCase();
-          c.style.display = text.includes(q) ? 'flex' : 'none';
-        });
-      };
-    }
+    searchInput.oninput = () => {
+      const q = searchInput.value.toLowerCase();
+      document.querySelectorAll('.product-card').forEach(c => {
+        const text = c.innerText.toLowerCase();
+        c.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    };
 
-    const filters = document.getElementById('category-filters');
-    if (filters) {
-      filters.onclick = (e) => {
+    document.getElementById('category-filters').onclick = (e) => {
         if(!e.target.classList.contains('filter-btn')) return;
         const filter = e.target.dataset.filter;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1906,67 +1710,46 @@ On one side of the device, you will find a micro USB charging port while on the 
         document.querySelectorAll('.product-card').forEach(c => {
             c.style.display = (filter === 'all' || c.dataset.category.includes(filter)) ? 'flex' : 'none';
         });
-      };
-    }
+    };
 
-    // --- Card Details Display Logic ---
+    // Card Details Display Logic
     document.querySelectorAll('.product-card').forEach(card => {
         const desc = card.querySelector('.product-description');
         if (desc) desc.textContent = card.dataset.details;
-        
         card.onclick = (e) => {
-            // Prevent toggling expansion when clicking UI elements or images
-            if(!e.target.closest('button, a, input, img')) {
-                card.classList.toggle('tapped');
-            }
+            if(!e.target.closest('button, a, input')) card.classList.toggle('tapped');
         };
     });
 
-    // --- Slider Logic for Product Cards ---
-    document.querySelectorAll('.slider').forEach(slider => {
-      const slides = slider.querySelector('.slides');
-      const imgCount = slides.querySelectorAll('img').length;
-      let index = 0;
+    // Slider Logic for all product cards
+document.querySelectorAll('.slider').forEach(slider => {
+  const slides = slider.querySelector('.slides');
+  const imgCount = slides.querySelectorAll('img').length;
+  let index = 0;
 
-      const nextBtn = slider.querySelector('.next');
-      const prevBtn = slider.querySelector('.prev');
+  slider.querySelector('.next').onclick = (e) => {
+    e.stopPropagation(); // Prevents card from expanding/closing
+    if (index < imgCount - 1) index++;
+    else index = 0; // Loop back
+    slides.style.transform = `translateX(${-index * 100}%)`;
+  };
 
-      if (nextBtn) {
-        nextBtn.onclick = (e) => {
-          e.stopPropagation(); 
-          if (index < imgCount - 1) index++;
-          else index = 0; 
-          slides.style.transform = `translateX(${-index * 100}%)`;
-        };
-      }
+  slider.querySelector('.prev').onclick = (e) => {
+    e.stopPropagation();
+    if (index > 0) index--;
+    else index = imgCount - 1; // Loop to end
+    slides.style.transform = `translateX(${-index * 100}%)`;
+  };
+});
 
-      if (prevBtn) {
-        prevBtn.onclick = (e) => {
-          e.stopPropagation();
-          if (index > 0) index--;
-          else index = imgCount - 1; 
-          slides.style.transform = `translateX(${-index * 100}%)`;
-        };
-      }
-    });
+// Zoom Logic
+document.querySelectorAll('.slides img').forEach(img => {
+  img.onclick = (e) => {
+    e.stopPropagation(); // Don't trigger the card expansion
+    img.classList.toggle('zoomed');
+  };
+});
 
-    // --- FIXED: Zoom Logic (Activated on Double Click) ---
-    document.querySelectorAll('.slides img').forEach(img => {
-      img.ondblclick = (e) => { 
-        e.stopPropagation(); // Stops card from expanding/closing on dblclick
-        img.classList.toggle('zoomed');
-      };
-      
-      // Optional: Prevent single click from doing anything to the image
-      img.onclick = (e) => {
-        e.stopPropagation();
-      };
-    });
-
-</script>
-
-            
-
-  
+  </script>
 </body>
 </html>
