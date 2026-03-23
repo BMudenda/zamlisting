@@ -666,6 +666,7 @@
  
 const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market", "Rufunsa", "Chongwe", "Lusaka", "Nyimba", "Luangwa", "Nyimba", "Petauke", "Chipata", "Katete", "Lundazi"];
 
+// ✅ Build graph from segments
 const graph = {};
 segments.forEach(({ from, to, distance }) => {
   if (!graph[from]) graph[from] = [];
@@ -674,12 +675,16 @@ segments.forEach(({ from, to, distance }) => {
   graph[to].push({ node: from, distance });
 });
 
+// ✅ Distance cache for consistency
+const distanceCache = {};
+
+// ✅ Dijkstra / shortest distance function
 function findShortestDistance(start, end) {
+  const key = start + '|' + end;
+  if (distanceCache[key] !== undefined) return distanceCache[key];
+
   if (start === end) return 0;
   if (!graph[start] || !graph[end]) return null;
-
-  const direct = graph[start].find(n => n.node === end);
-  if (direct) return direct.distance;
 
   const distances = {};
   const unvisited = new Set(Object.keys(graph));
@@ -689,7 +694,6 @@ function findShortestDistance(start, end) {
 
   while (unvisited.size) {
     let current = null;
-
     for (const node of unvisited) {
       if (current === null || distances[node] < distances[current]) {
         current = node;
@@ -697,7 +701,7 @@ function findShortestDistance(start, end) {
     }
 
     if (current === null || distances[current] === Infinity) break;
-    if (current === end) return distances[end];
+    if (current === end) break;
 
     unvisited.delete(current);
 
@@ -709,14 +713,14 @@ function findShortestDistance(start, end) {
     }
   }
 
-  return null;
+  const finalDistance = distances[end] !== Infinity ? distances[end] : null;
+  distanceCache[key] = finalDistance;
+  return finalDistance;
 }
 
-// ✅ FIXED FUNCTION
+// ✅ Total distance calculation (round-trip via nearest hub)
 function calculateTotalDistance(pickup, destination) {
-  if (pickup === destination) {
-    return { total: 0, trip: 0, hub: "N/A" };
-  }
+  if (pickup === destination) return { total: 0, trip: 0, hub: "N/A" };
 
   let nearestHub = null;
   let minTotalDistance = Infinity;
@@ -726,13 +730,8 @@ function calculateTotalDistance(pickup, destination) {
     const tripDistance = findShortestDistance(pickup, destination);
     const destinationToHub = findShortestDistance(destination, hub);
 
-    if (
-      hubToPickup !== null &&
-      tripDistance !== null &&
-      destinationToHub !== null
-    ) {
+    if (hubToPickup !== null && tripDistance !== null && destinationToHub !== null) {
       const total = hubToPickup + tripDistance + destinationToHub;
-
       if (total < minTotalDistance) {
         minTotalDistance = total;
         nearestHub = hub;
@@ -740,9 +739,7 @@ function calculateTotalDistance(pickup, destination) {
     }
   }
 
-  if (!nearestHub) {
-    return { total: null, trip: null, hub: null };
-  }
+  if (!nearestHub) return { total: null, trip: null, hub: null };
 
   const tripDistance = findShortestDistance(pickup, destination);
 
@@ -753,6 +750,7 @@ function calculateTotalDistance(pickup, destination) {
   };
 }
 
+// ✅ Ride and UI setup
 let rideData = null;
 const phoneInput = document.getElementById('customer-phone');
 const tripDiv = document.getElementById('trip-details');
@@ -763,12 +761,11 @@ const btnIcon = document.getElementById('btn-icon');
 const btnLoader = document.getElementById('btn-loader');
 const progressText = document.getElementById('progress-text');
 
-phoneInput.oninput = () => { 
-  if (/^0[0-9]{9}$/.test(phoneInput.value)) { 
-    tripDiv.style.display = 'block'; 
-  }
+phoneInput.oninput = () => {
+  if (/^0[0-9]{9}$/.test(phoneInput.value)) tripDiv.style.display = 'block';
 };
 
+// ✅ Autocomplete setup
 function setupAuto(inputId, containerId, listId) {
   const input = document.getElementById(inputId);
   const container = document.getElementById(containerId);
@@ -786,13 +783,11 @@ function setupAuto(inputId, containerId, listId) {
       const d = document.createElement('div');
       d.className = 'suggestion';
       d.textContent = p;
-
       d.onclick = () => {
         input.value = p;
         list.innerHTML = '';
         checkReady();
       };
-
       list.appendChild(d);
     });
   };
@@ -808,28 +803,28 @@ function setupAuto(inputId, containerId, listId) {
   };
 }
 
+// ✅ Check if ready to calculate
 function checkReady() {
   const from = document.getElementById('gm-origin').value;
   const to = document.getElementById('gm-destination').value;
   const mode = document.querySelector('input[name="mode"]:checked');
 
   if (places.includes(from) && places.includes(to)) {
-    if (!mode) {
-      statusText.textContent = "Select Mode.";
-    } else {
+    if (!mode) statusText.textContent = "Select Mode.";
+    else {
       statusText.textContent = "";
       calculate(from, to, mode.value);
     }
   }
 }
 
+// ✅ Calculate price and display
 function calculate(from, to, mode) {
   document.getElementById('spinner').style.display = 'block';
   summaryDiv.style.display = 'none';
 
   setTimeout(() => {
     document.getElementById('spinner').style.display = 'none';
-
     const res = calculateTotalDistance(from, to);
 
     if (res.total === null) {
@@ -839,10 +834,9 @@ function calculate(from, to, mode) {
 
     summaryDiv.style.display = 'block';
     document.getElementById('hub-tooltip').textContent =
-      "50% Dscount Promo! Price calculated via: " + res.hub;
+      "50% Discount Promo! Price calculated via: " + res.hub;
 
     let rate, minPrice, extra;
-
     if (mode === 'vehicle') {
       rate = config.vehiclePricePerKm;
       minPrice = config.vehicleMinPrice;
@@ -853,7 +847,7 @@ function calculate(from, to, mode) {
       extra = config.motorbikeExtra;
     }
 
-    let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
+    const price = Math.max(minPrice, Math.ceil(res.total * rate + extra));
 
     document.getElementById('summary-cards').innerHTML =
       `<div class="summary-card">
@@ -866,11 +860,8 @@ function calculate(from, to, mode) {
       </div>`;
 
     const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
-
     let formattedPhone = phoneInput.value;
-    if (formattedPhone.startsWith('0')) {
-      formattedPhone = '+260' + formattedPhone.substring(1);
-    }
+    if (formattedPhone.startsWith('0')) formattedPhone = '+260' + formattedPhone.substring(1);
 
     rideData = {
       preferredMode: mode,
@@ -889,13 +880,13 @@ function calculate(from, to, mode) {
     btnIcon.style.display = "block";
     btnLoader.style.display = "none";
     progressText.style.display = "none";
-
     document.getElementById('action-label').textContent = "Request Now";
     submitBtn.onclick = handleRequest;
 
   }, 600);
 }
 
+// ✅ Handle request submission
 async function handleRequest() {
   submitBtn.disabled = true;
   btnIcon.style.display = "none";
@@ -932,7 +923,6 @@ async function handleRequest() {
 
     statusText.textContent = "Sent! You will be contacted or Quickly Call.";
     statusText.style.color = "var(--success-color)";
-
     finishRequestUI("success");
 
   } catch (err) {
@@ -940,17 +930,14 @@ async function handleRequest() {
     clearTimeout(timeoutId);
 
     let message = "Failed to Submit. Please call directly.";
-    if (err.name === 'AbortError') {
-      message = "Request timed out -Network issues. Please call directly.";
-    }
-
+    if (err.name === 'AbortError') message = "Request timed out - Network issues. Please call directly.";
     statusText.textContent = message;
     statusText.style.color = "var(--error-color)";
-
     finishRequestUI("fail");
   }
 }
 
+// ✅ Finish UI after submission
 function finishRequestUI(outcome) {
   btnLoader.style.display = "none";
   progressText.style.display = "none";
@@ -958,14 +945,14 @@ function finishRequestUI(outcome) {
   btnIcon.className = "fas fa-phone";
   submitBtn.style.background = "var(--success-color)";
   submitBtn.disabled = false;
-
   document.getElementById('action-label').textContent = "Call Now";
 
-  submitBtn.onclick = function () {
+  submitBtn.onclick = () => {
     window.location.href = "tel:0978167546";
   };
 }
 
+// ✅ Initialize autocomplete and mode change
 setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
