@@ -460,12 +460,12 @@
     }
 
     const config = {
-      vehiclePricePerKm: 5.00,
-      motorbikePricePerKm: 2.50,
+      vehiclePricePerKm: 4.00,
+      motorbikePricePerKm: 2.00,
       vehicleMinPrice: 20,
       motorbikeMinPrice: 10,
       vehicleExtra: 6.00,      
-      motorbikeExtra: 2.04,    
+      motorbikeExtra: 2.00,    
       avgSpeed: 60
     };
 
@@ -664,183 +664,312 @@
       
     ];
  
-    const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market", "Rufunsa", "Chongwe", "Lusaka", "Nyimba", "Luangwa", "Nyimba", "Petauke", "Chipata", "Katete", "Lundazi"];
-    const graph = {};
-    segments.forEach(({ from, to, distance }) => {
-      if (!graph[from]) graph[from] = [];
-      if (!graph[to]) graph[to] = [];
-      graph[from].push({ node: to, distance });
-      graph[to].push({ node: from, distance });
+const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market", "Rufunsa", "Chongwe", "Lusaka", "Nyimba", "Luangwa", "Nyimba", "Petauke", "Chipata", "Katete", "Lundazi"];
+
+const graph = {};
+segments.forEach(({ from, to, distance }) => {
+  if (!graph[from]) graph[from] = [];
+  if (!graph[to]) graph[to] = [];
+  graph[from].push({ node: to, distance });
+  graph[to].push({ node: from, distance });
+});
+
+function findShortestDistance(start, end) {
+  if (start === end) return 0;
+  if (!graph[start] || !graph[end]) return null;
+
+  const direct = graph[start].find(n => n.node === end);
+  if (direct) return direct.distance;
+
+  const distances = {};
+  const unvisited = new Set(Object.keys(graph));
+
+  for (const node of unvisited) distances[node] = Infinity;
+  distances[start] = 0;
+
+  while (unvisited.size) {
+    let current = null;
+
+    for (const node of unvisited) {
+      if (current === null || distances[node] < distances[current]) {
+        current = node;
+      }
+    }
+
+    if (current === null || distances[current] === Infinity) break;
+    if (current === end) return distances[end];
+
+    unvisited.delete(current);
+
+    for (const neighbor of graph[current]) {
+      const newDist = distances[current] + neighbor.distance;
+      if (newDist < distances[neighbor.node]) {
+        distances[neighbor.node] = newDist;
+      }
+    }
+  }
+
+  return null;
+}
+
+// ✅ FIXED FUNCTION
+function calculateTotalDistance(pickup, destination) {
+  if (pickup === destination) {
+    return { total: 0, trip: 0, hub: "N/A" };
+  }
+
+  let nearestHub = null;
+  let minTotalDistance = Infinity;
+
+  for (const hub of hubs) {
+    const hubToPickup = findShortestDistance(hub, pickup);
+    const tripDistance = findShortestDistance(pickup, destination);
+    const destinationToHub = findShortestDistance(destination, hub);
+
+    if (
+      hubToPickup !== null &&
+      tripDistance !== null &&
+      destinationToHub !== null
+    ) {
+      const total = hubToPickup + tripDistance + destinationToHub;
+
+      if (total < minTotalDistance) {
+        minTotalDistance = total;
+        nearestHub = hub;
+      }
+    }
+  }
+
+  if (!nearestHub) {
+    return { total: null, trip: null, hub: null };
+  }
+
+  const tripDistance = findShortestDistance(pickup, destination);
+
+  return {
+    hub: nearestHub,
+    trip: tripDistance,
+    total: minTotalDistance
+  };
+}
+
+let rideData = null;
+const phoneInput = document.getElementById('customer-phone');
+const tripDiv = document.getElementById('trip-details');
+const summaryDiv = document.getElementById('summary-section');
+const statusText = document.getElementById('status');
+const submitBtn = document.getElementById('submit-btn');
+const btnIcon = document.getElementById('btn-icon');
+const btnLoader = document.getElementById('btn-loader');
+const progressText = document.getElementById('progress-text');
+
+phoneInput.oninput = () => { 
+  if (/^0[0-9]{9}$/.test(phoneInput.value)) { 
+    tripDiv.style.display = 'block'; 
+  }
+};
+
+function setupAuto(inputId, containerId, listId) {
+  const input = document.getElementById(inputId);
+  const container = document.getElementById(containerId);
+  const list = document.getElementById(listId);
+
+  input.oninput = () => {
+    const val = input.value.toLowerCase();
+    list.innerHTML = '';
+    container.classList.remove('field-error');
+    statusText.textContent = "";
+
+    if (!val) return;
+
+    places.filter(p => p.toLowerCase().includes(val)).forEach(p => {
+      const d = document.createElement('div');
+      d.className = 'suggestion';
+      d.textContent = p;
+
+      d.onclick = () => {
+        input.value = p;
+        list.innerHTML = '';
+        checkReady();
+      };
+
+      list.appendChild(d);
     });
+  };
 
-    function findShortestDistance(start, end) {
-      if (start === end) return 0;
-      if (!graph[start] || !graph[end]) return null;
-      const direct = graph[start].find(n => n.node === end);
-      if (direct) return direct.distance;
-      const distances = {};
-      const unvisited = new Set(Object.keys(graph));
-      for (const node of unvisited) { distances[node] = Infinity; }
-      distances[start] = 0;
-      while (unvisited.size) {
-        let current = null;
-        for (const node of unvisited) {
-          if (current === null || distances[node] < distances[current]) { current = node; }
-        }
-        if (current === null || distances[current] === Infinity) break;
-        if (current === end) return distances[end];
-        unvisited.delete(current);
-        for (const neighbor of graph[current]) {
-          const newDist = distances[current] + neighbor.distance;
-          if (newDist < distances[neighbor.node]) { distances[neighbor.node] = newDist; }
-        }
+  input.onblur = () => {
+    setTimeout(() => {
+      if (input.value && !places.includes(input.value)) {
+        container.classList.add('field-error');
+        statusText.textContent = "⚠️ Select from list.";
+        summaryDiv.style.display = 'none';
       }
-      return null;
+    }, 250);
+  };
+}
+
+function checkReady() {
+  const from = document.getElementById('gm-origin').value;
+  const to = document.getElementById('gm-destination').value;
+  const mode = document.querySelector('input[name="mode"]:checked');
+
+  if (places.includes(from) && places.includes(to)) {
+    if (!mode) {
+      statusText.textContent = "Select Mode.";
+    } else {
+      statusText.textContent = "";
+      calculate(from, to, mode.value);
+    }
+  }
+}
+
+function calculate(from, to, mode) {
+  document.getElementById('spinner').style.display = 'block';
+  summaryDiv.style.display = 'none';
+
+  setTimeout(() => {
+    document.getElementById('spinner').style.display = 'none';
+
+    const res = calculateTotalDistance(from, to);
+
+    if (res.total === null) {
+      statusText.textContent = "Route error.";
+      return;
     }
 
-    function calculateTotalDistance(pickup, destination) {
-      if (pickup === destination) { return { total: 0, trip: 0, hub: "N/A" }; }
-      let nearestHub = null;
-      let minDistance = Infinity;
-      for (const hub of hubs) {
-        const d = findShortestDistance(hub, pickup);
-        if (d !== null && d < minDistance) { minDistance = d; nearestHub = hub; }
-      }
-      if (!nearestHub) { return { total: null, trip: null, hub: null }; }
-      const hubToPickup = findShortestDistance(nearestHub, pickup);
-      const tripDistance = findShortestDistance(pickup, destination);
-      const destinationToHub = findShortestDistance(destination, nearestHub);
-      if (hubToPickup === null || tripDistance === null || destinationToHub === null) {
-        return { total: null, trip: null, hub: nearestHub };
-      }
-      return { hub: nearestHub, trip: tripDistance, total: hubToPickup + tripDistance + destinationToHub };
+    summaryDiv.style.display = 'block';
+    document.getElementById('hub-tooltip').textContent =
+      "50% Dscount Promo! Price calculated via: " + res.hub;
+
+    let rate, minPrice, extra;
+
+    if (mode === 'vehicle') {
+      rate = config.vehiclePricePerKm;
+      minPrice = config.vehicleMinPrice;
+      extra = config.vehicleExtra;
+    } else {
+      rate = config.motorbikePricePerKm;
+      minPrice = config.motorbikeMinPrice;
+      extra = config.motorbikeExtra;
     }
 
-    let rideData = null;
-    const phoneInput = document.getElementById('customer-phone');
-    const tripDiv = document.getElementById('trip-details');
-    const summaryDiv = document.getElementById('summary-section');
-    const statusText = document.getElementById('status');
-    const submitBtn = document.getElementById('submit-btn');
-    const btnIcon = document.getElementById('btn-icon');
-    const btnLoader = document.getElementById('btn-loader');
-    const progressText = document.getElementById('progress-text');
+    let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
 
-    phoneInput.oninput = () => { 
-      if (/^0[0-9]{9}$/.test(phoneInput.value)) { tripDiv.style.display = 'block'; }
+    document.getElementById('summary-cards').innerHTML =
+      `<div class="summary-card">
+        <span>Price</span>
+        <span style="color:var(--secondary-color); font-weight:bold;">K${price}</span>
+      </div>
+      <div class="summary-card">
+        <span>Trip Distance</span>
+        <span>${res.trip.toFixed(2)} km</span>
+      </div>`;
+
+    const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
+
+    let formattedPhone = phoneInput.value;
+    if (formattedPhone.startsWith('0')) {
+      formattedPhone = '+260' + formattedPhone.substring(1);
+    }
+
+    rideData = {
+      preferredMode: mode,
+      phone: formattedPhone,
+      hub: res.hub,
+      from,
+      to,
+      tripDistance: res.trip.toFixed(2),
+      totalDistance: res.total.toFixed(2),
+      price: price,
+      estimatedTime: timeVal + " mins"
     };
 
-    function setupAuto(inputId, containerId, listId) {
-      const input = document.getElementById(inputId);
-      const container = document.getElementById(containerId);
-      const list = document.getElementById(listId);
-      input.oninput = () => {
-        const val = input.value.toLowerCase(); list.innerHTML = ''; container.classList.remove('field-error'); statusText.textContent = ""; 
-        if (!val) return;
-        places.filter(p => p.toLowerCase().includes(val)).forEach(p => {
-          const d = document.createElement('div'); d.className = 'suggestion'; d.textContent = p;
-          d.onclick = () => { input.value = p; list.innerHTML = ''; checkReady(); };
-          list.appendChild(d);
-        });
-      };
-      input.onblur = () => { setTimeout(() => { if (input.value && !places.includes(input.value)) { container.classList.add('field-error'); statusText.textContent = "⚠️ Select from list."; summaryDiv.style.display = 'none'; } }, 250); };
+    submitBtn.style.background = "var(--primary-color)";
+    btnIcon.className = "fas fa-paper-plane";
+    btnIcon.style.display = "block";
+    btnLoader.style.display = "none";
+    progressText.style.display = "none";
+
+    document.getElementById('action-label').textContent = "Request Now";
+    submitBtn.onclick = handleRequest;
+
+  }, 600);
+}
+
+async function handleRequest() {
+  submitBtn.disabled = true;
+  btnIcon.style.display = "none";
+  btnLoader.style.display = "block";
+  progressText.style.display = "block";
+
+  statusText.textContent = "";
+  statusText.style.color = "inherit";
+
+  const startTime = Date.now();
+  const duration = 15000;
+
+  const progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    let progress = Math.floor((elapsed / duration) * 98);
+    if (progress > 98) progress = 98;
+    progressText.textContent = progress + "%";
+  }, 100);
+
+  const payload = { ...rideData, timestamp: new Date().toLocaleString() };
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), duration);
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: new URLSearchParams(payload),
+      signal: controller.signal
+    });
+
+    clearInterval(progressInterval);
+    progressText.textContent = "100%";
+    clearTimeout(timeoutId);
+
+    statusText.textContent = "Sent! You will be contacted or Quickly Call.";
+    statusText.style.color = "var(--success-color)";
+
+    finishRequestUI("success");
+
+  } catch (err) {
+    clearInterval(progressInterval);
+    clearTimeout(timeoutId);
+
+    let message = "Failed to Submit. Please call directly.";
+    if (err.name === 'AbortError') {
+      message = "Request timed out -Network issues. Please call directly.";
     }
 
-    function checkReady() {
-      const from = document.getElementById('gm-origin').value; const to = document.getElementById('gm-destination').value;
-      const mode = document.querySelector('input[name="mode"]:checked');
-      if (places.includes(from) && places.includes(to)) {
-        if (!mode) { statusText.textContent = "Select Mode."; }
-        else { statusText.textContent = ""; calculate(from, to, mode.value); }
-      }
-    }
+    statusText.textContent = message;
+    statusText.style.color = "var(--error-color)";
 
-    function calculate(from, to, mode) {
-      document.getElementById('spinner').style.display = 'block'; summaryDiv.style.display = 'none';
-      setTimeout(() => {
-        document.getElementById('spinner').style.display = 'none';
-        const res = calculateTotalDistance(from, to);
-        if (res.total === null) { statusText.textContent = "Route error."; return; }
-        summaryDiv.style.display = 'block';
-        document.getElementById('hub-tooltip').textContent = "50% Dscount Promo! Price calculated via: " + res.hub;
-        let rate, minPrice, extra;
-        if (mode === 'vehicle') { rate = config.vehiclePricePerKm; minPrice = config.vehicleMinPrice; extra = config.vehicleExtra; } 
-        else { rate = config.motorbikePricePerKm; minPrice = config.motorbikeMinPrice; extra = config.motorbikeExtra; }
-        let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-        document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Price</span><span style="color:var(--secondary-color); font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
-        const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
-        let formattedPhone = phoneInput.value;
-        if (formattedPhone.startsWith('0')) { formattedPhone = '+260' + formattedPhone.substring(1); }
-        rideData = { preferredMode: mode, phone: formattedPhone, hub: res.hub, from, to, tripDistance: res.trip.toFixed(2), totalDistance: res.total.toFixed(2), price: price, estimatedTime: timeVal + " mins" };
-        submitBtn.style.background = "var(--primary-color)"; 
-        btnIcon.className = "fas fa-paper-plane"; 
-        btnIcon.style.display = "block"; 
-        btnLoader.style.display = "none"; 
-        progressText.style.display = "none";
-        document.getElementById('action-label').textContent = "Request Now";
-        submitBtn.onclick = handleRequest;
-      }, 600);
-    }
+    finishRequestUI("fail");
+  }
+}
 
-    async function handleRequest() {
-      submitBtn.disabled = true;
-      btnIcon.style.display = "none";
-      btnLoader.style.display = "block";
-      progressText.style.display = "block";
-      statusText.textContent = "";           
-      statusText.style.color = "inherit";    
+function finishRequestUI(outcome) {
+  btnLoader.style.display = "none";
+  progressText.style.display = "none";
+  btnIcon.style.display = "block";
+  btnIcon.className = "fas fa-phone";
+  submitBtn.style.background = "var(--success-color)";
+  submitBtn.disabled = false;
 
-      const startTime = Date.now();
-      const duration = 15000; // 15 seconds
+  document.getElementById('action-label').textContent = "Call Now";
 
-      const progressInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        let progress = Math.floor((elapsed / duration) * 98); // Slow down at 98%
-        if (progress > 98) progress = 98;
-        progressText.textContent = progress + "%";
-      }, 100);
+  submitBtn.onclick = function () {
+    window.location.href = "tel:0978167546";
+  };
+}
 
-      const payload = { ...rideData, timestamp: new Date().toLocaleString() };
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), duration);
+setupAuto('gm-origin', 'origin-container', 'originList');
+setupAuto('gm-destination', 'dest-container', 'destinationList');
+document.getElementById('mode-group').onchange = checkReady;
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: new URLSearchParams(payload),
-          signal: controller.signal
-        });
-        clearInterval(progressInterval);
-        progressText.textContent = "100%";
-        clearTimeout(timeoutId);
-        statusText.textContent = "Sent! You will be contacted or Quickly Call.";
-        statusText.style.color = "var(--success-color)";
-        finishRequestUI("success");
-      } catch (err) {
-        clearInterval(progressInterval);
-        clearTimeout(timeoutId);
-        let message = "Failed to Submit. Please call directly.";
-        if (err.name === 'AbortError') message = "Request timed out -Network issues. Please call directly.";
-        statusText.textContent = message;
-        statusText.style.color = "var(--error-color)";
-        finishRequestUI("fail");
-      }
-    }
-
-    function finishRequestUI(outcome) {
-      btnLoader.style.display = "none";
-      progressText.style.display = "none";
-      btnIcon.style.display = "block";
-      btnIcon.className = "fas fa-phone";
-      submitBtn.style.background = "var(--success-color)";
-      submitBtn.disabled = false;
-      document.getElementById('action-label').textContent = "Call Now";
-      submitBtn.onclick = function() { window.location.href = "tel:0978167546"; };
-    }
-
-    setupAuto('gm-origin', 'origin-container', 'originList');
-    setupAuto('gm-destination', 'dest-container', 'destinationList');
-    document.getElementById('mode-group').onchange = checkReady;
   </script>
 </body>
 </html>
