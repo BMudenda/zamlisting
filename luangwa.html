@@ -1038,50 +1038,40 @@ setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
   </script>
- <script>
-let mapLink = "";
-
+<script>
 function getLocation() {
-  const status = document.getElementById("locationStatus");
+  const icon = document.getElementById("locationIcon");
+  const text = document.getElementById("locationText");
 
   if (navigator.geolocation) {
-    status.innerHTML = "Getting location...";
+    icon.textContent = "...";
+    text.textContent = "Fetching current location";
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         let lat = position.coords.latitude;
         let lon = position.coords.longitude;
 
-        mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-        status.innerHTML = "Location ready ✔";
+        icon.textContent = "✔";
+        text.textContent = "Current location captured";
+
+        document.getElementById("summary-cards").innerHTML += `
+          <div style="font-size:12px;">
+            📍 <a href="${mapLink}" target="_blank">View your location</a>
+          </div>
+        `;
       },
-      (error) => {
-        status.innerHTML = "Failed to get location!";
+      () => {
+        icon.textContent = "✖";
+        text.textContent = "Location access denied";
       }
     );
   } else {
-    status.innerHTML = "Geolocation not supported!";
+    icon.textContent = "⚠";
+    text.textContent = "Geolocation not supported";
   }
-}
-
-function shareWhatsApp() {
-  if (!mapLink) {
-    alert("Please get location first");
-    return;
-  }
-
-  let message = encodeURIComponent("Here is my location: " + mapLink);
-  window.open(`https://wa.me/260978167546?text=${message}`, "_blank");
-}
-
-function shareSMS() {
-  if (!mapLink) {
-    alert("Please get location first");
-    return;
-  }
-
-  window.location.href = `sms:0978167546?body=Here is my location: ${mapLink}`;
 }
 </script>
 </body>
