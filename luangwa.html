@@ -947,7 +947,9 @@ setTimeout(() => {
   totalDistance: res.total.toFixed(2),
   price: price,
   
-  estimatedTime: timeVal + " mins"
+  estimatedTime: timeVal + " mins",
+  mapLink: `Here is my location: https://www.google.com/maps?q=${lat},${lon}`
+
 
 };
     submitBtn.style.background = "var(--primary-color)";
@@ -1008,8 +1010,7 @@ async function handleRequest() {
     clearInterval(progressInterval);
     progressText.textContent = "100%";
     clearTimeout(timeoutId);
-    mapLink: `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
-
+    
     statusText.textContent = "Sent! You will be contacted or Quickly Call.";
     statusText.style.color = "var(--success-color)";
 
@@ -1055,7 +1056,7 @@ document.getElementById('mode-group').onchange = checkReady;
 function getLocation() {
   const status = document.getElementById("locationStatusCard");
 
-  if (!status) return; // prevent errors if not yet created
+  if (!status) return;
 
   if (navigator.geolocation) {
     status.innerHTML = "... Getting current location";
@@ -1065,12 +1066,14 @@ function getLocation() {
         let lat = position.coords.latitude;
         let lon = position.coords.longitude;
 
-        let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        // ✅ FIX: store formatted message
+        let mapLink = `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
 
-        // ✅ Success
+        // 🔥 IMPORTANT: attach to rideData
+        rideData.mapLink = mapLink;
+
         status.innerHTML = `
-          <span style="color:green;">✔</span> Location fetched 
-          
+          <span style="color:green;">✔</span> Location fetched
         `;
       },
       () => {
