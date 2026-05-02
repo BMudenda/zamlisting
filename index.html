@@ -337,6 +337,29 @@
             <i class="fab fa-tiktok"></i>
             <span class="contact-label-text">TikTok</span>
           </a>
+       <div class="menu-divider"></div>
+
+<div class="dropdown-content-section">
+  <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+  <p style="font-size: 0.85rem;">Tap below to send your current location.</p>
+
+  <a href="#" onclick="getLocation()" title="Get Location">
+    <i class="fas fa-location-arrow"></i>
+    <span class="contact-label-text">Get My Location</span>
+  </a>
+
+  <a href="#" onclick="shareWhatsApp()" title="Share via WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+    <span class="contact-label-text">Share via WhatsApp</span>
+  </a>
+
+  <a href="#" onclick="shareSMS()" title="Share via SMS">
+    <i class="fas fa-sms"></i>
+    <span class="contact-label-text">Share via SMS</span>
+  </a>
+
+  <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+</div>
           <p style="margin-top: 15px; text-align: center; font-size: 0.75rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides.</p>
         </div>
       </div>
@@ -1293,6 +1316,52 @@ setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
+  </script>
+  <script>
+let mapLink = "";
+
+function getLocation() {
+  const status = document.getElementById("locationStatus");
+
+  if (navigator.geolocation) {
+    status.innerHTML = "Getting location...";
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
+
+        mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+
+        status.innerHTML = "Location ready ✔";
+      },
+      (error) => {
+        status.innerHTML = "Failed to get location!";
+      }
+    );
+  } else {
+    status.innerHTML = "Geolocation not supported!";
+  }
+}
+
+function shareWhatsApp() {
+  if (!mapLink) {
+    alert("Please get location first");
+    return;
+  }
+
+  let message = encodeURIComponent("Here is my location: " + mapLink);
+  window.open(`https://wa.me/?text=${message}`, "_blank");
+}
+
+function shareSMS() {
+  if (!mapLink) {
+    alert("Please get location first");
+    return;
+  }
+
+  window.location.href = `sms:?body=Here is my location: ${mapLink}`;
+}
   </script>
 </body>
 </html>
