@@ -1055,33 +1055,77 @@ document.getElementById('mode-group').onchange = checkReady;
   </script>
 <script>
 let mapLink = "";
+let statusElement = null;
 
-function fetchLocation(callback) {
-  const status = document.getElementById("locationStatus");
-
+function getLocation() {
+  statusElement = document.getElementById("locationStatus");
+  
   if (!navigator.geolocation) {
-    status.innerHTML = "Geolocation not supported!";
+    if (statusElement) statusElement.innerHTML = "Geolocation not supported!";
     return;
   }
 
-  status.innerHTML = "Getting location...";
+  if (statusElement) statusElement.innerHTML = "Getting location...";
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
-
-      mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-
-      status.innerHTML = "Location ready ✔";
-
-      if (callback) callback();
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      
+      mapLink = `https://www.google.com/maps?q=\( {lat}, \){lon}`;
+      
+      if (statusElement) statusElement.innerHTML = "Location ready ✔";
+      
+      // Optional: Auto-share to WhatsApp after getting location
+      // shareWhatsApp(); // ← Uncomment this line if you want auto-share
     },
-    () => {
-      status.innerHTML = "Failed to get location!";
+    (error) => {
+      let errorMsg = "Failed to get location!";
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          errorMsg = "Location permission denied.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMsg = "Location information unavailable.";
+          break;
+        case error.TIMEOUT:
+          errorMsg = "Location request timed out.";
+          break;
+      }
+      if (statusElement) statusElement.innerHTML = errorMsg;
+    },
+    {
+      enableHighAccuracy: true,   // Better accuracy (uses GPS)
+      timeout: 10000,             // 10 seconds timeout
+      maximumAge: 0               // Don't use cached position
     }
   );
 }
- </script>
+
+// Auto-run when the page loads
+window.onload = function() {
+  getLocation();
+};
+
+// Keep your sharing functions (they still require user interaction)
+function shareWhatsApp() {
+  if (!mapLink) {
+    alert("Location is still loading...");
+    return;
+  }
+
+  const message = encodeURIComponent("Here is my location: " + mapLink);
+  window.open(`https://wa.me/260978167546?text=${message}`, "_blank");
+}
+
+function shareSMS() {
+  if (!mapLink) {
+    alert("Location is still loading...");
+    return;
+  }
+
+  window.location.href = `sms:0978167546?body=Here is my location: ${mapLink}`;
+}
+</script>
 </body>
 </html>
