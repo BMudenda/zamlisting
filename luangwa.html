@@ -1036,12 +1036,12 @@ document.getElementById('mode-group').onchange = checkReady;
   </script>
 <script>
 function getLocation() {
-  const icon = document.getElementById("locationIcon");
-  const text = document.getElementById("locationText");
+  const status = document.getElementById("locationStatusCard");
+
+  if (!status) return; // prevent errors if not yet created
 
   if (navigator.geolocation) {
-    icon.textContent = "...";
-    text.textContent = "Fetching current location";
+    status.innerHTML = "... Getting current location";
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -1050,23 +1050,18 @@ function getLocation() {
 
         let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-        icon.textContent = "✔";
-        text.textContent = "Current location captured";
-
-        document.getElementById("summary-cards").innerHTML += `
-          <div style="font-size:12px;">
-            📍 <a href="${mapLink}" target="_blank">View your location</a>
-          </div>
+        // ✅ Success
+        status.innerHTML = `
+          <span style="color:green;">✔</span> Location fetched 
+          <a href="${mapLink}" target="_blank">View</a>
         `;
       },
       () => {
-        icon.textContent = "✖";
-        text.textContent = "Location access denied";
+        status.innerHTML = "✖ Location access denied";
       }
     );
   } else {
-    icon.textContent = "⚠";
-    text.textContent = "Geolocation not supported";
+    status.innerHTML = "⚠ Geolocation not supported";
   }
 }
 </script>
