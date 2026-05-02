@@ -1054,70 +1054,34 @@ document.getElementById('mode-group').onchange = checkReady;
 
   </script>
 <script>
-let rideData = rideData || {}; // ensure it exists
+let mapLink = "";
 
-function shareWhatsApp() {
+function fetchLocation(callback) {
   const status = document.getElementById("locationStatus");
 
   if (!navigator.geolocation) {
-    status.innerHTML = "⚠ Geolocation not supported";
+    status.innerHTML = "Geolocation not supported!";
     return;
   }
 
-  status.innerHTML = "... Getting current location";
+  status.innerHTML = "Getting location...";
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
       let lat = position.coords.latitude;
       let lon = position.coords.longitude;
 
-      let mapLink = `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
+      mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-      // Save for Google Sheets / later use
-      rideData.mapLink = mapLink;
+      status.innerHTML = "Location ready ✔";
 
-      status.innerHTML = "✔ Opening WhatsApp...";
-
-      window.location.href =
-        `https://wa.me/260978167546?text=${encodeURIComponent(mapLink)}`;
+      if (callback) callback();
     },
     () => {
-      status.innerHTML = "✖ Location access denied";
+      status.innerHTML = "Failed to get location!";
     }
   );
 }
-
-
-function shareSMS() {
-  const status = document.getElementById("locationStatus");
-
-  if (!navigator.geolocation) {
-    status.innerHTML = "⚠ Geolocation not supported";
-    return;
-  }
-
-  status.innerHTML = "... Getting current location";
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
-
-      let mapLink = `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
-
-      // Save for Google Sheets / later use
-      rideData.mapLink = mapLink;
-
-      status.innerHTML = "✔ Opening SMS...";
-
-      window.location.href =
-        `sms:0978167546?body=${encodeURIComponent(mapLink)}`;
-    },
-    () => {
-      status.innerHTML = "✖ Location access denied";
-    }
-  );
-}
-</script>
+ </script>
 </body>
 </html>
