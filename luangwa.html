@@ -1052,36 +1052,69 @@ document.getElementById('mode-group').onchange = checkReady;
 
   </script>
 <script>
-function getLocation() {
-  const status = document.getElementById("locationStatusCard");
+let rideData = rideData || {}; // ensure it exists
 
-  if (!status) return;
+function shareWhatsApp() {
+  const status = document.getElementById("locationStatus");
 
-  if (navigator.geolocation) {
-    status.innerHTML = "... Getting current location";
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        let lat = position.coords.latitude;
-        let lon = position.coords.longitude;
-
-        // ✅ FIX: store formatted message
-        let mapLink = `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
-
-        // 🔥 IMPORTANT: attach to rideData
-        rideData.mapLink = mapLink;
-
-        status.innerHTML = `
-          <span style="color:green;">✔</span> Location fetched
-        `;
-      },
-      () => {
-        status.innerHTML = "✖ Location access denied";
-      }
-    );
-  } else {
+  if (!navigator.geolocation) {
     status.innerHTML = "⚠ Geolocation not supported";
+    return;
   }
+
+  status.innerHTML = "... Getting current location";
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
+
+      let mapLink = `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
+
+      // Save for Google Sheets / later use
+      rideData.mapLink = mapLink;
+
+      status.innerHTML = "✔ Opening WhatsApp...";
+
+      window.location.href =
+        `https://wa.me/260978167546?text=${encodeURIComponent(mapLink)}`;
+    },
+    () => {
+      status.innerHTML = "✖ Location access denied";
+    }
+  );
+}
+
+
+function shareSMS() {
+  const status = document.getElementById("locationStatus");
+
+  if (!navigator.geolocation) {
+    status.innerHTML = "⚠ Geolocation not supported";
+    return;
+  }
+
+  status.innerHTML = "... Getting current location";
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
+
+      let mapLink = `Here is my location: https://www.google.com/maps?q=${lat},${lon}`;
+
+      // Save for Google Sheets / later use
+      rideData.mapLink = mapLink;
+
+      status.innerHTML = "✔ Opening SMS...";
+
+      window.location.href =
+        `sms:0978167546?body=${encodeURIComponent(mapLink)}`;
+    },
+    () => {
+      status.innerHTML = "✖ Location access denied";
+    }
+  );
 }
 </script>
 </body>
