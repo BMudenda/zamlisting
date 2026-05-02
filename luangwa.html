@@ -336,26 +336,24 @@
 
 <div class="dropdown-content-section">
   <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+  <p style="font-size: 0.85rem;"> Please note: Exact pickup or drop-off locations within a 1 km radius of the selected points will not incur any additional charges. Tap below to share your current location .</p>
 
-  <p style="font-size: 0.85rem;">
-    Your current GPS location will be fetched automatically.
-  </p>
+  <a href="#" onclick="getLocation()" title="Get Location">
+    <i class="fas fa-location-arrow"></i>
+    <span class="contact-label-text">Get My Location</span>
+  </a>
 
-  <!-- WhatsApp Share -->
-  <a href="#" onclick="shareWhatsApp(); return false;" title="Share via WhatsApp">
+  <a href="#" onclick="shareWhatsApp()" title="Share via WhatsApp">
     <i class="fab fa-whatsapp"></i>
     <span class="contact-label-text">Share via WhatsApp</span>
   </a>
 
-  <!-- SMS Share -->
-  <a href="#" onclick="shareSMS(); return false;" title="Share via SMS">
+  <a href="#" onclick="shareSMS()" title="Share via SMS">
     <i class="fas fa-sms"></i>
     <span class="contact-label-text">Share via SMS</span>
   </a>
 
-  <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;">
-    Getting location...
-  </p>
+  <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
 </div>
           
           <p style="margin-top: 15px; text-align: center; font-size: 0.75rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides.</p>
@@ -422,21 +420,17 @@
       </div>
 
       <div id="summary-section" class="hidden-section">
-        <fieldset>
-  <legend>
-    <span class="material-icons">receipt_long</span> Trip Summary
-    <span class="tooltip-container">
-      <span class="material-icons tooltip-icon">help_outline</span>
-      <span class="tooltip-text" id="hub-tooltip">
-        Calculated via nearest hub
-      </span>
-    </span>
-  </legend>
-
-  <div id="summary-cards">
-    <!-- Location status will appear here -->
-  </div>
-</fieldset>
+        <<fieldset>
+          <legend>
+            <span class="material-icons">receipt_long</span> Trip Summary
+            <span class="tooltip-container">
+              <span class="material-icons tooltip-icon">help_outline</span>
+              <span class="tooltip-text" id="hub-tooltip"> Calculated via nearest hub</span>
+            </span>
+          </legend>
+          <div id="summary-cards"></div>
+        </fieldset>
+          
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
           <button class="submit-btn" id="submit-btn">
             <i class="fas fa-paper-plane" id="btn-icon"></i>
@@ -807,12 +801,6 @@ function calculateTotalDistance(pickup, destination) {
 }
 
 let rideData = null;
-// ✅ ADD THESE HERE (GLOBAL SCOPE)
-let Lat = null;
-let Lon = null;
-let mapLink = "";
-
-
 const phoneInput = document.getElementById('customer-phone');
 const tripDiv = document.getElementById('trip-details');
 const summaryDiv = document.getElementById('summary-section');
@@ -821,7 +809,6 @@ const submitBtn = document.getElementById('submit-btn');
 const btnIcon = document.getElementById('btn-icon');
 const btnLoader = document.getElementById('btn-loader');
 const progressText = document.getElementById('progress-text');
-
 phoneInput.oninput = () => { 
   if (/^0[0-9]{9}$/.test(phoneInput.value)) { 
     tripDiv.style.display = 'block'; 
@@ -923,16 +910,6 @@ function calculate(from, to, mode) {
         <span>Trip Distance</span>
         <span>${res.trip.toFixed(2)} km</span>
       </div>`;
-    // ✅ ADD this immediately after
-setTimeout(() => {
-  document.getElementById('summary-cards').innerHTML += `
-    <div id="locationStatusCard" style="font-size:12px; margin-top:6px;">
-      ... Getting current location
-    </div>
-  `;
-
-  getLocation(); // 👈 trigger location after summary is shown
-}, 300);
 
     const timeVal = Math.ceil((res.trip / config.avgSpeed) * 60);
 
@@ -940,19 +917,19 @@ setTimeout(() => {
     if (formattedPhone.startsWith('0')) {
       formattedPhone = '+260' + formattedPhone.substring(1);
     }
+
     rideData = {
-  preferredMode: mode,
-  phone: formattedPhone,
-  hub: res.hub,
-  from,
-  to,
-  tripDistance: res.trip.toFixed(2),
-  totalDistance: res.total.toFixed(2),
-  price: price,
-  
-  estimatedTime: timeVal + " mins"
-  
-};
+      preferredMode: mode,
+      phone: formattedPhone,
+      hub: res.hub,
+      from,
+      to,
+      tripDistance: res.trip.toFixed(2),
+      totalDistance: res.total.toFixed(2),
+      price: price,
+      estimatedTime: timeVal + " mins"
+    };
+
     submitBtn.style.background = "var(--primary-color)";
     btnIcon.className = "fas fa-paper-plane";
     btnIcon.style.display = "block";
@@ -1055,72 +1032,44 @@ document.getElementById('mode-group').onchange = checkReady;
   </script>
 <script>
 let mapLink = "";
-let statusElement = null;
 
 function getLocation() {
-  statusElement = document.getElementById("locationStatus");
-  
-  if (!navigator.geolocation) {
-    if (statusElement) statusElement.innerHTML = "Geolocation not supported!";
-    return;
-  }
+  const status = document.getElementById("locationStatus");
 
-  if (statusElement) statusElement.innerHTML = "Getting location...";
+  if (navigator.geolocation) {
+    status.innerHTML = "Getting location...";
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      
-      mapLink = `https://www.google.com/maps?q=\( {lat}, \){lon}`;
-      
-      if (statusElement) statusElement.innerHTML = "Location ready ✔";
-      
-      // Optional: Auto-share to WhatsApp after getting location
-      // shareWhatsApp(); // ← Uncomment this line if you want auto-share
-    },
-    (error) => {
-      let errorMsg = "Failed to get location!";
-      switch(error.code) {
-        case error.PERMISSION_DENIED:
-          errorMsg = "Location permission denied.";
-          break;
-        case error.POSITION_UNAVAILABLE:
-          errorMsg = "Location information unavailable.";
-          break;
-        case error.TIMEOUT:
-          errorMsg = "Location request timed out.";
-          break;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
+
+        mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+
+        status.innerHTML = "Location ready ✔";
+      },
+      (error) => {
+        status.innerHTML = "Failed to get location!";
       }
-      if (statusElement) statusElement.innerHTML = errorMsg;
-    },
-    {
-      enableHighAccuracy: true,   // Better accuracy (uses GPS)
-      timeout: 10000,             // 10 seconds timeout
-      maximumAge: 0               // Don't use cached position
-    }
-  );
+    );
+  } else {
+    status.innerHTML = "Geolocation not supported!";
+  }
 }
 
-// Auto-run when the page loads
-window.onload = function() {
-  getLocation();
-};
-
-// Keep your sharing functions (they still require user interaction)
 function shareWhatsApp() {
   if (!mapLink) {
-    alert("Location is still loading...");
+    alert("Please get location first");
     return;
   }
 
-  const message = encodeURIComponent("Here is my location: " + mapLink);
+  let message = encodeURIComponent("Here is my location: " + mapLink);
   window.open(`https://wa.me/260978167546?text=${message}`, "_blank");
 }
 
 function shareSMS() {
   if (!mapLink) {
-    alert("Location is still loading...");
+    alert("Please get location first");
     return;
   }
 
