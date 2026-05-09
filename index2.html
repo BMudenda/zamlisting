@@ -2,519 +2,939 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZamListing Rides – Luangwa Feira</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="description" content="Find cheap taxis, motorbikes, car rides, and Yango services in Luangwa Feira, Zambia on ZamListing. Interactive map with location markers.">
   
+  <title>Luangwa Feira Rides – Map & Taxi Booking</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  
+  <!-- Leaflet CSS + JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b6ef6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+<link rel="apple-touch-icon" href="lfr.jpg">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Roboto', sans-serif; background: #f5f5f5; color: #333; }
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #ff9900;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --border-color-light: #e0e0e0;
+      --font-color-dark: #333;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+
+   .corner-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-right: 10px;
+  }
+  .company-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+    header {
+      background: var(--primary-color);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
     
-    header { background: #2563eb; color: white; position: sticky; top: 0; z-index: 100; padding: 12px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .header-content { max-width: 500px; margin: auto; display: flex; justify-content: space-between; align-items: center; }
-
-    .booking-container { max-width: 500px; margin: 15px auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 20px; }
-    fieldset { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 16px; background: #fafafa; }
-    legend { font-weight: bold; color: #2563eb; }
-
-    .input-box { display: flex; align-items: center; background: white; border: 1.5px solid #ccc; border-radius: 8px; padding: 10px; position: relative; }
-    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; }
-
-    .autocomplete-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; z-index: 100; border-radius: 0 0 8px 8px; display: none; }
-    .autocomplete-list.show { display: block; }
-    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.2s; }
-    .suggestion:hover { background: #e3f2fd; }
-    .suggestion:last-child { border-bottom: none; }
-
-    .summary-card { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-
-    .submit-btn {
-      background: #2563eb; color: white; width: 70px; height: 70px; border-radius: 50%;
-      font-size: 28px; border: none; display: block; margin: 20px auto; cursor: pointer; position: relative;
-      display: flex; align-items: center; justify-content: center;
+    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+    .company-info h2 {
+      font-size: 1.15rem;
+      line-height: 1.2;
     }
-    .submit-btn:hover { background: #1e53da; }
-    .btn-loader {
-      width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3);
-      border-top: 4px solid white; border-radius: 50%; animation: spin 0.8s linear infinite;
-      position: absolute; display: none;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .dropdown-wrapper {
-      position: relative;
+    .zam {
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffcc00;
+      text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .menu-dropdown-container { 
+      position: relative; 
+      display: inline-block; 
+    }
+
+    .menu-button { 
+      background: none; 
+      border: none; 
+      color: white; 
+      cursor: pointer; 
+      padding: 5px; 
+      outline: none; 
+      font-size: 1.4rem; 
       display: flex;
       align-items: center;
     }
 
-    .dropdown-menu {
-      position: absolute; top: 100%; right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 999; min-width: 300px; display: none; margin-top: 8px; max-height: 500px; overflow-y: auto;
-    }
-    .dropdown-menu.active { display: block; }
-    .dropdown-menu button {
-      width: 100%; padding: 12px 16px; border: none; background: none; text-align: left; cursor: pointer;
-      font-size: 0.95rem; color: #333; border-bottom: 1px solid #eee; transition: background 0.2s;
-    }
-    .dropdown-menu button:hover { background: #f5f5f5; }
-    .dropdown-menu button:last-child { border-bottom: none; }
-    .dropdown-menu i { margin-right: 8px; color: #2563eb; width: 16px; }
-
-    #dropdownMapContainer {
+    .menu-dropdown {
       display: none;
-      border-top: 1px solid #eee;
+      position: absolute;
+      right: 0;
+      top: 42px;
+      background-color: white;
+      width: 360px;
+      max-height: 85vh; 
+      overflow-y: auto;
+      box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
+      z-index: 1000;
+      border-radius: 16px;
+      color: #333;
+      padding: 16px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .menu-dropdown.show { 
+      display: block; 
+    }
+
+    .dropdown-content-section { 
+      margin-bottom: 20px; 
+    }
+
+    .dropdown-content-section h4 { 
+      color: #2563eb; 
+      border-bottom: 1px solid #f0f0f0; 
+      padding-bottom: 8px; 
+      margin-bottom: 12px; 
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .dropdown-content-section p, .dropdown-content-section .map-note { 
+      font-size: 0.85rem; 
+      line-height: 1.5; 
+      margin-bottom: 10px; 
+      color: #4b5563; 
+    }
+
+    .dropdown-content-section a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       padding: 10px;
+      text-decoration: none;
+      color: #1f2937;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      transition: background 0.2s ease;
+    }
+    .dropdown-content-section a:hover { background-color: #f3f4f6; }
+    .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem;}
+
+    /* Map container inside dropdown */
+    .mini-map-container {
+      margin-top: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      transition: all 0.3s ease;
+    }
+    .mini-map-container.collapsed {
+      display: none;
+    }
+    #dropdown-map {
+      height: 260px;
+      width: 100%;
+      background: #e9f0f5;
+    }
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      cursor: pointer;
+    }
+    .map-header h5 {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .toggle-map-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #2563eb;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .toggle-map-btn:hover {
+      background: #e2e8f0;
+    }
+    .map-legend {
+      font-size: 0.7rem;
+      padding: 6px 10px;
+      display: flex;
+      justify-content: space-between;
+      color: #2c5282;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+    }
+    .contact-label-text { display: flex; flex-direction: column; }
+    .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
+
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { 
+      visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; 
+      position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem;
+      pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; }
+    .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
+    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .icon-img { width: 40px; height: 40px; object-fit: contain; }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; }
+    .autocomplete-list { 
+      position: absolute; 
+      top: 100%; 
+      left: 0; 
+      right: 0;
+      background: white; 
+      border: 1px solid #ddd; 
+      z-index: 1000; 
+      max-height: 200px; 
+      overflow-y: auto; 
+      border-radius: 0 0 8px 8px; 
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .suggestion { 
+      padding: 10px; 
+      cursor: pointer; 
+      border-bottom: 1px solid #eee; 
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
+    .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
+    .hidden-section { display: none; }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
+    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
+    @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+    
+    .route-info {
+      font-size: 0.75rem;
+      margin-top: 5px;
+      padding: 6px;
+      background: #f0f9ff;
+      border-radius: 6px;
+      text-align: center;
     }
     
-    #dropdownMapContainer.show {
-      display: block;
+    .location-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
     }
-
-    .map-header {
-      background: #2563eb; color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center;
-      font-weight: bold; font-size: 0.9rem; border-radius: 8px 8px 0 0;
+    .location-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
     }
-
-    .map-close-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; padding: 2px 5px; }
-    .map-close-btn:hover { opacity: 0.8; }
-
-    #dropdownMap { 
-      height: 300px; 
-      width: 100%; 
-      border-radius: 0 0 8px 8px;
-      margin-top: -4px;
+    .location-btn.whatsapp {
+      background: #25D366;
+      color: white;
     }
-
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
-      z-index: 300; display: none; justify-content: center; align-items: center;
+    .location-btn.sms {
+      background: #2563eb;
+      color: white;
     }
-    .modal-overlay.active { display: flex; }
-    .modal-content {
-      background: white; border-radius: 12px; padding: 24px; max-width: 400px; width: 90%;
-      max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    .location-btn.location {
+      background: #6c757d;
+      color: white;
     }
-    .modal-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    .location-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
-    .modal-header h2 { color: #2563eb; font-size: 1.3rem; }
-    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; padding: 5px; }
-    .modal-close:hover { color: #333; }
-    .modal-body {
-      color: #555; line-height: 1.6;
-    }
-    .modal-body h3 {
-      color: #2563eb; margin-top: 16px; margin-bottom: 8px; font-size: 0.95rem;
-    }
-    .modal-body ul {
-      margin-left: 20px; margin-bottom: 8px;
-    }
-    .modal-body li {
-      margin-bottom: 4px;
-    }
-    .modal-body p {
-      margin-bottom: 8px; font-size: 0.9rem;
+    .location-status {
+      font-size: 0.7rem;
+      margin-top: 8px;
+      padding: 6px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      text-align: center;
+      color: #495057;
     }
   </style>
 </head>
 <body>
-
 <header>
   <div class="header-content">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <img src="lfr.jpg" width="36" height="36" alt="Logo">
-      <h2>ZamListing Rides</h2>
+    <div class="company-info">
+      <img src="lfr.jpg" alt="Luangwa Feira Rides Logo" class="corner-logo">
+      <h2><span class="zam">Luangwa Feira Rides</span></h2>
     </div>
-    <div class="dropdown-wrapper">
-      <button id="menuBtn" onclick="toggleDropdown()" style="background:none;border:none;color:white;font-size:1.6rem;cursor:pointer;padding:5px;">
-        <i class="fas fa-ellipsis-v"></i>
-      </button>
-      <div id="dropdownMenu" class="dropdown-menu">
-        <button onclick="toggleDropdownMap();">
-          <i class="fas fa-map"></i> Show / Hide Map
-        </button>
-        <button onclick="openAboutModal(); toggleDropdown();">
-          <i class="fas fa-info-circle"></i> About
-        </button>
-        
-        <!-- Map Container Inside Dropdown -->
-        <div id="dropdownMapContainer">
-          <div class="map-header">
-            <span><i class="fas fa-map"></i> Route Map</span>
-            <button class="map-close-btn" onclick="toggleDropdownMap()"><i class="fas fa-times"></i></button>
+    <div class="menu-dropdown-container">
+      <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu"><i class="fas fa-ellipsis-v"></i></button>
+      <div id="header-menu-dropdown" class="menu-dropdown">
+        <div class="dropdown-content-section">
+          <div class="mini-map-container" id="map-container">
+            <div class="map-header" onclick="toggleMap()">
+              <h5><i class="fas fa-map-marked-alt"></i> Your Route Map</h5>
+              <button class="toggle-map-btn" id="toggleMapBtn">
+                <i class="fas fa-chevron-up" id="mapToggleIcon"></i>
+              </button>
+            </div>
+            <div id="map-wrapper">
+              <div id="dropdown-map"></div>
+              <div class="map-legend">
+                <span><i class="fas fa-map-marker-alt" style="color:#22c55e;"></i> Pickup</span>
+                <span><i class="fas fa-map-marker-alt" style="color:#ef4444;"></i> Destination</span>
+                <span><i class="fas fa-route" style="color:#2563eb;"></i> Route via hub</span>
+              </div>
+            </div>
           </div>
-          <div id="dropdownMap"></div>
+          <div id="map-route-info" class="route-info">📍 Select pickup & destination to see route</div>
         </div>
+        
+        <div class="dropdown-content-section">
+          <h4><i class="fas fa-location-dot"></i> Share My Location</h4>
+          <p style="font-size: 0.8rem; margin-bottom: 8px;">Get your current GPS coordinates and share via WhatsApp or SMS</p>
+          <div class="location-buttons">
+            <button class="location-btn location" onclick="getCurrentLocation()">
+              <i class="fas fa-location-arrow"></i> Get Location
+            </button>
+            <button class="location-btn whatsapp" onclick="shareLocationWhatsApp()">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+            <button class="location-btn sms" onclick="shareLocationSMS()">
+              <i class="fas fa-sms"></i> SMS
+            </button>
+          </div>
+          <div id="locationStatus" class="location-status">
+            <i class="fas fa-info-circle"></i> Tap "Get Location" to share your current position
+          </div>
+        </div>
+        
+        <div class="dropdown-content-section">
+          <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+          <p><strong>📍 Coverage:</strong> Luangwa District and beyond (Rufunsa, Lusaka, Eastern Province).</p>
+          <p><strong>💰 Pricing:</strong> Cheap & fixed rates + 50% Discount Promo! Calculated via nearest hub.</p>
+          <p><strong>🛵 Reliable:</strong> Safe transport: Motorbike / Car with live map assistance.</p>
+        </div>
+        
+        <div class="dropdown-content-section">
+          <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+          <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
+          <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
+          <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+        </div>
+        
+        <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides</p>
       </div>
     </div>
   </div>
+  <div class="subtitle-wrapper"><span class="scroll-subtitle">  🗺️ Toggle map on/off | Share your live location via WhatsApp/SMS | Smart hub routing calculates best price 🏍️🚗  </span></div>
 </header>
 
-<div class="booking-container">
-  <fieldset>
-    <legend>Phone Number</legend>
-    <div class="input-box">
-      <span class="material-icons">phone</span>
-      <input type="tel" id="customer-phone" maxlength="10" placeholder="0xxxxxxxxx">
+<main class="product-container">
+  <div class="booking-container">
+    <fieldset><legend><span class="material-icons">account_circle</span> Phone Number</legend>
+      <div class="input-box"><span class="material-icons">phone</span><input type="tel" id="customer-phone" maxlength="10" placeholder="0xxxxxxxxx (e.g., 0978167546)" inputmode="numeric"></div>
+    </fieldset>
+    <div id="trip-details" class="hidden-section">
+      <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
+        <p style="font-size: 0.8rem; color: #777; margin-bottom:8px;">Choose your ride</p>
+        <div id="mode-group" style="display:flex; justify-content:space-around;">
+          <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
+          <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>📍 Pickup Location</legend>
+        <div class="input-box" id="origin-container">
+          <span class="material-icons">my_location</span>
+          <input type="text" id="gm-origin" placeholder="Start typing place name..." autocomplete="off">
+          <div id="originList" class="autocomplete-list"></div>
+        </div>
+      </fieldset>
+      <fieldset><legend>📍 Destination</legend>
+        <div class="input-box" id="dest-container">
+          <span class="material-icons">pin_drop</span>
+          <input type="text" id="gm-destination" placeholder="Start typing place name..." autocomplete="off">
+          <div id="destinationList" class="autocomplete-list"></div>
+        </div>
+      </fieldset>
     </div>
-  </fieldset>
-
-  <div id="trip-details" style="display:none;">
-    <fieldset>
-      <legend>Transport Mode</legend>
-      <div style="display:flex; justify-content:center; gap:50px; padding:10px;">
-        <label><input type="radio" name="mode" value="motorbike"> Motorbike</label>
-        <label><input type="radio" name="mode" value="vehicle"> Car</label>
+    <div id="summary-section" class="hidden-section">
+      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
+        <div id="summary-cards"></div>
+      </fieldset>
+      <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
+        <button class="submit-btn" id="submit-btn"><i class="fas fa-paper-plane" id="btn-icon"></i><div class="btn-loader" id="btn-loader"></div><span id="progress-text">0%</span></button>
+        <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
       </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Pickup</legend>
-      <div class="input-box" style="position:relative;">
-        <span class="material-icons" style="color: #ccc;">location_on</span>
-        <input type="text" id="gm-origin" placeholder="Pickup location">
-        <div id="originList" class="autocomplete-list"></div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Destination</legend>
-      <div class="input-box" style="position:relative;">
-        <span class="material-icons" style="color: #ccc;">location_on</span>
-        <input type="text" id="gm-destination" placeholder="Destination">
-        <div id="destinationList" class="autocomplete-list"></div>
-      </div>
-    </fieldset>
-  </div>
-
-  <div id="summary-section" style="display:none;">
-    <fieldset>
-      <legend>Trip Summary</legend>
-      <div id="summary-cards"></div>
-    </fieldset>
-    <button class="submit-btn" id="submit-btn">
-      <i class="fas fa-paper-plane" id="btn-icon"></i>
-      <div class="btn-loader" id="btn-loader"></div>
-    </button>
-  </div>
-
-  <p id="status" style="text-align:center; font-weight:bold; margin-top:10px;"></p>
-</div>
-
-<!-- About Modal -->
-<div id="aboutModal" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2><i class="fas fa-info-circle"></i> About ZamListing</h2>
-      <button class="modal-close" onclick="closeAboutModal()"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-body">
-      <p>
-        <strong>ZamListing Rides</strong> is a premium ride-hailing service operating in the Luangwa Feira region, 
-        providing fast, reliable, and affordable transportation solutions for all your travel needs.
-      </p>
-
-      <h3>Our Services</h3>
-      <ul>
-        <li><strong>Motorbike Rides:</strong> Quick and efficient transportation for single passengers</li>
-        <li><strong>Car Transportation:</strong> Comfortable and spacious vehicles for groups and families</li>
-        <li><strong>Offline Map Navigation:</strong> Navigate without internet connection</li>
-        <li><strong>Real-time Distance Calculation:</strong> Get accurate pricing before booking</li>
-      </ul>
-
-      <h3>How It Works</h3>
-      <p>
-        1. Enter your phone number<br>
-        2. Select your preferred transport mode<br>
-        3. Choose your pickup location<br>
-        4. Select your destination<br>
-        5. Review the trip summary and pricing<br>
-        6. Submit your booking request
-      </p>
-
-      <h3>Service Areas</h3>
-      <p>
-        We operate in Luangwa with coverage of major locations including:
-        Luangwa Bus Station, Luangwa Market, Luangwa Feira Rides, 
-        Katondwe Mission Hospital, and Airstrip areas.
-      </p>
-
-      <h3>Contact & Support</h3>
-      <p>
-        For inquiries and support, please contact us through the app or visit our office 
-        at Luangwa Feira Rides.
-      </p>
-
-      <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.85rem;">
-        <strong>Version 1.0.0</strong><br>
-        &copy; 2026 ZamListing Rides. All rights reserved.
-      </p>
-    </div>
+    <div class="calc-loader" id="spinner"></div>
+    <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height: 40px;"></p>
   </div>
-</div>
+</main>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ==================== UPDATE COORDINATES HERE ====================
-const placeData = {
-  "Luangwa Bus Station": { lat: -15.6167, lng: 30.4167 },
-  "Luangwa Market": { lat: -15.6205, lng: 30.4128 },
-  "Luangwa Feira Rides": { lat: -15.6180, lng: 30.4185 },
-  "Katondwe Mission Hospital": { lat: -15.5800, lng: 30.4500 },
-  "Airstrip, Luangwa": { lat: -15.6300, lng: 30.4000 }
-  // ADD MORE PLACES BELOW:
-  // "Your Place Name": { lat: -15.XXXXX, lng: 30.XXXXX },
-};
-
-const places = Object.keys(placeData);
-
-// Rest of calculation logic (unchanged)
-const config = {
-  vehiclePricePerKm: 3.90, motorbikePricePerKm: 1.54,
-  vehicleMinPrice: 25, motorbikeMinPrice: 15,
-  vehicleExtra: 6.00, motorbikeExtra: 3.00
-};
-
-const segments = [ 
-  { from: "Luangwa Bus Station", to: "Luangwa Market", distance: 1.5 },
-  { from: "Luangwa Bus Station", to: "Luangwa Feira Rides", distance: 2.8 },
-  { from: "Luangwa Bus Station", to: "Katondwe Mission Hospital", distance: 48 }
-  // Paste your full segments here
-];
-
-const hubs = ["Luangwa Bus Station", "Luangwa Market"];
-
-const graph = {};
-segments.forEach(s => {
-  if (!graph[s.from]) graph[s.from] = [];
-  if (!graph[s.to]) graph[s.to] = [];
-  const d = parseFloat(s.distance);
-  graph[s.from].push({node: s.to, distance: d});
-  graph[s.to].push({node: s.from, distance: d});
-});
-
-function findShortestDistance(start, end) {
-  if (start === end) return 0;
-  if (!graph[start] || !graph[end]) return null;
-
-  const distances = Object.keys(graph).reduce((a,k)=>{a[k]=Infinity;return a;},{});
-  distances[start] = 0;
-  const unvisited = new Set(Object.keys(graph));
-
-  while (unvisited.size) {
-    let curr = [...unvisited].reduce((a,b) => distances[a] < distances[b] ? a : b);
-    if (distances[curr] === Infinity) break;
-    if (curr === end) return distances[end];
-    unvisited.delete(curr);
-    (graph[curr]||[]).forEach(n => {
-      const alt = distances[curr] + n.distance;
-      if (alt < distances[n.node]) distances[n.node] = alt;
-    });
+  // ----- COMPLETE PLACES LIST (with coordinates for map markers) -----
+  const placesWithCoords = [
+    { name: "Luangwa Bus Station", lat: -15.6167, lng: 30.4167 },
+    { name: "Airstrip, Luangwa", lat: -15.6100, lng: 30.4100 },
+    { name: "Anglican Church, Luangwa", lat: -15.6180, lng: 30.4180 },
+    { name: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", lat: -15.6400, lng: 30.3800 },
+    { name: "BM Residence, Luangwa", lat: -15.6120, lng: 30.4050 },
+    { name: "Boma Clinic, Luangwa", lat: -15.6175, lng: 30.4200 },
+    { name: "Boma Filling Station, Luangwa", lat: -15.6160, lng: 30.4190 },
+    { name: "Car Wash Pub, Luangwa", lat: -15.6200, lng: 30.4080 },
+    { name: "Chidada Community, Luangwa", lat: -15.6250, lng: 30.4000 },
+    { name: "Chitope, Luangwa", lat: -15.8500, lng: 30.0500 },
+    { name: "Chongwe", lat: -15.3600, lng: 28.6900 },
+    { name: "Feira Day Secondary School, Luangwa", lat: -15.6140, lng: 30.3950 },
+    { name: "JB Three Boarders Mall, Luangwa", lat: -15.6160, lng: 30.4170 },
+    { name: "Kakaro Liberation Heritage Site, Luangwa", lat: -15.5800, lng: 30.4500 },
+    { name: "Kapoche, Luangwa", lat: -15.5000, lng: 30.5500 },
+    { name: "Katondwe Mission Hospital, Luangwa", lat: -15.7250, lng: 30.2600 },
+    { name: "Luangwa Bridge Market", lat: -15.3000, lng: 30.7500 },
+    { name: "Luangwa District Hospital", lat: -15.6300, lng: 30.4000 },
+    { name: "Luangwa Town Council", lat: -15.6185, lng: 30.4120 },
+    { name: "Lusaka", lat: -15.3875, lng: 28.3228 },
+    { name: "Nyimba", lat: -14.5560, lng: 30.8170 },
+    { name: "Petauke", lat: -14.2400, lng: 31.3200 },
+    { name: "Chipata", lat: -13.6333, lng: 32.6500 },
+    { name: "Katete", lat: -14.2667, lng: 31.9500 },
+    { name: "Lundazi", lat: -12.3000, lng: 33.2000 },
+    { name: "Rufunsa", lat: -15.2500, lng: 30.3000 },
+    { name: "Soweto Junction, Luangwa", lat: -15.6220, lng: 30.4080 },
+    { name: "Yangoma Lodge, Luangwa", lat: -15.6190, lng: 30.4150 },
+    { name: "Luangwa Police Station", lat: -15.6178, lng: 30.4130 },
+    { name: "Luangwa Market", lat: -15.6165, lng: 30.4175 }
+  ];
+  
+  const allPlaceNames = placesWithCoords.map(p => p.name);
+  const legacyPlaces = [
+    "Chilombwe Community School, Luangwa", "Chiriwe Primary School, Luangwa", "Chitope Rural Health Centre, Luangwa",
+    "District Commissioner, Luangwa", "District Education Board Secretary, Luangwa", "Dzalo Skills Training Centre Kambolozo, Luangwa",
+    "Feira Day Community, Luangwa", "Feira Gardens, Luangwa", "Feira Kingdom Hall, Luangwa", "Gerasmos Safari Lodge, Luangwa",
+    "Hill View Pub, Luangwa", "Indeco Building, Luangwa", "Indeco Community, Luangwa", "JB Three Boarders Club, Luangwa",
+    "Justifeli Lodge, Luangwa", "Kakaro Primary School, Luangwa", "Kambolozo Community, Luangwa", "Kamoba Community, Luangwa",
+    "Kantuleni Executive Lodge, Luangwa", "Kasinsa, Luangwa", "Katondwe Chaz Hotel, Luangwa", "Katondwe Dam, Luangwa",
+    "Katondwe Girls Secondary School, Luangwa", "Katondwe Primary School, Luangwa", "Kaunga Secondary School, Luangwa",
+    "Kavalamanja, Luangwa", "Luangwa (Feira)", "Luangwa Basic School", "Luangwa Bridge", "Luangwa Council Lodge",
+    "Luangwa Harbour", "Luangwa High School Police Post", "Luangwa Immigration Border Post, Luangwa", "Luangwa Main SDA Church",
+    "Luangwa Post Office", "Luangwa Secondary School", "Makichilo Lodge, Luangwa", "Mandombe Community, Luangwa",
+    "Mwalila Primary School, Luangwa", "Mwavi Secondary School, Luangwa", "National Registration Office, Luangwa",
+    "Nyabota Lodge, Luangwa", "Passover Living Lamb Ministry, Luangwa", "Pentecostal Assembly of God Joshua Assembly, Luangwa",
+    "River Spot Club, Luangwa", "SDA Katondwe, Luangwa", "Soweto Community, Luangwa", "UCZ Feira, Luangwa",
+    "Yellow Shop, Luangwa", "Zambia Electricity Supply Corporation, Luangwa", "Zambia Revenue Authority – Luangwa Customs Services, Luangwa",
+    "ZICB Luangwa Branch, Luangwa", "Luangwa Feira Rides, Luangwa"
+  ];
+  
+  const MASTER_PLACES_LIST = [...new Set([...allPlaceNames, ...legacyPlaces])];
+  
+  function getCoordinates(placeName) {
+    const found = placesWithCoords.find(p => p.name === placeName);
+    if (found) return { lat: found.lat, lng: found.lng };
+    return { lat: -15.6167, lng: 30.4167 };
   }
-  return null;
-}
-
-function calculateTotalDistance(pickup, destination) {
-  let minTotal = Infinity, tripDist = null;
-  for (let hub of hubs) {
-    const d1 = findShortestDistance(hub, pickup);
-    const trip = findShortestDistance(pickup, destination);
-    const d2 = findShortestDistance(destination, hub);
-    if (d1 !== null && trip !== null && d2 !== null) {
-      const total = d1 + trip + d2;
-      if (total < minTotal) {
-        minTotal = total;
-        tripDist = trip;
+  
+  // Graph & distance engine
+  const segments = [
+    { from: "Luangwa Bus Station", to: "Airstrip, Luangwa", distance: 3.9 },
+    { from: "Luangwa Bus Station", to: "Boma Clinic, Luangwa", distance: 0.75 },
+    { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62.0 },
+    { from: "Luangwa Bus Station", to: "Luangwa Bridge Market", distance: 89.0 },
+    { from: "Luangwa Bus Station", to: "Rufunsa", distance: 102.7 },
+    { from: "Rufunsa", to: "Chongwe", distance: 90.0 },
+    { from: "Chongwe", to: "Lusaka", distance: 45.0 },
+    { from: "Lusaka", to: "Nyimba", distance: 288.0 },
+    { from: "Nyimba", to: "Petauke", distance: 65.0 },
+    { from: "Petauke", to: "Chipata", distance: 158.0 },
+    { from: "Chipata", to: "Katete", distance: 82.0 },
+    { from: "Chipata", to: "Lundazi", distance: 159.0 },
+    { from: "Luangwa Bus Station", to: "Feira Day Secondary School, Luangwa", distance: 3.6 },
+    { from: "Feira Day Secondary School, Luangwa", to: "Soweto Junction, Luangwa", distance: 2.2 },
+    { from: "Soweto Junction, Luangwa", to: "Luangwa District Hospital", distance: 2.5 },
+    { from: "Katondwe Mission Hospital, Luangwa", to: "Luangwa Bus Station", distance: 53.0 },
+    { from: "Kakaro Liberation Heritage Site, Luangwa", to: "Luangwa Bus Station", distance: 11.0 },
+    { from: "Kapoche, Luangwa", to: "Luangwa Bus Station", distance: 27.0 },
+    { from: "Luangwa Bus Station", to: "JB Three Boarders Mall, Luangwa", distance: 0.14 },
+    { from: "Luangwa Town Council", to: "Luangwa Bus Station", distance: 2.0 }
+  ];
+  
+  const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market", "Rufunsa", "Chongwe", "Lusaka", "Nyimba", "Petauke", "Chipata"];
+  
+  const graph = {};
+  segments.forEach(({ from, to, distance }) => {
+    if (!graph[from]) graph[from] = [];
+    if (!graph[to]) graph[to] = [];
+    graph[from].push({ node: to, distance });
+    graph[to].push({ node: from, distance });
+  });
+  
+  function findShortestDistance(start, end) {
+    if (start === end) return 0;
+    if (!graph[start] || !graph[end]) return null;
+    const direct = graph[start].find(n => n.node === end);
+    if (direct) return direct.distance;
+    const distances = {};
+    const unvisited = new Set(Object.keys(graph));
+    for (let node of unvisited) distances[node] = Infinity;
+    distances[start] = 0;
+    while (unvisited.size) {
+      let current = null;
+      for (let node of unvisited) {
+        if (current === null || distances[node] < distances[current]) current = node;
+      }
+      if (!current || distances[current] === Infinity) break;
+      if (current === end) return distances[end];
+      unvisited.delete(current);
+      for (let neighbor of graph[current]) {
+        let newDist = distances[current] + neighbor.distance;
+        if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
       }
     }
+    return null;
   }
-  return { total: minTotal, trip: tripDist };
-}
-
-// Dropdown Map
-let dropdownMap = null;
-
-function toggleDropdownMap() {
-  const container = document.getElementById("dropdownMapContainer");
-  container.classList.toggle('show');
-
-  if (container.classList.contains('show') && !dropdownMap) {
-    setTimeout(() => {
-      dropdownMap = L.map('dropdownMap').setView([-15.6167, 30.4167], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(dropdownMap);
-      updateDropdownMap();
-    }, 100);
-  }
-  if (dropdownMap) setTimeout(() => dropdownMap.invalidateSize(), 300);
-}
-
-function updateDropdownMap() {
-  if (!dropdownMap) return;
-
-  dropdownMap.eachLayer(layer => {
-    if (layer instanceof L.Marker || layer instanceof L.Polyline) dropdownMap.removeLayer(layer);
-  });
-
-  const pickupName = document.getElementById('gm-origin').value.trim();
-  const destName = document.getElementById('gm-destination').value.trim();
-
-  let pPos = null, dPos = null;
-
-  if (pickupName && placeData[pickupName]) {
-    pPos = [placeData[pickupName].lat, placeData[pickupName].lng];
-    L.marker(pPos, { title: 'Pickup' }).addTo(dropdownMap).bindPopup(`<b>Pickup:</b><br>${pickupName}`);
-  }
-  if (destName && placeData[destName]) {
-    dPos = [placeData[destName].lat, placeData[destName].lng];
-    L.marker(dPos, { title: 'Destination' }).addTo(dropdownMap).bindPopup(`<b>Destination:</b><br>${destName}`);
-  }
-
-  if (pPos && dPos) {
-    L.polyline([pPos, dPos], { color: '#2563eb', weight: 6, opacity: 0.9 }).addTo(dropdownMap);
-    dropdownMap.fitBounds([pPos, dPos], { padding: [50, 50] });
-  }
-}
-
-// Autocomplete, Calculation, etc.
-function setupAuto(inputId, listId) {
-  const input = document.getElementById(inputId);
-  const list = document.getElementById(listId);
-  input.oninput = () => {
-    const val = input.value.toLowerCase();
-    list.innerHTML = '';
-    if (!val) {
-      list.classList.remove('show');
-      return;
+  
+  function calculateTotalDistance(pickup, dest) {
+    if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
+    let nearestHub = null, minTotal = Infinity;
+    for (let hub of hubs) {
+      let hubToPickup = findShortestDistance(hub, pickup);
+      let tripDist = findShortestDistance(pickup, dest);
+      let destToHub = findShortestDistance(dest, hub);
+      if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
+        let total = hubToPickup + tripDist + destToHub;
+        if (total < minTotal) {
+          minTotal = total;
+          nearestHub = hub;
+        }
+      }
     }
-    
-    const filtered = places.filter(p => p.toLowerCase().includes(val));
-    if (filtered.length === 0) {
-      list.classList.remove('show');
-      return;
-    }
-    
-    filtered.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'suggestion';
-      div.textContent = p;
-      div.onclick = () => {
-        input.value = p;
-        list.innerHTML = '';
-        list.classList.remove('show');
-        checkReady();
-        updateDropdownMap();
-      };
-      list.appendChild(div);
-    });
-    list.classList.add('show');
+    if (!nearestHub) return { total: null, trip: null, hub: null };
+    return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
+  }
+  
+  const config = {
+    vehiclePricePerKm: 3.90,
+    motorbikePricePerKm: 1.54,
+    vehicleMinPrice: 25,
+    motorbikeMinPrice: 15,
+    vehicleExtra: 6.00,
+    motorbikeExtra: 3.00,
+    avgSpeed: 60
   };
   
-  input.addEventListener('blur', () => {
-    setTimeout(() => list.classList.remove('show'), 150);
-  });
+  let rideData = null;
+  let currentPickup = "";
+  let currentDestination = "";
+  let currentUserLocation = null;
   
-  input.addEventListener('focus', () => {
-    if (list.children.length > 0) list.classList.add('show');
-  });
-}
-
-function checkReady() {
-  const from = document.getElementById('gm-origin').value;
-  const to = document.getElementById('gm-destination').value;
-  const mode = document.querySelector('input[name="mode"]:checked');
-  if (from && to && mode) calculate(from, to, mode.value);
-}
-
-function calculate(from, to, mode) {
-  const res = calculateTotalDistance(from, to);
-  if (res.total === Infinity) {
-    document.getElementById('status').textContent = "Route not found";
-    return;
-  }
-
-  const isVehicle = mode === 'vehicle';
-  const rate = isVehicle ? config.vehiclePricePerKm : config.motorbikePricePerKm;
-  const minP = isVehicle ? config.vehicleMinPrice : config.motorbikeMinPrice;
-  const extra = isVehicle ? config.vehicleExtra : config.motorbikeExtra;
-  const price = Math.max(minP, Math.ceil(res.total * rate + extra));
-
-  document.getElementById('summary-cards').innerHTML = `
-    <div class="summary-card"><strong>Price:</strong> <span style="color:#ff9900">K${price}</span></div>
-    <div class="summary-card"><strong>Distance:</strong> ${res.trip ? res.trip.toFixed(2) : 'N/A'} km</div>
-  `;
-  document.getElementById('summary-section').style.display = 'block';
-  document.getElementById('status').textContent = '';
-}
-
-// Submit Loader
-document.getElementById('submit-btn').addEventListener('click', function() {
-  const btn = this;
-  const icon = document.getElementById('btn-icon');
-  const loader = document.getElementById('btn-loader');
-  const status = document.getElementById('status');
-
-  icon.style.display = 'none';
-  loader.style.display = 'block';
-  btn.disabled = true;
-  status.textContent = "Submitting...";
-
-  setTimeout(() => {
-    status.innerHTML = `<span style="color:green">✓ Request Sent Successfully!</span>`;
-    loader.style.display = 'none';
-    icon.style.display = 'block';
-    btn.disabled = false;
-  }, 2000);
-});
-
-// Initialize
-setupAuto('gm-origin', 'originList');
-setupAuto('gm-destination', 'destinationList');
-
-document.getElementById('customer-phone').addEventListener('input', function() {
-  if (this.value.length >= 9) document.getElementById('trip-details').style.display = 'block';
-});
-
-document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener('change', checkReady));
-
-document.getElementById('gm-origin').addEventListener('change', updateDropdownMap);
-document.getElementById('gm-destination').addEventListener('change', updateDropdownMap);
-
-// Dropdown Menu Toggle
-function toggleDropdown() {
-  const menu = document.getElementById('dropdownMenu');
-  menu.classList.toggle('active');
-}
-
-// Modal Functions
-function openAboutModal() {
-  document.getElementById('aboutModal').classList.add('active');
-}
-
-function closeAboutModal() {
-  document.getElementById('aboutModal').classList.remove('active');
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', function(e) {
-  const modal = document.getElementById('aboutModal');
-  if (e.target === modal) {
-    closeAboutModal();
-  }
-});
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-  const dropdownWrapper = document.querySelector('.dropdown-wrapper');
-  const menu = document.getElementById('dropdownMenu');
+  const phoneInput = document.getElementById('customer-phone');
+  const tripDiv = document.getElementById('trip-details');
+  const summaryDiv = document.getElementById('summary-section');
+  const statusText = document.getElementById('status');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnIcon = document.getElementById('btn-icon');
+  const btnLoader = document.getElementById('btn-loader');
+  const progressTextSpan = document.getElementById('progress-text');
   
-  if (dropdownWrapper && !dropdownWrapper.contains(e.target)) {
-    menu.classList.remove('active');
+  phoneInput.oninput = () => {
+    if (/^0[0-9]{9}$/.test(phoneInput.value)) {
+      tripDiv.style.display = 'block';
+    } else {
+      tripDiv.style.display = 'none';
+      summaryDiv.style.display = 'none';
+    }
+  };
+  
+  function setupAuto(inputId, containerId, listId) {
+    const input = document.getElementById(inputId);
+    const container = document.getElementById(containerId);
+    const list = document.getElementById(listId);
+    
+    input.oninput = () => {
+      const val = input.value.toLowerCase().trim();
+      list.innerHTML = '';
+      container.classList.remove('field-error');
+      if (!val || val.length < 1) return;
+      const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 8);
+      matches.forEach(place => {
+        const div = document.createElement('div');
+        div.className = 'suggestion';
+        div.textContent = place;
+        div.onclick = () => {
+          input.value = place;
+          list.innerHTML = '';
+          checkReady();
+        };
+        list.appendChild(div);
+      });
+    };
+    input.onblur = () => {
+      setTimeout(() => {
+        if (input.value && !MASTER_PLACES_LIST.includes(input.value)) {
+          container.classList.add('field-error');
+          statusText.textContent = "⚠️ Please select a location from the suggestions.";
+          summaryDiv.style.display = 'none';
+        } else if (input.value && MASTER_PLACES_LIST.includes(input.value)) {
+          container.classList.remove('field-error');
+        }
+      }, 200);
+    };
   }
-});
+  
+  function checkReady() {
+    const from = document.getElementById('gm-origin').value;
+    const to = document.getElementById('gm-destination').value;
+    const mode = document.querySelector('input[name="mode"]:checked');
+    
+    if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
+      if (!mode) {
+        statusText.textContent = "⚠️ Please select a transport mode.";
+        summaryDiv.style.display = 'none';
+      } else {
+        statusText.textContent = "";
+        currentPickup = from;
+        currentDestination = to;
+        calculate(from, to, mode.value);
+        updateMapWithRoute(from, to);
+      }
+    } else {
+      statusText.textContent = "";
+      summaryDiv.style.display = 'none';
+    }
+  }
+  
+  function calculate(from, to, mode) {
+    document.getElementById('spinner').style.display = 'block';
+    summaryDiv.style.display = 'none';
+    
+    setTimeout(() => {
+      document.getElementById('spinner').style.display = 'none';
+      const res = calculateTotalDistance(from, to);
+      
+      if (res.total === null) {
+        statusText.textContent = "❌ Route not available. Please try different locations.";
+        return;
+      }
+      
+      summaryDiv.style.display = 'block';
+      document.getElementById('hub-tooltip').textContent = `✨ 50% Discount! Route via: ${res.hub} (${res.total.toFixed(2)} km)`;
+      
+      let rate = mode === 'vehicle' ? config.vehiclePricePerKm : config.motorbikePricePerKm;
+      let minPrice = mode === 'vehicle' ? config.vehicleMinPrice : config.motorbikeMinPrice;
+      let extra = mode === 'vehicle' ? config.vehicleExtra : config.motorbikeExtra;
+      let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
+      
+      document.getElementById('summary-cards').innerHTML = `
+        <div class="summary-card"><span>💰 Total Price (50% off)</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
+        <div class="summary-card"><span>📏 Direct Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
+        <div class="summary-card"><span>🔄 Via ${res.hub}</span><span>${res.total.toFixed(2)} km</span></div>
+        <div class="summary-card"><span>⏱️ Est. Time</span><span>${Math.ceil((res.trip / config.avgSpeed) * 60)} mins</span></div>
+      `;
+      
+      let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
+      rideData = {
+        preferredMode: mode,
+        phone: formattedPhone,
+        hub: res.hub,
+        from: from,
+        to: to,
+        tripDistance: res.trip.toFixed(2),
+        totalDistance: res.total.toFixed(2),
+        price: price,
+        estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
+      };
+      
+      submitBtn.style.background = "var(--primary-color)";
+      btnIcon.className = "fas fa-paper-plane";
+      btnIcon.style.display = "block";
+      btnLoader.style.display = "none";
+      progressTextSpan.style.display = "none";
+      document.getElementById('action-label').innerHTML = `Request Now <span style="color:#ff4444; font-size:0.75rem;">(50% disc)</span>`;
+      submitBtn.onclick = handleRequest;
+    }, 500);
+  }
+  
+  async function handleRequest() {
+    submitBtn.disabled = true;
+    btnIcon.style.display = "none";
+    btnLoader.style.display = "block";
+    progressTextSpan.style.display = "block";
+    
+    const startTime = Date.now();
+    const duration = 13000;
+    const interval = setInterval(() => {
+      let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
+      progressTextSpan.textContent = p + "%";
+    }, 100);
+    
+    const payload = { ...rideData, timestamp: new Date().toISOString() };
+    
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
+        method: 'POST',
+        body: new URLSearchParams(payload),
+        mode: 'no-cors'
+      });
+      clearInterval(interval);
+      progressTextSpan.textContent = "100%";
+      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly.";
+      statusText.style.color = "green";
+      finishRequestUI();
+    } catch(e) {
+      clearInterval(interval);
+      statusText.innerHTML = "⚠️ Network issue. Please call: 0978167546";
+      statusText.style.color = "red";
+      finishRequestUI();
+    }
+  }
+  
+  function finishRequestUI() {
+    btnLoader.style.display = "none";
+    progressTextSpan.style.display = "none";
+    btnIcon.style.display = "block";
+    btnIcon.className = "fas fa-phone";
+    submitBtn.style.background = "var(--success-color)";
+    submitBtn.disabled = false;
+    document.getElementById('action-label').innerHTML = "📞 Call Now";
+    submitBtn.onclick = () => window.location.href = "tel:0978167546";
+  }
+  
+  setupAuto('gm-origin', 'origin-container', 'originList');
+  setupAuto('gm-destination', 'dest-container', 'destinationList');
+  document.getElementById('mode-group').onchange = checkReady;
+  
+  // Map functionality with toggle
+  let mapInitialized = false;
+  let currentMap = null;
+  let currentMarkers = [];
+  let isMapVisible = true;
+  
+  function toggleMap() {
+    const mapWrapper = document.getElementById('map-wrapper');
+    const icon = document.getElementById('mapToggleIcon');
+    if (mapWrapper.style.display === 'none') {
+      mapWrapper.style.display = 'block';
+      icon.className = 'fas fa-chevron-up';
+      isMapVisible = true;
+      setTimeout(() => {
+        if (currentMap) currentMap.invalidateSize();
+      }, 100);
+    } else {
+      mapWrapper.style.display = 'none';
+      icon.className = 'fas fa-chevron-down';
+      isMapVisible = false;
+    }
+  }
+  
+  function clearMapMarkers() {
+    if (currentMarkers) {
+      currentMarkers.forEach(marker => {
+        if (currentMap) currentMap.removeLayer(marker);
+      });
+      currentMarkers = [];
+    }
+  }
+  
+  function updateMapWithRoute(pickup, destination) {
+    if (!currentMap || !isMapVisible) return;
+    
+    clearMapMarkers();
+    
+    const pickupCoords = getCoordinates(pickup);
+    const destCoords = getCoordinates(destination);
+    
+    const pickupMarker = L.marker([pickupCoords.lat, pickupCoords.lng], {
+      icon: L.divIcon({
+        className: 'custom-div-icon',
+        html: '<div style="background-color: #22c55e; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.5);"></div>',
+        iconSize: [18, 18]
+      })
+    }).addTo(currentMap);
+    pickupMarker.bindPopup(`<b>📍 Pickup:</b><br>${pickup}`);
+    currentMarkers.push(pickupMarker);
+    
+    const destMarker = L.marker([destCoords.lat, destCoords.lng], {
+      icon: L.divIcon({
+        className: 'custom-div-icon',
+        html: '<div style="background-color: #ef4444; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.5);"></div>',
+        iconSize: [18, 18]
+      })
+    }).addTo(currentMap);
+    destMarker.bindPopup(`<b>📍 Destination:</b><br>${destination}`);
+    currentMarkers.push(destMarker);
+    
+    const latlngs = [[pickupCoords.lat, pickupCoords.lng], [destCoords.lat, destCoords.lng]];
+    const routeLine = L.polyline(latlngs, { color: '#2563eb', weight: 3, opacity: 0.7, dashArray: '5, 10' }).addTo(currentMap);
+    currentMarkers.push(routeLine);
+    
+    const bounds = L.latLngBounds(latlngs);
+    currentMap.fitBounds(bounds, { padding: [30, 30] });
+    
+    const totalDist = calculateTotalDistance(pickup, destination);
+    const infoDiv = document.getElementById('map-route-info');
+    if (infoDiv && totalDist.total) {
+      infoDiv.innerHTML = `🚕 ${pickup.substring(0, 20)} → ${destination.substring(0, 20)}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}`;
+    }
+  }
+  
+  function initDropdownMap() {
+    if (mapInitialized) return;
+    const mapContainer = document.getElementById('dropdown-map');
+    if (!mapContainer) return;
+    
+    currentMap = L.map('dropdown-map').setView([-15.6167, 30.4167], 10);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+      subdomains: 'abcd',
+      maxZoom: 18
+    }).addTo(currentMap);
+    
+    mapInitialized = true;
+  }
+  
+  // Location sharing functions with Google Maps coordinates
+  function getCurrentLocation() {
+    const statusDiv = document.getElementById('locationStatus');
+    if (navigator.geolocation) {
+      statusDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Getting your location...';
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          currentUserLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          };
+          const googleMapsUrl = `https://www.google.com/maps?q=${currentUserLocation.lat},${currentUserLocation.lng}`;
+          statusDiv.innerHTML = `
+            <i class="fas fa-check-circle" style="color: #16a34a;"></i> 
+            Location acquired!<br>
+            <small>Lat: ${currentUserLocation.lat.toFixed(6)}, Lng: ${currentUserLocation.lng.toFixed(6)}</small><br>
+            <small><i class="fas fa-map-marked-alt"></i> <a href="${googleMapsUrl}" target="_blank" style="color:#2563eb;">View on Google Maps</a></small>
+          `;
+        },
+        (error) => {
+          let errorMsg = "Location failed: ";
+          switch(error.code) {
+            case error.PERMISSION_DENIED: errorMsg += "Permission denied"; break;
+            case error.POSITION_UNAVAILABLE: errorMsg += "Position unavailable"; break;
+            case error.TIMEOUT: errorMsg += "Timeout"; break;
+            default: errorMsg += "Unknown error";
+          }
+          statusDiv.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> ${errorMsg}`;
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    } else {
+      statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> Geolocation not supported';
+    }
+  }
+  
+  function shareLocationWhatsApp() {
+    if (!currentUserLocation) {
+      const statusDiv = document.getElementById('locationStatus');
+      statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ff9900;"></i> Please get your location first using "Get Location"';
+      setTimeout(() => {
+        if (statusDiv.innerHTML.includes('first')) getCurrentLocation();
+      }, 2000);
+      return;
+    }
+    const googleMapsUrl = `https://www.google.com/maps?q=${currentUserLocation.lat},${currentUserLocation.lng}`;
+    const message = `📍 *My current location*%0A%0ALatitude: ${currentUserLocation.lat.toFixed(6)}%0ALongitude: ${currentUserLocation.lng.toFixed(6)}%0A%0A🗺️ Open in Google Maps: ${googleMapsUrl}%0A%0A🚕 I need a ride from this location!`;
+    window.open(`https://wa.me/260978167546?text=${message}`, '_blank');
+  }
+  
+  function shareLocationSMS() {
+    if (!currentUserLocation) {
+      const statusDiv = document.getElementById('locationStatus');
+      statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ff9900;"></i> Please get your location first';
+      setTimeout(() => getCurrentLocation(), 2000);
+      return;
+    }
+    const googleMapsUrl = `https://www.google.com/maps?q=${currentUserLocation.lat},${currentUserLocation.lng}`;
+    const message = `My location: Lat ${currentUserLocation.lat.toFixed(6)}, Lng ${currentUserLocation.lng.toFixed(6)}. Google Maps: ${googleMapsUrl}. Need a ride!`;
+    window.location.href = `sms:0978167546?body=${encodeURIComponent(message)}`;
+  }
+  
+  function toggleDropdown() {
+    const menu = document.getElementById("header-menu-dropdown");
+    menu.classList.toggle("show");
+    if (menu.classList.contains("show") && !mapInitialized) {
+      setTimeout(initDropdownMap, 100);
+    }
+    if (menu.classList.contains("show") && currentPickup && currentDestination && currentMap && isMapVisible) {
+      setTimeout(() => updateMapWithRoute(currentPickup, currentDestination), 150);
+    }
+  }
+  
+  window.onclick = (event) => {
+    const menu = document.getElementById("header-menu-dropdown");
+    const btn = document.getElementById("menu-toggle-btn");
+    if (menu && menu.classList.contains('show') && !menu.contains(event.target) && !btn.contains(event.target)) {
+      menu.classList.remove('show');
+    }
+  };
+  
+  window.toggleDropdown = toggleDropdown;
+  window.toggleMap = toggleMap;
+  window.getCurrentLocation = getCurrentLocation;
+  window.shareLocationWhatsApp = shareLocationWhatsApp;
+  window.shareLocationSMS = shareLocationSMS;
+  
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(e => console.log("SW failed:", e));
+    });
+  }
 </script>
 </body>
 </html>
