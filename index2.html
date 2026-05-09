@@ -53,7 +53,7 @@
 
     .dropdown-menu {
       position: absolute; top: 100%; right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 999; min-width: 200px; display: none; margin-top: 8px;
+      z-index: 999; min-width: 300px; display: none; margin-top: 8px; max-height: 500px; overflow-y: auto;
     }
     .dropdown-menu.active { display: block; }
     .dropdown-menu button {
@@ -64,18 +64,30 @@
     .dropdown-menu button:last-child { border-bottom: none; }
     .dropdown-menu i { margin-right: 8px; color: #2563eb; width: 16px; }
 
-    #leafletMapContainer { 
-      position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 100%; height: 0;
-      background: white; z-index: 150; transition: height 0.3s ease; overflow: hidden; border-top: 1px solid #ddd;
+    #dropdownMapContainer {
+      display: none;
+      border-top: 1px solid #eee;
+      padding: 10px;
     }
-    #leafletMapContainer.open { height: 400px; }
-    .map-header { 
-      background: #2563eb; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
-      font-weight: bold;
+    
+    #dropdownMapContainer.show {
+      display: block;
     }
-    .map-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+
+    .map-header {
+      background: #2563eb; color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center;
+      font-weight: bold; font-size: 0.9rem; border-radius: 8px 8px 0 0;
+    }
+
+    .map-close-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; padding: 2px 5px; }
     .map-close-btn:hover { opacity: 0.8; }
-    #leafletMap { height: calc(100% - 48px); width: 100%; }
+
+    #dropdownMap { 
+      height: 300px; 
+      width: 100%; 
+      border-radius: 0 0 8px 8px;
+      margin-top: -4px;
+    }
 
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
@@ -122,12 +134,21 @@
         <i class="fas fa-ellipsis-v"></i>
       </button>
       <div id="dropdownMenu" class="dropdown-menu">
-        <button onclick="toggleLeafletMap(); toggleDropdown();">
+        <button onclick="toggleDropdownMap();">
           <i class="fas fa-map"></i> Show / Hide Map
         </button>
         <button onclick="openAboutModal(); toggleDropdown();">
           <i class="fas fa-info-circle"></i> About
         </button>
+        
+        <!-- Map Container Inside Dropdown -->
+        <div id="dropdownMapContainer">
+          <div class="map-header">
+            <span><i class="fas fa-map"></i> Route Map</span>
+            <button class="map-close-btn" onclick="toggleDropdownMap()"><i class="fas fa-times"></i></button>
+          </div>
+          <div id="dropdownMap"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -182,15 +203,6 @@
   </div>
 
   <p id="status" style="text-align:center; font-weight:bold; margin-top:10px;"></p>
-</div>
-
-<!-- Map Container -->
-<div id="leafletMapContainer">
-  <div class="map-header">
-    <span><i class="fas fa-map"></i> Offline Map</span>
-    <button class="map-close-btn" onclick="toggleLeafletMap()"><i class="fas fa-times"></i></button>
-  </div>
-  <div id="leafletMap"></div>
 </div>
 
 <!-- About Modal -->
@@ -323,25 +335,28 @@ function calculateTotalDistance(pickup, destination) {
   return { total: minTotal, trip: tripDist };
 }
 
-// Map
-let leafletMap = null;
+// Dropdown Map
+let dropdownMap = null;
 
-function toggleLeafletMap() {
-  const container = document.getElementById("leafletMapContainer");
-  container.classList.toggle('open');
+function toggleDropdownMap() {
+  const container = document.getElementById("dropdownMapContainer");
+  container.classList.toggle('show');
 
-  if (container.classList.contains('open') && !leafletMap) {
-    leafletMap = L.map('leafletMap').setView([-15.6167, 30.4167], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
+  if (container.classList.contains('show') && !dropdownMap) {
+    setTimeout(() => {
+      dropdownMap = L.map('dropdownMap').setView([-15.6167, 30.4167], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(dropdownMap);
+      updateDropdownMap();
+    }, 100);
   }
-  if (leafletMap) setTimeout(() => leafletMap.invalidateSize(), 300);
+  if (dropdownMap) setTimeout(() => dropdownMap.invalidateSize(), 300);
 }
 
-function updateMap() {
-  if (!leafletMap) return;
+function updateDropdownMap() {
+  if (!dropdownMap) return;
 
-  leafletMap.eachLayer(layer => {
-    if (layer instanceof L.Marker || layer instanceof L.Polyline) leafletMap.removeLayer(layer);
+  dropdownMap.eachLayer(layer => {
+    if (layer instanceof L.Marker || layer instanceof L.Polyline) dropdownMap.removeLayer(layer);
   });
 
   const pickupName = document.getElementById('gm-origin').value.trim();
@@ -351,16 +366,16 @@ function updateMap() {
 
   if (pickupName && placeData[pickupName]) {
     pPos = [placeData[pickupName].lat, placeData[pickupName].lng];
-    L.marker(pPos).addTo(leafletMap).bindPopup(`<b>Pickup:</b><br>${pickupName}`);
+    L.marker(pPos, { title: 'Pickup' }).addTo(dropdownMap).bindPopup(`<b>Pickup:</b><br>${pickupName}`);
   }
   if (destName && placeData[destName]) {
     dPos = [placeData[destName].lat, placeData[destName].lng];
-    L.marker(dPos).addTo(leafletMap).bindPopup(`<b>Destination:</b><br>${destName}`);
+    L.marker(dPos, { title: 'Destination' }).addTo(dropdownMap).bindPopup(`<b>Destination:</b><br>${destName}`);
   }
 
   if (pPos && dPos) {
-    L.polyline([pPos, dPos], { color: '#2563eb', weight: 6, opacity: 0.9 }).addTo(leafletMap);
-    leafletMap.fitBounds([pPos, dPos], { padding: [70, 70] });
+    L.polyline([pPos, dPos], { color: '#2563eb', weight: 6, opacity: 0.9 }).addTo(dropdownMap);
+    dropdownMap.fitBounds([pPos, dPos], { padding: [50, 50] });
   }
 }
 
@@ -391,7 +406,7 @@ function setupAuto(inputId, listId) {
         list.innerHTML = '';
         list.classList.remove('show');
         checkReady();
-        updateMap();
+        updateDropdownMap();
       };
       list.appendChild(div);
     });
@@ -465,8 +480,8 @@ document.getElementById('customer-phone').addEventListener('input', function() {
 
 document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener('change', checkReady));
 
-document.getElementById('gm-origin').addEventListener('change', updateMap);
-document.getElementById('gm-destination').addEventListener('change', updateMap);
+document.getElementById('gm-origin').addEventListener('change', updateDropdownMap);
+document.getElementById('gm-destination').addEventListener('change', updateDropdownMap);
 
 // Dropdown Menu Toggle
 function toggleDropdown() {
