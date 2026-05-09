@@ -217,12 +217,35 @@
     .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
     fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
     legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
     .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
-    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
+    .input-box input { 
+      flex: 1; 
+      border: none; 
+      outline: none; 
+      font-size: 1rem; 
+      font-weight: bold; 
+      background: transparent; 
+      width: 100%; 
+    }
+    .input-box input::placeholder {
+      font-style: italic;
+      color: #999;
+      font-weight: normal;
+      font-size: 0.85rem;
+    }
     .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .icon-img { width: 40px; height: 40px; object-fit: contain; }
-    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; }
+    .field-error { 
+      border: 2px solid var(--error-color) !important; 
+      background: #fff5f5 !important;
+      animation: shake 0.4s ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
     .autocomplete-list { 
       position: absolute; 
       top: 100%; 
@@ -347,7 +370,10 @@
 <main class="product-container">
   <div class="booking-container">
     <fieldset><legend><span class="material-icons">account_circle</span> Phone Number</legend>
-      <div class="input-box"><span class="material-icons">phone</span><input type="tel" id="customer-phone" maxlength="10" placeholder="0xxxxxxxxx (e.g., 0978167546)" inputmode="numeric"></div>
+      <div class="input-box" id="phone-box">
+        <span class="material-icons">phone</span>
+        <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
+      </div>
     </fieldset>
     <div id="trip-details" class="hidden-section">
       <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
@@ -360,14 +386,14 @@
       <fieldset><legend>📍 Pickup Location</legend>
         <div class="input-box" id="origin-container">
           <span class="material-icons">my_location</span>
-          <input type="text" id="gm-origin" placeholder="Start typing place name..." autocomplete="off">
+          <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
           <div id="originList" class="autocomplete-list"></div>
         </div>
       </fieldset>
       <fieldset><legend>📍 Destination</legend>
         <div class="input-box" id="dest-container">
           <span class="material-icons">pin_drop</span>
-          <input type="text" id="gm-destination" placeholder="Start typing place name..." autocomplete="off">
+          <input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off">
           <div id="destinationList" class="autocomplete-list"></div>
         </div>
       </fieldset>
@@ -387,14 +413,54 @@
 </main>
 
 <script>
-  // Coordinates fetching and sharing functions (EXACTLY as requested)
+  // Service Worker Registration
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("sw.js").then(
+        function(reg) { console.log("ServiceWorker registered"); },
+        function(err) { console.log("ServiceWorker registration failed:", err); }
+      );
+    });
+  }
+
+  // App Install Prompt
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    const deferredPrompt = e;
+    const installBox = document.createElement("div");
+    installBox.style.position = "fixed";
+    installBox.style.top = "15px";
+    installBox.style.right = "15px";
+    installBox.style.background = "#2b6ef6";
+    installBox.style.color = "#fff";
+    installBox.style.borderRadius = "8px";
+    installBox.style.padding = "8px 14px";
+    installBox.style.fontFamily = "system-ui, sans-serif";
+    installBox.style.fontSize = "14px";
+    installBox.style.cursor = "pointer";
+    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+    installBox.style.zIndex = "9999";
+    installBox.style.display = "flex";
+    installBox.style.alignItems = "center";
+    installBox.style.gap = "8px";
+    installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
+    document.body.appendChild(installBox);
+
+    document.getElementById("installText").addEventListener("click", async () => {
+      installBox.remove();
+      deferredPrompt.prompt();
+    });
+    document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+  });
+
+  // Coordinates fetching and sharing functions
   let mapLink = "";
 
   function getLocation() {
     const status = document.getElementById("locationStatus");
 
     if (navigator.geolocation) {
-      status.innerHTML = "Getting location...";
+      status.innerHTML = "📍 Getting location...";
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -403,34 +469,34 @@
 
           mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-          status.innerHTML = "Location ready ✔";
+          status.innerHTML = "✅ Location ready! Tap WhatsApp or SMS to share.";
         },
         (error) => {
-          status.innerHTML = "Failed to get location!";
+          status.innerHTML = "❌ Failed to get location!";
         }
       );
     } else {
-      status.innerHTML = "Geolocation not supported!";
+      status.innerHTML = "❌ Geolocation not supported!";
     }
   }
 
   function shareWhatsApp() {
     if (!mapLink) {
-      alert("Please get location first");
+      alert("Please get your location first using 'Get My Location'");
       return;
     }
 
-    let message = encodeURIComponent("Here is my location: " + mapLink);
+    let message = encodeURIComponent("📍 Here is my current location: " + mapLink);
     window.open(`https://wa.me/260978167546?text=${message}`, "_blank");
   }
 
   function shareSMS() {
     if (!mapLink) {
-      alert("Please get location first");
+      alert("Please get your location first using 'Get My Location'");
       return;
     }
 
-    window.location.href = `sms:0978167546?body=Here is my location: ${mapLink}`;
+    window.location.href = `sms:0978167546?body=📍 Here is my location: ${mapLink}`;
   }
 
   // ----- COMPLETE PLACES LIST (with coordinates for map markers) -----
@@ -631,7 +697,7 @@
       setTimeout(() => {
         if (input.value && !MASTER_PLACES_LIST.includes(input.value)) {
           container.classList.add('field-error');
-          statusText.textContent = "⚠️ Please select a location from the suggestions.";
+          statusText.innerHTML = "⚠️ Invalid location! Please select from the list.";
           summaryDiv.style.display = 'none';
         } else if (input.value && MASTER_PLACES_LIST.includes(input.value)) {
           container.classList.remove('field-error');
@@ -647,17 +713,17 @@
     
     if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
       if (!mode) {
-        statusText.textContent = "⚠️ Please select a transport mode.";
+        statusText.innerHTML = "⚠️ Please select a transport mode.";
         summaryDiv.style.display = 'none';
       } else {
-        statusText.textContent = "";
+        statusText.innerHTML = "";
         currentPickup = from;
         currentDestination = to;
         calculate(from, to, mode.value);
         updateMapWithRoute(from, to);
       }
     } else {
-      statusText.textContent = "";
+      statusText.innerHTML = "";
       summaryDiv.style.display = 'none';
     }
   }
@@ -671,7 +737,7 @@
       const res = calculateTotalDistance(from, to);
       
       if (res.total === null) {
-        statusText.textContent = "❌ Route not available. Please try different locations.";
+        statusText.innerHTML = "❌ Route not available. Please try different locations.";
         return;
       }
       
@@ -691,10 +757,10 @@
       
       let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
       
+      // Removed Estimated Time column - only showing Price and Trip Distance
       document.getElementById('summary-cards').innerHTML = `
         <div class="summary-card"><span>💰 Total Price (50% off)</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
         <div class="summary-card"><span>📏 Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
-        <div class="summary-card"><span>⏱️ Estimated Time</span><span>${Math.ceil((res.trip / config.avgSpeed) * 60)} mins</span></div>
       `;
       
       let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
@@ -882,12 +948,6 @@
   window.getLocation = getLocation;
   window.shareWhatsApp = shareWhatsApp;
   window.shareSMS = shareSMS;
-  
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(e => console.log("SW failed:", e));
-    });
-  }
 </script>
 </body>
 </html>
