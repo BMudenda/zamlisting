@@ -41,8 +41,60 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    #leafletMapContainer { display: none; margin: 15px auto; max-width: 500px; border-radius: 12px; overflow: hidden; border: 2px solid #333; }
-    #leafletMap { height: 380px; width: 100%; }
+    .dropdown-menu {
+      position: absolute; top: 50px; right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 200; min-width: 200px; display: none;
+    }
+    .dropdown-menu.active { display: block; }
+    .dropdown-menu button {
+      width: 100%; padding: 12px 16px; border: none; background: none; text-align: left; cursor: pointer;
+      font-size: 0.95rem; color: #333; border-bottom: 1px solid #eee; transition: background 0.2s;
+    }
+    .dropdown-menu button:hover { background: #f5f5f5; }
+    .dropdown-menu button:last-child { border-bottom: none; }
+
+    #leafletMapContainer { 
+      position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 100%; height: 0;
+      background: white; z-index: 150; transition: height 0.3s ease; overflow: hidden; border-top: 1px solid #ddd;
+    }
+    #leafletMapContainer.open { height: 400px; }
+    .map-header { 
+      background: #2563eb; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
+      font-weight: bold;
+    }
+    .map-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+    #leafletMap { height: calc(100% - 48px); width: 100%; }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
+      z-index: 300; display: none; justify-content: center; align-items: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: white; border-radius: 12px; padding: 24px; max-width: 400px; width: 90%;
+      max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    }
+    .modal-header h2 { color: #2563eb; }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+    .modal-close:hover { color: #333; }
+    .modal-body {
+      color: #555; line-height: 1.6;
+    }
+    .modal-body h3 {
+      color: #2563eb; margin-top: 16px; margin-bottom: 8px; font-size: 0.95rem;
+    }
+    .modal-body ul {
+      margin-left: 20px; margin-bottom: 8px;
+    }
+    .modal-body li {
+      margin-bottom: 4px;
+    }
+    .modal-body p {
+      margin-bottom: 8px; font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -53,9 +105,19 @@
       <img src="lfr.jpg" width="36" height="36" alt="Logo">
       <h2>ZamListing Rides</h2>
     </div>
-    <button onclick="toggleDropdown()" style="background:none;border:none;color:white;font-size:1.6rem;cursor:pointer;">
-      <i class="fas fa-ellipsis-v"></i>
-    </button>
+    <div style="position: relative;">
+      <button onclick="toggleDropdown()" style="background:none;border:none;color:white;font-size:1.6rem;cursor:pointer;">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <button onclick="toggleLeafletMap(); toggleDropdown();">
+          <i class="fas fa-map"></i> Show / Hide Map
+        </button>
+        <button onclick="openAboutModal(); toggleDropdown();">
+          <i class="fas fa-info-circle"></i> About
+        </button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -108,13 +170,64 @@
   <p id="status" style="text-align:center; font-weight:bold; margin-top:10px;"></p>
 </div>
 
-<!-- Map -->
-<div style="max-width:500px; margin:10px auto; padding:0 12px;">
-  <button onclick="toggleLeafletMap()" style="width:100%; padding:12px; background:white; border:1px solid #ccc; border-radius:8px;">
-    <i class="fas fa-map"></i> Show / Hide Offline Map
-  </button>
-  <div id="leafletMapContainer">
-    <div id="leafletMap"></div>
+<!-- Map Container -->
+<div id="leafletMapContainer">
+  <div class="map-header">
+    <span><i class="fas fa-map"></i> Offline Map</span>
+    <button class="map-close-btn" onclick="toggleLeafletMap()"><i class="fas fa-times"></i></button>
+  </div>
+  <div id="leafletMap"></div>
+</div>
+
+<!-- About Modal -->
+<div id="aboutModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="fas fa-info-circle"></i> About ZamListing</h2>
+      <button class="modal-close" onclick="closeAboutModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>
+        <strong>ZamListing Rides</strong> is a premium ride-hailing service operating in the Luangwa Feira region, 
+        providing fast, reliable, and affordable transportation solutions for all your travel needs.
+      </p>
+
+      <h3>Our Services</h3>
+      <ul>
+        <li><strong>Motorbike Rides:</strong> Quick and efficient transportation for single passengers</li>
+        <li><strong>Car Transportation:</strong> Comfortable and spacious vehicles for groups and families</li>
+        <li><strong>Offline Map Navigation:</strong> Navigate without internet connection</li>
+        <li><strong>Real-time Distance Calculation:</strong> Get accurate pricing before booking</li>
+      </ul>
+
+      <h3>How It Works</h3>
+      <p>
+        1. Enter your phone number<br>
+        2. Select your preferred transport mode<br>
+        3. Choose your pickup location<br>
+        4. Select your destination<br>
+        5. Review the trip summary and pricing<br>
+        6. Submit your booking request
+      </p>
+
+      <h3>Service Areas</h3>
+      <p>
+        We operate in Luangwa with coverage of major locations including:
+        Luangwa Bus Station, Luangwa Market, Luangwa Feira Rides, 
+        Katondwe Mission Hospital, and Airstrip areas.
+      </p>
+
+      <h3>Contact & Support</h3>
+      <p>
+        For inquiries and support, please contact us through the app or visit our office 
+        at Luangwa Feira Rides.
+      </p>
+
+      <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.85rem;">
+        <strong>Version 1.0.0</strong><br>
+        &copy; 2026 ZamListing Rides. All rights reserved.
+      </p>
+    </div>
   </div>
 </div>
 
@@ -201,9 +314,9 @@ let leafletMap = null;
 
 function toggleLeafletMap() {
   const container = document.getElementById("leafletMapContainer");
-  container.style.display = container.style.display === "block" ? "none" : "block";
+  container.classList.toggle('open');
 
-  if (container.style.display === "block" && !leafletMap) {
+  if (container.classList.contains('open') && !leafletMap) {
     leafletMap = L.map('leafletMap').setView([-15.6167, 30.4167], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
   }
@@ -237,7 +350,7 @@ function updateMap() {
   }
 }
 
-// Autocomplete, Calculation, etc. (same as before)
+// Autocomplete, Calculation, etc.
 function setupAuto(inputId, listId) {
   const input = document.getElementById(inputId);
   const list = document.getElementById(listId);
@@ -320,7 +433,36 @@ document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener(
 document.getElementById('gm-origin').addEventListener('change', updateMap);
 document.getElementById('gm-destination').addEventListener('change', updateMap);
 
-function toggleDropdown() { alert("Menu"); }
+// Dropdown Menu Toggle
+function toggleDropdown() {
+  const menu = document.getElementById('dropdownMenu');
+  menu.classList.toggle('active');
+}
+
+// Modal Functions
+function openAboutModal() {
+  document.getElementById('aboutModal').classList.add('active');
+}
+
+function closeAboutModal() {
+  document.getElementById('aboutModal').classList.remove('active');
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(e) {
+  const modal = document.getElementById('aboutModal');
+  if (e.target === modal) {
+    closeAboutModal();
+  }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const header = document.querySelector('header');
+  if (!header.contains(e.target)) {
+    document.getElementById('dropdownMenu').classList.remove('active');
+  }
+});
 </script>
 </body>
 </html>
