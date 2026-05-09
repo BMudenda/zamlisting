@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2b6ef6">
@@ -1413,6 +1415,62 @@ function shareSMS() {
 
   window.location.href = `sms:0978167546?body=Here is my location: ${mapLink}`;
 }
+</script>
+
+  
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+let mapInitialized = false;
+let leafletMap;
+
+function toggleLeafletMap(){
+
+const mapContainer =
+document.getElementById("leafletMapContainer");
+
+if(mapContainer.style.display === "none"){
+
+mapContainer.style.display = "block";
+
+if(!mapInitialized){
+
+leafletMap = L.map('leafletMap').setView(
+[-15.6167, 30.4167],
+13
+);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19,
+attribution:'© OpenStreetMap'
+}
+).addTo(leafletMap);
+
+L.marker([-15.6167, 30.4167])
+.addTo(leafletMap)
+.bindPopup("Luangwa Feira Rides")
+.openPopup();
+
+mapInitialized = true;
+
+setTimeout(()=>{
+leafletMap.invalidateSize();
+},300);
+
+}
+
+}else{
+
+mapContainer.style.display = "none";
+
+}
+
+}
+
 </script>
 </body>
 </html>
