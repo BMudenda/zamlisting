@@ -152,14 +152,35 @@
       padding: 12px;
     }
     
-    .route-status {
-      background: #e0f2fe;
+    .route-info {
+      font-size: 0.8rem;
+      margin-bottom: 12px;
       padding: 8px;
-      font-size: 0.75rem;
-      text-align: center;
-      color: #0369a1;
+      background: #f0f9ff;
       border-radius: 8px;
-      margin-bottom: 10px;
+      text-align: center;
+      color: #1e293b;
+    }
+    
+    .open-maps-link {
+      display: block;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      text-align: center;
+      transition: background 0.2s;
+      font-weight: 500;
+    }
+    
+    .open-maps-link:hover {
+      background: #1d4ed8;
+    }
+    
+    .open-maps-link i {
+      margin-right: 8px;
     }
     
     .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
@@ -235,32 +256,6 @@
     .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
     .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
     @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-    
-    .route-info {
-      font-size: 0.75rem;
-      margin-top: 8px;
-      padding: 10px;
-      background: #f0f9ff;
-      border-radius: 8px;
-      text-align: center;
-    }
-    
-    .open-maps-link {
-      display: block;
-      margin-top: 10px;
-      padding: 10px;
-      background: #2563eb;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      text-align: center;
-      transition: background 0.2s;
-    }
-    
-    .open-maps-link:hover {
-      background: #1d4ed8;
-    }
   </style>
 </head>
 <body>
@@ -314,17 +309,14 @@
           <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
         </div>
         
-        <!-- Route Info Section -->
+        <!-- Route Info Section with Map Button -->
         <div class="dropdown-content-section">
           <div class="route-container">
-            <div class="route-status">
+            <div id="map-route-info" class="route-info">
               <i class="fas fa-route"></i> Select pickup & destination to see route details
             </div>
-            <div id="map-route-info" class="route-info">
-              📍 Waiting for pickup and destination selection
-            </div>
             <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">
-              <i class="fab fa-google"></i> Open Route in Google Maps
+              <i class="fas fa-map-marker-alt"></i> Click to View Map
             </a>
           </div>
         </div>
@@ -682,7 +674,7 @@
     };
   }
   
-  // Show route info and update Google Maps link
+  // Update route info and Google Maps link
   function updateRouteInfo(pickup, destination) {
     if (!pickup || !destination) return;
     
@@ -692,12 +684,12 @@
     
     const infoDiv = document.getElementById('map-route-info');
     if (infoDiv && totalDist.total) {
-      infoDiv.innerHTML = `🚕 ${pickup} → ${destination}<br>📏 Distance: ${totalDist.trip?.toFixed(1) || '?'} km<br>📍 Via: ${totalDist.hub}`;
+      infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}`;
     }
     
     const openLink = document.getElementById('openMapsLink');
     openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-    openLink.innerHTML = `<i class="fab fa-google"></i> Open Route: ${pickup} → ${destination}`;
+    // Keep button text as "Click to View Map" - no change needed
   }
   
   function checkReady() {
