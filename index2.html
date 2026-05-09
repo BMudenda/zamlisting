@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="description" content="Find cheap taxis, motorbikes, car rides, and Yango services in Luangwa Feira, Zambia on ZamListing. Interactive Google Maps with search and directions.">
+  <meta name="description" content="Find cheap taxis, motorbikes, car rides, and Yango services in Luangwa Feira, Zambia on ZamListing. Interactive Google Maps with location markers.">
   
-  <title>Luangwa Feira Rides – Google Maps Search & Booking</title>
+  <title>Luangwa Feira Rides – Google Map & Taxi Booking</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
@@ -200,11 +200,14 @@
       border-top: 1px solid #e2e8f0;
     }
     
-    /* Search bar styling */
+    /* Map search bar with autocomplete from places list */
     .map-search-bar {
       padding: 10px;
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
+    }
+    .map-search-container {
+      position: relative;
       display: flex;
       gap: 8px;
     }
@@ -235,6 +238,39 @@
     }
     .map-search-btn:hover {
       background: #1d4ed8;
+    }
+    .map-autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      z-index: 1000;
+      max-height: 150px;
+      overflow-y: auto;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .map-suggestion {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+    .map-suggestion:hover {
+      background: #e8f0fe;
+      color: var(--primary-color);
+    }
+    
+    .auto-search-status {
+      background: #e0f2fe;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      text-align: center;
+      color: #0369a1;
+      border-bottom: 1px solid #bae6fd;
     }
     
     .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
@@ -398,39 +434,45 @@
           <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
         </div>
         
-        <!-- Map Section LAST (at the bottom) - Enhanced Google Maps with Search -->
+        <!-- Map Section LAST (at the bottom) -->
         <div class="dropdown-content-section">
           <div class="map-container" id="map-container">
             <div class="map-header" onclick="toggleMap()">
-              <h5><i class="fab fa-google"></i> Google Maps - Search & Directions</h5>
+              <h5><i class="fab fa-google"></i> Google Maps - Search from Our Places</h5>
               <button class="toggle-map-btn" id="toggleMapBtn">
                 <i class="fas fa-chevron-up" id="mapToggleIcon"></i>
               </button>
             </div>
             <div id="map-wrapper">
-              <!-- Search Bar -->
+              <div class="auto-search-status">
+                <i class="fas fa-map-marker-alt"></i> Map auto-updates when you select pickup/destination
+              </div>
+              <!-- Map search bar with autocomplete from places list -->
               <div class="map-search-bar">
-                <input type="text" id="map-search-input" class="map-search-input" 
-                       placeholder="Search location (e.g., Lusaka, -15.4355,28.2221, or Katondwe Hospital)" 
-                       onkeypress="if(event.key === 'Enter') searchLocationOnMap()">
-                <button class="map-search-btn" onclick="searchLocationOnMap()">
-                  <i class="fas fa-search"></i> Search
-                </button>
+                <div class="map-search-container">
+                  <input type="text" id="map-search-input" class="map-search-input" 
+                         placeholder="Search from our places (e.g., Luangwa Bus Station, Lusaka, Katondwe)" 
+                         autocomplete="off">
+                  <button class="map-search-btn" onclick="searchPlaceOnMap()">
+                    <i class="fas fa-search"></i> Search Place
+                  </button>
+                  <div id="mapAutocompleteList" class="map-autocomplete-list"></div>
+                </div>
               </div>
               <iframe id="googleMapFrame" class="google-map-frame" 
                       src="https://maps.google.com/maps?q=Luangwa%20Bus%20Station&z=12&ie=UTF8&output=embed" 
                       allowfullscreen></iframe>
               <div class="map-legend">
-                <span><i class="fas fa-map-marker-alt" style="color:#22c55e;"></i> Pickup Location</span>
+                <span><i class="fas fa-map-marker-alt" style="color:#22c55e;"></i> Pickup</span>
                 <span><i class="fas fa-map-marker-alt" style="color:#ef4444;"></i> Destination</span>
-                <span><i class="fas fa-route" style="color:#2563eb;"></i> Route</span>
-                <span><i class="fas fa-search" style="color:#ff9900;"></i> Search Anywhere</span>
+                <span><i class="fas fa-route" style="color:#2563eb;"></i> Route (when both selected)</span>
+                <span><i class="fas fa-search" style="color:#ff9900;"></i> Search from our places</span>
               </div>
             </div>
           </div>
-          <div id="map-route-info" class="route-info">📍 Select pickup & destination to see Google Maps route</div>
+          <div id="map-route-info" class="route-info">📍 Select pickup & destination to automatically see route on map</div>
           <div class="map-note">
-            <i class="fab fa-google"></i> Search any location by name or coordinates | Shows route between selected places
+            <i class="fab fa-google"></i> Search any of our 100+ locations | Map auto-shows your selected pickup/destination
             <br>
             <a id="openMapsLink" href="#" target="_blank" class="open-maps-link" style="display: inline-block; margin-top: 6px;">
               <i class="fas fa-external-link-alt"></i> Open in Google Maps App
@@ -442,7 +484,7 @@
       </div>
     </div>
   </div>
-  <div class="subtitle-wrapper"><span class="scroll-subtitle">  🗺️ Search any location on Google Maps | Use place names or coordinates | Get directions between selected places 🏍️🚗  </span></div>
+  <div class="subtitle-wrapper"><span class="scroll-subtitle">  🗺️ Map searches from our 100+ locations | Auto-shows pickup/destination when selected | Book your ride 🏍️🚗  </span></div>
 </header>
 
 <main class="product-container">
@@ -635,6 +677,7 @@
   function getCoordinates(placeName) {
     const found = placesWithCoords.find(p => p.name === placeName);
     if (found) return { lat: found.lat, lng: found.lng };
+    // Try to find in legacy places (use geocoding approximation)
     return { lat: -15.6167, lng: 30.4167 };
   }
   
@@ -748,6 +791,7 @@
     }
   };
   
+  // Setup autocomplete for pickup/destination inputs
   function setupAuto(inputId, containerId, listId) {
     const input = document.getElementById(inputId);
     const container = document.getElementById(containerId);
@@ -766,6 +810,15 @@
         div.onclick = () => {
           input.value = place;
           list.innerHTML = '';
+          // Auto-show on map when pickup/destination is selected
+          if (inputId === 'gm-origin') {
+            currentPickup = place;
+            showSingleLocationOnMap(place, 'pickup');
+          }
+          if (inputId === 'gm-destination') {
+            currentDestination = place;
+            showSingleLocationOnMap(place, 'destination');
+          }
           checkReady();
         };
         list.appendChild(div);
@@ -784,21 +837,142 @@
     };
   }
   
+  // Setup autocomplete for map search (using the same places list)
+  function setupMapAutocomplete() {
+    const mapSearchInput = document.getElementById('map-search-input');
+    const mapAutocompleteList = document.getElementById('mapAutocompleteList');
+    
+    if (!mapSearchInput) return;
+    
+    mapSearchInput.oninput = () => {
+      const val = mapSearchInput.value.toLowerCase().trim();
+      mapAutocompleteList.innerHTML = '';
+      if (!val || val.length < 1) return;
+      
+      const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 8);
+      matches.forEach(place => {
+        const div = document.createElement('div');
+        div.className = 'map-suggestion';
+        div.textContent = place;
+        div.onclick = () => {
+          mapSearchInput.value = place;
+          mapAutocompleteList.innerHTML = '';
+          searchPlaceOnMap();
+        };
+        mapAutocompleteList.appendChild(div);
+      });
+    };
+    
+    // Hide autocomplete when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!mapSearchInput.contains(e.target) && !mapAutocompleteList.contains(e.target)) {
+        mapAutocompleteList.innerHTML = '';
+      }
+    });
+  }
+  
+  // Auto-show location on map when selected from pickup/destination inputs
+  function showSingleLocationOnMap(location, type) {
+    if (!location) return;
+    
+    const coords = getCoordinates(location);
+    const mapsUrl = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=14&output=embed`;
+    const iframe = document.getElementById('googleMapFrame');
+    if (iframe) {
+      iframe.src = mapsUrl;
+    }
+    
+    const infoDiv = document.getElementById('map-route-info');
+    const emoji = type === 'pickup' ? '📍 Pickup' : '🎯 Destination';
+    if (infoDiv) {
+      infoDiv.innerHTML = `${emoji}: ${location}<br>Coordinates: ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+    }
+    
+    const openLink = document.getElementById('openMapsLink');
+    openLink.href = `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+  }
+  
+  // Show route between pickup and destination
+  function showRouteOnMap(pickup, destination) {
+    if (!pickup || !destination) return;
+    
+    const pickupCoords = getCoordinates(pickup);
+    const destCoords = getCoordinates(destination);
+    
+    const mapsUrl = `https://maps.google.com/maps?q=${pickupCoords.lat},${pickupCoords.lng}&to=${destCoords.lat},${destCoords.lng}&z=12&ie=UTF8&output=embed`;
+    
+    const iframe = document.getElementById('googleMapFrame');
+    if (iframe) {
+      iframe.src = mapsUrl;
+    }
+    
+    const totalDist = calculateTotalDistance(pickup, destination);
+    const infoDiv = document.getElementById('map-route-info');
+    if (infoDiv && totalDist.total) {
+      infoDiv.innerHTML = `🚕 Route: ${pickup} → ${destination}<br>📏 Distance: ${totalDist.trip?.toFixed(1) || '?'} km | 📍 Both locations shown on map`;
+    }
+    
+    const openLink = document.getElementById('openMapsLink');
+    openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
+  }
+  
+  // Search place on map from our master list
+  function searchPlaceOnMap() {
+    const searchInput = document.getElementById('map-search-input');
+    const query = searchInput.value.trim();
+    
+    if (!query) {
+      alert("Please enter a place name from our list");
+      return;
+    }
+    
+    // Check if the place exists in our master list
+    const matchedPlace = MASTER_PLACES_LIST.find(place => 
+      place.toLowerCase() === query.toLowerCase() || 
+      place.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    if (!matchedPlace) {
+      alert(`"${query}" not found in our places list. Please select from the suggestions.`);
+      return;
+    }
+    
+    const coords = getCoordinates(matchedPlace);
+    const mapsUrl = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=14&output=embed`;
+    
+    const iframe = document.getElementById('googleMapFrame');
+    if (iframe) {
+      iframe.src = mapsUrl;
+    }
+    
+    const infoDiv = document.getElementById('map-route-info');
+    if (infoDiv) {
+      infoDiv.innerHTML = `🔍 Showing: ${matchedPlace}<br>📍 Coordinates: ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+    }
+    
+    const openLink = document.getElementById('openMapsLink');
+    openLink.href = `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+    
+    // Clear the autocomplete list
+    document.getElementById('mapAutocompleteList').innerHTML = '';
+  }
+  
   function checkReady() {
     const from = document.getElementById('gm-origin').value;
     const to = document.getElementById('gm-destination').value;
     const mode = document.querySelector('input[name="mode"]:checked');
     
     if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
+      currentPickup = from;
+      currentDestination = to;
+      
       if (!mode) {
         statusText.innerHTML = "⚠️ Please select a transport mode.";
         summaryDiv.style.display = 'none';
       } else {
         statusText.innerHTML = "";
-        currentPickup = from;
-        currentDestination = to;
         calculate(from, to, mode.value);
-        updateGoogleMapWithRoute(from, to);
+        showRouteOnMap(from, to);
       }
     } else {
       statusText.innerHTML = "";
@@ -908,91 +1082,10 @@
     submitBtn.onclick = () => window.location.href = "tel:0978167546";
   }
   
-  // Enhanced Google Maps functions with search
-  function updateGoogleMapWithRoute(pickup, destination) {
-    const pickupCoords = getCoordinates(pickup);
-    const destCoords = getCoordinates(destination);
-    
-    // Using coordinates format as requested
-    const mapsUrl = `https://maps.google.com/maps?q=${pickupCoords.lat},${pickupCoords.lng}&to=${destCoords.lat},${destCoords.lng}&z=13&ie=UTF8&output=embed`;
-    
-    const iframe = document.getElementById('googleMapFrame');
-    if (iframe) {
-      iframe.src = mapsUrl;
-    }
-    
-    const openLink = document.getElementById('openMapsLink');
-    const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-    openLink.href = googleMapsDirectionsUrl;
-    
-    const totalDist = calculateTotalDistance(pickup, destination);
-    const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv && totalDist.total) {
-      infoDiv.innerHTML = `🚕 ${pickup} → ${destination}<br>📏 Distance: ${totalDist.trip?.toFixed(1) || '?'} km | 📍 Route shown on map`;
-    }
-  }
-  
-  // Search any location on the map
-  function searchLocationOnMap() {
-    const searchInput = document.getElementById('map-search-input');
-    const query = searchInput.value.trim();
-    
-    if (!query) {
-      alert("Please enter a location name or coordinates to search");
-      return;
-    }
-    
-    // Check if query is coordinates (pattern: numbers, comma, numbers)
-    const coordPattern = /^-?\d+\.?\d*,\s*-?\d+\.?\d*$/;
-    let searchUrl;
-    
-    if (coordPattern.test(query)) {
-      // It's coordinates - use coordinates format
-      const coords = query.replace(/\s/g, '').split(',');
-      searchUrl = `https://maps.google.com/maps?q=${coords[0]},${coords[1]}&z=15&output=embed`;
-    } else {
-      // It's a place name - encode for URL
-      searchUrl = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=14&output=embed`;
-    }
-    
-    const iframe = document.getElementById('googleMapFrame');
-    if (iframe) {
-      iframe.src = searchUrl;
-    }
-    
-    const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv) {
-      infoDiv.innerHTML = `🔍 Searching for: ${query}<br>📍 Map updated to show this location`;
-    }
-    
-    const openLink = document.getElementById('openMapsLink');
-    if (coordPattern.test(query)) {
-      const coords = query.replace(/\s/g, '').split(',');
-      openLink.href = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
-    } else {
-      openLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-    }
-  }
-  
-  // Function to search by coordinates directly
-  window.searchByCoordinates = function(lat, lng) {
-    const coordsUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-    const iframe = document.getElementById('googleMapFrame');
-    if (iframe) {
-      iframe.src = coordsUrl;
-    }
-    
-    const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv) {
-      infoDiv.innerHTML = `📍 Showing coordinates: ${lat}, ${lng}`;
-    }
-    
-    const openLink = document.getElementById('openMapsLink');
-    openLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
-  };
-  
+  // Initialize all autocomplete
   setupAuto('gm-origin', 'origin-container', 'originList');
   setupAuto('gm-destination', 'dest-container', 'destinationList');
+  setupMapAutocomplete();
   document.getElementById('mode-group').onchange = checkReady;
   
   // Map toggle functionality
@@ -1016,7 +1109,7 @@
     const menu = document.getElementById("header-menu-dropdown");
     menu.classList.toggle("show");
     if (menu.classList.contains("show") && currentPickup && currentDestination) {
-      setTimeout(() => updateGoogleMapWithRoute(currentPickup, currentDestination), 150);
+      setTimeout(() => showRouteOnMap(currentPickup, currentDestination), 150);
     }
   }
   
@@ -1033,7 +1126,7 @@
   window.getLocation = getLocation;
   window.shareWhatsApp = shareWhatsApp;
   window.shareSMS = shareSMS;
-  window.searchLocationOnMap = searchLocationOnMap;
+  window.searchPlaceOnMap = searchPlaceOnMap;
 </script>
 </body>
 </html>
