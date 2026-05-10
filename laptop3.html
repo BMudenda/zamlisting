@@ -851,23 +851,32 @@
     };
   }
   
-  // Update route info and Google Maps link
-  function updateRouteInfo(pickup, destination) {
-    if (!pickup || !destination) return;
+// Update route info and Google Maps link
+function updateRouteInfo(pickup, destination) {
+  if (!pickup || !destination) return;
+  
+  const pickupCoords = getCoordinates(pickup);
+  const destCoords = getCoordinates(destination);
+  const totalDist = calculateTotalDistance(pickup, destination);
+  
+  const infoDiv = document.getElementById('map-route-info');
+  if (infoDiv && totalDist.total) {
+    // Calculate estimated time
+    const avgSpeedKmh = 60;
+    const tripDistanceKm = totalDist.trip || 0;
+    const estimatedMinutes = Math.ceil((tripDistanceKm / avgSpeedKmh) * 60);
+    const hours = Math.floor(estimatedMinutes / 60);
+    const mins = estimatedMinutes % 60;
+    const estTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
     
-    const pickupCoords = getCoordinates(pickup);
-    const destCoords = getCoordinates(destination);
-    const totalDist = calculateTotalDistance(pickup, destination);
-    
-    const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv && totalDist.total) {
-      infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}`;
-    }
-    
-    const openLink = document.getElementById('openMapsLink');
-    openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-    // Keep button text as "Click to View Map" - no change needed
+    // Display with estimated time included
+    infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estTimeStr}`;
   }
+  
+  const openLink = document.getElementById('openMapsLink');
+  openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
+  // Keep button text as "Click to View Map" - no change needed
+}
   
   function checkReady() {
     const from = document.getElementById('gm-origin').value;
