@@ -282,7 +282,9 @@
           <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
           <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
           <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+          
           <div class="menu-divider"></div>
+          <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
           <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank" title="Visit Facebook">
             <i class="fab fa-facebook"></i>
             <span class="contact-label-text">Facebook Page</span>
@@ -303,8 +305,9 @@
           <a href="#" onclick="getLocation()" title="Get Location">
             <i class="fas fa-location-arrow"></i>
             <span class="contact-label-text">Get My Location</span>
+            <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
           </a>
-
+          
           <a href="#" onclick="shareWhatsApp()" title="Share via WhatsApp">
             <i class="fab fa-whatsapp"></i>
             <span class="contact-label-text">Share via WhatsApp</span>
@@ -315,17 +318,21 @@
             <span class="contact-label-text">Share via SMS</span>
           </a>
 
-          <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+          
         </div>
         
-        <!-- Route Info Section with Map Button -->
+        <!-- View Map Section - FIXED with centered text/icon AND estimated time display -->
         <div class="dropdown-content-section">
+          <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
+          
+          <!-- Route Info Section with Map Button -->
           <div class="route-container">
             <div id="map-route-info" class="route-info">
               <i class="fas fa-route"></i> Select pickup & destination to see route details
             </div>
-            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">
-              <i class="fas fa-map-marker-alt"></i> Click to View Map
+            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+              <i class="fas fa-globe" style="font-size: 1rem;"></i>
+              <span>Click to View Map</span>
             </a>
           </div>
         </div>
@@ -443,7 +450,7 @@
 
           mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-          status.innerHTML = "✅ Location ready! Tap WhatsApp or SMS to share.";
+          status.innerHTML = "🌐 ✅ current location ready!.";
         },
         (error) => {
           status.innerHTML = "❌ Failed to get location!";
@@ -845,23 +852,32 @@
     };
   }
   
-  // Update route info and Google Maps link
-  function updateRouteInfo(pickup, destination) {
-    if (!pickup || !destination) return;
+// Update route info and Google Maps link
+function updateRouteInfo(pickup, destination) {
+  if (!pickup || !destination) return;
+  
+  const pickupCoords = getCoordinates(pickup);
+  const destCoords = getCoordinates(destination);
+  const totalDist = calculateTotalDistance(pickup, destination);
+  
+  const infoDiv = document.getElementById('map-route-info');
+  if (infoDiv && totalDist.total) {
+    // Calculate estimated time
+    const avgSpeedKmh = 60;
+    const tripDistanceKm = totalDist.trip || 0;
+    const estimatedMinutes = Math.ceil((tripDistanceKm / avgSpeedKmh) * 60);
+    const hours = Math.floor(estimatedMinutes / 60);
+    const mins = estimatedMinutes % 60;
+    const estTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
     
-    const pickupCoords = getCoordinates(pickup);
-    const destCoords = getCoordinates(destination);
-    const totalDist = calculateTotalDistance(pickup, destination);
-    
-    const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv && totalDist.total) {
-      infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}`;
-    }
-    
-    const openLink = document.getElementById('openMapsLink');
-    openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-    // Keep button text as "Click to View Map" - no change needed
+    // Display with estimated time included
+    infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estTimeStr}`;
   }
+  
+  const openLink = document.getElementById('openMapsLink');
+  openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
+  // Keep button text as "Click to View Map" - no change needed
+}
   
   function checkReady() {
     const from = document.getElementById('gm-origin').value;
