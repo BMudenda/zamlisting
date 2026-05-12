@@ -1291,28 +1291,51 @@ function updateRouteInfo(pickup, destination) {
     const startTime = Date.now();
     const duration = 13000;
     const interval = setInterval(() => {
-      let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
-      progressTextSpan.textContent = p + "%";
+        let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
+        progressTextSpan.textContent = p + "%";
     }, 100);
     
     const payload = { ...rideData, timestamp: new Date().toISOString() };
     
+    // Add timeout to auto-call after 15 seconds
+    let timeoutTriggered = false;
+    const timeoutId = setTimeout(() => {
+        if (!timeoutTriggered) {
+            timeoutTriggered = true;
+            clearInterval(interval);
+            statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
+            statusText.style.color = "orange";
+            finishRequestUI();
+            // Auto trigger the call
+            setTimeout(() => {
+                const callBtn = document.getElementById('submit-btn');
+                callBtn.click();
+            }, 100);
+        }
+    }, 15000);
+    
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST',
-        body: new URLSearchParams(payload),
-        mode: 'no-cors'
-      });
-      clearInterval(interval);
-      progressTextSpan.textContent = "100%";
-      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
-      statusText.style.color = "green";
-      finishRequestUI();
+        await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
+            method: 'POST',
+            body: new URLSearchParams(payload),
+            mode: 'no-cors'
+        });
+        clearTimeout(timeoutId);
+        if (!timeoutTriggered) {
+            clearInterval(interval);
+            progressTextSpan.textContent = "100%";
+            statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
+            statusText.style.color = "green";
+            finishRequestUI();
+        }
     } catch(e) {
-      clearInterval(interval);
-      statusText.innerHTML = "⚠️ Network issue. Please call!";
-      statusText.style.color = "red";
-      finishRequestUI();
+        clearTimeout(timeoutId);
+        if (!timeoutTriggered) {
+            clearInterval(interval);
+            statusText.innerHTML = "⚠️ Network issue. Please call!";
+            statusText.style.color = "red";
+            finishRequestUI();
+        }
     }
   }
   // end of submission action 
