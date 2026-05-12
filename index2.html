@@ -467,13 +467,14 @@
   });
 
 // Function to get driver contact based on selected hub
+// Function to get driver contact based on selected hub
 function getDriverContactForHub() {
     // Default main number if no hub is selected
     if (!rideData || !rideData.hub) {
         return "0978167546";
     }
     
-    // Hub-specific driver numbers
+    // Hub-specific driver numbers (Zambia format without country code)
     const hubDriverNumbers = {
         "Luangwa Bus Station": "0978167546",
         "Chitope, Luangwa": "0978123456",
@@ -486,8 +487,16 @@ function getDriverContactForHub() {
         "Chipata": "0978890123"
     };
     
-    // Return hub-specific number if it exists, otherwise default
     return hubDriverNumbers[rideData.hub] || "0978167546";
+}
+
+// Function to convert local number to international format for WhatsApp
+function formatForWhatsApp(number) {
+    // Remove leading 0 and add country code 260
+    if (number.startsWith('0')) {
+        return '260' + number.substring(1);
+    }
+    return number;
 }
 
 // Coordinates fetching and sharing functions
@@ -506,8 +515,6 @@ function getLocation() {
                 
                 mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
                 
-                // Show which driver it will be sent to
-                const driverNumber = getDriverContactForHub();
                 const hubName = rideData?.hub || "Main Office";
                 status.innerHTML = `🌐 ✅ Location ready! Will send to driver at ${hubName}`;
             },
@@ -526,8 +533,9 @@ function shareWhatsApp() {
         return;
     }
     
-    // Get the driver number for the selected hub
-    const driverNumber = getDriverContactForHub();
+    // Get the driver number and convert to international format for WhatsApp
+    let driverNumber = getDriverContactForHub();
+    driverNumber = formatForWhatsApp(driverNumber); // Converts 0978167546 to 260978167546
     
     let message = encodeURIComponent("📍 Here is my current location: " + mapLink);
     window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
@@ -539,11 +547,12 @@ function shareSMS() {
         return;
     }
     
-    // Get the driver number for the selected hub
-    const driverNumber = getDriverContactForHub();
+    // Get the driver number (SMS works with local format)
+    let driverNumber = getDriverContactForHub();
     
+    // SMS can use local format or with +260
     window.location.href = `sms:${driverNumber}?body=📍 Here is my location: ${mapLink}`;
-}
+      }
 
   // ----- COMPLETE PLACES LIST (with coordinates) -----
   const placesWithCoords = [
