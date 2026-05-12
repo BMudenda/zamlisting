@@ -729,21 +729,29 @@
       { from: "Rufunsa", to: "Luangwa Bridge", distance: 73.00 }
   ];
   
-  // Hub-specific contact numbers for the "Call Now" button after booking
-const hubCallNumbers = {
-  "Luangwa Bus Station": "0978167546",
-  "Chitope, Luangwa": "0978123456",
-  "Luangwa Bridge Market": "0978234567",
-  "Rufunsa": "0978345678",
-  "Chongwe": "0978456789",
-  "Lusaka": "0978567890",
-  "Nyimba": "0978678901",
-  "Petauke": "0978789012",
-  "Chipata": "0978890123"
-};
-
-const defaultCallNumber = "0978167546";
-  
+  // Hub-
+const hubs = [
+  "Luangwa Bus Station", 
+  "Chitope, Luangwa", 
+  "Luangwa Bridge Market", 
+  "Rufunsa", 
+  "Chongwe", 
+  "Lusaka", 
+  "Nyimba", 
+  "Petauke", 
+  "Chipata", 
+  "Katete", 
+  "Lundazi", 
+  "Kabwe", 
+  "Kapiri Mposhi", 
+  "Ndola", 
+  "Mpongwe", 
+  "Masaiti", 
+  "Luanshya", 
+  "Luanshya Town Roundabout", 
+  "Mpatamatu Bus Stop, Luanshya"
+];
+     
   const graph = {};
   segments.forEach(({ from, to, distance }) => {
     if (!graph[from]) graph[from] = [];
@@ -1017,11 +1025,36 @@ function updateRouteInfo(pickup, destination) {
     progressTextSpan.style.display = "none";
     btnIcon.style.display = "block";
     btnIcon.className = "fas fa-phone";
+    
+    // Get the hub-specific phone number based on the calculated route
+    let callNumber = "0978167546"; // Default main number
+    
+    // Check if we have rideData and a hub assigned
+    if (rideData && rideData.hub) {
+        // Hub-specific numbers
+        const hubNumbers = {
+            "Luangwa Bus Station": "0978167546",
+            "Chitope, Luangwa": "0978123456",
+            "Luangwa Bridge Market": "0978234567",
+            "Rufunsa": "0978345678",
+            "Chongwe": "0978456789",
+            "Lusaka": "0978567890",
+            "Nyimba": "0978678901",
+            "Petauke": "0978789012",
+            "Chipata": "0978890123"
+        };
+        
+        // Use hub-specific number if it exists, otherwise use default
+        if (hubNumbers[rideData.hub]) {
+            callNumber = hubNumbers[rideData.hub];
+        }
+    }
+    
     submitBtn.style.background = "var(--success-color)";
     submitBtn.disabled = false;
     document.getElementById('action-label').innerHTML = " Call Now";
-    submitBtn.onclick = () => window.location.href = "tel:0978167546";
-  }
+    submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
+}
   
   // Initialize autocomplete
   setupAuto('gm-origin', 'origin-container', 'originList');
