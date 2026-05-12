@@ -466,51 +466,93 @@
     document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
   });
 
-  // Coordinates fetching and sharing functions
-  let mapLink = "";
+// Function to get driver contact based on selected hub
+// Function to get driver contact based on selected hub
+function getDriverContactForHub() {
+    // Default main number if no hub is selected
+    if (!rideData || !rideData.hub) {
+        return "0978167546";
+    }
+    
+    // Hub-specific driver numbers (Zambia format without country code)
+    const hubDriverNumbers = {
+        "Luangwa Bus Station": "0978167546",
+        "Chitope, Luangwa": "0978123456",
+        "Luangwa Bridge Market": "0978234567",
+        "Rufunsa": "0978345678",
+        "Chongwe": "0978456789",
+        "Lusaka": "0978567890",
+        "Nyimba": "0978678901",
+        "Petauke": "0978789012",
+        "Chipata": "0978890123"
+    };
+    
+    return hubDriverNumbers[rideData.hub] || "0978167546";
+}
 
-  function getLocation() {
+// Function to convert local number to international format for WhatsApp
+function formatForWhatsApp(number) {
+    // Remove leading 0 and add country code 260
+    if (number.startsWith('0')) {
+        return '260' + number.substring(1);
+    }
+    return number;
+}
+
+// Coordinates fetching and sharing functions
+let mapLink = "";
+
+function getLocation() {
     const status = document.getElementById("locationStatus");
-
+    
     if (navigator.geolocation) {
-      status.innerHTML = "📍 Getting location...";
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          let lat = position.coords.latitude;
-          let lon = position.coords.longitude;
-
-          mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-
-          status.innerHTML = "🌐 ✅ current location ready!.";
-        },
-        (error) => {
-          status.innerHTML = "❌ Failed to get location!";
-        }
-      );
+        status.innerHTML = "📍 Getting location...";
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                let lat = position.coords.latitude;
+                let lon = position.coords.longitude;
+                
+                mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                
+                const hubName = rideData?.hub || "Main Office";
+                status.innerHTML = `🌐 ✅ Location ready! share to ${hubName}`;
+            },
+            (error) => {
+                status.innerHTML = "❌ Failed to get location!";
+            }
+        );
     } else {
-      status.innerHTML = "❌ Geolocation not supported!";
+        status.innerHTML = "❌ Geolocation not supported!";
     }
-  }
+}
 
-  function shareWhatsApp() {
+function shareWhatsApp() {
     if (!mapLink) {
-      alert("Please get your location first using 'Get My Location'");
-      return;
+        alert("Please get your location first using 'Get My Location'");
+        return;
     }
-
+    
+    // Get the driver number and convert to international format for WhatsApp
+    let driverNumber = getDriverContactForHub();
+    driverNumber = formatForWhatsApp(driverNumber); // Converts 0978167546 to 260978167546
+    
     let message = encodeURIComponent("📍 Here is my current location: " + mapLink);
-    window.open(`https://wa.me/260978167546?text=${message}`, "_blank");
-  }
+    window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
+}
 
-  function shareSMS() {
+function shareSMS() {
     if (!mapLink) {
-      alert("Please get your location first using 'Get My Location'");
-      return;
+        alert("Please get your location first using 'Get My Location'");
+        return;
     }
-
-    window.location.href = `sms:0978167546?body=📍 Here is my location: ${mapLink}`;
-  }
+    
+    // Get the driver number (SMS works with local format)
+    let driverNumber = getDriverContactForHub();
+    
+    // SMS can use local format or with +260
+    window.location.href = `sms:${driverNumber}?body=📍 Here is my location: ${mapLink}`;
+      }
 
   // ----- COMPLETE PLACES LIST (with coordinates) -----
   const placesWithCoords = [
@@ -1238,6 +1280,7 @@ function updateRouteInfo(pickup, destination) {
       submitBtn.onclick = handleRequest;
     }, 500);
   }
+  // Submit button display and actions 
   
   async function handleRequest() {
     submitBtn.disabled = true;
@@ -1248,30 +1291,54 @@ function updateRouteInfo(pickup, destination) {
     const startTime = Date.now();
     const duration = 13000;
     const interval = setInterval(() => {
-      let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
-      progressTextSpan.textContent = p + "%";
+        let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
+        progressTextSpan.textContent = p + "%";
     }, 100);
     
     const payload = { ...rideData, timestamp: new Date().toISOString() };
     
+    // Add timeout to auto-call after 15 seconds
+    let timeoutTriggered = false;
+    const timeoutId = setTimeout(() => {
+        if (!timeoutTriggered) {
+            timeoutTriggered = true;
+            clearInterval(interval);
+            statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
+            statusText.style.color = "orange";
+            finishRequestUI();
+            // Auto trigger the call
+            setTimeout(() => {
+                const callBtn = document.getElementById('submit-btn');
+                callBtn.click();
+            }, 100);
+        }
+    }, 15000);
+    
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST',
-        body: new URLSearchParams(payload),
-        mode: 'no-cors'
-      });
-      clearInterval(interval);
-      progressTextSpan.textContent = "100%";
-      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
-      statusText.style.color = "green";
-      finishRequestUI();
+        await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
+            method: 'POST',
+            body: new URLSearchParams(payload),
+            mode: 'no-cors'
+        });
+        clearTimeout(timeoutId);
+        if (!timeoutTriggered) {
+            clearInterval(interval);
+            progressTextSpan.textContent = "100%";
+            statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
+            statusText.style.color = "green";
+            finishRequestUI();
+        }
     } catch(e) {
-      clearInterval(interval);
-      statusText.innerHTML = "⚠️ Network issue. Please call!";
-      statusText.style.color = "red";
-      finishRequestUI();
+        clearTimeout(timeoutId);
+        if (!timeoutTriggered) {
+            clearInterval(interval);
+            statusText.innerHTML = "⚠️ Network issue. Please call!";
+            statusText.style.color = "red";
+            finishRequestUI();
+        }
     }
   }
+  // end of submission action 
   
   function finishRequestUI() {
     btnLoader.style.display = "none";
