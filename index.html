@@ -651,19 +651,16 @@ function shareSMS() {
   }
   
   // Graph & distance engine
-  const segments = [
-       
+      const segments = [
 // ============================================
-// SECTION 1: ALL PLACES CONNECTED TO HUB 1 (LUANGWA BUS STATION)
+// SECTION 1: LUANGWA - ALL PLACES CONNECTED TO LUANGWA BUS STATION
 // ============================================
 { from: "Airstrip, Luangwa", to: "Luangwa Bus Station", distance: 3.90 },
 { from: "Airstrip, Luangwa", to: "Luangwa Town Council", distance: 2.10 },
 { from: "Airstrip, Luangwa", to: "Luangwa District Hospital", distance: 1.80 },
 { from: "Airstrip, Luangwa", to: "Chitope, Luangwa", distance: 58.00 },
 { from: "Airstrip, Luangwa", to: "Luangwa Bridge Market", distance: 86.00 },
-    
 { from: "Luangwa Town", to: "Luangwa Bus Station", distance: 1.50 },
-    
 { from: "Anglican Church, Luangwa", to: "Luangwa Bus Station", distance: 1.00 },
 { from: "Boma Clinic, Luangwa", to: "Luangwa Bus Station", distance: 0.75 },
 { from: "Boma Filling Station, Luangwa", to: "Luangwa Bus Station", distance: 0.45 },
@@ -706,7 +703,6 @@ function shareSMS() {
 { from: "Kaunga Secondary School, Luangwa", to: "Luangwa Bus Station", distance: 73.00 },
 { from: "Kavalamanja, Luangwa", to: "Luangwa Bus Station", distance: 21.00 },
 { from: "Kapoche, Luangwa", to: "Luangwa Bus Station", distance: 27.00 },
-{ from: "Luangwa Feira", to: "Luangwa Bus Station", distance: 0.10 },
 { from: "Luangwa Basic School", to: "Luangwa Bus Station", distance: 0.55 },
 { from: "Luangwa Bridge", to: "Luangwa Bus Station", distance: 89.00 },
 { from: "Luangwa Bridge Market", to: "Luangwa Bus Station", distance: 89.00 },
@@ -739,130 +735,99 @@ function shareSMS() {
 { from: "Zambia Electricity Supply Corporation, Luangwa", to: "Luangwa Bus Station", distance: 1.60 },
 { from: "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", to: "Luangwa Bus Station", distance: 1.30 },
 { from: "ZICB Luangwa Branch, Luangwa", to: "Luangwa Bus Station", distance: 0.75 },
+
 // ============================================
-// cluster link
+// SECTION 2: LUANGWA INTRA-TOWN CLUSTERS (Triangle Connections)
 // ============================================
 { from: "Anglican Church, Luangwa", to: "Chitope, Luangwa", distance: 63.00 },
-
-
-// ============================================
-// CLUSTER 1: Mall & Entertainment
 { from: "JB Three Boarders Mall, Luangwa", to: "River Spot Club, Luangwa", distance: 0.03 },
 { from: "JB Three Boarders Mall, Luangwa", to: "Nyabota Lodge, Luangwa", distance: 0.25 },
 { from: "River Spot Club, Luangwa", to: "Nyabota Lodge, Luangwa", distance: 0.25 },
-// CLUSTER 2: Fuel & Harbour
 { from: "Boma Filling Station, Luangwa", to: "Kantuleni Executive Lodge, Luangwa", distance: 0.19 },
 { from: "Boma Filling Station, Luangwa", to: "Luangwa Harbour, Luangwa", distance: 0.28 },
 { from: "Kantuleni Executive Lodge, Luangwa", to: "Luangwa Harbour, Luangwa", distance: 0.09 },
-// CLUSTER 3: Government
 { from: "Luangwa Council Lodge, Luangwa", to: "District Commissioner, Luangwa", distance: 0.30 },
 { from: "Luangwa Council Lodge, Luangwa", to: "Luangwa Police Station, Luangwa", distance: 0.40 },
 { from: "District Commissioner, Luangwa", to: "Luangwa Police Station, Luangwa", distance: 0.30 },
-// CLUSTER 4: Schools Central
 { from: "Luangwa Basic School", to: "District Education Board Secretary, Luangwa", distance: 0.20 },
 { from: "Luangwa Basic School", to: "Boma Clinic, Luangwa", distance: 0.25 },
 { from: "District Education Board Secretary, Luangwa", to: "Boma Clinic, Luangwa", distance: 0.15 },
-// CLUSTER 5: Churches Central
 { from: "Anglican Church, Luangwa", to: "Feira Kingdom Hall, Luangwa", distance: 0.08 },
 { from: "Anglican Church, Luangwa", to: "Luangwa Main SDA Church", distance: 0.50 },
 { from: "Feira Kingdom Hall, Luangwa", to: "Luangwa Main SDA Church", distance: 0.55 },
-// CLUSTER 6: Markets
 { from: "Luangwa Market", to: "Yellow Shop, Luangwa", distance: 0.18 },
 { from: "Luangwa Market", to: "Feira Gardens, Luangwa", distance: 0.45 },
 { from: "Yellow Shop, Luangwa", to: "Feira Gardens, Luangwa", distance: 0.30 },
-// CLUSTER 7: Lodges 1
 { from: "Gerasmos Safari Lodge, Luangwa", to: "Kabila, Luangwa", distance: 0.50 },
 { from: "Gerasmos Safari Lodge, Luangwa", to: "Makichilo Lodge, Luangwa", distance: 0.30 },
 { from: "Kabila, Luangwa", to: "Makichilo Lodge, Luangwa", distance: 0.40 },
-// CLUSTER 8: Town Council Area
 { from: "Luangwa Town Council", to: "National Registration Office, Luangwa", distance: 0.49 },
 { from: "Luangwa Town Council", to: "Car Wash Pub, Luangwa", distance: 1.00 },
 { from: "National Registration Office, Luangwa", to: "Car Wash Pub, Luangwa", distance: 0.80 },
-// CLUSTER 9: Churches & Assembly
 { from: "UCZ Feira, Luangwa", to: "Pentecostal Assembly of God Joshua Assembly, Luangwa", distance: 0.08 },
 { from: "UCZ Feira, Luangwa", to: "JB Three Boarders Club, Luangwa", distance: 0.30 },
 { from: "Pentecostal Assembly of God Joshua Assembly, Luangwa", to: "JB Three Boarders Club, Luangwa", distance: 0.35 },
-// CLUSTER 10: Buildings & Utilities
 { from: "Indeco Building, Luangwa", to: "Indeco Community, Luangwa", distance: 1.30 },
 { from: "Indeco Building, Luangwa", to: "Zambia Electricity Supply Corporation, Luangwa", distance: 0.85 },
 { from: "Indeco Community, Luangwa", to: "Zambia Electricity Supply Corporation, Luangwa", distance: 0.90 },
-// CLUSTER 11: Lodges 2
 { from: "Justifeli Lodge, Luangwa", to: "Yangoma Lodge, Luangwa", distance: 0.60 },
 { from: "Justifeli Lodge, Luangwa", to: "BM Residence, Luangwa", distance: 1.20 },
 { from: "Yangoma Lodge, Luangwa", to: "BM Residence, Luangwa", distance: 0.90 },
-// CLUSTER 12: Communities North
 { from: "Chidada Community, Luangwa", to: "Chidada Ground, Luangwa", distance: 1.30 },
 { from: "Chidada Community, Luangwa", to: "Ludaka, Luangwa", distance: 1.80 },
 { from: "Chidada Ground, Luangwa", to: "Ludaka, Luangwa", distance: 2.00 },
-// CLUSTER 13: Feira Area
 { from: "Feira Day Community, Luangwa", to: "Feira Day Secondary School, Luangwa", distance: 1.30 },
 { from: "Feira Day Community, Luangwa", to: "ZamListing Rides, Luangwa", distance: 1.00 },
 { from: "Feira Day Secondary School, Luangwa", to: "ZamListing Rides, Luangwa", distance: 1.10 },
-// CLUSTER 14: Kambolozo Area
 { from: "Dzalo Skills Training Centre Kambolozo, Luangwa", to: "Kambolozo Community, Luangwa", distance: 1.30 },
 { from: "Dzalo Skills Training Centre Kambolozo, Luangwa", to: "Hill View Pub, Luangwa", distance: 0.80 },
 { from: "Kambolozo Community, Luangwa", to: "Hill View Pub, Luangwa", distance: 1.10 },
-// CLUSTER 15: Hospital Area
 { from: "Luangwa District Hospital", to: "Mandombe Community, Luangwa", distance: 1.30 },
 { from: "Luangwa District Hospital", to: "Kamoba Community, Luangwa", distance: 1.30 },
 { from: "Mandombe Community, Luangwa", to: "Kamoba Community, Luangwa", distance: 1.50 },
-// CLUSTER 16: Soweto Area
 { from: "Soweto Community, Luangwa", to: "Soweto Junction, Luangwa", distance: 1.30 },
 { from: "Soweto Community, Luangwa", to: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", distance: 2.00 },
 { from: "Soweto Junction, Luangwa", to: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", distance: 2.50 },
-// CLUSTER 17: Customs & Border
 { from: "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", to: "Luangwa Immigration Border Post, Luangwa", distance: 0.50 },
 { from: "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", to: "ZICB Luangwa Branch, Luangwa", distance: 0.70 },
 { from: "Luangwa Immigration Border Post, Luangwa", to: "ZICB Luangwa Branch, Luangwa", distance: 0.28 },
-// CLUSTER 18: Chitope Rural Area
 { from: "Chitope, Luangwa", to: "Chitope Rural Health Centre, Luangwa", distance: 0.50 },
 { from: "Chitope, Luangwa", to: "Mwavi Secondary School, Luangwa", distance: 1.10 },
 { from: "Chitope Rural Health Centre, Luangwa", to: "Mwavi Secondary School, Luangwa", distance: 2.00 },
-// CLUSTER 19: Mwalila & Kaunga
 { from: "Mwalila Primary School, Luangwa", to: "Kaunga Secondary School, Luangwa", distance: 5.00 },
 { from: "Mwalila Primary School, Luangwa", to: "Kasinsa, Luangwa", distance: 6.00 },
 { from: "Kaunga Secondary School, Luangwa", to: "Kasinsa, Luangwa", distance: 5.00 },
-// CLUSTER 20: Luangwa Secondary Area
 { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.80 },
 { from: "Luangwa Secondary School", to: "Chiriwe Primary School, Luangwa", distance: 2.00 },
 { from: "Luangwa High School Police Post", to: "Chiriwe Primary School, Luangwa", distance: 2.10 },
-// CLUSTER 21: Katondwe Mission
 { from: "Katondwe Mission Hospital, Luangwa", to: "Katondwe Primary School, Luangwa", distance: 0.55 },
 { from: "Katondwe Mission Hospital, Luangwa", to: "Katondwe Girls Secondary School, Luangwa", distance: 0.60 },
 { from: "Katondwe Primary School, Luangwa", to: "Katondwe Girls Secondary School, Luangwa", distance: 0.00 },
-// CLUSTER 22: Katondwe Hotels & Dam
 { from: "Katondwe Chaz Hotel, Luangwa", to: "Passover Living Lamb Ministry, Luangwa", distance: 0.40 },
 { from: "Katondwe Chaz Hotel, Luangwa", to: "Katondwe Dam, Luangwa", distance: 0.50 },
 { from: "Passover Living Lamb Ministry, Luangwa", to: "Katondwe Dam, Luangwa", distance: 0.10 },
-// CLUSTER 23: SDA & Bridge
 { from: "SDA Katondwe, Luangwa", to: "Luangwa Bridge", distance: 39.00 },
 { from: "SDA Katondwe, Luangwa", to: "Luangwa Bridge Market", distance: 39.00 },
 { from: "Luangwa Bridge", to: "Luangwa Bridge Market", distance: 3.00 },
-// CLUSTER 24: Kakaro Heritage
 { from: "Kakaro Liberation Heritage Site, Luangwa", to: "Kakaro Primary School, Luangwa", distance: 1.20 },
 { from: "Kakaro Liberation Heritage Site, Luangwa", to: "Kapoche, Luangwa", distance: 16.00 },
 { from: "Kakaro Primary School, Luangwa", to: "Kapoche, Luangwa", distance: 15.00 },
-// CLUSTER 25: Kavalamanja & Chilombwe
 { from: "Kavalamanja, Luangwa", to: "Chilombwe Community School, Luangwa", distance: 6.00 },
 { from: "Kavalamanja, Luangwa", to: "Luangwa District Hospital", distance: 17.00 },
 { from: "Chilombwe Community School, Luangwa", to: "Luangwa District Hospital", distance: 11.00 },
-// CLUSTER 26: Post Office & Luangwa (Feira)
-{ from: "Luangwa Post Office", to: "Luangwa Feira", distance: 0.20 },
 { from: "Luangwa Post Office", to: "Luangwa Market", distance: 0.15 },
-{ from: "Luangwa Feira", to: "Luangwa Market", distance: 0.10 },
-   // Lusaka to Ndola Luanshya
-  // ============================================
-// SECTION 1: ALL PLACES CONNECTED TO MAIN HUB (LUSAKA)
-// ============================================
 
-{ from: "Luanshya", to: "Lusaka", distance: 335.00 },
+// ============================================
+// SECTION 3: INTER-TOWN CONNECTIONS (VIA LUSAKA HUB)
+// ============================================
+{ from: "Luanshya Town", to: "Lusaka", distance: 335.00 },
 { from: "Ndola", to: "Lusaka", distance: 320.00 },
 { from: "Mpongwe", to: "Lusaka", distance: 420.00 },
 { from: "Masaiti", to: "Lusaka", distance: 350.00 },
 { from: "Kapiri Mposhi", to: "Lusaka", distance: 210.00 },
 { from: "Kabwe", to: "Lusaka", distance: 140.00 },
 { from: "Luangwa Town", to: "Lusaka", distance: 320.00 },
-{ from: "Rufunsa", to: "Lusaka", distance: 192.70 },
+{ from: "Rufunsa Town", to: "Lusaka", distance: 192.70 },
 { from: "Chongwe", to: "Lusaka", distance: 45.00 },
 { from: "Nyimba", to: "Lusaka", distance: 288.00 },
 { from: "Petauke", to: "Lusaka", distance: 350.00 },
@@ -874,78 +839,41 @@ function shareSMS() {
 { from: "Luangwa Bridge Market", to: "Lusaka", distance: 393.00 },
 
 // ============================================
-// SECTION 2: CLUSTERS OF 3 PLACES EACH WITH INTERLINKS
+// SECTION 4: REGIONAL CLUSTERS (Town-to-Town Triangles)
 // ============================================
-
-// CLUSTER 1: Copperbelt Triangle (Luanshya, Ndola, Masaiti)
-{ from: "Luanshya", to: "Ndola", distance: 35.00 },
-{ from: "Luanshya", to: "Masaiti", distance: 60.00 },
+{ from: "Luanshya Town", to: "Ndola", distance: 35.00 },
+{ from: "Luanshya Town", to: "Masaiti", distance: 60.00 },
 { from: "Ndola", to: "Masaiti", distance: 45.00 },
-
-// CLUSTER 2: Copperbelt West (Luanshya, Mpongwe, Masaiti)
-{ from: "Luanshya", to: "Mpongwe", distance: 75.00 },
-{ from: "Luanshya", to: "Masaiti", distance: 60.00 },
+{ from: "Luanshya Town", to: "Mpongwe", distance: 75.00 },
 { from: "Mpongwe", to: "Masaiti", distance: 85.00 },
-
-// CLUSTER 3: Copperbelt East (Ndola, Mpongwe, Kapiri Mposhi)
 { from: "Ndola", to: "Mpongwe", distance: 110.00 },
 { from: "Ndola", to: "Kapiri Mposhi", distance: 120.00 },
 { from: "Mpongwe", to: "Kapiri Mposhi", distance: 190.00 },
-
-// CLUSTER 4: Central Province (Kapiri Mposhi, Kabwe, Lusaka)
 { from: "Kapiri Mposhi", to: "Kabwe", distance: 70.00 },
-{ from: "Kapiri Mposhi", to: "Lusaka", distance: 210.00 },
 { from: "Kabwe", to: "Lusaka", distance: 140.00 },
-
-// CLUSTER 5: Luangwa Valley (Luangwa, Rufunsa, Chongwe)
-{ from: "Luangwa Town", to: "Rufunsa", distance: 102.70 },
+{ from: "Luangwa Town", to: "Rufunsa Town", distance: 102.70 },
 { from: "Luangwa Town", to: "Chongwe", distance: 275.00 },
-{ from: "Rufunsa", to: "Chongwe", distance: 90.00 },
-
-// CLUSTER 6: Luangwa Bridge Area (Luangwa Bridge, Luangwa Bridge Market, Rufunsa)
+{ from: "Rufunsa Town", to: "Chongwe", distance: 90.00 },
 { from: "Luangwa Bridge", to: "Luangwa Bridge Market", distance: 3.00 },
-{ from: "Luangwa Bridge", to: "Rufunsa", distance: 73.00 },
-{ from: "Luangwa Bridge Market", to: "Rufunsa", distance: 71.00 },
-
-// CLUSTER 7: Eastern Province 1 (Nyimba, Petauke, Chipata)
+{ from: "Luangwa Bridge", to: "Rufunsa Town", distance: 73.00 },
+{ from: "Luangwa Bridge Market", to: "Rufunsa Town", distance: 71.00 },
 { from: "Nyimba", to: "Petauke", distance: 65.00 },
 { from: "Nyimba", to: "Chipata", distance: 223.00 },
 { from: "Petauke", to: "Chipata", distance: 158.00 },
-
-// CLUSTER 8: Eastern Province 2 (Chipata, Katete, Lundazi)
 { from: "Chipata", to: "Katete", distance: 30.00 },
 { from: "Chipata", to: "Lundazi", distance: 159.00 },
 { from: "Katete", to: "Lundazi", distance: 200.00 },
-
-// CLUSTER 9: Eastern Long Distances (Nyimba, Lundazi, Petauke)
 { from: "Nyimba", to: "Lundazi", distance: 358.00 },
-{ from: "Nyimba", to: "Petauke", distance: 65.00 },
 { from: "Lundazi", to: "Petauke", distance: 295.00 },
-
-// CLUSTER 10: Luangwa Bus Station Cluster (Luangwa Bus Station, Luangwa, Nyimba)
-{ from: "Luangwa Bus Station", to: "Luangwa", distance: 0.00 },
 { from: "Luangwa Bus Station", to: "Nyimba", distance: 187.10 },
 { from: "Luangwa Town", to: "Nyimba", distance: 187.10 },
-
-// CLUSTER 11: Chongwe & Luangwa Connection (Chongwe, Luangwa, Rufunsa)
-{ from: "Chongwe", to: "Luangwa", distance: 275.00 },
-{ from: "Chongwe", to: "Rufunsa", distance: 90.00 },
-{ from: "Luangwa Town", to: "Rufunsa", distance: 102.70 },
-
-// CLUSTER 12: Central & Eastern Link (Kapiri Mposhi, Nyimba, Petauke)
 { from: "Kapiri Mposhi", to: "Nyimba", distance: 78.00 },
 { from: "Kapiri Mposhi", to: "Petauke", distance: 140.00 },
-{ from: "Nyimba", to: "Petauke", distance: 65.00 },
-      // Link back to Lusaka Rufunsa District 
-    
-      // Main Hub Network
 
-    
-  // ============================================
-// SECTION 1: ALL PLACES CONNECTED TO HUB 1 (RUFUNSA BUS STATION)
 // ============================================
-{ from: "Rufunsa", to: "Rufunsa Bus Station", distance: 1.50 },
-    
+// SECTION 5: RUFUNSA - ALL PLACES CONNECTED TO RUFUNSA BUS STATION
+// ============================================
+{ from: "Rufunsa Town", to: "Rufunsa Bus Station", distance: 1.50 },
 { from: "Rufunsa Boma", to: "Rufunsa Bus Station", distance: 2.50 },
 { from: "Kampasa Market, Rufunsa", to: "Rufunsa Bus Station", distance: 4.80 },
 { from: "Rufunsa Mission", to: "Rufunsa Bus Station", distance: 5.30 },
@@ -962,64 +890,41 @@ function shareSMS() {
 { from: "Luembe Bridge, Rufunsa", to: "Rufunsa Bus Station", distance: 10.20 },
 { from: "Shikabeta Area, Rufunsa", to: "Rufunsa Bus Station", distance: 17.70 },
 { from: "Munyaule Bridge, Rufunsa", to: "Rufunsa Bus Station", distance: 16.85 },
+
 // ============================================
-//CLUSTER LINKS
+// SECTION 6: RUFUNSA INTRA-TOWN CLUSTERS
 // ============================================
-// CLUSTER 1: Boma Government Area
-// Places: Rufunsa Boma, Rufunsa Police Station, Rufunsa Civic Centre
 { from: "Rufunsa Boma", to: "Rufunsa Police Station", distance: 1.40 },
 { from: "Rufunsa Boma", to: "Rufunsa Civic Centre", distance: 2.90 },
 { from: "Rufunsa Police Station", to: "Rufunsa Civic Centre", distance: 1.60 },
-// CLUSTER 2: Mission & Schools
-// Places: Rufunsa Mission, Rufunsa Secondary School, Rufunsa Bus Station
 { from: "Rufunsa Mission", to: "Rufunsa Secondary School", distance: 1.20 },
-{ from: "Rufunsa Mission", to: "Rufunsa Bus Station", distance: 5.30 },
-{ from: "Rufunsa Secondary School", to: "Rufunsa Bus Station", distance: 2.30 },
-// CLUSTER 3: Market & Health
-// Places: Kampasa Market, Rufunsa Market, Rufunsa Health Centre
 { from: "Kampasa Market, Rufunsa", to: "Rufunsa Market", distance: 5.55 },
 { from: "Kampasa Market, Rufunsa", to: "Rufunsa Health Centre", distance: 7.35 },
 { from: "Rufunsa Market", to: "Rufunsa Health Centre", distance: 1.80 },
-// CLUSTER 4: Civic & Market Area
-// Places: Rufunsa Civic Centre, Rufunsa Market, Munyaule Bridge
 { from: "Rufunsa Civic Centre", to: "Rufunsa Market", distance: 0.75 },
 { from: "Rufunsa Civic Centre", to: "Munyaule Bridge, Rufunsa", distance: 13.20 },
 { from: "Rufunsa Market", to: "Munyaule Bridge, Rufunsa", distance: 12.45 },
-// CLUSTER 5: Lukwipa & Chimusanya Area
-// Places: Lukwipa Area, Chimusanya School, Rufunsa Mission
 { from: "Lukwipa Area, Rufunsa", to: "Chimusanya School, Rufunsa", distance: 5.10 },
 { from: "Lukwipa Area, Rufunsa", to: "Rufunsa Mission", distance: 8.10 },
 { from: "Chimusanya School, Rufunsa", to: "Rufunsa Mission", distance: 12.00 },
-// CLUSTER 6: Mpanshya & Luembe Area
-// Places: Mpanshya Turnoff, Luembe Bridge, Rufunsa Bus Station
 { from: "Mpanshya Turnoff, Rufunsa", to: "Luembe Bridge, Rufunsa", distance: 10.70 },
-{ from: "Mpanshya Turnoff, Rufunsa", to: "Rufunsa Bus Station", distance: 20.90 },
 { from: "Luembe Bridge, Rufunsa", to: "Rufunsa Bus Station", distance: 10.20 },
-// CLUSTER 7: Katoba & Mwachisompola Area
-// Places: Katoba Area, Mwachisompola Area, Rufunsa Civic Centre
 { from: "Katoba Area, Rufunsa", to: "Mwachisompola Area, Rufunsa", distance: 4.50 },
 { from: "Katoba Area, Rufunsa", to: "Rufunsa Civic Centre", distance: 8.40 },
 { from: "Mwachisompola Area, Rufunsa", to: "Rufunsa Civic Centre", distance: 8.40 },
-// CLUSTER 8: Shikabeta & Munyaule Area
-// Places: Shikabeta Area, Munyaule Bridge, Rufunsa Health Centre
 { from: "Shikabeta Area, Rufunsa", to: "Munyaule Bridge, Rufunsa", distance: 4.50 },
 { from: "Shikabeta Area, Rufunsa", to: "Rufunsa Health Centre", distance: 11.50 },
 { from: "Munyaule Bridge, Rufunsa", to: "Rufunsa Health Centre", distance: 15.00 },
-// CLUSTER 9: Police & Secondary School Area
-// Places: Rufunsa Police Station, Rufunsa Secondary School, Kampasa Market
 { from: "Rufunsa Police Station", to: "Rufunsa Secondary School", distance: 3.50 },
 { from: "Rufunsa Police Station", to: "Kampasa Market, Rufunsa", distance: 6.60 },
 { from: "Rufunsa Secondary School", to: "Kampasa Market, Rufunsa", distance: 7.10 },
-// CLUSTER 10: Bus Station & Boma & Mission
-// Places: Rufunsa Bus Station, Rufunsa Boma, Rufunsa Mission
 { from: "Rufunsa Bus Station", to: "Rufunsa Boma", distance: 2.50 },
-{ from: "Rufunsa Bus Station", to: "Rufunsa Mission", distance: 5.30 },
 { from: "Rufunsa Boma", to: "Rufunsa Mission", distance: 2.80 },
-    
+
 // ============================================
-// SECTION 1: ALL PLACES CONNECTED TO HUB (MPATAMATU BUS STATION)
+// SECTION 7: LUANSHYA - ALL PLACES CONNECTED TO MPATAMATU BUS STATION
 // ============================================
-{ from: "Luanshya Town Roundabout", to: "Mpatamatu Bus Station, Luanshya", distance: 11.60 },
+{ from: "Luanshya Town", to: "Mpatamatu Bus Station, Luanshya", distance: 11.60 },
 { from: "Downtown Shopping Centre, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 11.70 },
 { from: "Shopping Complex, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 11.75 },
 { from: "Zambia Electricity Supply Corporation, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 11.83 },
@@ -1121,235 +1026,149 @@ function shareSMS() {
 { from: "Kasims Medical Center, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 15.25 },
 { from: "Luanshya Sports Complex", to: "Mpatamatu Bus Station, Luanshya", distance: 17.75 },
 { from: "9 Clinic, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 19.00 },
-{ from: "Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 11.60 },
 { from: "Luanshya Technical and Business College", to: "Mpatamatu Bus Station, Luanshya", distance: 13.10 },
 { from: "DaGama Home and School, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 14.10 },
 { from: "Luanshya Central Secondary School", to: "Mpatamatu Bus Station, Luanshya", distance: 13.50 },
 { from: "Mwatimwa Pub and Grill, Luanshya", to: "Mpatamatu Bus Station, Luanshya", distance: 12.45 },
 
 // ============================================
-// SECTION 2: INTRATOWN CLUSTERS (Luanshya)
+// SECTION 8: LUANSHYA INTRA-TOWN CLUSTERS
 // ============================================
-
-// CLUSTER 1: Town Centre Shops
 { from: "Downtown Shopping Centre, Luanshya", to: "Shopping Complex, Luanshya", distance: 0.05 },
 { from: "Downtown Shopping Centre, Luanshya", to: "Zambia Electricity Supply Corporation, Luanshya", distance: 0.13 },
 { from: "Shopping Complex, Luanshya", to: "Zambia Electricity Supply Corporation, Luanshya", distance: 0.08 },
-
-// CLUSTER 2: Government Offices
 { from: "National Registration Office, Luanshya", to: "District Education Board Secretary, Luanshya", distance: 0.60 },
 { from: "National Registration Office, Luanshya", to: "Luanshya Local Court", distance: 0.90 },
 { from: "District Education Board Secretary, Luanshya", to: "Luanshya Local Court", distance: 0.30 },
-
-// CLUSTER 3: Religious & Education
 { from: "Temple Of The Annunciation, Luanshya", to: "Luanshya Skills Training Institute", distance: 0.18 },
 { from: "Temple Of The Annunciation, Luanshya", to: "Hellen Kaunda Public Library, Luanshya", distance: 0.53 },
 { from: "Luanshya Skills Training Institute", to: "Hellen Kaunda Public Library, Luanshya", distance: 0.35 },
-
-// CLUSTER 4: Hindu & Sports
 { from: "Luanshya Hindu Hall", to: "Bharat Sports Club, Luanshya", distance: 0.20 },
 { from: "Luanshya Hindu Hall", to: "Zambia Library Service, Luanshya", distance: 0.47 },
 { from: "Bharat Sports Club, Luanshya", to: "Zambia Library Service, Luanshya", distance: 0.27 },
-
-// CLUSTER 5: Police & Filling Station
 { from: "Zambia Police Service, Luanshya", to: "Levy Nchito New Police Camp, Luanshya", distance: 0.55 },
 { from: "Zambia Police Service, Luanshya", to: "Engen Filling Station, Luanshya", distance: 0.85 },
 { from: "Levy Nchito New Police Camp, Luanshya", to: "Engen Filling Station, Luanshya", distance: 0.30 },
-
-// CLUSTER 6: Bakery & Correction & Cemetery
 { from: "FC Chatepa Bakery, Luanshya", to: "Luanshya Correction Service", distance: 1.20 },
 { from: "FC Chatepa Bakery, Luanshya", to: "Old Cemetery Milemu, Luanshya", distance: 1.40 },
 { from: "Luanshya Correction Service", to: "Old Cemetery Milemu, Luanshya", distance: 0.20 },
-
-// CLUSTER 7: Catholic & Schools
 { from: "St. Anthony Catholic Parish, Luanshya", to: "Muchinshi Primary School, Luanshya", distance: 0.75 },
 { from: "St. Anthony Catholic Parish, Luanshya", to: "Ndelela Primary School, Luanshya", distance: 3.35 },
 { from: "Muchinshi Primary School, Luanshya", to: "Ndelela Primary School, Luanshya", distance: 3.00 },
-
-// CLUSTER 8: ETG & Kingdom Hall & SDA Church
 { from: "ETG, Luanshya", to: "Kingdom Hall Of Jehovah's Witnesses, Luanshya", distance: 2.40 },
 { from: "ETG, Luanshya", to: "Luanshya Main Seventh Day Adventist Church", distance: 3.20 },
 { from: "Kingdom Hall Of Jehovah's Witnesses, Luanshya", to: "Luanshya Main Seventh Day Adventist Church", distance: 0.80 },
-
-// CLUSTER 9: Temple & Health Centre
 { from: "Temple Baptist Church, Luanshya", to: "Mikomfwa Health Centre, Luanshya", distance: 0.24 },
 { from: "Temple Baptist Church, Luanshya", to: "Reformed Church, Luanshya", distance: 0.84 },
 { from: "Mikomfwa Health Centre, Luanshya", to: "Reformed Church, Luanshya", distance: 0.60 },
-
-// CLUSTER 10: Stadium & Schools
 { from: "Mikomfwa Stadium, Luanshya", to: "Mama Rosa Primary School, Luanshya", distance: 1.20 },
 { from: "Mikomfwa Stadium, Luanshya", to: "Twatemwa Primary School, Luanshya", distance: 1.80 },
 { from: "Mama Rosa Primary School, Luanshya", to: "Twatemwa Primary School, Luanshya", distance: 1.50 },
-
-// CLUSTER 11: Market & Church & Kingdom Hall
 { from: "Buntungwa Market, Luanshya", to: "United Methodist Church, Luanshya", distance: 1.10 },
 { from: "Buntungwa Market, Luanshya", to: "Luanshya Kalala Kingdom Hall of Jehovah's Witnesses", distance: 0.30 },
 { from: "United Methodist Church, Luanshya", to: "Luanshya Kalala Kingdom Hall of Jehovah's Witnesses", distance: 1.40 },
-
-// CLUSTER 12: UCZ & Kambilo & Bethel
 { from: "UCZ Jordan Congregation, Luanshya", to: "Kambilo Mbilo, Luanshya", distance: 1.00 },
 { from: "UCZ Jordan Congregation, Luanshya", to: "Bethel Centre for the Deaf, Luanshya", distance: 0.65 },
 { from: "Kambilo Mbilo, Luanshya", to: "Bethel Centre for the Deaf, Luanshya", distance: 0.65 },
-
-// CLUSTER 13: Malaika Area
 { from: "Malaika Morning Market, Luanshya", to: "Malaika Clinic, Luanshya", distance: 0.60 },
 { from: "Malaika Morning Market, Luanshya", to: "Malaika School, Luanshya", distance: 1.30 },
 { from: "Malaika Clinic, Luanshya", to: "Malaika School, Luanshya", distance: 0.70 },
-
-// CLUSTER 14: TVTC & Boys Secondary & Mwetete Lodge
 { from: "TVTC, Luanshya", to: "Luanshya Boys Secondary School", distance: 1.00 },
 { from: "TVTC, Luanshya", to: "Mwetete Executive Lodge, Luanshya", distance: 2.30 },
 { from: "Luanshya Boys Secondary School", to: "Mwetete Executive Lodge, Luanshya", distance: 1.30 },
-
-// CLUSTER 15: Lodges & JC
 { from: "Pakawama Lodge, Luanshya", to: "Bethsaida Hotels, Luanshya", distance: 0.75 },
 { from: "Pakawama Lodge, Luanshya", to: "JC Lodge, Luanshya", distance: 3.05 },
 { from: "Bethsaida Hotels, Luanshya", to: "JC Lodge, Luanshya", distance: 2.30 },
-
-// CLUSTER 16: Malaika & Ndeke
 { from: "Malaika Area, Luanshya", to: "Ndeke SDA Church, Luanshya", distance: 0.20 },
 { from: "Malaika Area, Luanshya", to: "Ndeke Market, Luanshya", distance: 1.30 },
 { from: "Ndeke SDA Church, Luanshya", to: "Ndeke Market, Luanshya", distance: 1.10 },
-
-// CLUSTER 17: Chibansa & Kamirenda
 { from: "Chibansa Primary School, Luanshya", to: "Kamirenda New Apostolic Church, Luanshya", distance: 3.20 },
 { from: "Chibansa Primary School, Luanshya", to: "Kamirenda Seventh Day Adventist Church, Luanshya", distance: 3.70 },
 { from: "Kamirenda New Apostolic Church, Luanshya", to: "Kamirenda Seventh Day Adventist Church, Luanshya", distance: 0.50 },
-
-// CLUSTER 18: Kamirenda Clinic & Market & Roan Mall
 { from: "Kamirenda Community Clinic, Luanshya", to: "Kamirenda Market, Luanshya", distance: 1.00 },
 { from: "Kamirenda Community Clinic, Luanshya", to: "Roan Mall, Luanshya", distance: 3.40 },
 { from: "Kamirenda Market, Luanshya", to: "Roan Mall, Luanshya", distance: 2.40 },
-
-// CLUSTER 19: Hospitals
 { from: "Thomson District Hospital, Luanshya", to: "Roan Antelope General Hospital, Luanshya", distance: 5.60 },
 { from: "Thomson District Hospital, Luanshya", to: "Roan Market, Luanshya", distance: 4.60 },
 { from: "Roan Antelope General Hospital, Luanshya", to: "Roan Market, Luanshya", distance: 2.40 },
-
-// CLUSTER 20: Stadium & Lodge & CLM
 { from: "Kafubu Stadium, Luanshya", to: "Bowas Lodge, Luanshya", distance: 2.50 },
 { from: "Kafubu Stadium, Luanshya", to: "CLM Luanshya Copper Mines", distance: 4.50 },
 { from: "Bowas Lodge, Luanshya", to: "CLM Luanshya Copper Mines", distance: 4.00 },
-
-// CLUSTER 21: Civic Center & Niagara & Antelope
 { from: "Luanshya Civic Center", to: "Niagara Fitment Center & Car Wash, Luanshya", distance: 2.20 },
 { from: "Luanshya Civic Center", to: "Antelope Milling, Luanshya", distance: 4.10 },
 { from: "Niagara Fitment Center & Car Wash, Luanshya", to: "Antelope Milling, Luanshya", distance: 2.10 },
-
-// CLUSTER 22: Zamefa & Mazzieri & Twashuka
 { from: "Zamefa, Luanshya", to: "Mazzieri Primary School, Luanshya", distance: 3.90 },
 { from: "Zamefa, Luanshya", to: "Twashuka Market, Luanshya", distance: 5.20 },
 { from: "Mazzieri Primary School, Luanshya", to: "Twashuka Market, Luanshya", distance: 1.40 },
-
-// CLUSTER 23: Mpatamatu Stadium & Section 25 & Secondary School
 { from: "Mpatamatu Stadium, Luanshya", to: "Section 25 Mini Hospital, Luanshya", distance: 1.20 },
 { from: "Mpatamatu Stadium, Luanshya", to: "Mpatamatu Secondary School, Luanshya", distance: 2.60 },
 { from: "Section 25 Mini Hospital, Luanshya", to: "Mpatamatu Secondary School, Luanshya", distance: 1.40 },
-
-// CLUSTER 24: Mpatamatu Primary & Police & Main SDA
 { from: "Mpatamatu Primary School, Luanshya", to: "Mpatamatu Police Station, Luanshya", distance: 1.30 },
 { from: "Mpatamatu Primary School, Luanshya", to: "Mpatamatu Main SDA Church, Luanshya", distance: 2.40 },
 { from: "Mpatamatu Police Station, Luanshya", to: "Mpatamatu Main SDA Church, Luanshya", distance: 1.10 },
-
-// CLUSTER 25: Mpatamatu Churches & Bus Stop
 { from: "Mpatamatu South SDA Church, Luanshya", to: "Mpatamatu Reformed Church in Zambia, Luanshya", distance: 1.00 },
 { from: "Mpatamatu South SDA Church, Luanshya", to: "Mpatamatu Bus Stop, Luanshya", distance: 3.00 },
 { from: "Mpatamatu Reformed Church in Zambia, Luanshya", to: "Mpatamatu Bus Stop, Luanshya", distance: 2.00 },
-
-// CLUSTER 26: Dam & Gardens & High School
 { from: "Makoma Dam, Luanshya", to: "Beracah Gardens, Luanshya", distance: 13.70 },
 { from: "Makoma Dam, Luanshya", to: "Fisenge High School, Luanshya", distance: 17.40 },
 { from: "Beracah Gardens, Luanshya", to: "Fisenge High School, Luanshya", distance: 3.20 },
-
-// CLUSTER 27: Fisenge Church & Mosque & Lodge
 { from: "Fisenge Seventh Day Adventist Church, Luanshya", to: "Fisenge Mosque, Luanshya", distance: 0.45 },
 { from: "Fisenge Seventh Day Adventist Church, Luanshya", to: "Lowden Lodge, Luanshya", distance: 6.70 },
 { from: "Fisenge Mosque, Luanshya", to: "Lowden Lodge, Luanshya", distance: 2.90 },
-
-// CLUSTER 28: Mubende & Junction & Pleasure
 { from: "Mubende Country Lodge, Luanshya", to: "Luanshya Junction Market", distance: 1.70 },
 { from: "Mubende Country Lodge, Luanshya", to: "Pleasure Given Garden, Luanshya", distance: 2.55 },
 { from: "Luanshya Junction Market", to: "Pleasure Given Garden, Luanshya", distance: 0.85 },
-
-// CLUSTER 29: Baluba & Misaka & Copperstone
 { from: "Baluba Market, Luanshya", to: "Misaka SDA Church, Luanshya", distance: 0.75 },
 { from: "Baluba Market, Luanshya", to: "Copperstone University Zambezi Hostel, Luanshya", distance: 10.25 },
 { from: "Misaka SDA Church, Luanshya", to: "Copperstone University Zambezi Hostel, Luanshya", distance: 9.50 },
-
-// CLUSTER 30: CSMM & Jon Ken & CEC
 { from: "CSMM Fueling Station, Luanshya", to: "Jon Ken, Luanshya", distance: 7.90 },
 { from: "CSMM Fueling Station, Luanshya", to: "CEC 220KV Maposa Substation, Luanshya", distance: 3.10 },
 { from: "Jon Ken, Luanshya", to: "CEC 220KV Maposa Substation, Luanshya", distance: 0.00 },
-
-// CLUSTER 31: Golf & Lodge & Rugby
 { from: "Luanshya Golf Course", to: "Golden Age Lodge, Luanshya", distance: 2.70 },
 { from: "Luanshya Golf Course", to: "Roan Rugby Club, Luanshya", distance: 3.25 },
 { from: "Golden Age Lodge, Luanshya", to: "Roan Rugby Club, Luanshya", distance: 0.55 },
-
-// CLUSTER 32: Mine & Hospital & Trust School
 { from: "CLM Luanshya Copper Mines", to: "Luanshya Mine Hospital", distance: 0.65 },
 { from: "CLM Luanshya Copper Mines", to: "Luanshya Trust School", distance: 2.35 },
 { from: "Luanshya Mine Hospital", to: "Luanshya Trust School", distance: 1.70 },
-
-// CLUSTER 33: Golf Club & Newtown & Kasims
 { from: "Luanshya Golf Club", to: "Newtown Clinic, Luanshya", distance: 1.20 },
 { from: "Luanshya Golf Club", to: "Kasims Medical Center, Luanshya", distance: 0.70 },
 { from: "Newtown Clinic, Luanshya", to: "Kasims Medical Center, Luanshya", distance: 1.20 },
-
-// CLUSTER 34: Sports Complex & 9 Clinic & Roan Market
 { from: "Luanshya Sports Complex", to: "9 Clinic, Luanshya", distance: 4.80 },
 { from: "Luanshya Sports Complex", to: "Roan Market, Luanshya", distance: 4.00 },
 { from: "9 Clinic, Luanshya", to: "Roan Market, Luanshya", distance: 1.50 },
-
-// CLUSTER 35: Technical College & DaGama & Central Secondary
 { from: "Luanshya Technical and Business College", to: "DaGama Home and School, Luanshya", distance: 1.00 },
 { from: "Luanshya Technical and Business College", to: "Luanshya Central Secondary School", distance: 1.50 },
 { from: "DaGama Home and School, Luanshya", to: "Luanshya Central Secondary School", distance: 0.60 },
-
-// CLUSTER 36: Mwatimwa & Kasims & Town Roundabout
 { from: "Mwatimwa Pub and Grill, Luanshya", to: "Kasims Medical Center, Luanshya", distance: 1.00 },
-{ from: "Mwatimwa Pub and Grill, Luanshya", to: "Luanshya Town Roundabout", distance: 0.85 },
-{ from: "Kasims Medical Center, Luanshya", to: "Luanshya Town Roundabout", distance: 3.75 },
+{ from: "Mwatimwa Pub and Grill, Luanshya", to: "Luanshya Town", distance: 0.85 },
+{ from: "Kasims Medical Center, Luanshya", to: "Luanshya Town", distance: 3.75 },
 
 // ============================================
-// SECTION 3: HUB-TO-HUB CLUSTERS (Intra-town Triangle Connections)
+// SECTION 9: HUB-TO-HUB CLUSTERS (Triangle Connections)
 // ============================================
-
-// Luangwa Hub Cluster
 { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62.00 },
 { from: "Luangwa Bus Station", to: "Luangwa Bridge Market", distance: 89.00 },
 { from: "Chitope, Luangwa", to: "Luangwa Bridge Market", distance: 27.00 },
-
-// Luanshya Hub Cluster
-{ from: "Luanshya Town Roundabout", to: "Mpatamatu Bus Station, Luanshya", distance: 11.60 },
-{ from: "Luanshya Town Roundabout", to: "Ndeke, Luanshya", distance: 3.50 },
+{ from: "Luanshya Town", to: "Mpatamatu Bus Station, Luanshya", distance: 11.60 },
+{ from: "Luanshya Town", to: "Ndeke, Luanshya", distance: 3.50 },
 { from: "Mpatamatu Bus Station, Luanshya", to: "Ndeke, Luanshya", distance: 14.70 },
-
-// Rufunsa Hub Cluster
 { from: "Rufunsa Bus Station", to: "Rufunsa Boma", distance: 2.50 },
 { from: "Rufunsa Bus Station", to: "Kampasa Market, Rufunsa", distance: 4.80 },
 { from: "Rufunsa Boma", to: "Kampasa Market, Rufunsa", distance: 5.20 },
 
 // ============================================
-// SECTION 4: INTER-TOWN HUB CONNECTIONS (Rufunsa ↔ Luangwa)
+// SECTION 10: RUFUNSA TO LUANGWA DIRECT CONNECTIONS
 // ============================================
-
-// Rufunsa to Luangwa
 { from: "Rufunsa Bus Station", to: "Luangwa Bus Station", distance: 102.70 },
 { from: "Rufunsa Bus Station", to: "Chitope, Luangwa", distance: 164.70 },
 { from: "Rufunsa Bus Station", to: "Luangwa Bridge Market", distance: 191.70 },
-
-// Rufunsa Boma to Luangwa
 { from: "Rufunsa Boma", to: "Luangwa Bus Station", distance: 105.20 },
 { from: "Rufunsa Boma", to: "Chitope, Luangwa", distance: 167.20 },
 { from: "Rufunsa Boma", to: "Luangwa Bridge Market", distance: 194.20 },
-
-// Kampasa Market to Luangwa
 { from: "Kampasa Market, Rufunsa", to: "Luangwa Bus Station", distance: 107.50 },
 { from: "Kampasa Market, Rufunsa", to: "Chitope, Luangwa", distance: 169.50 },
 { from: "Kampasa Market, Rufunsa", to: "Luangwa Bridge Market", distance: 196.50 }
-
-  ];
+];
   
   // Hub-
 const hubs = [
