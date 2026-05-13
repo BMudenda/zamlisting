@@ -31,17 +31,8 @@
     }
     body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
-    .corner-logo {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      margin-right: 10px;
-    }
-    .company-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .corner-logo { width: 32px; height: 32px; object-fit: contain; margin-right: 10px; }
+    .company-info { display: flex; align-items: center; gap: 10px; }
 
     header {
       background: var(--primary-color);
@@ -581,7 +572,7 @@
     { from: "Chilombwe Community School, Luangwa", to: "Luangwa District Hospital", distance: 11.00 },
     { from: "Luangwa Post Office", to: "Luangwa Market", distance: 0.15 },
 
-    // SECTION 3: INTER-TOWN CONNECTIONS
+    // SECTION 3: INTER-TOWN CONNECTIONS (VIA LUSAKA)
     { from: "Luanshya", to: "Lusaka", distance: 335.00 },
     { from: "Ndola", to: "Lusaka", distance: 320.00 },
     { from: "Mpongwe", to: "Lusaka", distance: 420.00 },
@@ -614,7 +605,7 @@
     { from: "Luangwa Town", to: "Chongwe", distance: 275.00 },
     { from: "Rufunsa", to: "Chongwe", distance: 90.00 },
     { from: "Luangwa Bridge", to: "Luangwa Bridge Market", distance: 3.00 },
-    // REMOVED incorrect Rufunsa to Luangwa Bridge connections
+    // REMOVED: Incorrect Rufunsa to Luangwa Bridge connections (73km and 71km)
     { from: "Nyimba", to: "Petauke", distance: 65.00 },
     { from: "Nyimba", to: "Chipata", distance: 223.00 },
     { from: "Petauke", to: "Chipata", distance: 158.00 },
@@ -902,7 +893,7 @@
     { from: "Rufunsa Bus Station", to: "Kampasa Market, Rufunsa", distance: 4.80 },
     { from: "Rufunsa Boma", to: "Kampasa Market, Rufunsa", distance: 5.20 },
 
-    // SECTION 10: RUFUNSA TO LUANGWA DIRECT
+    // SECTION 10: RUFUNSA TO LUANGWA DIRECT (KEPT FOR ROUTING)
     { from: "Rufunsa", to: "Luangwa Town", distance: 102.70 },
     { from: "Rufunsa Boma", to: "Luangwa Bus Station", distance: 105.20 },
     { from: "Kampasa Market, Rufunsa", to: "Luangwa Bus Station", distance: 107.50 }
@@ -926,7 +917,7 @@
     graph[to].push({ node: from, distance });
   });
 
-  // ==================== SHORTEST PATH ALGORITHM ====================
+  // ==================== SHORTEST PATH ALGORITHM (DIJKSTRA) ====================
   function findShortestDistance(start, end) {
     if (start === end) return 0;
     if (!graph[start] || !graph[end]) return null;
@@ -935,7 +926,9 @@
     if (direct) return direct.distance;
     
     const distances = {};
+    const previous = {};
     const unvisited = new Set(Object.keys(graph));
+    
     for (let node of unvisited) distances[node] = Infinity;
     distances[start] = 0;
     
@@ -945,52 +938,54 @@
         if (current === null || distances[node] < distances[current]) current = node;
       }
       if (!current || distances[current] === Infinity) break;
-      if (current === end) return distances[end];
+      if (current === end) break;
       unvisited.delete(current);
       for (let neighbor of graph[current]) {
         let newDist = distances[current] + neighbor.distance;
-        if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
+        if (newDist < distances[neighbor.node]) {
+          distances[neighbor.node] = newDist;
+          previous[neighbor.node] = current;
+        }
       }
     }
-    return null;
+    
+    if (distances[end] === Infinity) return null;
+    return distances[end];
   }
 
-  // ==================== CALCULATE TOTAL DISTANCE (FIXED) ====================
+  // ==================== CALCULATE TOTAL DISTANCE (FIXED - NO 377 ERROR) ====================
   function calculateTotalDistance(pickup, dest) {
     if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
     
-    // First, check if direct path exists
-    const directTrip = findShortestDistance(pickup, dest);
-    
-    let nearestHub = null;
-    let minTotal = Infinity;
-    let bestTripDist = directTrip !== null ? directTrip : 0;
-    
-    // If direct path exists, use it as baseline
-    if (directTrip !== null) {
-      minTotal = directTrip;
-      nearestHub = "Direct";
+    // First, try direct path
+    const directDistance = findShortestDistance(pickup, dest);
+    if (directDistance !== null) {
+      return { total: directDistance, trip: directDistance, hub: "Direct" };
     }
     
-    // Check via each hub
+    // If no direct path, find best route via hub
+    let bestHub = null;
+    let bestTotal = Infinity;
+    
     for (let hub of hubs) {
-      const hubToPickup = findShortestDistance(hub, pickup);
-      const destToHub = findShortestDistance(dest, hub);
+      const toHub = findShortestDistance(pickup, hub);
+      const fromHub = findShortestDistance(hub, dest);
       
-      if (hubToPickup === null || destToHub === null) continue;
-      
-      // Total via this hub (no direct trip distance when going via hub)
-      const total = hubToPickup + destToHub;
-      
-      if (total < minTotal) {
-        minTotal = total;
-        nearestHub = hub;
-        bestTripDist = 0; // No direct trip when routing via hub
+      if (toHub !== null && fromHub !== null) {
+        const totalViaHub = toHub + fromHub;
+        if (totalViaHub < bestTotal) {
+          bestTotal = totalViaHub;
+          bestHub = hub;
+        }
       }
     }
     
-    if (minTotal === Infinity) return { total: null, trip: null, hub: null };
-    return { hub: nearestHub, trip: bestTripDist, total: minTotal };
+    if (bestHub === null) {
+      return { total: null, trip: null, hub: null };
+    }
+    
+    // For hub-based route, we don't have a direct trip distance
+    return { total: bestTotal, trip: bestTotal, hub: bestHub };
   }
 
   // ==================== CONFIGURATION ====================
