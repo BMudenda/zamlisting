@@ -10,328 +10,289 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   
+  <!-- Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initGoogleMaps" async defer></script>
+  
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2b6ef6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
 <link rel="apple-touch-icon" href="lfr.jpg">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --primary-color: #2563eb;
-      --secondary-color: #ff9900;
-      --error-color: #dc2626;
-      --success-color: #16a34a;
-      --bg-color-body: #f5f5f5;
-      --bg-color-card: #ffffff;
-      --border-color-light: #e0e0e0;
-      --font-color-dark: #333;
-    }
-    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
-   .corner-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    margin-right: 10px;
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary-color: #2563eb;
+    --secondary-color: #ff9900;
+    --error-color: #dc2626;
+    --success-color: #16a34a;
+    --bg-color-body: #f5f5f5;
+    --bg-color-card: #ffffff;
+    --border-color-light: #e0e0e0;
+    --font-color-dark: #333;
   }
-  .company-info {
+  body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+
+  .corner-logo { width: 32px; height: 32px; object-fit: contain; margin-right: 10px; }
+  .company-info { display: flex; align-items: center; gap: 10px; }
+
+  header {
+    background: var(--primary-color);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  }
+  
+  .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+  .company-info h2 { font-size: 1.15rem; line-height: 1.2; }
+
+  .zam {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffcc00;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+
+  .z-green { color: #198754; }
+  .z-red { color: #dc3545; }
+  .z-black { color: #000000; }
+
+  .menu-dropdown-container { position: relative; display: inline-block; }
+  .menu-button { background: none; border: none; color: white; cursor: pointer; padding: 5px; outline: none; font-size: 1.4rem; display: flex; align-items: center; }
+  .menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 42px;
+    background-color: white;
+    width: 380px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
+    z-index: 1000;
+    border-radius: 16px;
+    color: #333;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+  }
+  .menu-dropdown.show { display: block; }
+  .dropdown-content-section { margin-bottom: 20px; }
+  .dropdown-content-section h4 {
+    color: #2563eb;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    font-weight: 700;
   }
+  .dropdown-content-section p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px; color: #4b5563; }
+  .dropdown-content-section a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .dropdown-content-section a:hover { background-color: #f3f4f6; }
+  .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem; }
+  .contact-label-text { display: flex; flex-direction: column; }
+  .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
 
-    header {
-      background: var(--primary-color);
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
-    
-    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-    .company-info h2 {
-      font-size: 1.15rem;
-      line-height: 1.2;
-    }
+  .route-container {
+    margin-top: 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    padding: 12px;
+  }
+  .route-info {
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    padding: 8px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    text-align: center;
+    color: #1e293b;
+  }
+  .open-maps-link {
+    display: block;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+    transition: background 0.2s;
+    font-weight: 500;
+  }
+  .open-maps-link:hover { background: #1d4ed8; }
+  .open-maps-link i { margin-right: 8px; }
 
-    .zam {
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: #ffcc00;
-      text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
-      font-family: 'Segoe UI', Arial, sans-serif;
-    }
+  .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+  .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+  .tooltip-text {
+    visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px;
+    position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem;
+    pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+  .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-    .menu-dropdown-container { 
-      position: relative; 
-      display: inline-block; 
-    }
+  .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+  .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
+  fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
+  legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+  .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
+  .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
+  .input-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    font-weight: bold;
+    background: transparent;
+    width: 100%;
+  }
+  .input-box input::placeholder {
+    font-style: italic;
+    color: #999;
+    font-weight: normal;
+    font-size: 0.85rem;
+  }
+  .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .icon-img { width: 40px; height: 40px; object-fit: contain; }
+  .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  .autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
+  .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
+  .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
+  .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+  #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
+  .hidden-section { display: none; }
+  .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
+  .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
+  @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+  
+  .location-status {
+    font-size: 0.75rem;
+    margin-top: 8px;
+    padding: 6px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .location-status.success { background: #d1fae5; color: #065f46; }
+  .location-status.error { background: #fee2e2; color: #991b1b; }
+  .location-status.info { background: #dbeafe; color: #1e40af; }
+  .location-status.warning { background: #fed7aa; color: #92400e; }
 
-    .menu-button { 
-      background: none; 
-      border: none; 
-      color: white; 
-      cursor: pointer; 
-      padding: 5px; 
-      outline: none; 
-      font-size: 1.4rem; 
-      display: flex;
-      align-items: center;
-    }
-
-    .menu-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 42px;
-      background-color: white;
-      width: 380px;
-      max-height: 85vh; 
-      overflow-y: auto;
-      box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
-      z-index: 1000;
-      border-radius: 16px;
-      color: #333;
-      padding: 16px;
-      border: 1px solid #e0e0e0;
-    }
-
-    .menu-dropdown.show { 
-      display: block; 
-    }
-
-    .dropdown-content-section { 
-      margin-bottom: 20px; 
-    }
-
-    .dropdown-content-section h4 { 
-      color: #2563eb; 
-      border-bottom: 1px solid #f0f0f0; 
-      padding-bottom: 8px; 
-      margin-bottom: 12px; 
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-    }
-
-    .dropdown-content-section p, .dropdown-content-section .map-note { 
-      font-size: 0.85rem; 
-      line-height: 1.5; 
-      margin-bottom: 10px; 
-      color: #4b5563; 
-    }
-
-    .dropdown-content-section a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      text-decoration: none;
-      color: #1f2937;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      transition: background 0.2s ease;
-    }
-    .dropdown-content-section a:hover { background-color: #f3f4f6; }
-    .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem;}
-
-    .contact-label-text { display: flex; flex-direction: column; }
-    .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
-
-    /* Route info container */
-    .route-container {
-      margin-top: 8px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      padding: 12px;
-    }
-    
-    .route-info {
-      font-size: 0.8rem;
-      margin-bottom: 12px;
-      padding: 8px;
-      background: #f0f9ff;
-      border-radius: 8px;
-      text-align: center;
-      color: #1e293b;
-    }
-    
-    .open-maps-link {
-      display: block;
-      padding: 12px;
-      background: #2563eb;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      text-align: center;
-      transition: background 0.2s;
-      font-weight: 500;
-    }
-    
-    .open-maps-link:hover {
-      background: #1d4ed8;
-    }
-    
-    .open-maps-link i {
-      margin-right: 8px;
-    }
-    
-    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
-    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
-    .tooltip-text { 
-      visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; 
-      position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem;
-      pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
-
-    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
-    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
-    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
-    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
-    .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
-    .input-box input { 
-      flex: 1; 
-      border: none; 
-      outline: none; 
-      font-size: 1rem; 
-      font-weight: bold; 
-      background: transparent; 
-      width: 100%; 
-    }
-    .input-box input::placeholder {
-      font-style: italic;
-      color: #999;
-      font-weight: normal;
-      font-size: 0.85rem;
-    }
-    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .icon-img { width: 40px; height: 40px; object-fit: contain; }
-    .field-error { 
-      border: 2px solid var(--error-color) !important; 
-      background: #fff5f5 !important;
-      animation: shake 0.4s ease-in-out;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    .autocomplete-list { 
-      position: absolute; 
-      top: 100%; 
-      left: 0; 
-      right: 0;
-      background: white; 
-      border: 1px solid #ddd; 
-      z-index: 1000; 
-      max-height: 200px; 
-      overflow-y: auto; 
-      border-radius: 0 0 8px 8px; 
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .suggestion { 
-      padding: 10px; 
-      cursor: pointer; 
-      border-bottom: 1px solid #eee; 
-      font-size: 0.9rem;
-      transition: background 0.2s;
-    }
-    .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
-    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
-    .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-    #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
-    .hidden-section { display: none; }
-    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
-    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
-    @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-  </style>
+  .auto-fetch-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+    margin-left: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .auto-fetch-btn:hover {
+    background: #e0e7ff;
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  .input-row input {
+    flex: 1;
+  }
+</style>
 </head>
 <body>
 <header>
   <div class="header-content">
     <div class="company-info">
-      <img src="lfr.jpg" alt="Luangwa Feira Rides Logo" class="corner-logo">
-      <h2><span class="zam">Luangwa Feira Rides</span></h2>
+      <img src="lfr.jpg" alt="Logo" class="corner-logo">
+      <h2 class="zam">
+        <span class="z-green">Z</span>
+        <span class="z-black">a</span>
+        <span class="z-red">m</span>
+        <span>Listing Rides</span>
+      </h2>
     </div>
+    
     <div class="menu-dropdown-container">
       <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu"><i class="fas fa-ellipsis-v"></i></button>
       <div id="header-menu-dropdown" class="menu-dropdown">
-        <!-- About Section FIRST -->
         <div class="dropdown-content-section">
           <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-          <p><strong>Coverage:</strong> Luangwa District and beyond .</p>
-          <p><strong>Pricing:</strong> Cheap & fixed rates + 50% Discount Promo! Calculated via nearest hub.</p>
-          <p><strong>Reliable:</strong> Safe transport: Motorbike / Car.</p>
+          <p>A local company that provides passenger hailing services through motorbikes and cars.</p>
+          <p><strong>Coverage:</strong> Luangwa District and surrounding areas.</p>
+          <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
         </div>
         
-        <!-- Contact Section SECOND -->
         <div class="dropdown-content-section">
           <h4><i class="fas fa-headset"></i> Quick Contact</h4>
           <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
           <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
           <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-          
-          <div class="menu-divider"></div>
-          <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
-          <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank" title="Visit Facebook">
-            <i class="fab fa-facebook"></i>
-            <span class="contact-label-text">Facebook Page</span>
-          </a>
-          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank" title="Visit TikTok">
-            <i class="fab fa-tiktok"></i>
-            <span class="contact-label-text">TikTok</span>
-          </a>
         </div>
         
-        <!-- Share Location Section THIRD -->
         <div class="menu-divider"></div>
 
         <div class="dropdown-content-section">
           <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;"> Please note: Exact pickup or drop-off locations within a 1 km radius of the selected points will not incur any additional charges.</p>
-
-          <a href="#" onclick="getLocation()" title="Get Location">
+          <p style="font-size: 0.85rem;">Click the button below to share your current location. This will be automatically saved to our system.</p>
+          <a href="#" onclick="fetchAndShareLocation()" title="Share Location">
             <i class="fas fa-location-arrow"></i>
-            <span class="contact-label-text">Get My Location</span>
-            <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+            <span class="contact-label-text">Share My Location</span>
           </a>
-          
-          <a href="#" onclick="shareWhatsApp()" title="Share via WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-            <span class="contact-label-text">Share via WhatsApp</span>
-          </a>
-
-          <a href="#" onclick="shareSMS()" title="Share via SMS">
-            <i class="fas fa-sms"></i>
-            <span class="contact-label-text">Share via SMS</span>
-          </a>
-
-          
+          <div id="locationStatus" class="location-status info">📍 Ready to share location</div>
         </div>
         
-        <!-- View Map Section - FIXED with centered text/icon AND estimated time display -->
         <div class="dropdown-content-section">
           <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
-          
-          <!-- Route Info Section with Map Button -->
           <div class="route-container">
             <div id="map-route-info" class="route-info">
               <i class="fas fa-route"></i> Select pickup & destination to see route details
             </div>
-            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
-              <i class="fas fa-globe" style="font-size: 1rem;"></i>
+            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">
+              <i class="fas fa-globe"></i>
               <span>Click to View Map</span>
             </a>
           </div>
@@ -341,7 +302,7 @@
       </div>
     </div>
   </div>
-  <div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍 Please continue reviewing the app and ensure to submit your final booking/request. Your feedback is appreciated.🚗 </span></div>
+  <div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍 Welcome to Luangwa Feira Rides. Kindly make your request.🚗 </span></div>
 </header>
 
 <main class="product-container">
@@ -354,11 +315,9 @@
     </fieldset>
     <div id="trip-details" class="hidden-section">
       <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
-         <!-- === NEW: Placeholder text added under Transport Mode as requested === -->
-          <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">
-            Choose your preferred transport mode
-          </p>
-        
+        <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">
+          Choose your preferred transport mode
+        </p>
         <div id="mode-group" style="display:flex; justify-content:space-around;">
           <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
           <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
@@ -367,9 +326,17 @@
       <fieldset><legend> Pickup Location</legend>
         <div class="input-box" id="origin-container">
           <span class="material-icons">my_location</span>
-          <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
+          <div class="input-row">
+            <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
+            <button type="button" class="auto-fetch-btn" onclick="fetchCurrentLocationAsPickup()" title="Use my current location">
+              <i class="fas fa-location-dot"></i>
+            </button>
+          </div>
           <div id="originList" class="autocomplete-list"></div>
         </div>
+        <p style="font-size: 0.7rem; color: #666; margin-top: 5px;">
+          <i class="fas fa-info-circle"></i> Click the <i class="fas fa-location-dot"></i> icon to automatically use your current location
+        </p>
       </fieldset>
       <fieldset><legend> Destination</legend>
         <div class="input-box" id="dest-container">
@@ -380,7 +347,7 @@
       </fieldset>
     </div>
     <div id="summary-section" class="hidden-section">
-      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
+      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Pricing includes driver pickup from nearest hub</span></span></legend>
         <div id="summary-cards"></div>
       </fieldset>
       <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
@@ -394,392 +361,459 @@
 </main>
 
 <script>
-  // Service Worker Registration
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function() {
-      navigator.serviceWorker.register("sw.js").then(
-        function(reg) { console.log("ServiceWorker registered"); },
-        function(err) { console.log("ServiceWorker registration failed:", err); }
-      );
-    });
-  }
-
-  // App Install Prompt
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    const deferredPrompt = e;
-    const installBox = document.createElement("div");
-    installBox.style.position = "fixed";
-    installBox.style.top = "15px";
-    installBox.style.right = "15px";
-    installBox.style.background = "#2b6ef6";
-    installBox.style.color = "#fff";
-    installBox.style.borderRadius = "8px";
-    installBox.style.padding = "8px 14px";
-    installBox.style.fontFamily = "system-ui, sans-serif";
-    installBox.style.fontSize = "14px";
-    installBox.style.cursor = "pointer";
-    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-    installBox.style.zIndex = "9999";
-    installBox.style.display = "flex";
-    installBox.style.alignItems = "center";
-    installBox.style.gap = "8px";
-    installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
-    document.body.appendChild(installBox);
-
-    document.getElementById("installText").addEventListener("click", async () => {
-      installBox.remove();
-      deferredPrompt.prompt();
-    });
-    document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
-  });
-
-  // Coordinates fetching and sharing functions
-  let mapLink = "";
-
-  function getLocation() {
-    const status = document.getElementById("locationStatus");
-
-    if (navigator.geolocation) {
-      status.innerHTML = "📍 Getting location...";
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          let lat = position.coords.latitude;
-          let lon = position.coords.longitude;
-
-          mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-
-          status.innerHTML = "🌐 ✅ current location ready!.";
-        },
-        (error) => {
-          status.innerHTML = "❌ Failed to get location!";
-        }
-      );
-    } else {
-      status.innerHTML = "❌ Geolocation not supported!";
-    }
-  }
-
-  function shareWhatsApp() {
-    if (!mapLink) {
-      alert("Please get your location first using 'Get My Location'");
-      return;
-    }
-
-    let message = encodeURIComponent("📍 Here is my current location: " + mapLink);
-    window.open(`https://wa.me/260978167546?text=${message}`, "_blank");
-  }
-
-  function shareSMS() {
-    if (!mapLink) {
-      alert("Please get your location first using 'Get My Location'");
-      return;
-    }
-
-    window.location.href = `sms:0978167546?body=📍 Here is my location: ${mapLink}`;
-  }
-
-  // ----- COMPLETE PLACES LIST (with coordinates) -----
-  const placesWithCoords = [
-    { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
-    { name: "Airstrip, Luangwa", lat: -15.6100, lng: 30.4100 },
-    { name: "Anglican Church, Luangwa", lat: -15.6275, lng: 30.4076 },
-    { name: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", lat: -15.6400, lng: 30.3800 },
-    { name: "BM Residence, Luangwa", lat: -15.6245, lng: 30.3885 },
-    { name: "Boma Clinic, Luangwa", lat: -15.6240, lng: 30.4081 },
-    { name: "Boma Filling Station, Luangwa", lat: -15.6207, lng: 30.4111 },
-    { name: "Car Wash Pub, Luangwa", lat: -15.6200, lng: 30.4080 },
+  // ==================== CUSTOM PLACES (Not on Google Maps) ====================
+  // Add your custom places here with their coordinates
+  const customPlaces = [
     { name: "Chidada Community, Luangwa", lat: -15.6250, lng: 30.4000 },
-    { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055 },
-    { name: "Chongwe", lat: -15.3600, lng: 28.6900 },
-    { name: "Feira Day Secondary School, Luangwa", lat: -15.6140, lng: 30.3950 },
-    { name: "JB Three Boarders Mall, Luangwa", lat: -15.6160, lng: 30.4170 },
-    { name: "Kakaro Liberation Heritage Site, Luangwa", lat: -15.5536, lng: 30.3637 },
-    { name: "Kapoche, Luangwa", lat: -15.4159, lng: 30.3708 },
-    { name: "Katondwe Mission Hospital, Luangwa", lat: -15.2462, lng: 30.2476 },
-    { name: "Luangwa Bridge Market", lat: -15.9853, lng: 30.2049 },
-    { name: "Luangwa District Hospital", lat: -15.5946, lng: 30.3822 },
-    { name: "Luangwa Town Council", lat: -15.6267, lng: 30.4956 },
-    { name: "Justifeli Lodge, Luangwa", lat: -15.6249, lng 30.3977 },
-    { name: "Justifeli Lodge, Luangwa", lat: -15.6249, lng 30.3977 },
-
-    { name: "Lusaka", lat: -15.3875, lng: 28.3228 },
-    { name: "Nyimba", lat: -14.5560, lng: 30.8170 },
-    { name: "Petauke", lat: -14.2400, lng: 31.3200 },
-    { name: "Chipata", lat: -13.6333, lng: 32.6500 },
-    { name: "Katete", lat: -14.2667, lng: 31.9500 },
-    { name: "Lundazi", lat: -12.3000, lng: 33.2000 },
-    { name: "Rufunsa", lat: -15.2500, lng: 30.3000 },
-    { name: "Soweto Junction, Luangwa", lat: -15.6220, lng: 30.4080 },
-    { name: "Yangoma Lodge, Luangwa", lat: -15.6190, lng: 30.4150 },
-    { name: "Luangwa Police Station", lat: -15.6178, lng: 30.4130 },
-    { name: "Luangwa Market", lat: -15.6165, lng: 30.4175 }
+    { name: "Chidada Ground, Luangwa", lat: -15.6240, lng: 30.3980 },
+    { name: "Mandombe Community, Luangwa", lat: -15.5900, lng: 30.3700 },
+    { name: "Kamoba Community, Luangwa", lat: -15.5950, lng: 30.3750 },
+    { name: "Soweto Community, Luangwa", lat: -15.6180, lng: 30.4050 },
+    { name: "Indeco Community, Luangwa", lat: -15.6220, lng: 30.4100 },
+    { name: "Feira Day Community, Luangwa", lat: -15.6140, lng: 30.3950 },
+    { name: "Kambolozo Community, Luangwa", lat: -15.6300, lng: 30.4200 },
+    // Add more custom places as needed
   ];
   
-  const allPlaceNames = placesWithCoords.map(p => p.name);
-  const legacyPlaces = [
-      "Airstrip, Luangwa", "Anglican Church, Luangwa", "Big 2 Zambezi Water Front Resort & Safari, Luangwa", "BM Residence, Luangwa",
-      "Boma Clinic, Luangwa", "Boma Filling Station, Luangwa", "Car Wash Pub, Luangwa", "Chidada Community, Luangwa", "Chidada Ground, Luangwa",
-      "Chilombwe Community School, Luangwa", "Chiriwe Primary School, Luangwa", "Chitope Rural Health Centre, Luangwa", "Chitope, Luangwa",
-      "District Commissioner, Luangwa", "District Education Board Secretary, Luangwa", "Dzalo Skills Training Centre Kambolozo, Luangwa",
-      "Feira Day Community, Luangwa", "Feira Day Secondary School, Luangwa", "Feira Gardens, Luangwa", "Feira Kingdom Hall, Luangwa",
-      "Gerasmos Safari Lodge, Luangwa", "Hill View Pub, Luangwa", "Indeco Building, Luangwa", "Indeco Community, Luangwa", "JB Three Boarders Club, Luangwa",
-      "JB Three Boarders Mall, Luangwa", "Justifeli Lodge, Luangwa", "Kakaro Liberation Heritage Site, Luangwa", "Kakaro Primary School, Luangwa",
-      "Kambolozo Community, Luangwa", "Kamoba Community, Luangwa", "Kabila, Luangwa", "Kantuleni Executive Lodge, Luangwa", "Kasinsa, Luangwa", "Katondwe Chapel, Luangwa",
-      "Katondwe Chaz Hotel, Luangwa","Kapoche, Luangwa", "Katondwe Dam, Luangwa", "Katondwe Girls Secondary School, Luangwa", "Katondwe Mission Hospital, Luangwa",
-      "Katondwe Primary School, Luangwa", "Kaunga Secondary School, Luangwa", "Kavalamanja, Luangwa", "Luangwa (Feira)", "Luangwa Basic School",
-      "Luangwa Bridge Market", "Ludaka, Luangwa", "Luangwa Bridge", "Luangwa Bus Station", "Luangwa Council Lodge", "Luangwa District Hospital", "Luangwa Harbour",
-      "Luangwa High School Police Post", "Luangwa Immigration Border Post, Luangwa", "Luangwa Main SDA Church", "Luangwa Market", "Luangwa Police Station",
-      "Luangwa Post Office", "Luangwa Secondary School", "Luangwa Town Council", "Makichilo Lodge, Luangwa", "Mandombe Community, Luangwa",
-      "Mwalila Primary School, Luangwa", "Mwavi Secondary School, Luangwa", "National Registration Office, Luangwa", "Nyabota Lodge, Luangwa",
-      "Passover Living Lamb Ministry, Luangwa", "Pentecostal Assembly of God Joshua Assembly, Luangwa", "River Spot Club, Luangwa",
-      "SDA Katondwe, Luangwa", "Soweto Community, Luangwa", "Soweto Junction, Luangwa", "UCZ Feira, Luangwa", "Yangoma Lodge, Luangwa",
-      "Yellow Shop, Luangwa", "Luangwa Feira Rides, Luangwa", "Zambia Electricity Supply Corporation, Luangwa",
-      "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", "ZICB Luangwa Branch, Luangwa", "Rufunsa", "Chongwe", "Lusaka", "Nyimba", "Luangwa",
-      "Nyimba", "Petauke", "Chipata", "Katete", "Lundazi"
+  // Combine custom places with hub locations for autocomplete
+  const allCustomPlaceNames = customPlaces.map(p => p.name);
+  
+  // ==================== HUBS AND DRIVER CONTACTS ====================
+  const hubs = [
+    { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064, phone: "0978167546" },
+    { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055, phone: "0978167546" },
+    { name: "Luangwa Bridge Market", lat: -15.9853, lng: 30.2049, phone: "0978167546" },
+    { name: "Luangwa Town", lat: -15.6400, lng: 30.5000, phone: "0978167546" },
+    { name: "Rufunsa Town", lat: -15.2500, lng: 30.3000, phone: "0978167546" },
+    { name: "Chongwe Town", lat: -15.3600, lng: 28.6900, phone: "0978167546" },
+    { name: "Lusaka Town", lat: -15.3875, lng: 28.3228, phone: "0978167546" }
   ];
   
-  const MASTER_PLACES_LIST = [...new Set([...allPlaceNames, ...legacyPlaces])];
+  // Combine hubs and custom places for location detection
+  const allKnownLocations = [...hubs, ...customPlaces];
   
-  function getCoordinates(placeName) {
-    const found = placesWithCoords.find(p => p.name === placeName);
-    if (found) return { lat: found.lat, lng: found.lng };
-    return { lat: -15.6167, lng: 30.4167 };
-  }
-  
-  // Graph & distance engine
-  const segments = [
-      { from: "Airstrip, Luangwa", to: "Luangwa Bus Station", distance: 3.90 },
-      { from: "Anglican Church, Luangwa", to: "Luangwa Bus Station", distance: 1.00 },
-      { from: "Boma Clinic, Luangwa", to: "Luangwa Bus Station", distance: 0.75 },
-      { from: "Boma Filling Station, Luangwa", to: "Luangwa Bus Station", distance: 0.45 },
-      { from: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", to: "Luangwa Bus Station", distance: 4.80 },
-      { from: "BM Residence, Luangwa", to: "Luangwa Bus Station", distance: 2.60 },
-      { from: "Car Wash Pub, Luangwa", to: "Luangwa Bus Station", distance: 2.70 },
-      { from: "Chidada Community, Luangwa", to: "Luangwa Bus Station", distance: 1.90 },
-      { from: "Chidada Ground, Luangwa", to: "Luangwa Bus Station", distance: 1.90 },
-      { from: "Ludaka, Luangwa", to: "Luangwa Bus Station", distance: 2.90 },
-      { from: "Chidada Ground, Luangwa", to: "Ludaka, Luangwa", distance: 2.00 },
-      { from: "Chilombwe Community School, Luangwa", to: "Luangwa Bus Station", distance: 15.00 },
-      { from: "Chiriwe Primary School, Luangwa", to: "Luangwa Bus Station", distance: 47.00 },
-      { from: "Chitope, Luangwa", to: "Luangwa Bus Station", distance: 62.00 },
-      { from: "Chitope Rural Health Centre, Luangwa", to: "Luangwa Bus Station", distance: 62.00 },
-      { from: "District Commissioner, Luangwa", to: "Luangwa Bus Station", distance: 1.30 },
-      { from: "District Education Board Secretary, Luangwa", to: "Luangwa Bus Station", distance: 0.70 },
-      { from: "Dzalo Skills Training Centre Kambolozo, Luangwa", to: "Luangwa Bus Station", distance: 1.60 },
-      { from: "Feira Day Community, Luangwa", to: "Luangwa Bus Station", distance: 3.60 },
-      { from: "Feira Day Secondary School, Luangwa", to: "Luangwa Bus Station", distance: 3.60 },
-      { from: "Feira Gardens, Luangwa", to: "Luangwa Bus Station", distance: 0.55 },
-      { from: "Feira Kingdom Hall, Luangwa", to: "Luangwa Bus Station", distance: 1.00 },
-      { from: "Gerasmos Safari Lodge, Luangwa", to: "Luangwa Bus Station", distance: 1.20 },
-      { from: "Kabila, Luangwa", to: "Luangwa Bus Station", distance: 1.20 },
-      { from: "Kabila, Luangwa", to: "Gerasmos Safari Lodge, Luangwa", distance: 0.50 },
-      { from: "Hill View Pub, Luangwa", to: "Luangwa Bus Station", distance: 2.00 },
-      { from: "Indeco Building, Luangwa", to: "Luangwa Bus Station", distance: 0.75 },
-      { from: "Indeco Community, Luangwa", to: "Luangwa Bus Station", distance: 0.75 },
-      { from: "JB Three Boarders Club, Luangwa", to: "Luangwa Bus Station", distance: 1.00 },
-      { from: "JB Three Boarders Mall, Luangwa", to: "Luangwa Bus Station", distance: 0.14 },
-      { from: "Justifeli Lodge, Luangwa", to: "Luangwa Bus Station", distance: 1.40 },
-      { from: "Kakaro Liberation Heritage Site, Luangwa", to: "Luangwa Bus Station", distance: 11.00 },
-      { from: "Kakaro Primary School, Luangwa", to: "Luangwa Bus Station", distance: 12.00 },
-      { from: "Kambolozo Community, Luangwa", to: "Luangwa Bus Station", distance: 1.60 },
-      { from: "Kamoba Community, Luangwa", to: "Luangwa Bus Station", distance: 1.10 },
-      { from: "Kantuleni Executive Lodge, Luangwa", to: "Luangwa Bus Station", distance: 0.65 },
-      { from: "Kasinsa, Luangwa", to: "Luangwa Bus Station", distance: 68.00 },
-      { from: "Katondwe Chaz Hotel, Luangwa", to: "Luangwa Bus Station", distance: 52.00 },
-      { from: "Katondwe Dam, Luangwa", to: "Luangwa Bus Station", distance: 54.00 },
-      { from: "Katondwe Girls Secondary School, Luangwa", to: "Luangwa Bus Station", distance: 53.00 },
-      { from: "Katondwe Mission Hospital, Luangwa", to: "Luangwa Bus Station", distance: 53.00 },
-      { from: "Katondwe Primary School, Luangwa", to: "Luangwa Bus Station", distance: 53.00 },
-      { from: "Kaunga Secondary School, Luangwa", to: "Luangwa Bus Station", distance: 73.00 },
-      { from: "Kavalamanja, Luangwa", to: "Luangwa Bus Station", distance: 21.00 },
-      { from: "Luangwa (Feira)", to: "Luangwa Bus Station", distance: 0.10 },
-      { from: "Luangwa Basic School", to: "Luangwa Bus Station", distance: 0.55 },
-      { from: "Luangwa Bridge", to: "Luangwa Bus Station", distance: 89.00 },
-      { from: "Luangwa District Hospital", to: "Luangwa Bus Station", distance: 4.40 },
-      { from: "Luangwa Harbour", to: "Luangwa Bus Station", distance: 0.90 },
-      { from: "Luangwa High School Police Post", to: "Luangwa Bus Station", distance: 49.00 },
-      { from: "Luangwa Immigration Border Post, Luangwa", to: "Luangwa Bus Station", distance: 1.30 },
-      { from: "Luangwa Main SDA Church", to: "Luangwa Bus Station", distance: 1.00 },
-      { from: "Luangwa Market", to: "Luangwa Bus Station", distance: 0.10 },
-      { from: "Luangwa Police Station", to: "Luangwa Bus Station", distance: 0.60 },
-      { from: "Luangwa Post Office", to: "Luangwa Bus Station", distance: 0.75 },
-      { from: "Luangwa Secondary School", to: "Luangwa Bus Station", distance: 48.00 },
-      { from: "Luangwa Town Council", to: "Luangwa Bus Station", distance: 2.00 },
-      { from: "Mandombe Community, Luangwa", to: "Luangwa Bus Station", distance: 5.00 },
-      { from: "Makichilo Lodge, Luangwa", to: "Luangwa Bus Station", distance: 0.90 },
-      { from: "Mwalila Primary School, Luangwa", to: "Luangwa Bus Station", distance: 68.00 },
-      { from: "Mwavi Secondary School, Luangwa", to: "Luangwa Bus Station", distance: 60.00 },
-      { from: "National Registration Office, Luangwa", to: "Luangwa Bus Station", distance: 1.70 },
-      { from: "Nyabota Lodge, Luangwa", to: "Luangwa Bus Station", distance: 0.40 },
-      { from: "Passover Living Lamb Ministry, Luangwa", to: "Luangwa Bus Station", distance: 52.00 },
-      { from: "Pentecostal Assembly of God Joshua Assembly, Luangwa", to: "Luangwa Bus Station", distance: 0.90 },
-      { from: "River Spot Club, Luangwa", to: "Luangwa Bus Station", distance: 0.17 },
-      { from: "SDA Katondwe, Luangwa", to: "Luangwa Bus Station", distance: 50.00 },
-      { from: "Soweto Community, Luangwa", to: "Luangwa Bus Station", distance: 3.00 },
-      { from: "Soweto Junction, Luangwa", to: "Luangwa Bus Station", distance: 2.00 },
-      { from: "UCZ Feira, Luangwa", to: "Luangwa Bus Station", distance: 0.80 },
-      { from: "Yangoma Lodge, Luangwa", to: "Luangwa Bus Station", distance: 1.80 },
-      { from: "Yellow Shop, Luangwa", to: "Luangwa Bus Station", distance: 0.28 },
-      { from: "ZamListing Rides, Luangwa", to: "Luangwa Bus Station", distance: 2.60 },
-      { from: "Zambia Electricity Supply Corporation, Luangwa", to: "Luangwa Bus Station", distance: 1.60 },
-      { from: "Kapoche, Luangwa", to: "Luangwa Bus Station", distance: 27.00 },
-      { from: "Kapoche, Luangwa", to: "Kakaro Liberation Heritage Site, Luangwa", distance: 16.00 },
-      { from: "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", to: "Luangwa Bus Station", distance: 1.30 },
-      { from: "ZICB Luangwa Branch, Luangwa", to: "Luangwa Bus Station", distance: 0.75 },
-      { from: "Luangwa Market", to: "Makichilo Lodge, Luangwa", distance: 0.4 },
-      { from: "Makichilo Lodge, Luangwa", to: "Gerasmos Safari Lodge, Luangwa", distance: 0.3 },
-      { from: "Makichilo Lodge, Luangwa", to: "UCZ Feira, Luangwa", distance: 0.5 },
-      { from: "UCZ Feira, Luangwa", to: "Pentecostal Assembly of God Joshua Assembly, Luangwa", distance: 0.08 },
-      { from: "Zambia Electricity Supply Corporation, Luangwa", to: "Luangwa Main SDA Church", distance: 0.65 },
-      { from: "Luangwa Main SDA Church", to: "Indeco Building, Luangwa", distance: 0.7 },
-      { from: "Indeco Building, Luangwa", to: "JB Three Boarders Club, Luangwa", distance: 0.1 },
-      { from: "JB Three Boarders Club, Luangwa", to: "Yellow Shop, Luangwa", distance: 0.45 },
-      { from: "Indeco Building, Luangwa", to: "Indeco Community, Luangwa", distance: 1.3 },
-      { from: "JB Three Boarders Mall, Luangwa", to: "Boma Filling Station, Luangwa", distance: 0.35 },
-      { from: "JB Three Boarders Mall, Luangwa", to: "Nyabota Lodge, Luangwa", distance: 0.25 },
-      { from: "JB Three Boarders Mall, Luangwa", to: "River Spot Club, Luangwa", distance: 0.03 },
-      { from: "Boma Filling Station, Luangwa", to: "Kantuleni Executive Lodge, Luangwa", distance: 0.19 },
-      { from: "Kantuleni Executive Lodge, Luangwa", to: "Luangwa Harbour", distance: 0.09 },
-      { from: "Kantuleni Executive Lodge, Luangwa", to: "Luangwa Council Lodge", distance: 0.09 },
-      { from: "Luangwa Council Lodge", to: "District Commissioner, Luangwa", distance: 0.3 },
-      { from: "District Commissioner, Luangwa", to: "Luangwa Police Station", distance: 0.3 },
-      { from: "District Commissioner, Luangwa", to: "Luangwa Post Office", distance: 0.1 },
-      { from: "Luangwa Police Station", to: "District Education Board Secretary, Luangwa", distance: 0.1 },
-      { from: "District Education Board Secretary, Luangwa", to: "Yangoma Lodge, Luangwa", distance: 0.4 },
-      { from: "Yangoma Lodge, Luangwa", to: "Boma Clinic, Luangwa", distance: 0.5 },
-      { from: "Nyabota Lodge, Luangwa", to: "Luangwa Basic School", distance: 0.18 },
-      { from: "Justifeli Lodge, Luangwa", to: "Luangwa Town Council", distance: 0.5 },
-      { from: "Luangwa Town Council", to: "National Registration Office, Luangwa", distance: 0.49 },
-      { from: "Luangwa Town Council", to: "Dzalo Skills Training Centre Kambolozo, Luangwa", distance: 0.6 },
-      { from: "Dzalo Skills Training Centre Kambolozo, Luangwa", to: "Kambolozo Community, Luangwa", distance: 1.3 },
-      { from: "Luangwa Town Council", to: "Hill View Pub, Luangwa", distance: 0.4 },
-      { from: "Luangwa Town Council", to: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", distance: 3.2 },
-      { from: "National Registration Office, Luangwa", to: "Chidada Ground, Luangwa", distance: 0.49 },
-      { from: "Chidada Ground, Luangwa", to: "Chidada Community, Luangwa", distance: 1.3 },
-      { from: "Chidada Ground, Luangwa", to: "Yangoma Lodge, Luangwa", distance: 2.34 },
-      { from: "Hill View Pub, Luangwa", to: "BM Residence, Luangwa", distance: 1.0 },
-      { from: "Luangwa Feira Rides, Luangwa", to: "BM Residence, Luangwa", distance: 0.0 },
-      { from: "BM Residence, Luangwa", to: "Feira Day Secondary School, Luangwa", distance: 1.1 },
-      { from: "Feira Day Secondary School, Luangwa", to: "Feira Day Community, Luangwa", distance: 1.3 },
-      { from: "Luangwa District Hospital", to: "Soweto Junction, Luangwa", distance: 2.5 },
-      { from: "Luangwa District Hospital", to: "Mandombe Community, Luangwa", distance: 1.3 },
-      { from: "Luangwa District Hospital", to: "Kamoba Community, Luangwa", distance: 1.3 },
-      { from: "Soweto Junction, Luangwa", to: "Airstrip, Luangwa", distance: 1.7 },
-      { from: "Soweto Junction, Luangwa", to: "Zambia Electricity Supply Corporation, Luangwa", distance: 0.3 },
-      { from: "Soweto Junction, Luangwa", to: "Car Wash Pub, Luangwa", distance: 1.25 },
-      { from: "Soweto Junction, Luangwa", to: "Soweto Community, Luangwa", distance: 1.3 },
-      { from: "Car Wash Pub, Luangwa", to: "Luangwa Town Council", distance: 1.0 },
-      { from: "Car Wash Pub, Luangwa", to: "BM Residence, Luangwa", distance: 1.0 },
-      { from: "Feira Kingdom Hall, Luangwa", to: "Anglican Church, Luangwa", distance: 0.08 },
-      { from: "Feira Kingdom Hall, Luangwa", to: "Luangwa (Feira)", distance: 0.7 },
-      { from: "Zambia Revenue Authority – Luangwa Customs Services, Luangwa", to: "Feira Gardens, Luangwa", distance: 0.7 },
-      { from: "Feira Gardens, Luangwa", to: "ZICB Luangwa Branch, Luangwa", distance: 0.85 },
-      { from: "ZICB Luangwa Branch, Luangwa", to: "Luangwa Immigration Border Post, Luangwa", distance: 0.28 },
-      { from: "Luangwa Immigration Border Post, Luangwa", to: "Yellow Shop, Luangwa", distance: 1.4 },
-      { from: "Luangwa Immigration Border Post, Luangwa", to: "District Commissioner, Luangwa", distance: 0.5 },
-      { from: "Big 2 Zambezi Water Front Resort & Safari, Luangwa", to: "Chilombwe Community School, Luangwa", distance: 9.8 },
-      { from: "Chitope, Luangwa", to: "Mwavi Secondary School, Luangwa", distance: 1.1 },
-      { from: "Mwavi Secondary School, Luangwa", to: "Chitope Rural Health Centre, Luangwa", distance: 2.0 },
-      { from: "Chitope Rural Health Centre, Luangwa", to: "Mwalila Primary School, Luangwa", distance: 6.0 },
-      { from: "Mwalila Primary School, Luangwa", to: "Kaunga Secondary School, Luangwa", distance: 5.0 },
-      { from: "Chitope, Luangwa", to: "Kasinsa, Luangwa", distance: 10.0 },
-      { from: "Kasinsa, Luangwa", to: "Luangwa Secondary School", distance: 14.0 },
-      { from: "Luangwa Secondary School", to: "Kapoche, Luangwa", distance: 21.0 },
-      { from: "Luangwa Secondary School", to: "Luangwa High School Police Post", distance: 0.8 },
-      { from: "Luangwa Secondary School", to: "Katondwe Mission Hospital, Luangwa", distance: 5.0 },
-      { from: "Luangwa High School Police Post", to: "Chiriwe Primary School, Luangwa", distance: 2.1 },
-      { from: "Luangwa High School Police Post", to: "SDA Katondwe, Luangwa", distance: 1.0 },
-      { from: "Katondwe Mission Hospital, Luangwa", to: "Katondwe Primary School, Luangwa", distance: 0.55 },
-      { from: "Katondwe Chapel, Luangwa", to: "Katondwe Primary School, Luangwa", distance: 0.05 },
-      { from: "Katondwe Primary School, Luangwa", to: "Katondwe Girls Secondary School, Luangwa", distance: 0.0 },
-      { from: "Katondwe Girls Secondary School, Luangwa", to: "Katondwe Chaz Hotel, Luangwa", distance: 0.45 },
-      { from: "Katondwe Chaz Hotel, Luangwa", to: "Passover Living Lamb Ministry, Luangwa", distance: 0.4 },
-      { from: "Passover Living Lamb Ministry, Luangwa", to: "Katondwe Dam, Luangwa", distance: 0.1 },
-      { from: "Luangwa Bridge Market", to: "Luangwa Bridge", distance: 3.0 },
-      { from: "Kakaro Primary School, Luangwa", to: "Kakaro Liberation Heritage Site, Luangwa", distance: 1.2 },
-      { from: "Kakaro Primary School, Luangwa", to: "Luangwa District Hospital", distance: 7.1 },
-      { from: "Luangwa", to: "Rufunsa", distance: 102.70 },
-      { from: "Luangwa", to: "Chongwe", distance: 275.00 },
-      { from: "Luangwa", to: "Lusaka", distance: 320.00 },
-      { from: "Luangwa", to: "Nyimba", distance: 187.10 },
-      { from: "Luangwa", to: "Luangwa Bus Station", distance: 0.00 },
-
-      { from: "Chongwe", to: "Rufunsa", distance: 90.00 },
-      { from: "Chongwe", to: "Lusaka", distance: 45.00 },
-          // Eastern Province connections
-      { from: "Nyimba", to: "Petauke", distance: 65.00 },
-      { from: "Petauke", to: "Chipata", distance: 158.00 },     
-      { from: "Chipata", to: "Katete", distance: 82.00 },
-      { from: "Chipata", to: "Lundazi", distance: 159.00 },     
-      { from: "Nyimba", to: "Chipata", distance: 223.00 },      
-      { from: "Petauke", to: "Lundazi", distance: 295.00 },      
-      { from: "Nyimba", to: "Lundazi", distance: 358.00 },      
-      { from: "Katete", to: "Chipata", distance: 30.00 },
-      // Link back to Lusaka (via established dataset)
-      { from: "Lusaka", to: "Nyimba", distance: 288.00 },       
-      { from: "Lusaka", to: "Petauke", distance: 350.00 },
-      { from: "Rufunsa", to: "Luangwa Bridge Market", distance: 71.00 },
-      { from: "Nyimba", to: "Luangwa Bridge Market", distance: 102.00 },
-      { from: "Nyimba", to: "Luangwa Bridge", distance: 100.00 },
-      { from: "Rufunsa", to: "Luangwa Bridge", distance: 73.00 }
-  ];
-  
-  const hubs = ["Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market", "Rufunsa", "Chongwe", "Lusaka", "Nyimba", "Petauke", "Chipata"];
-  
-  const graph = {};
-  segments.forEach(({ from, to, distance }) => {
-    if (!graph[from]) graph[from] = [];
-    if (!graph[to]) graph[to] = [];
-    graph[from].push({ node: to, distance });
-    graph[to].push({ node: from, distance });
-  });
-  
-  function findShortestDistance(start, end) {
-    if (start === end) return 0;
-    if (!graph[start] || !graph[end]) return null;
-    const direct = graph[start].find(n => n.node === end);
-    if (direct) return direct.distance;
-    const distances = {};
-    const unvisited = new Set(Object.keys(graph));
-    for (let node of unvisited) distances[node] = Infinity;
-    distances[start] = 0;
-    while (unvisited.size) {
-      let current = null;
-      for (let node of unvisited) {
-        if (current === null || distances[node] < distances[current]) current = node;
-      }
-      if (!current || distances[current] === Infinity) break;
-      if (current === end) return distances[end];
-      unvisited.delete(current);
-      for (let neighbor of graph[current]) {
-        let newDist = distances[current] + neighbor.distance;
-        if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
-      }
+  function getPlaceCoordinates(placeName) {
+    // First check custom places
+    const customPlace = customPlaces.find(p => p.name.toLowerCase() === placeName.toLowerCase());
+    if (customPlace) {
+      return { lat: customPlace.lat, lng: customPlace.lng, isCustom: true };
+    }
+    // Then check hubs
+    const hub = hubs.find(h => h.name.toLowerCase() === placeName.toLowerCase());
+    if (hub) {
+      return { lat: hub.lat, lng: hub.lng, isCustom: false };
     }
     return null;
   }
   
-  function calculateTotalDistance(pickup, dest) {
-    if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
-    let nearestHub = null, minTotal = Infinity;
+  function getNearestHub(lat, lng) {
+    let nearest = hubs[0];
+    let minDistance = Infinity;
+    
     for (let hub of hubs) {
-      let hubToPickup = findShortestDistance(hub, pickup);
-      let tripDist = findShortestDistance(pickup, dest);
-      let destToHub = findShortestDistance(dest, hub);
-      if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-        let total = hubToPickup + tripDist + destToHub;
-        if (total < minTotal) {
-          minTotal = total;
-          nearestHub = hub;
-        }
+      const distance = Math.sqrt(Math.pow(hub.lat - lat, 2) + Math.pow(hub.lng - lng, 2));
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearest = hub;
       }
     }
-    if (!nearestHub) return { total: null, trip: null, hub: null };
-    return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
+    return nearest;
   }
   
+  function getDriverContactForHub(hubName) {
+    const hub = hubs.find(h => h.name === hubName);
+    return hub ? hub.phone : "0978167546";
+  }
+  
+  function formatForWhatsApp(number) {
+    if (number.startsWith('0')) {
+      return '260' + number.substring(1);
+    }
+    return number;
+  }
+  
+  // ==================== CUSTOM PLACE AUTOCOMPLETE ====================
+  let currentOriginList = [];
+  let currentDestList = [];
+  
+  function setupCustomAutocomplete(inputElement, isOrigin) {
+    inputElement.addEventListener('input', function() {
+      const query = this.value.toLowerCase();
+      const listContainer = isOrigin ? document.getElementById('originList') : document.getElementById('destinationList');
+      
+      if (query.length < 2) {
+        listContainer.innerHTML = '';
+        listContainer.style.display = 'none';
+        return;
+      }
+      
+      // Filter custom places and hubs
+      const matches = allKnownLocations.filter(place => 
+        place.name.toLowerCase().includes(query)
+      ).slice(0, 8);
+      
+      if (matches.length > 0) {
+        listContainer.innerHTML = '';
+        listContainer.style.display = 'block';
+        matches.forEach(place => {
+          const div = document.createElement('div');
+          div.className = 'suggestion';
+          div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #2563eb;"></i>${place.name}`;
+          div.onclick = () => {
+            inputElement.value = place.name;
+            listContainer.innerHTML = '';
+            listContainer.style.display = 'none';
+            
+            // Set coordinates from custom place or hub
+            const coords = getPlaceCoordinates(place.name);
+            if (coords) {
+              if (isOrigin) {
+                originCoords = { lat: coords.lat, lng: coords.lng };
+                originAddress = place.name;
+                originIsCustom = coords.isCustom;
+                determineNearestHub(originCoords.lat, originCoords.lng);
+                if (destinationCoords) {
+                  calculateAllDistances();
+                }
+              } else {
+                destinationCoords = { lat: coords.lat, lng: coords.lng };
+                destinationAddress = place.name;
+                destinationIsCustom = coords.isCustom;
+                if (originCoords) {
+                  calculateAllDistances();
+                }
+              }
+              checkAndShowSummary();
+            }
+          };
+          listContainer.appendChild(div);
+        });
+      } else {
+        listContainer.style.display = 'none';
+      }
+    });
+    
+    // Hide list when clicking outside
+    document.addEventListener('click', function(e) {
+      const listContainer = isOrigin ? document.getElementById('originList') : document.getElementById('destinationList');
+      if (!inputElement.contains(e.target)) {
+        listContainer.style.display = 'none';
+      }
+    });
+  }
+  
+  // ==================== AUTO-FETCH CURRENT LOCATION FOR PICKUP ====================
+  let isFetchingLocation = false;
+  
+  function fetchCurrentLocationAsPickup() {
+    const phone = document.getElementById('customer-phone').value;
+    const statusDiv = document.getElementById('status');
+    const originInput = document.getElementById('gm-origin');
+    
+    if (!phone || !/^0[0-9]{9}$/.test(phone)) {
+      statusText.innerHTML = "⚠️ Please enter your phone number first!";
+      statusText.style.color = "orange";
+      return;
+    }
+    
+    if (!navigator.geolocation) {
+      statusText.innerHTML = "❌ Geolocation is not supported by your browser!";
+      statusText.style.color = "red";
+      return;
+    }
+    
+    isFetchingLocation = true;
+    statusText.innerHTML = "📍 Fetching your current location...";
+    statusText.style.color = "#2563eb";
+    originInput.placeholder = "Fetching location...";
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        // Try to reverse geocode to get address
+        const geocoder = new google.maps.Geocoder();
+        const latlng = { lat: lat, lng: lng };
+        
+        geocoder.geocode({ location: latlng }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const address = results[0].formatted_address;
+            originInput.value = address;
+            originAddress = address;
+            originCoords = { lat: lat, lng: lng };
+            originIsCustom = false;
+            
+            if (results[0].place_id) {
+              originPlaceId = results[0].place_id;
+            }
+            
+            statusText.innerHTML = "✅ Current location set as pickup!";
+            statusText.style.color = "green";
+            
+            determineNearestHub(lat, lng);
+            
+            if (destinationCoords) {
+              calculateAllDistances();
+            }
+            
+            checkAndShowSummary();
+          } else {
+            // If reverse geocoding fails, use coordinates directly
+            originInput.value = `Location at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            originAddress = originInput.value;
+            originCoords = { lat: lat, lng: lng };
+            originIsCustom = true;
+            
+            statusText.innerHTML = "✅ Current location set! (approximate address)";
+            statusText.style.color = "green";
+            
+            determineNearestHub(lat, lng);
+            
+            if (destinationCoords) {
+              calculateAllDistances();
+            }
+            
+            checkAndShowSummary();
+          }
+          isFetchingLocation = false;
+          originInput.placeholder = "Where should we pick you up?";
+        });
+      },
+      (error) => {
+        let errorMsg = "";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = "Permission denied. Please allow location access.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = "Location unavailable. Please check your GPS.";
+            break;
+          case error.TIMEOUT:
+            errorMsg = "Location request timed out. Please try again.";
+            break;
+          default:
+            errorMsg = "Failed to get location. Please enter manually.";
+        }
+        statusText.innerHTML = `❌ ${errorMsg}`;
+        statusText.style.color = "red";
+        originInput.placeholder = "Where should we pick you up?";
+        isFetchingLocation = false;
+      }
+    );
+  }
+  
+  // ==================== GOOGLE MAPS API INTEGRATION ====================
+  let autocompleteOrigin, autocompleteDestination;
+  let distanceService;
+  let geocoder;
+  let originPlaceId = null;
+  let destinationPlaceId = null;
+  let originAddress = "";
+  let destinationAddress = "";
+  let originCoords = null;
+  let destinationCoords = null;
+  let originIsCustom = false;
+  let destinationIsCustom = false;
+  let googleMapsReady = false;
+  let currentTripDistance = null;
+  let currentDuration = null;
+  let currentHubToPickup = null;
+  let currentDestToHub = null;
+  let currentTotalDistance = null;
+  let assignedHub = null;
+  
+  function initGoogleMaps() {
+    googleMapsReady = true;
+    distanceService = new google.maps.DistanceMatrixService();
+    geocoder = new google.maps.Geocoder();
+    
+    const originInput = document.getElementById('gm-origin');
+    const destInput = document.getElementById('gm-destination');
+    
+    // Setup custom autocomplete for custom places
+    setupCustomAutocomplete(originInput, true);
+    setupCustomAutocomplete(destInput, false);
+    
+    // Initialize Google Places Autocomplete for standard addresses
+    autocompleteOrigin = new google.maps.places.Autocomplete(originInput, {
+      componentRestrictions: { country: 'zm' },
+      fields: ['formatted_address', 'geometry', 'place_id', 'name']
+    });
+    autocompleteOrigin.addListener('place_changed', () => {
+      if (isFetchingLocation) return;
+      const place = autocompleteOrigin.getPlace();
+      if (place && place.place_id) {
+        originPlaceId = place.place_id;
+        originAddress = place.formatted_address || place.name;
+        originCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
+        originIsCustom = false;
+        document.getElementById('gm-origin').value = originAddress;
+        determineNearestHub(originCoords.lat, originCoords.lng);
+        if (destinationCoords) {
+          calculateAllDistances();
+        }
+      }
+    });
+    
+    autocompleteDestination = new google.maps.places.Autocomplete(destInput, {
+      componentRestrictions: { country: 'zm' },
+      fields: ['formatted_address', 'geometry', 'place_id', 'name']
+    });
+    autocompleteDestination.addListener('place_changed', () => {
+      const place = autocompleteDestination.getPlace();
+      if (place && place.place_id) {
+        destinationPlaceId = place.place_id;
+        destinationAddress = place.formatted_address || place.name;
+        destinationCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
+        destinationIsCustom = false;
+        document.getElementById('gm-destination').value = destinationAddress;
+        if (originCoords) {
+          calculateAllDistances();
+        }
+      }
+    });
+    
+    console.log("Google Maps API ready");
+  }
+  
+  function determineNearestHub(lat, lng) {
+    assignedHub = getNearestHub(lat, lng);
+    document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name} will pick you up`;
+    return assignedHub;
+  }
+  
+  function getDistanceBetweenPoints(point1, point2, callback) {
+    // If both points are custom (no place_id), use direct coordinate distance
+    if (point1.isCustom || point2.isCustom || !point1.placeId || !point2.placeId) {
+      // Use Haversine formula for approximate distance
+      const R = 6371; // Earth's radius in km
+      const dLat = (point2.lat - point1.lat) * Math.PI / 180;
+      const dLon = (point2.lng - point1.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      callback(distance);
+      return;
+    }
+    
+    // Use Google Distance Matrix for standard addresses
+    distanceService.getDistanceMatrix({
+      origins: [{ lat: point1.lat, lng: point1.lng }],
+      destinations: [{ lat: point2.lat, lng: point2.lng }],
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.METRIC
+    }, (response, status) => {
+      if (status === 'OK') {
+        const result = response.rows[0].elements[0];
+        if (result.status === 'OK') {
+          callback(result.distance.value / 1000);
+        } else {
+          // Fallback to direct distance
+          const R = 6371;
+          const dLat = (point2.lat - point1.lat) * Math.PI / 180;
+          const dLon = (point2.lng - point1.lng) * Math.PI / 180;
+          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const distance = R * c;
+          callback(distance);
+        }
+      } else {
+        const R = 6371;
+        const dLat = (point2.lat - point1.lat) * Math.PI / 180;
+        const dLon = (point2.lng - point1.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        callback(distance);
+      }
+    });
+  }
+  
+  function calculateAllDistances() {
+    if (!originCoords || !destinationCoords || !assignedHub) return;
+    
+    currentHubToPickup = null;
+    currentTripDistance = null;
+    currentDestToHub = null;
+    
+    // Hub to pickup
+    getDistanceBetweenPoints(
+      { lat: assignedHub.lat, lng: assignedHub.lng, placeId: null, isCustom: false },
+      { lat: originCoords.lat, lng: originCoords.lng, placeId: originPlaceId, isCustom: originIsCustom },
+      (distance) => {
+        currentHubToPickup = distance;
+        checkAllDistancesComplete();
+      }
+    );
+    
+    // Pickup to destination
+    getDistanceBetweenPoints(
+      { lat: originCoords.lat, lng: originCoords.lng, placeId: originPlaceId, isCustom: originIsCustom },
+      { lat: destinationCoords.lat, lng: destinationCoords.lng, placeId: destinationPlaceId, isCustom: destinationIsCustom },
+      (distance) => {
+        currentTripDistance = distance;
+        // Estimate duration based on distance (60 km/h average)
+        const estimatedMinutes = Math.ceil((distance / 60) * 60);
+        const hours = Math.floor(estimatedMinutes / 60);
+        const mins = estimatedMinutes % 60;
+        currentDuration = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
+        checkAllDistancesComplete();
+      }
+    );
+    
+    // Destination to hub
+    getDistanceBetweenPoints(
+      { lat: destinationCoords.lat, lng: destinationCoords.lng, placeId: destinationPlaceId, isCustom: destinationIsCustom },
+      { lat: assignedHub.lat, lng: assignedHub.lng, placeId: null, isCustom: false },
+      (distance) => {
+        currentDestToHub = distance;
+        checkAllDistancesComplete();
+      }
+    );
+  }
+  
+  function checkAllDistancesComplete() {
+    if (currentHubToPickup !== null && currentTripDistance !== null && currentDestToHub !== null) {
+      currentTotalDistance = currentHubToPickup + currentTripDistance + currentDestToHub;
+      
+      const infoDiv = document.getElementById('map-route-info');
+      if (infoDiv) {
+        const customNote = (originIsCustom || destinationIsCustom) ? '<br>📍 Includes custom location (not on Google Maps)' : '';
+        infoDiv.innerHTML = `<i class="fas fa-route"></i> ${originAddress} → ${destinationAddress}<br>
+        📏 Trip Distance: ${currentTripDistance.toFixed(1)} km<br>
+        🚗 Driver pickup: ${currentHubToPickup.toFixed(1)} km from ${assignedHub.name}<br>
+        ⏱️ Est. Time: ${currentDuration}<br>
+        💰 Total billed distance: ${currentTotalDistance.toFixed(1)} km (includes driver pickup)${customNote}`;
+      }
+      
+      const openLink = document.getElementById('openMapsLink');
+      if (!originIsCustom && !destinationIsCustom) {
+        openLink.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originAddress)}&destination=${encodeURIComponent(destinationAddress)}`;
+      } else {
+        openLink.href = `https://www.google.com/maps/dir/${originCoords.lat},${originCoords.lng}/${destinationCoords.lat},${destinationCoords.lng}`;
+      }
+      
+      checkAndShowSummary();
+    }
+  }
+  
+  function checkAndShowSummary() {
+    const mode = document.querySelector('input[name="mode"]:checked');
+    const phone = document.getElementById('customer-phone').value;
+    
+    if (currentTotalDistance && mode && /^0[0-9]{9}$/.test(phone)) {
+      calculatePrice();
+    }
+  }
+  
+  // ==================== PRICING CONFIGURATION ====================
   const config = {
     vehiclePricePerKm: 3.90,
     motorbikePricePerKm: 1.54,
@@ -790,9 +824,195 @@
     avgSpeed: 60
   };
   
+  function calculatePrice() {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    let rate, minPrice, extra;
+    
+    if (mode === 'vehicle') {
+      rate = config.vehiclePricePerKm;
+      minPrice = config.vehicleMinPrice;
+      extra = config.vehicleExtra;
+    } else {
+      rate = config.motorbikePricePerKm;
+      minPrice = config.motorbikeMinPrice;
+      extra = config.motorbikeExtra;
+    }
+    
+    let price = Math.max(minPrice, Math.ceil((currentTotalDistance * rate) + extra));
+    
+    const customBadge = (originIsCustom || destinationIsCustom) ? '<div class="summary-card"><span>📍 Custom Location</span><span>Included</span></div>' : '';
+    
+    document.getElementById('summary-cards').innerHTML = `
+      <div class="summary-card"><span> Total Price </span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
+      <div class="summary-card"><span> Trip Distance</span><span>${currentTripDistance.toFixed(2)} km</span></div>
+      <div class="summary-card"><span> Driver Pickup</span><span>${currentHubToPickup.toFixed(2)} km</span></div>
+      <div class="summary-card"><span> Total Billed</span><span>${currentTotalDistance.toFixed(2)} km</span></div>
+      <div class="summary-card"><span> Est. Time</span><span>${currentDuration}</span></div>
+      <div class="summary-card"><span> Serving Hub</span><span>${assignedHub.name}</span></div>
+      ${customBadge}
+    `;
+    
+    document.getElementById('summary-section').style.display = 'block';
+    
+    let formattedPhone = document.getElementById('customer-phone').value;
+    formattedPhone = formattedPhone.startsWith('0') ? '+260' + formattedPhone.substring(1) : formattedPhone;
+    
+    rideData = {
+      preferredMode: mode,
+      phone: formattedPhone,
+      hub: assignedHub.name,
+      from: originAddress,
+      to: destinationAddress,
+      tripDistance: currentTripDistance.toFixed(2),
+      hubToPickupDistance: currentHubToPickup.toFixed(2),
+      destToHubDistance: currentDestToHub.toFixed(2),
+      totalDistance: currentTotalDistance.toFixed(2),
+      price: price,
+      estimatedTime: currentDuration,
+      originIsCustom: originIsCustom,
+      destinationIsCustom: destinationIsCustom,
+      originPlaceId: originPlaceId,
+      destinationPlaceId: destinationPlaceId
+    };
+    
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.style.background = "var(--primary-color)";
+    document.getElementById('btn-icon').className = "fas fa-paper-plane";
+    document.getElementById('btn-icon').style.display = "block";
+    document.getElementById('btn-loader').style.display = "none";
+    document.getElementById('progress-text').style.display = "none";
+    document.getElementById('action-label').innerHTML = `Request Now`;
+    submitBtn.onclick = handleRequest;
+  }
+  
+  // ==================== LOCATION SHARING FUNCTIONS ====================
+  let sharedLocationLink = "";
+  let sharedLocationTimestamp = "";
+  
+  function updateLocationStatus(message, type) {
+    const statusDiv = document.getElementById("locationStatus");
+    statusDiv.textContent = message;
+    statusDiv.className = `location-status ${type}`;
+  }
+  
+  function fetchAndShareLocation() {
+    const phone = document.getElementById('customer-phone').value;
+    
+    if (!phone || !/^0[0-9]{9}$/.test(phone)) {
+      updateLocationStatus("⚠️ Please enter your phone number first!", "warning");
+      return;
+    }
+    
+    if (!navigator.geolocation) {
+      updateLocationStatus("❌ Geolocation is not supported by your browser!", "error");
+      return;
+    }
+    
+    updateLocationStatus("📍 Fetching your location...", "info");
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const timestamp = new Date().toISOString();
+        
+        sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        sharedLocationTimestamp = timestamp;
+        
+        updateLocationStatus("✅ Location fetched! Saving to system...", "info");
+        saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp);
+      },
+      (error) => {
+        let errorMsg = "";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = "Permission denied. Please allow location access.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = "Location unavailable. Please check your GPS.";
+            break;
+          case error.TIMEOUT:
+            errorMsg = "Location request timed out. Please try again.";
+            break;
+          default:
+            errorMsg = "Failed to get location. Please try again.";
+        }
+        updateLocationStatus(`❌ ${errorMsg}`, "error");
+      }
+    );
+  }
+  
+  function saveLocationToSheet(lat, lon, mapLink, phone, timestamp) {
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+    
+    const payload = {
+      sharedLocation: mapLink,
+      locationLatitude: lat,
+      locationLongitude: lon,
+      locationTimestamp: timestamp,
+      locationPhone: phone,
+      requestType: "location_share",
+      timestamp: timestamp,
+      phone: phone,
+      from: originAddress || "Location Share",
+      to: destinationAddress || "N/A",
+      preferredMode: document.querySelector('input[name="mode"]:checked')?.value || "N/A",
+      hub: assignedHub?.name || "Unknown"
+    };
+    
+    fetch(scriptURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: new URLSearchParams(payload)
+    }).then(() => {
+      updateLocationStatus("✅ Location saved to system successfully!", "success");
+    }).catch((error) => {
+      console.error("Save failed:", error);
+      updateLocationStatus("⚠️ Location saved locally. Will sync when online.", "warning");
+      let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
+      pending.push(payload);
+      localStorage.setItem("pendingLocations", JSON.stringify(pending));
+    });
+  }
+  
+  window.addEventListener("online", () => {
+    const pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
+    if (pending.length > 0) {
+      const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+      pending.forEach(payload => {
+        fetch(scriptURL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: new URLSearchParams(payload)
+        });
+      });
+      localStorage.removeItem("pendingLocations");
+      updateLocationStatus("✅ Pending locations synced!", "success");
+    }
+  });
+  
+  function shareWhatsApp() {
+    if (!sharedLocationLink) {
+      alert("Please get your location first using 'Share My Location'");
+      return;
+    }
+    let driverNumber = getDriverContactForHub(assignedHub?.name);
+    driverNumber = formatForWhatsApp(driverNumber);
+    let message = encodeURIComponent("📍 My current location: " + sharedLocationLink);
+    window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
+  }
+  
+  function shareSMS() {
+    if (!sharedLocationLink) {
+      alert("Please get your location first using 'Share My Location'");
+      return;
+    }
+    let driverNumber = getDriverContactForHub(assignedHub?.name);
+    window.location.href = `sms:${driverNumber}?body=📍 My location: ${sharedLocationLink}`;
+  }
+  
+  // ==================== UI HANDLERS ====================
   let rideData = null;
-  let currentPickup = "";
-  let currentDestination = "";
   
   const phoneInput = document.getElementById('customer-phone');
   const tripDiv = document.getElementById('trip-details');
@@ -806,161 +1026,20 @@
   phoneInput.oninput = () => {
     if (/^0[0-9]{9}$/.test(phoneInput.value)) {
       tripDiv.style.display = 'block';
+      if (originCoords && destinationCoords) {
+        checkAndShowSummary();
+      }
     } else {
       tripDiv.style.display = 'none';
       summaryDiv.style.display = 'none';
     }
   };
   
-  // Setup autocomplete for pickup/destination inputs
-  function setupAuto(inputId, containerId, listId) {
-    const input = document.getElementById(inputId);
-    const container = document.getElementById(containerId);
-    const list = document.getElementById(listId);
-    
-    input.oninput = () => {
-      const val = input.value.toLowerCase().trim();
-      list.innerHTML = '';
-      container.classList.remove('field-error');
-      if (!val || val.length < 1) return;
-      const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 8);
-      matches.forEach(place => {
-        const div = document.createElement('div');
-        div.className = 'suggestion';
-        div.textContent = place;
-        div.onclick = () => {
-          input.value = place;
-          list.innerHTML = '';
-          if (inputId === 'gm-origin') {
-            currentPickup = place;
-          }
-          if (inputId === 'gm-destination') {
-            currentDestination = place;
-          }
-          checkReady();
-        };
-        list.appendChild(div);
-      });
-    };
-    input.onblur = () => {
-      setTimeout(() => {
-        if (input.value && !MASTER_PLACES_LIST.includes(input.value)) {
-          container.classList.add('field-error');
-          statusText.innerHTML = "⚠️ Invalid location! Please select from the list.";
-          summaryDiv.style.display = 'none';
-        } else if (input.value && MASTER_PLACES_LIST.includes(input.value)) {
-          container.classList.remove('field-error');
-        }
-      }, 200);
-    };
-  }
-  
-// Update route info and Google Maps link
-function updateRouteInfo(pickup, destination) {
-  if (!pickup || !destination) return;
-  
-  const pickupCoords = getCoordinates(pickup);
-  const destCoords = getCoordinates(destination);
-  const totalDist = calculateTotalDistance(pickup, destination);
-  
-  const infoDiv = document.getElementById('map-route-info');
-  if (infoDiv && totalDist.total) {
-    // Calculate estimated time
-    const avgSpeedKmh = 60;
-    const tripDistanceKm = totalDist.trip || 0;
-    const estimatedMinutes = Math.ceil((tripDistanceKm / avgSpeedKmh) * 60);
-    const hours = Math.floor(estimatedMinutes / 60);
-    const mins = estimatedMinutes % 60;
-    const estTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
-    
-    // Display with estimated time included
-    infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estTimeStr}`;
-  }
-  
-  const openLink = document.getElementById('openMapsLink');
-  openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-  // Keep button text as "Click to View Map" - no change needed
-}
-  
-  function checkReady() {
-    const from = document.getElementById('gm-origin').value;
-    const to = document.getElementById('gm-destination').value;
-    const mode = document.querySelector('input[name="mode"]:checked');
-    
-    if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
-      currentPickup = from;
-      currentDestination = to;
-      
-      if (!mode) {
-        statusText.innerHTML = "⚠️ Please select a transport mode.";
-        summaryDiv.style.display = 'none';
-      } else {
-        statusText.innerHTML = "";
-        calculate(from, to, mode.value);
-        updateRouteInfo(from, to);
-      }
-    } else {
-      statusText.innerHTML = "";
-      summaryDiv.style.display = 'none';
+  document.getElementById('mode-group').onchange = () => {
+    if (originCoords && destinationCoords && /^0[0-9]{9}$/.test(phoneInput.value)) {
+      checkAndShowSummary();
     }
-  }
-  
-  function calculate(from, to, mode) {
-    document.getElementById('spinner').style.display = 'block';
-    summaryDiv.style.display = 'none';
-    
-    setTimeout(() => {
-      document.getElementById('spinner').style.display = 'none';
-      const res = calculateTotalDistance(from, to);
-      
-      if (res.total === null) {
-        statusText.innerHTML = "❌ Route not available. Please try different locations.";
-        return;
-      }
-      
-      summaryDiv.style.display = 'block';
-      document.getElementById('hub-tooltip').textContent = `✨ 50% Discount! Calculated via: ${res.hub}`;
-      
-      let rate, minPrice, extra;
-      if (mode === 'vehicle') {
-        rate = config.vehiclePricePerKm;
-        minPrice = config.vehicleMinPrice;
-        extra = config.vehicleExtra;
-      } else {
-        rate = config.motorbikePricePerKm;
-        minPrice = config.motorbikeMinPrice;
-        extra = config.motorbikeExtra;
-      }
-      
-      let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-      
-      document.getElementById('summary-cards').innerHTML = `
-        <div class="summary-card"><span> Total Price </span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
-        <div class="summary-card"><span> Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
-      `;
-      
-      let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
-      rideData = {
-        preferredMode: mode,
-        phone: formattedPhone,
-        hub: res.hub,
-        from: from,
-        to: to,
-        tripDistance: res.trip.toFixed(2),
-        totalDistance: res.total.toFixed(2),
-        price: price,
-        estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
-      };
-      
-      submitBtn.style.background = "var(--primary-color)";
-      btnIcon.className = "fas fa-paper-plane";
-      btnIcon.style.display = "block";
-      btnLoader.style.display = "none";
-      progressTextSpan.style.display = "none";
-      document.getElementById('action-label').innerHTML = `Request Now <span style="color:#ff4444; font-size:0.75rem;"></span>`;
-      submitBtn.onclick = handleRequest;
-    }, 500);
-  }
+  };
   
   async function handleRequest() {
     submitBtn.disabled = true;
@@ -975,7 +1054,28 @@ function updateRouteInfo(pickup, destination) {
       progressTextSpan.textContent = p + "%";
     }, 100);
     
-    const payload = { ...rideData, timestamp: new Date().toISOString() };
+    const payload = { 
+      ...rideData, 
+      timestamp: new Date().toISOString(),
+      sharedLocation: sharedLocationLink || "",
+      sharedLocationTimestamp: sharedLocationTimestamp || "",
+      requestType: "booking"
+    };
+    
+    let timeoutTriggered = false;
+    const timeoutId = setTimeout(() => {
+      if (!timeoutTriggered) {
+        timeoutTriggered = true;
+        clearInterval(interval);
+        statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
+        statusText.style.color = "orange";
+        finishRequestUI();
+        setTimeout(() => {
+          const callBtn = document.getElementById('submit-btn');
+          callBtn.click();
+        }, 100);
+      }
+    }, 15000);
     
     try {
       await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
@@ -983,16 +1083,22 @@ function updateRouteInfo(pickup, destination) {
         body: new URLSearchParams(payload),
         mode: 'no-cors'
       });
-      clearInterval(interval);
-      progressTextSpan.textContent = "100%";
-      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
-      statusText.style.color = "green";
-      finishRequestUI();
+      clearTimeout(timeoutId);
+      if (!timeoutTriggered) {
+        clearInterval(interval);
+        progressTextSpan.textContent = "100%";
+        statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
+        statusText.style.color = "green";
+        finishRequestUI();
+      }
     } catch(e) {
-      clearInterval(interval);
-      statusText.innerHTML = "⚠️ Network issue. Please call!";
-      statusText.style.color = "red";
-      finishRequestUI();
+      clearTimeout(timeoutId);
+      if (!timeoutTriggered) {
+        clearInterval(interval);
+        statusText.innerHTML = "⚠️ Network issue. Please call!";
+        statusText.style.color = "red";
+        finishRequestUI();
+      }
     }
   }
   
@@ -1001,23 +1107,18 @@ function updateRouteInfo(pickup, destination) {
     progressTextSpan.style.display = "none";
     btnIcon.style.display = "block";
     btnIcon.className = "fas fa-phone";
+    
+    let callNumber = getDriverContactForHub(assignedHub?.name);
+    
     submitBtn.style.background = "var(--success-color)";
     submitBtn.disabled = false;
     document.getElementById('action-label').innerHTML = " Call Now";
-    submitBtn.onclick = () => window.location.href = "tel:0978167546";
+    submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
   }
-  
-  // Initialize autocomplete
-  setupAuto('gm-origin', 'origin-container', 'originList');
-  setupAuto('gm-destination', 'dest-container', 'destinationList');
-  document.getElementById('mode-group').onchange = checkReady;
   
   function toggleDropdown() {
     const menu = document.getElementById("header-menu-dropdown");
     menu.classList.toggle("show");
-    if (menu.classList.contains("show") && currentPickup && currentDestination) {
-      setTimeout(() => updateRouteInfo(currentPickup, currentDestination), 150);
-    }
   }
   
   window.onclick = (event) => {
@@ -1029,9 +1130,11 @@ function updateRouteInfo(pickup, destination) {
   };
   
   window.toggleDropdown = toggleDropdown;
-  window.getLocation = getLocation;
+  window.fetchAndShareLocation = fetchAndShareLocation;
+  window.fetchCurrentLocationAsPickup = fetchCurrentLocationAsPickup;
   window.shareWhatsApp = shareWhatsApp;
   window.shareSMS = shareSMS;
+  window.initGoogleMaps = initGoogleMaps;
 </script>
 </body>
 </html>
