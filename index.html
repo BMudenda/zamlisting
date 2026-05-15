@@ -509,49 +509,137 @@ function formatForWhatsApp(number) {
 }
 
 // Coordinates fetching and sharing functions
-let mapLink = "";
+let sharedLocationLink = "";
+let sharedLocationTimestamp = "";
 
 function getLocation() {
     const status = document.getElementById("locationStatus");
+    const phone = document.getElementById('customer-phone').value;
+    
+    // Check if phone number is entered
+    if (!phone || !/^0[0-9]{9}$/.test(phone)) {
+        status.innerHTML = "⚠️ Please enter your phone number first!";
+        status.style.color = "orange";
+        return;
+    }
     
     if (navigator.geolocation) {
         status.innerHTML = "📍 Getting location...";
+        status.style.color = "#2563eb";
         
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 let lat = position.coords.latitude;
                 let lon = position.coords.longitude;
+                let timestamp = new Date().toISOString();
                 
-                mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                sharedLocationTimestamp = timestamp;
                 
                 const hubName = rideData?.hub || "Main Office";
-                status.innerHTML = `🌐 ✅ Location ready! share to ${hubName}`;
+                status.innerHTML = `🌐 ✅ Location ready! Auto-saving to sheet...`;
+                status.style.color = "green";
+                
+                // Auto-save to Google Sheet
+                saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp, hubName);
             },
             (error) => {
-                status.innerHTML = "❌ Failed to get location!";
+                let errorMsg = "";
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMsg = "Permission denied. Please allow location access.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMsg = "Location unavailable. Try again.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMsg = "Location request timed out.";
+                        break;
+                }
+                status.innerHTML = `❌ ${errorMsg}`;
+                status.style.color = "red";
             }
         );
     } else {
         status.innerHTML = "❌ Geolocation not supported!";
+        status.style.color = "red";
     }
 }
 
+// NEW FUNCTION: Save location to Google Sheet
+function saveLocationToSheet(lat, lon, mapLink, phone, timestamp, hubName) {
+    const status = document.getElementById("locationStatus");
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+    
+    const payload = {
+        // Location fields
+        sharedLocation: mapLink,
+        locationLatitude: lat,
+        locationLongitude: lon,
+        locationTimestamp: timestamp,
+        locationPhone: phone,
+        locationHub: hubName,
+        requestType: "location_share",
+        // Include booking context if available
+        bookingFrom: currentPickup || "",
+        bookingTo: currentDestination || "",
+        timestamp: timestamp,
+        phone: phone,
+        from: currentPickup || "Location Share",
+        to: currentDestination || "N/A",
+        preferredMode: document.querySelector('input[name="mode"]:checked')?.value || "N/A",
+        hub: rideData?.hub || "Unknown"
+    };
+    
+    fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: new URLSearchParams(payload)
+    }).then(() => {
+        status.innerHTML = `✅ Location saved to sheet! You can now share with ${hubName}`;
+    }).catch((error) => {
+        console.error("Save failed:", error);
+        status.innerHTML = "⚠️ Location saved locally. Will sync when online.";
+        // Store for retry
+        let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
+        pending.push(payload);
+        localStorage.setItem("pendingLocations", JSON.stringify(pending));
+    });
+}
+
+// Retry pending locations when online
+window.addEventListener("online", () => {
+    const pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
+    if (pending.length > 0) {
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+        pending.forEach(payload => {
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: new URLSearchParams(payload)
+            });
+        });
+        localStorage.removeItem("pendingLocations");
+        console.log("Pending locations synced");
+    }
+});
+
 function shareWhatsApp() {
-    if (!mapLink) {
+    if (!sharedLocationLink) {
         alert("Please get your location first using 'Get My Location'");
         return;
     }
     
     // Get the driver number and convert to international format for WhatsApp
     let driverNumber = getDriverContactForHub();
-    driverNumber = formatForWhatsApp(driverNumber); // Converts 0978167546 to 260978167546
+    driverNumber = formatForWhatsApp(driverNumber);
     
-    let message = encodeURIComponent("📍 Here is my current location: " + mapLink);
+    let message = encodeURIComponent("📍 Here is my current location: " + sharedLocationLink);
     window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
 }
 
 function shareSMS() {
-    if (!mapLink) {
+    if (!sharedLocationLink) {
         alert("Please get your location first using 'Get My Location'");
         return;
     }
@@ -559,9 +647,8 @@ function shareSMS() {
     // Get the driver number (SMS works with local format)
     let driverNumber = getDriverContactForHub();
     
-    // SMS can use local format or with +260
-    window.location.href = `sms:${driverNumber}?body=📍 Here is my location: ${mapLink}`;
-      }
+    window.location.href = `sms:${driverNumber}?body=📍 Here is my location: ${sharedLocationLink}`;
+}
 
   // ----- COMPLETE PLACES LIST (with coordinates) -----
   const placesWithCoords = [
