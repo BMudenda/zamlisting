@@ -335,31 +335,19 @@
           </a>
         </div>
         
-        <!-- Share Location Section THIRD -->
-        <div class="menu-divider"></div>
+        <!-- Share Location Section -->
+<div class="menu-divider"></div>
 
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;"> Please note: Exact pickup or drop-off locations within a 1 km radius of the selected points will not incur any additional charges.</p>
+<div class="dropdown-content-section">
+  <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+  <p style="font-size: 0.85rem;">Click the button below to share your current location. This will be automatically saved to our system.</p>
 
-          <a href="#" onclick="getLocation()" title="Get Location">
-            <i class="fas fa-location-arrow"></i>
-            <span class="contact-label-text">Get My Location</span>
-            <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
-          </a>
-          
-          <a href="#" onclick="shareWhatsApp()" title="Share via WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-            <span class="contact-label-text">Share via WhatsApp</span>
-          </a>
-
-          <a href="#" onclick="shareSMS()" title="Share via SMS">
-            <i class="fas fa-sms"></i>
-            <span class="contact-label-text">Share via SMS</span>
-          </a>
-
-          
-        </div>
+  <a href="#" onclick="getLocation()" title="Share Location">
+    <i class="fas fa-location-arrow"></i>
+    <span class="contact-label-text">Share My Location</span>
+    <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+  </a>
+</div>
         
         <!-- View Map Section - FIXED with centered text/icon AND estimated time display -->
         <div class="dropdown-content-section">
@@ -536,12 +524,11 @@ function getLocation() {
                 sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
                 sharedLocationTimestamp = timestamp;
                 
-                const hubName = rideData?.hub || "Main Office";
-                status.innerHTML = `🌐 ✅ Location ready! Auto-saving to sheet...`;
+                status.innerHTML = `🌐 ✅ Location saved to sheet!`;
                 status.style.color = "green";
                 
                 // Auto-save to Google Sheet
-                saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp, hubName);
+                saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp);
             },
             (error) => {
                 let errorMsg = "";
@@ -566,23 +553,18 @@ function getLocation() {
     }
 }
 
-// NEW FUNCTION: Save location to Google Sheet
-function saveLocationToSheet(lat, lon, mapLink, phone, timestamp, hubName) {
+// Save location to Google Sheet
+function saveLocationToSheet(lat, lon, mapLink, phone, timestamp) {
     const status = document.getElementById("locationStatus");
     const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
     
     const payload = {
-        // Location fields
         sharedLocation: mapLink,
         locationLatitude: lat,
         locationLongitude: lon,
         locationTimestamp: timestamp,
         locationPhone: phone,
-        locationHub: hubName,
         requestType: "location_share",
-        // Include booking context if available
-        bookingFrom: currentPickup || "",
-        bookingTo: currentDestination || "",
         timestamp: timestamp,
         phone: phone,
         from: currentPickup || "Location Share",
@@ -595,12 +577,9 @@ function saveLocationToSheet(lat, lon, mapLink, phone, timestamp, hubName) {
         method: 'POST',
         mode: 'no-cors',
         body: new URLSearchParams(payload)
-    }).then(() => {
-        status.innerHTML = `✅ Location saved to sheet! You can now share with ${hubName}`;
     }).catch((error) => {
         console.error("Save failed:", error);
         status.innerHTML = "⚠️ Location saved locally. Will sync when online.";
-        // Store for retry
         let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
         pending.push(payload);
         localStorage.setItem("pendingLocations", JSON.stringify(pending));
@@ -620,36 +599,8 @@ window.addEventListener("online", () => {
             });
         });
         localStorage.removeItem("pendingLocations");
-        console.log("Pending locations synced");
     }
 });
-
-function shareWhatsApp() {
-    if (!sharedLocationLink) {
-        alert("Please get your location first using 'Get My Location'");
-        return;
-    }
-    
-    // Get the driver number and convert to international format for WhatsApp
-    let driverNumber = getDriverContactForHub();
-    driverNumber = formatForWhatsApp(driverNumber);
-    
-    let message = encodeURIComponent("📍 Here is my current location: " + sharedLocationLink);
-    window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
-}
-
-function shareSMS() {
-    if (!sharedLocationLink) {
-        alert("Please get your location first using 'Get My Location'");
-        return;
-    }
-    
-    // Get the driver number (SMS works with local format)
-    let driverNumber = getDriverContactForHub();
-    
-    window.location.href = `sms:${driverNumber}?body=📍 Here is my location: ${sharedLocationLink}`;
-}
-
   // ----- COMPLETE PLACES LIST (with coordinates) -----
   const placesWithCoords = [
     { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
