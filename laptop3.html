@@ -10,16 +10,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   
-  <!-- Google Maps API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initGoogleMaps" async defer></script>
+  <!-- Google Maps API with provided key -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnNBbFvTjmvfv6Wfm72scc1Z-jY1z_eRA&libraries=places&callback=initGoogleMaps" async defer></script>
   
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2b6ef6">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
-<link rel="apple-touch-icon" href="lfr.jpg">
-
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -194,6 +187,8 @@
   .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
   .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
   .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  /* Updated summary: only price and trip distance columns visible, others hidden */
+  .summary-card-hidden { display: none; }
   .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
   .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
   #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
@@ -247,7 +242,7 @@
 <header>
   <div class="header-content">
     <div class="company-info">
-      <img src="lfr.jpg" alt="Logo" class="corner-logo">
+      <img src="lfr.jpg" alt="Logo" class="corner-logo" onerror="this.style.display='none'">
       <h2 class="zam">
         <span class="z-green">Z</span>
         <span class="z-black">a</span>
@@ -310,7 +305,7 @@
     <fieldset><legend><span class="material-icons">account_circle</span> Phone Number</legend>
       <div class="input-box" id="phone-box">
         <span class="material-icons">phone</span>
-        <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
+        <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0978167546" inputmode="numeric">
       </div>
     </fieldset>
     <div id="trip-details" class="hidden-section">
@@ -319,8 +314,8 @@
           Choose your preferred transport mode
         </p>
         <div id="mode-group" style="display:flex; justify-content:space-around;">
-          <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
-          <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
+          <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike" onerror="this.style.display='none'"><small>Motorbike</small></label>
+          <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car" onerror="this.style.display='none'"><small>Car</small></label>
         </div>
       </fieldset>
       <fieldset><legend> Pickup Location</legend>
@@ -362,7 +357,6 @@
 
 <script>
   // ==================== CUSTOM PLACES (Not on Google Maps) ====================
-  // Add your custom places here with their coordinates
   const customPlaces = [
     { name: "Chidada Community, Luangwa", lat: -15.6250, lng: 30.4000 },
     { name: "Chidada Ground, Luangwa", lat: -15.6240, lng: 30.3980 },
@@ -371,14 +365,10 @@
     { name: "Soweto Community, Luangwa", lat: -15.6180, lng: 30.4050 },
     { name: "Indeco Community, Luangwa", lat: -15.6220, lng: 30.4100 },
     { name: "Feira Day Community, Luangwa", lat: -15.6140, lng: 30.3950 },
-    { name: "Kambolozo Community, Luangwa", lat: -15.6300, lng: 30.4200 },
-    // Add more custom places as needed
+    { name: "Kambolozo Community, Luangwa", lat: -15.6300, lng: 30.4200 }
   ];
   
-  // Combine custom places with hub locations for autocomplete
   const allCustomPlaceNames = customPlaces.map(p => p.name);
-  
-  // ==================== HUBS AND DRIVER CONTACTS ====================
   const hubs = [
     { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064, phone: "0978167546" },
     { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055, phone: "0978167546" },
@@ -389,752 +379,235 @@
     { name: "Lusaka Town", lat: -15.3875, lng: 28.3228, phone: "0978167546" }
   ];
   
-  // Combine hubs and custom places for location detection
   const allKnownLocations = [...hubs, ...customPlaces];
   
   function getPlaceCoordinates(placeName) {
-    // First check custom places
-    const customPlace = customPlaces.find(p => p.name.toLowerCase() === placeName.toLowerCase());
-    if (customPlace) {
-      return { lat: customPlace.lat, lng: customPlace.lng, isCustom: true };
-    }
-    // Then check hubs
-    const hub = hubs.find(h => h.name.toLowerCase() === placeName.toLowerCase());
-    if (hub) {
-      return { lat: hub.lat, lng: hub.lng, isCustom: false };
-    }
+    let custom = customPlaces.find(p => p.name.toLowerCase() === placeName.toLowerCase());
+    if (custom) return { lat: custom.lat, lng: custom.lng, isCustom: true };
+    let hub = hubs.find(h => h.name.toLowerCase() === placeName.toLowerCase());
+    if (hub) return { lat: hub.lat, lng: hub.lng, isCustom: false };
     return null;
   }
   
   function getNearestHub(lat, lng) {
     let nearest = hubs[0];
     let minDistance = Infinity;
-    
     for (let hub of hubs) {
       const distance = Math.sqrt(Math.pow(hub.lat - lat, 2) + Math.pow(hub.lng - lng, 2));
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearest = hub;
-      }
+      if (distance < minDistance) { minDistance = distance; nearest = hub; }
     }
     return nearest;
   }
   
-  function getDriverContactForHub(hubName) {
-    const hub = hubs.find(h => h.name === hubName);
-    return hub ? hub.phone : "0978167546";
-  }
+  function getDriverContactForHub(hubName) { return hubs.find(h => h.name === hubName)?.phone || "0978167546"; }
+  function formatForWhatsApp(number) { return number.startsWith('0') ? '260' + number.substring(1) : number; }
   
-  function formatForWhatsApp(number) {
-    if (number.startsWith('0')) {
-      return '260' + number.substring(1);
-    }
-    return number;
-  }
-  
-  // ==================== CUSTOM PLACE AUTOCOMPLETE ====================
-  let currentOriginList = [];
-  let currentDestList = [];
-  
-  function setupCustomAutocomplete(inputElement, isOrigin) {
-    inputElement.addEventListener('input', function() {
-      const query = this.value.toLowerCase();
-      const listContainer = isOrigin ? document.getElementById('originList') : document.getElementById('destinationList');
-      
-      if (query.length < 2) {
-        listContainer.innerHTML = '';
-        listContainer.style.display = 'none';
-        return;
-      }
-      
-      // Filter custom places and hubs
-      const matches = allKnownLocations.filter(place => 
-        place.name.toLowerCase().includes(query)
-      ).slice(0, 8);
-      
-      if (matches.length > 0) {
-        listContainer.innerHTML = '';
-        listContainer.style.display = 'block';
-        matches.forEach(place => {
-          const div = document.createElement('div');
-          div.className = 'suggestion';
-          div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #2563eb;"></i>${place.name}`;
-          div.onclick = () => {
-            inputElement.value = place.name;
-            listContainer.innerHTML = '';
-            listContainer.style.display = 'none';
-            
-            // Set coordinates from custom place or hub
-            const coords = getPlaceCoordinates(place.name);
-            if (coords) {
-              if (isOrigin) {
-                originCoords = { lat: coords.lat, lng: coords.lng };
-                originAddress = place.name;
-                originIsCustom = coords.isCustom;
-                determineNearestHub(originCoords.lat, originCoords.lng);
-                if (destinationCoords) {
-                  calculateAllDistances();
-                }
-              } else {
-                destinationCoords = { lat: coords.lat, lng: coords.lng };
-                destinationAddress = place.name;
-                destinationIsCustom = coords.isCustom;
-                if (originCoords) {
-                  calculateAllDistances();
-                }
-              }
-              checkAndShowSummary();
-            }
-          };
-          listContainer.appendChild(div);
-        });
-      } else {
-        listContainer.style.display = 'none';
-      }
-    });
-    
-    // Hide list when clicking outside
-    document.addEventListener('click', function(e) {
-      const listContainer = isOrigin ? document.getElementById('originList') : document.getElementById('destinationList');
-      if (!inputElement.contains(e.target)) {
-        listContainer.style.display = 'none';
-      }
-    });
-  }
-  
-  // ==================== AUTO-FETCH CURRENT LOCATION FOR PICKUP ====================
-  let isFetchingLocation = false;
-  
-  function fetchCurrentLocationAsPickup() {
-    const phone = document.getElementById('customer-phone').value;
-    const statusDiv = document.getElementById('status');
-    const originInput = document.getElementById('gm-origin');
-    
-    if (!phone || !/^0[0-9]{9}$/.test(phone)) {
-      statusText.innerHTML = "⚠️ Please enter your phone number first!";
-      statusText.style.color = "orange";
-      return;
-    }
-    
-    if (!navigator.geolocation) {
-      statusText.innerHTML = "❌ Geolocation is not supported by your browser!";
-      statusText.style.color = "red";
-      return;
-    }
-    
-    isFetchingLocation = true;
-    statusText.innerHTML = "📍 Fetching your current location...";
-    statusText.style.color = "#2563eb";
-    originInput.placeholder = "Fetching location...";
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        
-        // Try to reverse geocode to get address
-        const geocoder = new google.maps.Geocoder();
-        const latlng = { lat: lat, lng: lng };
-        
-        geocoder.geocode({ location: latlng }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            const address = results[0].formatted_address;
-            originInput.value = address;
-            originAddress = address;
-            originCoords = { lat: lat, lng: lng };
-            originIsCustom = false;
-            
-            if (results[0].place_id) {
-              originPlaceId = results[0].place_id;
-            }
-            
-            statusText.innerHTML = "✅ Current location set as pickup!";
-            statusText.style.color = "green";
-            
-            determineNearestHub(lat, lng);
-            
-            if (destinationCoords) {
-              calculateAllDistances();
-            }
-            
-            checkAndShowSummary();
-          } else {
-            // If reverse geocoding fails, use coordinates directly
-            originInput.value = `Location at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-            originAddress = originInput.value;
-            originCoords = { lat: lat, lng: lng };
-            originIsCustom = true;
-            
-            statusText.innerHTML = "✅ Current location set! (approximate address)";
-            statusText.style.color = "green";
-            
-            determineNearestHub(lat, lng);
-            
-            if (destinationCoords) {
-              calculateAllDistances();
-            }
-            
-            checkAndShowSummary();
-          }
-          isFetchingLocation = false;
-          originInput.placeholder = "Where should we pick you up?";
-        });
-      },
-      (error) => {
-        let errorMsg = "";
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMsg = "Permission denied. Please allow location access.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMsg = "Location unavailable. Please check your GPS.";
-            break;
-          case error.TIMEOUT:
-            errorMsg = "Location request timed out. Please try again.";
-            break;
-          default:
-            errorMsg = "Failed to get location. Please enter manually.";
-        }
-        statusText.innerHTML = `❌ ${errorMsg}`;
-        statusText.style.color = "red";
-        originInput.placeholder = "Where should we pick you up?";
-        isFetchingLocation = false;
-      }
-    );
-  }
-  
-  // ==================== GOOGLE MAPS API INTEGRATION ====================
-  let autocompleteOrigin, autocompleteDestination;
-  let distanceService;
-  let geocoder;
-  let originPlaceId = null;
-  let destinationPlaceId = null;
-  let originAddress = "";
-  let destinationAddress = "";
-  let originCoords = null;
-  let destinationCoords = null;
-  let originIsCustom = false;
-  let destinationIsCustom = false;
+  let originCoords = null, destinationCoords = null, originAddress = "", destinationAddress = "";
+  let originIsCustom = false, destinationIsCustom = false;
+  let originPlaceId = null, destinationPlaceId = null;
+  let assignedHub = null, currentTripDistance = null, currentHubToPickup = null, currentDestToHub = null, currentTotalDistance = null, currentDuration = null;
+  let distanceService, geocoder;
   let googleMapsReady = false;
-  let currentTripDistance = null;
-  let currentDuration = null;
-  let currentHubToPickup = null;
-  let currentDestToHub = null;
-  let currentTotalDistance = null;
-  let assignedHub = null;
   
   function initGoogleMaps() {
     googleMapsReady = true;
     distanceService = new google.maps.DistanceMatrixService();
     geocoder = new google.maps.Geocoder();
-    
     const originInput = document.getElementById('gm-origin');
     const destInput = document.getElementById('gm-destination');
     
-    // Setup custom autocomplete for custom places
+    function setupCustomAutocomplete(inputElement, isOrigin) {
+      inputElement.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        const listContainer = isOrigin ? document.getElementById('originList') : document.getElementById('destinationList');
+        if (query.length < 2) { listContainer.innerHTML = ''; listContainer.style.display = 'none'; return; }
+        const matches = allKnownLocations.filter(place => place.name.toLowerCase().includes(query)).slice(0, 8);
+        if (matches.length > 0) {
+          listContainer.innerHTML = '';
+          listContainer.style.display = 'block';
+          matches.forEach(place => {
+            const div = document.createElement('div');
+            div.className = 'suggestion';
+            div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #2563eb;"></i>${place.name}`;
+            div.onclick = () => {
+              inputElement.value = place.name;
+              listContainer.innerHTML = '';
+              listContainer.style.display = 'none';
+              const coords = getPlaceCoordinates(place.name);
+              if (coords) {
+                if (isOrigin) { originCoords = { lat: coords.lat, lng: coords.lng }; originAddress = place.name; originIsCustom = coords.isCustom; determineNearestHub(originCoords.lat, originCoords.lng); if (destinationCoords) calculateAllDistances(); }
+                else { destinationCoords = { lat: coords.lat, lng: coords.lng }; destinationAddress = place.name; destinationIsCustom = coords.isCustom; if (originCoords) calculateAllDistances(); }
+                checkAndShowSummary();
+              }
+            };
+            listContainer.appendChild(div);
+          });
+        } else { listContainer.style.display = 'none'; }
+      });
+      document.addEventListener('click', function(e) { if (!inputElement.contains(e.target)) { const list = isOrigin ? document.getElementById('originList') : document.getElementById('destinationList'); if(list) list.style.display = 'none'; } });
+    }
+    
     setupCustomAutocomplete(originInput, true);
     setupCustomAutocomplete(destInput, false);
     
-    // Initialize Google Places Autocomplete for standard addresses
-    autocompleteOrigin = new google.maps.places.Autocomplete(originInput, {
-      componentRestrictions: { country: 'zm' },
-      fields: ['formatted_address', 'geometry', 'place_id', 'name']
-    });
-    autocompleteOrigin.addListener('place_changed', () => {
-      if (isFetchingLocation) return;
-      const place = autocompleteOrigin.getPlace();
+    const originAuto = new google.maps.places.Autocomplete(originInput, { componentRestrictions: { country: 'zm' }, fields: ['formatted_address', 'geometry', 'place_id', 'name'] });
+    originAuto.addListener('place_changed', () => {
+      const place = originAuto.getPlace();
       if (place && place.place_id) {
-        originPlaceId = place.place_id;
-        originAddress = place.formatted_address || place.name;
-        originCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-        originIsCustom = false;
-        document.getElementById('gm-origin').value = originAddress;
-        determineNearestHub(originCoords.lat, originCoords.lng);
-        if (destinationCoords) {
-          calculateAllDistances();
-        }
+        originPlaceId = place.place_id; originAddress = place.formatted_address || place.name; originCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }; originIsCustom = false;
+        document.getElementById('gm-origin').value = originAddress; determineNearestHub(originCoords.lat, originCoords.lng); if (destinationCoords) calculateAllDistances();
       }
     });
-    
-    autocompleteDestination = new google.maps.places.Autocomplete(destInput, {
-      componentRestrictions: { country: 'zm' },
-      fields: ['formatted_address', 'geometry', 'place_id', 'name']
-    });
-    autocompleteDestination.addListener('place_changed', () => {
-      const place = autocompleteDestination.getPlace();
+    const destAuto = new google.maps.places.Autocomplete(destInput, { componentRestrictions: { country: 'zm' }, fields: ['formatted_address', 'geometry', 'place_id', 'name'] });
+    destAuto.addListener('place_changed', () => {
+      const place = destAuto.getPlace();
       if (place && place.place_id) {
-        destinationPlaceId = place.place_id;
-        destinationAddress = place.formatted_address || place.name;
-        destinationCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-        destinationIsCustom = false;
-        document.getElementById('gm-destination').value = destinationAddress;
-        if (originCoords) {
-          calculateAllDistances();
-        }
+        destinationPlaceId = place.place_id; destinationAddress = place.formatted_address || place.name; destinationCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }; destinationIsCustom = false;
+        document.getElementById('gm-destination').value = destinationAddress; if (originCoords) calculateAllDistances();
       }
     });
-    
-    console.log("Google Maps API ready");
   }
   
-  function determineNearestHub(lat, lng) {
-    assignedHub = getNearestHub(lat, lng);
-    document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name} will pick you up`;
-    return assignedHub;
-  }
+  function determineNearestHub(lat, lng) { assignedHub = getNearestHub(lat, lng); document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name} will pick you up`; return assignedHub; }
   
-  function getDistanceBetweenPoints(point1, point2, callback) {
-    // If both points are custom (no place_id), use direct coordinate distance
-    if (point1.isCustom || point2.isCustom || !point1.placeId || !point2.placeId) {
-      // Use Haversine formula for approximate distance
-      const R = 6371; // Earth's radius in km
-      const dLat = (point2.lat - point1.lat) * Math.PI / 180;
-      const dLon = (point2.lng - point1.lng) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const distance = R * c;
-      callback(distance);
-      return;
-    }
-    
-    // Use Google Distance Matrix for standard addresses
-    distanceService.getDistanceMatrix({
-      origins: [{ lat: point1.lat, lng: point1.lng }],
-      destinations: [{ lat: point2.lat, lng: point2.lng }],
-      travelMode: google.maps.TravelMode.DRIVING,
-      unitSystem: google.maps.UnitSystem.METRIC
-    }, (response, status) => {
-      if (status === 'OK') {
-        const result = response.rows[0].elements[0];
-        if (result.status === 'OK') {
-          callback(result.distance.value / 1000);
-        } else {
-          // Fallback to direct distance
-          const R = 6371;
-          const dLat = (point2.lat - point1.lat) * Math.PI / 180;
-          const dLon = (point2.lng - point1.lng) * Math.PI / 180;
-          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
-                    Math.sin(dLon/2) * Math.sin(dLon/2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-          const distance = R * c;
-          callback(distance);
-        }
-      } else {
-        const R = 6371;
-        const dLat = (point2.lat - point1.lat) * Math.PI / 180;
-        const dLon = (point2.lng - point1.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c;
-        callback(distance);
-      }
+  function getDistanceBetweenPoints(p1, p2, callback) {
+    const R = 6371;
+    const dLat = (p2.lat - p1.lat) * Math.PI / 180, dLon = (p2.lng - p1.lng) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(p1.lat * Math.PI/180) * Math.cos(p2.lat * Math.PI/180) * Math.sin(dLon/2)**2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const directDist = R * c;
+    if (!distanceService || p1.isCustom || p2.isCustom || !p1.placeId || !p2.placeId) { callback(directDist); return; }
+    distanceService.getDistanceMatrix({ origins: [{ lat: p1.lat, lng: p1.lng }], destinations: [{ lat: p2.lat, lng: p2.lng }], travelMode: google.maps.TravelMode.DRIVING, unitSystem: google.maps.UnitSystem.METRIC }, (response, status) => {
+      if (status === 'OK') { let elem = response.rows[0].elements[0]; if (elem.status === 'OK') callback(elem.distance.value / 1000); else callback(directDist); }
+      else callback(directDist);
     });
   }
   
   function calculateAllDistances() {
     if (!originCoords || !destinationCoords || !assignedHub) return;
-    
-    currentHubToPickup = null;
-    currentTripDistance = null;
-    currentDestToHub = null;
-    
-    // Hub to pickup
-    getDistanceBetweenPoints(
-      { lat: assignedHub.lat, lng: assignedHub.lng, placeId: null, isCustom: false },
-      { lat: originCoords.lat, lng: originCoords.lng, placeId: originPlaceId, isCustom: originIsCustom },
-      (distance) => {
-        currentHubToPickup = distance;
-        checkAllDistancesComplete();
-      }
-    );
-    
-    // Pickup to destination
-    getDistanceBetweenPoints(
-      { lat: originCoords.lat, lng: originCoords.lng, placeId: originPlaceId, isCustom: originIsCustom },
-      { lat: destinationCoords.lat, lng: destinationCoords.lng, placeId: destinationPlaceId, isCustom: destinationIsCustom },
-      (distance) => {
-        currentTripDistance = distance;
-        // Estimate duration based on distance (60 km/h average)
-        const estimatedMinutes = Math.ceil((distance / 60) * 60);
-        const hours = Math.floor(estimatedMinutes / 60);
-        const mins = estimatedMinutes % 60;
-        currentDuration = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
-        checkAllDistancesComplete();
-      }
-    );
-    
-    // Destination to hub
-    getDistanceBetweenPoints(
-      { lat: destinationCoords.lat, lng: destinationCoords.lng, placeId: destinationPlaceId, isCustom: destinationIsCustom },
-      { lat: assignedHub.lat, lng: assignedHub.lng, placeId: null, isCustom: false },
-      (distance) => {
-        currentDestToHub = distance;
-        checkAllDistancesComplete();
-      }
-    );
+    currentHubToPickup = null; currentTripDistance = null; currentDestToHub = null;
+    getDistanceBetweenPoints({ lat: assignedHub.lat, lng: assignedHub.lng, placeId: null, isCustom: false }, { lat: originCoords.lat, lng: originCoords.lng, placeId: originPlaceId, isCustom: originIsCustom }, (d) => { currentHubToPickup = d; checkComplete(); });
+    getDistanceBetweenPoints({ lat: originCoords.lat, lng: originCoords.lng, placeId: originPlaceId, isCustom: originIsCustom }, { lat: destinationCoords.lat, lng: destinationCoords.lng, placeId: destinationPlaceId, isCustom: destinationIsCustom }, (d) => { currentTripDistance = d; let mins = Math.ceil((d / 60) * 60); let hours = Math.floor(mins / 60); currentDuration = hours > 0 ? `${hours}h ${mins % 60}m` : `${mins} mins`; checkComplete(); });
+    getDistanceBetweenPoints({ lat: destinationCoords.lat, lng: destinationCoords.lng, placeId: destinationPlaceId, isCustom: destinationIsCustom }, { lat: assignedHub.lat, lng: assignedHub.lng, placeId: null, isCustom: false }, (d) => { currentDestToHub = d; checkComplete(); });
   }
   
-  function checkAllDistancesComplete() {
+  function checkComplete() {
     if (currentHubToPickup !== null && currentTripDistance !== null && currentDestToHub !== null) {
       currentTotalDistance = currentHubToPickup + currentTripDistance + currentDestToHub;
-      
       const infoDiv = document.getElementById('map-route-info');
-      if (infoDiv) {
-        const customNote = (originIsCustom || destinationIsCustom) ? '<br>📍 Includes custom location (not on Google Maps)' : '';
-        infoDiv.innerHTML = `<i class="fas fa-route"></i> ${originAddress} → ${destinationAddress}<br>
-        📏 Trip Distance: ${currentTripDistance.toFixed(1)} km<br>
-        🚗 Driver pickup: ${currentHubToPickup.toFixed(1)} km from ${assignedHub.name}<br>
-        ⏱️ Est. Time: ${currentDuration}<br>
-        💰 Total billed distance: ${currentTotalDistance.toFixed(1)} km (includes driver pickup)${customNote}`;
-      }
-      
+      if(infoDiv) infoDiv.innerHTML = `<i class="fas fa-route"></i> ${originAddress} → ${destinationAddress}<br>📏 Trip: ${currentTripDistance.toFixed(1)} km<br>🚗 Driver pickup: ${currentHubToPickup.toFixed(1)} km from ${assignedHub.name}<br>⏱️ Est: ${currentDuration}<br>💰 Total billed: ${currentTotalDistance.toFixed(1)} km`;
       const openLink = document.getElementById('openMapsLink');
-      if (!originIsCustom && !destinationIsCustom) {
-        openLink.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originAddress)}&destination=${encodeURIComponent(destinationAddress)}`;
-      } else {
-        openLink.href = `https://www.google.com/maps/dir/${originCoords.lat},${originCoords.lng}/${destinationCoords.lat},${destinationCoords.lng}`;
-      }
-      
+      openLink.href = (!originIsCustom && !destinationIsCustom) ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originAddress)}&destination=${encodeURIComponent(destinationAddress)}` : `https://www.google.com/maps/dir/${originCoords.lat},${originCoords.lng}/${destinationCoords.lat},${destinationCoords.lng}`;
       checkAndShowSummary();
     }
+  }
+  
+  const config = { vehiclePricePerKm: 3.90, motorbikePricePerKm: 1.54, vehicleMinPrice: 25, motorbikeMinPrice: 15, vehicleExtra: 6.00, motorbikeExtra: 3.00 };
+  
+  function calculatePrice() {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    let rate = mode === 'vehicle' ? config.vehiclePricePerKm : config.motorbikePricePerKm;
+    let minPrice = mode === 'vehicle' ? config.vehicleMinPrice : config.motorbikeMinPrice;
+    let extra = mode === 'vehicle' ? config.vehicleExtra : config.motorbikeExtra;
+    let price = Math.max(minPrice, Math.ceil((currentTotalDistance * rate) + extra));
+    // IMPORTANT: In summary section, show ONLY price and trip distance. All other cards hidden.
+    document.getElementById('summary-cards').innerHTML = `
+      <div class="summary-card"><span>💰 Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
+      <div class="summary-card"><span>📏 Trip Distance</span><span>${currentTripDistance.toFixed(2)} km</span></div>
+      <div class="summary-card-hidden"></div>
+    `;
+    // Extra hidden info stored in rideData
+    let formattedPhone = document.getElementById('customer-phone').value;
+    formattedPhone = formattedPhone.startsWith('0') ? '+260' + formattedPhone.substring(1) : formattedPhone;
+    window.rideData = { preferredMode: mode, phone: formattedPhone, hub: assignedHub.name, from: originAddress, to: destinationAddress, tripDistance: currentTripDistance.toFixed(2), totalDistance: currentTotalDistance.toFixed(2), price: price, estimatedTime: currentDuration, originIsCustom, destinationIsCustom, originPlaceId, destinationPlaceId };
+    document.getElementById('summary-section').style.display = 'block';
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.style.background = "var(--primary-color)";
+    document.getElementById('btn-icon').className = "fas fa-paper-plane"; document.getElementById('btn-icon').style.display = "block";
+    document.getElementById('btn-loader').style.display = "none";
+    document.getElementById('progress-text').style.display = "none";
+    document.getElementById('action-label').innerHTML = "Request Now";
+    submitBtn.onclick = handleRequest;
   }
   
   function checkAndShowSummary() {
     const mode = document.querySelector('input[name="mode"]:checked');
     const phone = document.getElementById('customer-phone').value;
-    
-    if (currentTotalDistance && mode && /^0[0-9]{9}$/.test(phone)) {
-      calculatePrice();
-    }
+    if (currentTotalDistance && mode && /^0[0-9]{9}$/.test(phone)) calculatePrice();
   }
   
-  // ==================== PRICING CONFIGURATION ====================
-  const config = {
-    vehiclePricePerKm: 3.90,
-    motorbikePricePerKm: 1.54,
-    vehicleMinPrice: 25,
-    motorbikeMinPrice: 15,
-    vehicleExtra: 6.00,
-    motorbikeExtra: 3.00,
-    avgSpeed: 60
-  };
-  
-  function calculatePrice() {
-    const mode = document.querySelector('input[name="mode"]:checked').value;
-    let rate, minPrice, extra;
-    
-    if (mode === 'vehicle') {
-      rate = config.vehiclePricePerKm;
-      minPrice = config.vehicleMinPrice;
-      extra = config.vehicleExtra;
-    } else {
-      rate = config.motorbikePricePerKm;
-      minPrice = config.motorbikeMinPrice;
-      extra = config.motorbikeExtra;
-    }
-    
-    let price = Math.max(minPrice, Math.ceil((currentTotalDistance * rate) + extra));
-    
-    const customBadge = (originIsCustom || destinationIsCustom) ? '<div class="summary-card"><span>📍 Custom Location</span><span>Included</span></div>' : '';
-    
-    document.getElementById('summary-cards').innerHTML = `
-      <div class="summary-card"><span> Total Price </span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
-      <div class="summary-card"><span> Trip Distance</span><span>${currentTripDistance.toFixed(2)} km</span></div>
-      <div class="summary-card"><span> Driver Pickup</span><span>${currentHubToPickup.toFixed(2)} km</span></div>
-      <div class="summary-card"><span> Total Billed</span><span>${currentTotalDistance.toFixed(2)} km</span></div>
-      <div class="summary-card"><span> Est. Time</span><span>${currentDuration}</span></div>
-      <div class="summary-card"><span> Serving Hub</span><span>${assignedHub.name}</span></div>
-      ${customBadge}
-    `;
-    
-    document.getElementById('summary-section').style.display = 'block';
-    
-    let formattedPhone = document.getElementById('customer-phone').value;
-    formattedPhone = formattedPhone.startsWith('0') ? '+260' + formattedPhone.substring(1) : formattedPhone;
-    
-    rideData = {
-      preferredMode: mode,
-      phone: formattedPhone,
-      hub: assignedHub.name,
-      from: originAddress,
-      to: destinationAddress,
-      tripDistance: currentTripDistance.toFixed(2),
-      hubToPickupDistance: currentHubToPickup.toFixed(2),
-      destToHubDistance: currentDestToHub.toFixed(2),
-      totalDistance: currentTotalDistance.toFixed(2),
-      price: price,
-      estimatedTime: currentDuration,
-      originIsCustom: originIsCustom,
-      destinationIsCustom: destinationIsCustom,
-      originPlaceId: originPlaceId,
-      destinationPlaceId: destinationPlaceId
-    };
-    
-    const submitBtn = document.getElementById('submit-btn');
-    submitBtn.style.background = "var(--primary-color)";
-    document.getElementById('btn-icon').className = "fas fa-paper-plane";
-    document.getElementById('btn-icon').style.display = "block";
-    document.getElementById('btn-loader').style.display = "none";
-    document.getElementById('progress-text').style.display = "none";
-    document.getElementById('action-label').innerHTML = `Request Now`;
-    submitBtn.onclick = handleRequest;
-  }
-  
-  // ==================== LOCATION SHARING FUNCTIONS ====================
-  let sharedLocationLink = "";
-  let sharedLocationTimestamp = "";
-  
-  function updateLocationStatus(message, type) {
-    const statusDiv = document.getElementById("locationStatus");
-    statusDiv.textContent = message;
-    statusDiv.className = `location-status ${type}`;
-  }
-  
+  let sharedLocationLink = "", sharedLocationTimestamp = "";
+  function updateLocationStatus(msg, type) { let div = document.getElementById("locationStatus"); div.textContent = msg; div.className = `location-status ${type}`; }
   function fetchAndShareLocation() {
     const phone = document.getElementById('customer-phone').value;
-    
-    if (!phone || !/^0[0-9]{9}$/.test(phone)) {
-      updateLocationStatus("⚠️ Please enter your phone number first!", "warning");
-      return;
-    }
-    
-    if (!navigator.geolocation) {
-      updateLocationStatus("❌ Geolocation is not supported by your browser!", "error");
-      return;
-    }
-    
-    updateLocationStatus("📍 Fetching your location...", "info");
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        const timestamp = new Date().toISOString();
-        
-        sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
-        sharedLocationTimestamp = timestamp;
-        
-        updateLocationStatus("✅ Location fetched! Saving to system...", "info");
-        saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp);
-      },
-      (error) => {
-        let errorMsg = "";
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMsg = "Permission denied. Please allow location access.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMsg = "Location unavailable. Please check your GPS.";
-            break;
-          case error.TIMEOUT:
-            errorMsg = "Location request timed out. Please try again.";
-            break;
-          default:
-            errorMsg = "Failed to get location. Please try again.";
-        }
-        updateLocationStatus(`❌ ${errorMsg}`, "error");
-      }
-    );
-  }
-  
-  function saveLocationToSheet(lat, lon, mapLink, phone, timestamp) {
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-    
-    const payload = {
-      sharedLocation: mapLink,
-      locationLatitude: lat,
-      locationLongitude: lon,
-      locationTimestamp: timestamp,
-      locationPhone: phone,
-      requestType: "location_share",
-      timestamp: timestamp,
-      phone: phone,
-      from: originAddress || "Location Share",
-      to: destinationAddress || "N/A",
-      preferredMode: document.querySelector('input[name="mode"]:checked')?.value || "N/A",
-      hub: assignedHub?.name || "Unknown"
-    };
-    
-    fetch(scriptURL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: new URLSearchParams(payload)
-    }).then(() => {
-      updateLocationStatus("✅ Location saved to system successfully!", "success");
-    }).catch((error) => {
-      console.error("Save failed:", error);
-      updateLocationStatus("⚠️ Location saved locally. Will sync when online.", "warning");
-      let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
-      pending.push(payload);
-      localStorage.setItem("pendingLocations", JSON.stringify(pending));
-    });
-  }
-  
-  window.addEventListener("online", () => {
-    const pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
-    if (pending.length > 0) {
+    if (!phone || !/^0[0-9]{9}$/.test(phone)) { updateLocationStatus("⚠️ Please enter your phone number first!", "warning"); return; }
+    if (!navigator.geolocation) { updateLocationStatus("❌ Geolocation not supported!", "error"); return; }
+    updateLocationStatus("📍 Fetching location...", "info");
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude, lon = position.coords.longitude;
+      sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      sharedLocationTimestamp = new Date().toISOString();
+      updateLocationStatus("✅ Location saved to system!", "success");
       const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-      pending.forEach(payload => {
-        fetch(scriptURL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: new URLSearchParams(payload)
+      fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ sharedLocation: sharedLocationLink, locationLatitude: lat, locationLongitude: lon, locationTimestamp: sharedLocationTimestamp, locationPhone: phone, requestType: "location_share", timestamp: sharedLocationTimestamp }) }).catch(()=>{});
+    }, (error) => { updateLocationStatus("❌ Location error", "error"); });
+  }
+  
+  function fetchCurrentLocationAsPickup() {
+    const phone = document.getElementById('customer-phone').value;
+    if (!phone || !/^0[0-9]{9}$/.test(phone)) { document.getElementById('status').innerHTML = "⚠️ Enter phone first!"; return; }
+    if (!navigator.geolocation) return;
+    document.getElementById('status').innerHTML = "📍 Getting your location...";
+    navigator.geolocation.getCurrentPosition((pos) => {
+      let lat = pos.coords.latitude, lng = pos.coords.longitude;
+      if (geocoder) {
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            let addr = results[0].formatted_address;
+            document.getElementById('gm-origin').value = addr;
+            originAddress = addr; originCoords = { lat, lng }; originIsCustom = false; originPlaceId = null;
+            determineNearestHub(lat, lng);
+            if (destinationCoords) calculateAllDistances();
+            checkAndShowSummary();
+            document.getElementById('status').innerHTML = "✅ Pickup set to your location";
+          } else { fallbackManual(lat,lng); }
         });
-      });
-      localStorage.removeItem("pendingLocations");
-      updateLocationStatus("✅ Pending locations synced!", "success");
-    }
-  });
-  
-  function shareWhatsApp() {
-    if (!sharedLocationLink) {
-      alert("Please get your location first using 'Share My Location'");
-      return;
-    }
-    let driverNumber = getDriverContactForHub(assignedHub?.name);
-    driverNumber = formatForWhatsApp(driverNumber);
-    let message = encodeURIComponent("📍 My current location: " + sharedLocationLink);
-    window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
+      } else { fallbackManual(lat,lng); }
+    }, () => { document.getElementById('status').innerHTML = "❌ Location failed"; });
+    function fallbackManual(lat,lng) { document.getElementById('gm-origin').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`; originAddress = document.getElementById('gm-origin').value; originCoords = { lat, lng }; originIsCustom = true; determineNearestHub(lat,lng); if (destinationCoords) calculateAllDistances(); checkAndShowSummary(); document.getElementById('status').innerHTML = "✅ Pickup set (approx)"; }
   }
   
-  function shareSMS() {
-    if (!sharedLocationLink) {
-      alert("Please get your location first using 'Share My Location'");
-      return;
-    }
-    let driverNumber = getDriverContactForHub(assignedHub?.name);
-    window.location.href = `sms:${driverNumber}?body=📍 My location: ${sharedLocationLink}`;
+  async function handleRequest() {
+    let btn = document.getElementById('submit-btn'), icon = document.getElementById('btn-icon'), loader = document.getElementById('btn-loader'), prog = document.getElementById('progress-text');
+    btn.disabled = true; icon.style.display = "none"; loader.style.display = "block"; prog.style.display = "block";
+    let start = Date.now(), dur = 13000, interval = setInterval(() => { let p = Math.min(98, Math.floor(((Date.now() - start) / dur) * 98)); prog.textContent = p + "%"; }, 100);
+    let payload = { ...window.rideData, timestamp: new Date().toISOString(), sharedLocation: sharedLocationLink || "", sharedLocationTimestamp: sharedLocationTimestamp || "", requestType: "booking" };
+    setTimeout(() => { clearInterval(interval); finishRequestUI(true); }, 15000);
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", { method: 'POST', body: new URLSearchParams(payload), mode: 'no-cors' });
+      clearInterval(interval); prog.textContent = "100%"; document.getElementById('status').innerHTML = "✅ Request sent! Driver will contact you."; finishRequestUI(false);
+    } catch(e) { clearInterval(interval); finishRequestUI(true); }
   }
   
-  // ==================== UI HANDLERS ====================
-  let rideData = null;
+  function finishRequestUI(isError) {
+    let btn = document.getElementById('submit-btn'), loader = document.getElementById('btn-loader'), prog = document.getElementById('progress-text'), icon = document.getElementById('btn-icon');
+    loader.style.display = "none"; prog.style.display = "none"; icon.style.display = "block"; icon.className = "fas fa-phone";
+    let callNumber = getDriverContactForHub(assignedHub?.name);
+    btn.style.background = "var(--success-color)"; btn.disabled = false;
+    document.getElementById('action-label').innerHTML = " Call Now";
+    btn.onclick = () => window.location.href = `tel:${callNumber}`;
+    if(isError) document.getElementById('status').innerHTML = "⚠️ Network issue. Please call driver.";
+  }
+  
+  function toggleDropdown() { document.getElementById("header-menu-dropdown").classList.toggle("show"); }
+  window.onclick = (e) => { let menu = document.getElementById("header-menu-dropdown"), btn = document.getElementById("menu-toggle-btn"); if(menu && menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) menu.classList.remove('show'); };
+  
+  window.toggleDropdown = toggleDropdown; window.fetchAndShareLocation = fetchAndShareLocation; window.fetchCurrentLocationAsPickup = fetchCurrentLocationAsPickup; window.initGoogleMaps = initGoogleMaps;
   
   const phoneInput = document.getElementById('customer-phone');
   const tripDiv = document.getElementById('trip-details');
-  const summaryDiv = document.getElementById('summary-section');
-  const statusText = document.getElementById('status');
-  const submitBtn = document.getElementById('submit-btn');
-  const btnIcon = document.getElementById('btn-icon');
-  const btnLoader = document.getElementById('btn-loader');
-  const progressTextSpan = document.getElementById('progress-text');
-  
-  phoneInput.oninput = () => {
-    if (/^0[0-9]{9}$/.test(phoneInput.value)) {
-      tripDiv.style.display = 'block';
-      if (originCoords && destinationCoords) {
-        checkAndShowSummary();
-      }
-    } else {
-      tripDiv.style.display = 'none';
-      summaryDiv.style.display = 'none';
-    }
-  };
-  
-  document.getElementById('mode-group').onchange = () => {
-    if (originCoords && destinationCoords && /^0[0-9]{9}$/.test(phoneInput.value)) {
-      checkAndShowSummary();
-    }
-  };
-  
-  async function handleRequest() {
-    submitBtn.disabled = true;
-    btnIcon.style.display = "none";
-    btnLoader.style.display = "block";
-    progressTextSpan.style.display = "block";
-    
-    const startTime = Date.now();
-    const duration = 13000;
-    const interval = setInterval(() => {
-      let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
-      progressTextSpan.textContent = p + "%";
-    }, 100);
-    
-    const payload = { 
-      ...rideData, 
-      timestamp: new Date().toISOString(),
-      sharedLocation: sharedLocationLink || "",
-      sharedLocationTimestamp: sharedLocationTimestamp || "",
-      requestType: "booking"
-    };
-    
-    let timeoutTriggered = false;
-    const timeoutId = setTimeout(() => {
-      if (!timeoutTriggered) {
-        timeoutTriggered = true;
-        clearInterval(interval);
-        statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
-        statusText.style.color = "orange";
-        finishRequestUI();
-        setTimeout(() => {
-          const callBtn = document.getElementById('submit-btn');
-          callBtn.click();
-        }, 100);
-      }
-    }, 15000);
-    
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST',
-        body: new URLSearchParams(payload),
-        mode: 'no-cors'
-      });
-      clearTimeout(timeoutId);
-      if (!timeoutTriggered) {
-        clearInterval(interval);
-        progressTextSpan.textContent = "100%";
-        statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
-        statusText.style.color = "green";
-        finishRequestUI();
-      }
-    } catch(e) {
-      clearTimeout(timeoutId);
-      if (!timeoutTriggered) {
-        clearInterval(interval);
-        statusText.innerHTML = "⚠️ Network issue. Please call!";
-        statusText.style.color = "red";
-        finishRequestUI();
-      }
-    }
-  }
-  
-  function finishRequestUI() {
-    btnLoader.style.display = "none";
-    progressTextSpan.style.display = "none";
-    btnIcon.style.display = "block";
-    btnIcon.className = "fas fa-phone";
-    
-    let callNumber = getDriverContactForHub(assignedHub?.name);
-    
-    submitBtn.style.background = "var(--success-color)";
-    submitBtn.disabled = false;
-    document.getElementById('action-label').innerHTML = " Call Now";
-    submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
-  }
-  
-  function toggleDropdown() {
-    const menu = document.getElementById("header-menu-dropdown");
-    menu.classList.toggle("show");
-  }
-  
-  window.onclick = (event) => {
-    const menu = document.getElementById("header-menu-dropdown");
-    const btn = document.getElementById("menu-toggle-btn");
-    if (menu && menu.classList.contains('show') && !menu.contains(event.target) && !btn.contains(event.target)) {
-      menu.classList.remove('show');
-    }
-  };
-  
-  window.toggleDropdown = toggleDropdown;
-  window.fetchAndShareLocation = fetchAndShareLocation;
-  window.fetchCurrentLocationAsPickup = fetchCurrentLocationAsPickup;
-  window.shareWhatsApp = shareWhatsApp;
-  window.shareSMS = shareSMS;
-  window.initGoogleMaps = initGoogleMaps;
+  phoneInput.oninput = () => { if (/^0[0-9]{9}$/.test(phoneInput.value)) { tripDiv.style.display = 'block'; if (originCoords && destinationCoords) checkAndShowSummary(); } else { tripDiv.style.display = 'none'; document.getElementById('summary-section').style.display = 'none'; } };
+  document.getElementById('mode-group').onchange = () => { if (originCoords && destinationCoords && /^0[0-9]{9}$/.test(phoneInput.value)) checkAndShowSummary(); };
 </script>
 </body>
 </html>
