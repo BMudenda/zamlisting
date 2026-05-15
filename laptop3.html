@@ -234,6 +234,8 @@
   .input-row input {
     flex: 1;
   }
+  
+  .visible-block { display: block; }
 </style>
 </head>
 <body>
@@ -256,7 +258,7 @@
           <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
           <p>A local company that provides passenger hailing services through motorbikes and cars.</p>
           <p><strong>Coverage:</strong> Luangwa District and surrounding areas.</p>
-          <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
+          <p><strong>Pricing:</strong> Affordable fixed rates.</p>
         </div>
         
         <div class="dropdown-content-section">
@@ -270,7 +272,7 @@
 
         <div class="dropdown-content-section">
           <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;">Click the button below to share your current location. This will be automatically saved to our system.</p>
+          <p style="font-size: 0.85rem;">Click the button below to share your current location.</p>
           <a href="#" onclick="fetchAndShareLocation()" title="Share Location">
             <i class="fas fa-location-arrow"></i>
             <span class="contact-label-text">Share My Location</span>
@@ -282,11 +284,11 @@
           <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
           <div class="route-container">
             <div id="map-route-info" class="route-info">
-              <i class="fas fa-route"></i> Select pickup & destination to see route details
+              <i class="fas fa-route"></i> Select pickup & destination
             </div>
             <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">
               <i class="fas fa-globe"></i>
-              <span>Click to View Map</span>
+              <span>View on Google Maps</span>
             </a>
           </div>
         </div>
@@ -308,11 +310,8 @@
     </fieldset>
     <div id="trip-details" class="hidden-section">
       <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
-        <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">
-          Choose your preferred transport mode
-        </p>
         <div id="mode-group" style="display:flex; justify-content:space-around;">
-          <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike" onerror="this.style.display='none'"><small>Motorbike</small></label>
+          <label class="mode-option"><input type="radio" name="mode" value="motorbike" checked><img src="motorbike.png" class="icon-img" alt="bike" onerror="this.style.display='none'"><small>Motorbike</small></label>
           <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car" onerror="this.style.display='none'"><small>Car</small></label>
         </div>
       </fieldset>
@@ -320,27 +319,24 @@
         <div class="input-box" id="origin-container">
           <span class="material-icons">my_location</span>
           <div class="input-row">
-            <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
+            <input type="text" id="gm-origin" placeholder="Type pickup location" autocomplete="off">
             <button type="button" class="auto-fetch-btn" onclick="fetchCurrentLocationAsPickup()" title="Use my current location">
               <i class="fas fa-location-dot"></i>
             </button>
           </div>
           <div id="originList" class="autocomplete-list"></div>
         </div>
-        <p style="font-size: 0.7rem; color: #666; margin-top: 5px;">
-          <i class="fas fa-info-circle"></i> Click the <i class="fas fa-location-dot"></i> icon to automatically use your current location
-        </p>
       </fieldset>
       <fieldset><legend> Destination</legend>
         <div class="input-box" id="dest-container">
           <span class="material-icons">pin_drop</span>
-          <input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off">
+          <input type="text" id="gm-destination" placeholder="Type destination" autocomplete="off">
           <div id="destinationList" class="autocomplete-list"></div>
         </div>
       </fieldset>
     </div>
     <div id="summary-section" class="hidden-section">
-      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Pricing includes driver pickup from nearest hub</span></span></legend>
+      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary</legend>
         <div id="summary-cards"></div>
       </fieldset>
       <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
@@ -348,13 +344,12 @@
         <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
       </div>
     </div>
-    <div class="calc-loader" id="spinner"></div>
     <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height: 40px;"></p>
   </div>
 </main>
 
 <script>
-  // ==================== DATA & HELPERS ====================
+  // ==================== CONFIGURATION ====================
   const customPlaces = [
     { name: "Chidada Community, Luangwa", lat: -15.6250, lng: 30.4000 },
     { name: "Chidada Ground, Luangwa", lat: -15.6240, lng: 30.3980 },
@@ -365,6 +360,7 @@
     { name: "Feira Day Community, Luangwa", lat: -15.6140, lng: 30.3950 },
     { name: "Kambolozo Community, Luangwa", lat: -15.6300, lng: 30.4200 }
   ];
+  
   const hubs = [
     { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064, phone: "0978167546" },
     { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055, phone: "0978167546" },
@@ -374,52 +370,80 @@
     { name: "Chongwe Town", lat: -15.3600, lng: 28.6900, phone: "0978167546" },
     { name: "Lusaka Town", lat: -15.3875, lng: 28.3228, phone: "0978167546" }
   ];
-  const allKnownPlaces = [...customPlaces, ...hubs];
+  
+  const allSuggestions = [...customPlaces, ...hubs];
   
   function getPlaceCoords(name) {
-    let p = customPlaces.find(c => c.name.toLowerCase() === name.toLowerCase());
-    if(p) return { lat: p.lat, lng: p.lng, isCustom: true };
-    let h = hubs.find(hh => hh.name.toLowerCase() === name.toLowerCase());
-    if(h) return { lat: h.lat, lng: h.lng, isCustom: false };
+    let found = allSuggestions.find(p => p.name.toLowerCase() === name.toLowerCase());
+    if (found) {
+      let isCustom = customPlaces.some(c => c.name.toLowerCase() === name.toLowerCase());
+      return { lat: found.lat, lng: found.lng, isCustom: isCustom };
+    }
     return null;
   }
+  
   function getNearestHub(lat, lng) {
-    let nearest = hubs[0], minDist = Infinity;
-    for(let h of hubs) {
-      let d = Math.hypot(h.lat - lat, h.lng - lng);
-      if(d < minDist) { minDist = d; nearest = h; }
+    let nearest = hubs[0];
+    let minDist = Infinity;
+    for (let h of hubs) {
+      let dist = Math.hypot(h.lat - lat, h.lng - lng);
+      if (dist < minDist) { minDist = dist; nearest = h; }
     }
     return nearest;
   }
-  function getDriverContact(hubName) { return hubs.find(h => h.name === hubName)?.phone || "0978167546"; }
   
-  // State
-  let originCoords = null, destCoords = null, originAddr = "", destAddr = "";
+  function getDriverContact(hubName) {
+    let hub = hubs.find(h => h.name === hubName);
+    return hub ? hub.phone : "0978167546";
+  }
+  
+  // ==================== GLOBAL STATE ====================
+  let originCoords = null, destCoords = null;
+  let originAddr = "", destAddr = "";
   let originIsCustom = false, destIsCustom = false;
-  let originPlaceId = null, destPlaceId = null;
   let assignedHub = null;
-  let tripDist = null, hubToPickup = null, destToHub = null, totalDist = null, durationEst = null;
-  let distanceService = null, geocoder = null;
-  let mapsReady = false;
+  let tripDistance = null, hubToPickupDist = null, destToHubDist = null, totalDistance = null, estimatedTime = null;
+  let mapsApiReady = false;
+  let geocoder = null;
+  let autocompleteOrigin, autocompleteDest;
   
-  // Pricing
-  const rates = { vehicle: 3.90, motorbike: 1.54 };
-  const minPrice = { vehicle: 25, motorbike: 15 };
-  const extraFee = { vehicle: 6.00, motorbike: 3.00 };
+  // ==================== PRICING ====================
+  const PRICE_PER_KM = { vehicle: 3.90, motorbike: 1.54 };
+  const MIN_PRICE = { vehicle: 25, motorbike: 15 };
+  const EXTRA = { vehicle: 6.00, motorbike: 3.00 };
   
-  function calculatePrice() {
-    let mode = document.querySelector('input[name="mode"]:checked')?.value;
-    if(!mode || !totalDist) return;
-    let rate = rates[mode], minP = minPrice[mode], extra = extraFee[mode];
-    let raw = (totalDist * rate) + extra;
-    let finalPrice = Math.max(minP, Math.ceil(raw));
+  function calculateAndShowPrice() {
+    let modeRadio = document.querySelector('input[name="mode"]:checked');
+    if (!modeRadio || !totalDistance) return;
+    let mode = modeRadio.value;
+    let rate = PRICE_PER_KM[mode];
+    let minP = MIN_PRICE[mode];
+    let extra = EXTRA[mode];
+    let price = Math.max(minP, Math.ceil((totalDistance * rate) + extra));
+    
     // Show ONLY price and trip distance
     document.getElementById('summary-cards').innerHTML = `
-      <div class="summary-card"><span>💰 Total Price</span><span style="font-weight:bold;color:#ff9900;">K${finalPrice}</span></div>
-      <div class="summary-card"><span>📏 Trip Distance</span><span>${tripDist.toFixed(2)} km</span></div>
+      <div class="summary-card"><span>💰 Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
+      <div class="summary-card"><span>📏 Trip Distance</span><span>${tripDistance.toFixed(2)} km</span></div>
     `;
-    window.currentRide = { mode, phone: document.getElementById('customer-phone').value, hub: assignedHub.name, from: originAddr, to: destAddr, tripDistance: tripDist, totalDistance: totalDist, price: finalPrice, duration: durationEst };
+    
     document.getElementById('summary-section').style.display = 'block';
+    
+    // Store ride data for submission
+    window.currentRide = {
+      preferredMode: mode,
+      phone: document.getElementById('customer-phone').value,
+      hub: assignedHub.name,
+      from: originAddr,
+      to: destAddr,
+      tripDistance: tripDistance.toFixed(2),
+      totalDistance: totalDistance.toFixed(2),
+      price: price,
+      estimatedTime: estimatedTime,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Reset button state
     let btn = document.getElementById('submit-btn');
     btn.style.background = "var(--primary-color)";
     document.getElementById('btn-icon').className = "fas fa-paper-plane";
@@ -428,203 +452,356 @@
     document.getElementById('progress-text').style.display = "none";
     document.getElementById('action-label').innerHTML = "Request Now";
     btn.onclick = handleRequest;
+    btn.disabled = false;
   }
   
-  // Distance calculation (always fallback to haversine for reliability)
-  function haversine(p1, p2) {
+  // ==================== DISTANCE CALCULATION (Haversine) ====================
+  function haversineDistance(p1, p2) {
     const R = 6371;
-    const dLat = (p2.lat - p1.lat) * Math.PI/180;
-    const dLon = (p2.lng - p1.lng) * Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(p1.lat * Math.PI/180) * Math.cos(p2.lat * Math.PI/180) * Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+    const dLon = (p2.lng - p1.lng) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(p1.lat * Math.PI/180) * Math.cos(p2.lat * Math.PI/180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
   }
   
-  function computeDistances() {
-    if(!originCoords || !destCoords || !assignedHub) return;
-    hubToPickup = haversine(assignedHub, originCoords);
-    tripDist = haversine(originCoords, destCoords);
-    destToHub = haversine(destCoords, assignedHub);
-    totalDist = hubToPickup + tripDist + destToHub;
-    let mins = Math.max(5, Math.round((tripDist / 40) * 60));
-    durationEst = mins >= 60 ? `${Math.floor(mins/60)}h ${mins%60}m` : `${mins} mins`;
-    // update map info
+  function computeAllDistances() {
+    if (!originCoords || !destCoords || !assignedHub) return;
+    
+    tripDistance = haversineDistance(originCoords, destCoords);
+    hubToPickupDist = haversineDistance(assignedHub, originCoords);
+    destToHubDist = haversineDistance(destCoords, assignedHub);
+    totalDistance = hubToPickupDist + tripDistance + destToHubDist;
+    
+    let minutes = Math.max(5, Math.round((tripDistance / 40) * 60));
+    estimatedTime = minutes >= 60 ? `${Math.floor(minutes/60)}h ${minutes%60}m` : `${minutes} mins`;
+    
+    // Update map info
     let infoDiv = document.getElementById('map-route-info');
-    if(infoDiv) infoDiv.innerHTML = `<i class="fas fa-route"></i> ${originAddr} → ${destAddr}<br>📏 Trip: ${tripDist.toFixed(1)} km<br>🚗 Pickup from ${assignedHub.name}: ${hubToPickup.toFixed(1)} km<br>⏱️ Est: ${durationEst}<br>💰 Billed total: ${totalDist.toFixed(1)} km`;
+    if (infoDiv) {
+      infoDiv.innerHTML = `<i class="fas fa-route"></i> ${originAddr} → ${destAddr}<br>
+      📏 Trip: ${tripDistance.toFixed(1)} km<br>
+      🚗 Pickup: ${hubToPickupDist.toFixed(1)} km from ${assignedHub.name}<br>
+      ⏱️ Est: ${estimatedTime}<br>
+      💰 Total: ${totalDistance.toFixed(1)} km`;
+    }
+    
     let mapLink = `https://www.google.com/maps/dir/${originCoords.lat},${originCoords.lng}/${destCoords.lat},${destCoords.lng}`;
     document.getElementById('openMapsLink').href = mapLink;
-    checkAndShow();
+    
+    // Trigger price calculation if conditions met
+    checkAndTriggerPrice();
   }
   
-  function checkAndShow() {
-    let modeSelected = document.querySelector('input[name="mode"]:checked');
+  function checkAndTriggerPrice() {
     let phoneValid = /^0[0-9]{9}$/.test(document.getElementById('customer-phone').value);
-    if(totalDist && modeSelected && phoneValid) calculatePrice();
+    let modeSelected = document.querySelector('input[name="mode"]:checked');
+    if (totalDistance && phoneValid && modeSelected) {
+      calculateAndShowPrice();
+    }
   }
   
-  // Autocomplete logic (custom places + hubs)
-  function setupAutocomplete(input, isOrigin) {
+  // ==================== AUTOCOMPLETE (Custom Places + Hubs) ====================
+  function setupCustomAutocomplete(inputElement, isOrigin) {
     const listId = isOrigin ? 'originList' : 'destinationList';
     const listEl = document.getElementById(listId);
-    input.addEventListener('input', function(e) {
-      let val = this.value.toLowerCase();
-      if(val.length < 2) { listEl.style.display = 'none'; listEl.innerHTML = ''; return; }
-      let matches = allKnownPlaces.filter(p => p.name.toLowerCase().includes(val)).slice(0, 7);
-      if(matches.length) {
+    
+    inputElement.addEventListener('input', function(e) {
+      let query = this.value.toLowerCase();
+      if (query.length < 2) {
+        listEl.style.display = 'none';
         listEl.innerHTML = '';
-        matches.forEach(m => {
+        return;
+      }
+      
+      let matches = allSuggestions.filter(p => p.name.toLowerCase().includes(query)).slice(0, 8);
+      if (matches.length > 0) {
+        listEl.innerHTML = '';
+        matches.forEach(match => {
           let div = document.createElement('div');
           div.className = 'suggestion';
-          div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right:8px; color:#2563eb;"></i>${m.name}`;
+          div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right:8px; color:#2563eb;"></i>${match.name}`;
           div.onclick = () => {
-            input.value = m.name;
+            inputElement.value = match.name;
             listEl.style.display = 'none';
-            let coords = getPlaceCoords(m.name);
-            if(coords) {
-              if(isOrigin) {
+            let coords = getPlaceCoords(match.name);
+            if (coords) {
+              if (isOrigin) {
                 originCoords = { lat: coords.lat, lng: coords.lng };
-                originAddr = m.name;
+                originAddr = match.name;
                 originIsCustom = coords.isCustom;
-                originPlaceId = null;
                 assignedHub = getNearestHub(originCoords.lat, originCoords.lng);
                 document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name} will pick you up`;
-                if(destCoords) computeDistances();
+                if (destCoords) computeAllDistances();
+                else document.getElementById('status').innerHTML = "✅ Pickup set. Now enter destination.";
               } else {
                 destCoords = { lat: coords.lat, lng: coords.lng };
-                destAddr = m.name;
+                destAddr = match.name;
                 destIsCustom = coords.isCustom;
-                destPlaceId = null;
-                if(originCoords) computeDistances();
+                if (originCoords) computeAllDistances();
+                else document.getElementById('status').innerHTML = "✅ Destination set. Now enter pickup.";
               }
-              checkAndShow();
+              checkAndTriggerPrice();
             }
           };
           listEl.appendChild(div);
         });
         listEl.style.display = 'block';
-      } else { listEl.style.display = 'none'; }
+      } else {
+        listEl.style.display = 'none';
+      }
     });
-    document.addEventListener('click', function(ev) { if(!input.contains(ev.target)) listEl.style.display = 'none'; });
+    
+    document.addEventListener('click', function(e) {
+      if (!inputElement.contains(e.target)) {
+        listEl.style.display = 'none';
+      }
+    });
   }
   
-  // Google Places Autocomplete
+  // ==================== GOOGLE MAPS PLACES ====================
   function initGoogleMaps() {
-    mapsReady = true;
-    distanceService = new google.maps.DistanceMatrixService();
+    mapsApiReady = true;
     geocoder = new google.maps.Geocoder();
+    
     const originInput = document.getElementById('gm-origin');
     const destInput = document.getElementById('gm-destination');
     
-    setupAutocomplete(originInput, true);
-    setupAutocomplete(destInput, false);
+    // Setup custom autocomplete (for local places)
+    setupCustomAutocomplete(originInput, true);
+    setupCustomAutocomplete(destInput, false);
     
-    const originAuto = new google.maps.places.Autocomplete(originInput, { componentRestrictions: { country: 'zm' }, fields: ['formatted_address', 'geometry', 'place_id'] });
-    originAuto.addListener('place_changed', () => {
-      let place = originAuto.getPlace();
-      if(place && place.geometry) {
+    // Google Places Autocomplete
+    autocompleteOrigin = new google.maps.places.Autocomplete(originInput, {
+      componentRestrictions: { country: 'zm' },
+      fields: ['formatted_address', 'geometry', 'place_id']
+    });
+    autocompleteOrigin.addListener('place_changed', () => {
+      let place = autocompleteOrigin.getPlace();
+      if (place && place.geometry) {
         originCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-        originAddr = place.formatted_address || place.name;
-        originPlaceId = place.place_id;
+        originAddr = place.formatted_address;
         originIsCustom = false;
         assignedHub = getNearestHub(originCoords.lat, originCoords.lng);
-        document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name}`;
-        if(destCoords) computeDistances();
-        checkAndShow();
+        if (destCoords) computeAllDistances();
+        checkAndTriggerPrice();
+        document.getElementById('status').innerHTML = "✅ Pickup location set";
       }
     });
-    const destAuto = new google.maps.places.Autocomplete(destInput, { componentRestrictions: { country: 'zm' }, fields: ['formatted_address', 'geometry', 'place_id'] });
-    destAuto.addListener('place_changed', () => {
-      let place = destAuto.getPlace();
-      if(place && place.geometry) {
+    
+    autocompleteDest = new google.maps.places.Autocomplete(destInput, {
+      componentRestrictions: { country: 'zm' },
+      fields: ['formatted_address', 'geometry', 'place_id']
+    });
+    autocompleteDest.addListener('place_changed', () => {
+      let place = autocompleteDest.getPlace();
+      if (place && place.geometry) {
         destCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-        destAddr = place.formatted_address || place.name;
-        destPlaceId = place.place_id;
+        destAddr = place.formatted_address;
         destIsCustom = false;
-        if(originCoords) computeDistances();
-        checkAndShow();
+        if (originCoords) computeAllDistances();
+        checkAndTriggerPrice();
+        document.getElementById('status').innerHTML = "✅ Destination set";
       }
     });
   }
   
-  // Geolocation for pickup
+  // ==================== GEOLOCATION ====================
   function fetchCurrentLocationAsPickup() {
     let phone = document.getElementById('customer-phone').value;
-    if(!/^0[0-9]{9}$/.test(phone)) { document.getElementById('status').innerHTML = "⚠️ Enter valid phone first"; return; }
-    if(!navigator.geolocation) { alert("Geolocation not supported"); return; }
-    document.getElementById('status').innerHTML = "📍 Getting location...";
+    if (!/^0[0-9]{9}$/.test(phone)) {
+      document.getElementById('status').innerHTML = "⚠️ Please enter valid phone number first!";
+      return;
+    }
+    if (!navigator.geolocation) {
+      document.getElementById('status').innerHTML = "❌ Geolocation not supported";
+      return;
+    }
+    document.getElementById('status').innerHTML = "📍 Getting your location...";
     navigator.geolocation.getCurrentPosition(pos => {
       let lat = pos.coords.latitude, lng = pos.coords.longitude;
-      if(geocoder) {
-        geocoder.geocode({ location: { lat, lng } }, (res, stat) => {
-          if(stat === 'OK' && res[0]) {
-            let addr = res[0].formatted_address;
+      if (geocoder) {
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            let addr = results[0].formatted_address;
             document.getElementById('gm-origin').value = addr;
-            originAddr = addr; originCoords = { lat, lng }; originIsCustom = false; originPlaceId = null;
+            originAddr = addr;
+            originCoords = { lat, lng };
+            originIsCustom = false;
             assignedHub = getNearestHub(lat, lng);
-            document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name}`;
-            if(destCoords) computeDistances();
-            checkAndShow();
-            document.getElementById('status').innerHTML = "✅ Pickup set";
-          } else setManualCoords(lat,lng);
+            if (destCoords) computeAllDistances();
+            checkAndTriggerPrice();
+            document.getElementById('status').innerHTML = "✅ Pickup set to your current location";
+          } else {
+            document.getElementById('gm-origin').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            originAddr = document.getElementById('gm-origin').value;
+            originCoords = { lat, lng };
+            originIsCustom = true;
+            assignedHub = getNearestHub(lat, lng);
+            if (destCoords) computeAllDistances();
+            checkAndTriggerPrice();
+            document.getElementById('status').innerHTML = "✅ Pickup set (approximate)";
+          }
         });
-      } else setManualCoords(lat,lng);
-    }, err => { document.getElementById('status').innerHTML = "❌ Location error"; });
-    function setManualCoords(lat,lng) {
-      document.getElementById('gm-origin').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-      originAddr = document.getElementById('gm-origin').value; originCoords = { lat, lng }; originIsCustom = true;
-      assignedHub = getNearestHub(lat, lng);
-      if(destCoords) computeDistances();
-      checkAndShow();
-      document.getElementById('status').innerHTML = "✅ Pickup set (approx)";
+      } else {
+        document.getElementById('gm-origin').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        originAddr = document.getElementById('gm-origin').value;
+        originCoords = { lat, lng };
+        originIsCustom = true;
+        assignedHub = getNearestHub(lat, lng);
+        if (destCoords) computeAllDistances();
+        checkAndTriggerPrice();
+        document.getElementById('status').innerHTML = "✅ Pickup set";
+      }
+    }, () => {
+      document.getElementById('status').innerHTML = "❌ Could not get location";
+    });
+  }
+  
+  function fetchAndShareLocation() {
+    let phone = document.getElementById('customer-phone').value;
+    if (!/^0[0-9]{9}$/.test(phone)) {
+      updateLocationStatus("⚠️ Enter phone number first", "warning");
+      return;
+    }
+    if (!navigator.geolocation) {
+      updateLocationStatus("❌ Not supported", "error");
+      return;
+    }
+    updateLocationStatus("📍 Fetching location...", "info");
+    navigator.geolocation.getCurrentPosition(pos => {
+      let link = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+      updateLocationStatus("✅ Location shared with dispatch", "success");
+      // Send to backend (fire and forget)
+      fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
+        method: 'POST', mode: 'no-cors',
+        body: new URLSearchParams({
+          sharedLocation: link,
+          locationLatitude: pos.coords.latitude,
+          locationLongitude: pos.coords.longitude,
+          locationPhone: phone,
+          requestType: "location_share",
+          timestamp: new Date().toISOString()
+        })
+      }).catch(() => {});
+    }, () => updateLocationStatus("❌ Failed to get location", "error"));
+  }
+  
+  function updateLocationStatus(msg, type) {
+    let div = document.getElementById("locationStatus");
+    div.textContent = msg;
+    div.className = `location-status ${type}`;
+  }
+  
+  // ==================== REQUEST HANDLER ====================
+  async function handleRequest() {
+    let btn = document.getElementById('submit-btn');
+    let icon = document.getElementById('btn-icon');
+    let loader = document.getElementById('btn-loader');
+    let prog = document.getElementById('progress-text');
+    
+    btn.disabled = true;
+    icon.style.display = "none";
+    loader.style.display = "block";
+    prog.style.display = "block";
+    
+    let startTime = Date.now();
+    let interval = setInterval(() => {
+      let p = Math.min(98, Math.floor(((Date.now() - startTime) / 13000) * 98));
+      prog.textContent = p + "%";
+    }, 200);
+    
+    let payload = { ...window.currentRide, requestType: "booking" };
+    
+    let timeoutId = setTimeout(() => {
+      clearInterval(interval);
+      finishRequest(true);
+    }, 15000);
+    
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
+        method: 'POST',
+        body: new URLSearchParams(payload),
+        mode: 'no-cors'
+      });
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+      prog.textContent = "100%";
+      finishRequest(false);
+    } catch (err) {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+      finishRequest(true);
     }
   }
   
-  // Share location  function fetchAndShareLocation() {
-    let phone = document.getElementById('customer-phone').value;
-    if(!/^0[0-9]{9}$/.test(phone)) { updateLocStatus("⚠️ Enter phone first", "warning"); return; }
-    if(!navigator.geolocation) { updateLocStatus("❌ Not supported", "error"); return; }
-    updateLocStatus("📍 Fetching...", "info");
-    navigator.geolocation.getCurrentPosition(pos => {
-      let link = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-      updateLocStatus("✅ Location shared", "success");
-      fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST', mode: 'no-cors', body: new URLSearchParams({ sharedLocation: link, locationLatitude: pos.coords.latitude, locationLongitude: pos.coords.longitude, locationPhone: phone, requestType: "location_share", timestamp: new Date().toISOString() })
-      }).catch(()=>{});
-    }, () => updateLocStatus("❌ Failed", "error"));
-  }
-  function updateLocStatus(msg, type) { let div = document.getElementById("locationStatus"); div.textContent = msg; div.className = `location-status ${type}`; }
-  
-  // Request handler
-  async function handleRequest() {
-    let btn = document.getElementById('submit-btn'), icon = document.getElementById('btn-icon'), loader = document.getElementById('btn-loader'), prog = document.getElementById('progress-text');
-    btn.disabled = true; icon.style.display = "none"; loader.style.display = "block"; prog.style.display = "block";
-    let start = Date.now(), interval = setInterval(() => { let p = Math.min(98, Math.floor(((Date.now()-start)/13000)*98)); prog.textContent = p+"%"; }, 200);
-    let payload = { ...window.currentRide, timestamp: new Date().toISOString(), requestType: "booking" };
-    setTimeout(() => { clearInterval(interval); finishRequest(true); }, 14000);
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", { method: 'POST', body: new URLSearchParams(payload), mode: 'no-cors' });
-      clearInterval(interval); prog.textContent = "100%"; finishRequest(false);
-    } catch(e) { clearInterval(interval); finishRequest(true); }
-  }
   function finishRequest(isError) {
-    let btn = document.getElementById('submit-btn'), loader = document.getElementById('btn-loader'), prog = document.getElementById('progress-text'), icon = document.getElementById('btn-icon');
-    loader.style.display = "none"; prog.style.display = "none"; icon.style.display = "block"; icon.className = "fas fa-phone";
-    let number = getDriverContact(assignedHub?.name);
-    btn.style.background = "var(--success-color)"; btn.disabled = false;
-    document.getElementById('action-label').innerHTML = " Call Now";
-    btn.onclick = () => window.location.href = `tel:${number}`;
-    document.getElementById('status').innerHTML = isError ? "⚠️ Network issue. Please call driver." : "✅ Request sent! Driver will contact you.";
+    let btn = document.getElementById('submit-btn');
+    let loader = document.getElementById('btn-loader');
+    let prog = document.getElementById('progress-text');
+    let icon = document.getElementById('btn-icon');
+    
+    loader.style.display = "none";
+    prog.style.display = "none";
+    icon.style.display = "block";
+    icon.className = "fas fa-phone";
+    
+    let phoneNumber = getDriverContact(assignedHub?.name);
+    btn.style.background = "var(--success-color)";
+    btn.disabled = false;
+    document.getElementById('action-label').innerHTML = "📞 Call Driver Now";
+    btn.onclick = () => window.location.href = `tel:${phoneNumber}`;
+    document.getElementById('status').innerHTML = isError ? "⚠️ Network issue. Please call driver directly." : "✅ Request sent! Driver will contact you shortly.";
   }
   
-  // UI event bindings
-  document.getElementById('customer-phone').oninput = function() {
-    let valid = /^0[0-9]{9}$/.test(this.value);
-    document.getElementById('trip-details').style.display = valid ? 'block' : 'none';
-    if(!valid) document.getElementById('summary-section').style.display = 'none';
-    else if(totalDist && document.querySelector('input[name="mode"]:checked')) checkAndShow();
-  };
-  document.getElementById('mode-group').onchange = () => { if(totalDist && /^0[0-9]{9}$/.test(document.getElementById('customer-phone').value)) calculatePrice(); };
+  // ==================== PHONE VALIDATION & UI INIT ====================
+  function initUI() {
+    const phoneInput = document.getElementById('customer-phone');
+    const tripDetailsDiv = document.getElementById('trip-details');
+    
+    phoneInput.addEventListener('input', function() {
+      let isValid = /^0[0-9]{9}$/.test(this.value);
+      if (isValid) {
+        tripDetailsDiv.style.display = 'block';
+        // If both locations already exist, trigger price update
+        if (totalDistance && document.querySelector('input[name="mode"]:checked')) {
+          calculateAndShowPrice();
+        }
+      } else {
+        tripDetailsDiv.style.display = 'none';
+        document.getElementById('summary-section').style.display = 'none';
+      }
+    });
+    
+    // Mode change listener
+    document.getElementById('mode-group').addEventListener('change', function() {
+      let phoneValid = /^0[0-9]{9}$/.test(phoneInput.value);
+      if (totalDistance && phoneValid) {
+        calculateAndShowPrice();
+      }
+    });
+  }
   
-  function toggleDropdown() { document.getElementById("header-menu-dropdown").classList.toggle("show"); }
+  function toggleDropdown() {
+    document.getElementById("header-menu-dropdown").classList.toggle("show");
+  }
+  
+  window.onclick = (e) => {
+    let menu = document.getElementById("header-menu-dropdown");
+    let btn = document.getElementById("menu-toggle-btn");
+    if (menu && menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.classList.remove('show');
+    }
+  };
+  
+  // Initialize everything when DOM ready
+  document.addEventListener('DOMContentLoaded', () => {
+    initUI();
+  });
+  
+  // Expose global functions
   window.toggleDropdown = toggleDropdown;
   window.fetchAndShareLocation = fetchAndShareLocation;
   window.fetchCurrentLocationAsPickup = fetchCurrentLocationAsPickup;
