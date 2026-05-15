@@ -60,12 +60,8 @@
     .zam {
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: #ffcc00; /* taxi yellow */
-
-  /* Elegant shadow */
+  color: #ffcc00;
   text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
-
-  /* Smooth look */
   font-family: 'Segoe UI', Arial, sans-serif;
 }
 
@@ -161,7 +157,6 @@
     .contact-label-text { display: flex; flex-direction: column; }
     .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
 
-    /* Route info container */
     .route-container {
       margin-top: 8px;
       border-radius: 12px;
@@ -297,17 +292,12 @@
         <!-- About Section FIRST -->
         <div class="dropdown-content-section">
           <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-
 <p>
   A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.
 </p>
-
 <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
-
 <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
-
 <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
-
 <p>
   <strong>Install App:</strong> Open the site using your browser 
   (such as Chrome or Edge), then tap the 
@@ -349,11 +339,10 @@
   </a>
 </div>
         
-        <!-- View Map Section - FIXED with centered text/icon AND estimated time display -->
+        <!-- View Map Section -->
         <div class="dropdown-content-section">
           <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
           
-          <!-- Route Info Section with Map Button -->
           <div class="route-container">
             <div id="map-route-info" class="route-info">
               <i class="fas fa-route"></i> Select pickup & destination to see route details
@@ -382,7 +371,6 @@
     </fieldset>
     <div id="trip-details" class="hidden-section">
       <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
-         <!-- === NEW: Placeholder text added under Transport Mode as requested === -->
           <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">
             Choose your preferred transport mode
           </p>
@@ -462,145 +450,108 @@
     document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
   });
 
-// Function to get driver contact based on selected hub
-// Function to get driver contact based on selected hub
-function getDriverContactForHub() {
-    // Default main number if no hub is selected
-    if (!rideData || !rideData.hub) {
-        return "0978167546";
-    }
-    
-    // Hub-specific driver numbers (Zambia format without country code)
-    const hubDriverNumbers = {
-        "Luangwa Bus Station": "0978167546",
-        "Chitope, Luangwa": "0978167546",
-        "Luangwa Bridge Market": "0978167546",
-        "Luangwa Town": "0978167546",
-        "Rufunsa Town": "0978167546",
-        "Chongwe Town": "0978167546",
-        "Lusaka Town": "0978167546",
-        "Nyimba Town": "0978167546",
-        "Petauke Town": "0978167546",
-        "Chipata Town": "0978167546"
-    };
-    
-    return hubDriverNumbers[rideData.hub] || "0978167546";
-}
+  // Coordinates fetching and sharing functions
+  let sharedLocationLink = "";
+  let sharedLocationTimestamp = "";
 
-// Function to convert local number to international format for WhatsApp
-function formatForWhatsApp(number) {
-    // Remove leading 0 and add country code 260
-    if (number.startsWith('0')) {
-        return '260' + number.substring(1);
-    }
-    return number;
-}
-
-// Coordinates fetching and sharing functions
-let sharedLocationLink = "";
-let sharedLocationTimestamp = "";
-
-function getLocation() {
+  function getLocation() {
     const status = document.getElementById("locationStatus");
     const phone = document.getElementById('customer-phone').value;
     
-    // Check if phone number is entered
     if (!phone || !/^0[0-9]{9}$/.test(phone)) {
-        status.innerHTML = "⚠️ Please enter your phone number first!";
-        status.style.color = "orange";
-        return;
+      status.innerHTML = "⚠️ Please enter your phone number first!";
+      status.style.color = "orange";
+      return;
     }
     
     if (navigator.geolocation) {
-        status.innerHTML = "📍 Getting location...";
-        status.style.color = "#2563eb";
-        
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                let lat = position.coords.latitude;
-                let lon = position.coords.longitude;
-                let timestamp = new Date().toISOString();
-                
-                sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
-                sharedLocationTimestamp = timestamp;
-                
-                status.innerHTML = `🌐 ✅ Location saved to sheet!`;
-                status.style.color = "green";
-                
-                // Auto-save to Google Sheet
-                saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp);
-            },
-            (error) => {
-                let errorMsg = "";
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMsg = "Permission denied. Please allow location access.";
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMsg = "Location unavailable. Try again.";
-                        break;
-                    case error.TIMEOUT:
-                        errorMsg = "Location request timed out.";
-                        break;
-                }
-                status.innerHTML = `❌ ${errorMsg}`;
-                status.style.color = "red";
-            }
-        );
+      status.innerHTML = "📍 Getting location...";
+      status.style.color = "#2563eb";
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          let lat = position.coords.latitude;
+          let lon = position.coords.longitude;
+          let timestamp = new Date().toISOString();
+          
+          sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
+          sharedLocationTimestamp = timestamp;
+          
+          status.innerHTML = `🌐 ✅ Location saved to sheet!`;
+          status.style.color = "green";
+          
+          saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp);
+        },
+        (error) => {
+          let errorMsg = "";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMsg = "Permission denied. Please allow location access.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMsg = "Location unavailable. Try again.";
+              break;
+            case error.TIMEOUT:
+              errorMsg = "Location request timed out.";
+              break;
+          }
+          status.innerHTML = `❌ ${errorMsg}`;
+          status.style.color = "red";
+        }
+      );
     } else {
-        status.innerHTML = "❌ Geolocation not supported!";
-        status.style.color = "red";
+      status.innerHTML = "❌ Geolocation not supported!";
+      status.style.color = "red";
     }
-}
+  }
 
-// Save location to Google Sheet
-function saveLocationToSheet(lat, lon, mapLink, phone, timestamp) {
+  function saveLocationToSheet(lat, lon, mapLink, phone, timestamp) {
     const status = document.getElementById("locationStatus");
     const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
     
     const payload = {
-        sharedLocation: mapLink,
-        locationLatitude: lat,
-        locationLongitude: lon,
-        locationTimestamp: timestamp,
-        locationPhone: phone,
-        requestType: "location_share",
-        timestamp: timestamp,
-        phone: phone,
-        from: currentPickup || "Location Share",
-        to: currentDestination || "N/A",
-        preferredMode: document.querySelector('input[name="mode"]:checked')?.value || "N/A",
-        hub: rideData?.hub || "Unknown"
+      sharedLocation: mapLink,
+      locationLatitude: lat,
+      locationLongitude: lon,
+      locationTimestamp: timestamp,
+      locationPhone: phone,
+      requestType: "location_share",
+      timestamp: timestamp,
+      phone: phone,
+      from: currentPickup || "Location Share",
+      to: currentDestination || "N/A",
+      preferredMode: document.querySelector('input[name="mode"]:checked')?.value || "N/A",
+      hub: rideData?.hub || "Unknown"
     };
     
     fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: new URLSearchParams(payload)
+      method: 'POST',
+      mode: 'no-cors',
+      body: new URLSearchParams(payload)
     }).catch((error) => {
-        console.error("Save failed:", error);
-        status.innerHTML = "⚠️ Location saved locally. Will sync when online.";
-        let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
-        pending.push(payload);
-        localStorage.setItem("pendingLocations", JSON.stringify(pending));
+      console.error("Save failed:", error);
+      status.innerHTML = "⚠️ Location saved locally. Will sync when online.";
+      let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
+      pending.push(payload);
+      localStorage.setItem("pendingLocations", JSON.stringify(pending));
     });
-}
+  }
 
-// Retry pending locations when online
-window.addEventListener("online", () => {
+  window.addEventListener("online", () => {
     const pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
     if (pending.length > 0) {
-        const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-        pending.forEach(payload => {
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: new URLSearchParams(payload)
-            });
+      const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
+      pending.forEach(payload => {
+        fetch(scriptURL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: new URLSearchParams(payload)
         });
-        localStorage.removeItem("pendingLocations");
+      });
+      localStorage.removeItem("pendingLocations");
     }
-});
+  });
+
   // ----- COMPLETE PLACES LIST (with coordinates) -----
   const placesWithCoords = [
     { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
@@ -698,7 +649,7 @@ window.addEventListener("online", () => {
     return { lat: -15.8167, lng: 30.7167 };
   }
   
-  // Graph & distance engine
+  // Graph & distance engine (Sections 1-10 from your data - keeping as is)
   const segments = [
 // ============================================
 // SECTION 1: LUANGWA - ALL PLACES CONNECTED TO LUANGWA BUS STATION
@@ -976,7 +927,6 @@ window.addEventListener("online", () => {
 // ============================================
 // SECTION 7: LUANSHYA - ALL PLACES CONNECTED TO LUANSHYA ROUNDABOUT 
 // ============================================
-// ============================================
 // LUANSHYA - ALL PLACES CONNECTED TO LUANSHYA TOWN ROUNDABOUT
 // ============================================
 
@@ -1240,7 +1190,7 @@ window.addEventListener("online", () => {
 { from: "Kampasa Market, Rufunsa", to: "Luangwa Bus Station", distance: 107.50 }
 ];
   
-  // Hub-
+  // Hub list
 const hubs = [
   "Luangwa Bus Station",
   "Chitope, Luangwa",
@@ -1268,7 +1218,7 @@ const hubs = [
   "Kampasa Market, Rufunsa"
 ];
   
-  // Graph & distance engine
+  // Build graph
 const graph = {};
 segments.forEach(({ from, to, distance }) => {
   if (!graph[from]) graph[from] = [];
@@ -1334,8 +1284,6 @@ const config = {
 let rideData = null;
 let currentPickup = "";
 let currentDestination = "";
-let sharedLocationLink = "";  // NEW: Store shared location
-let sharedLocationTimestamp = "";  // NEW: Store when location was shared
 
 const phoneInput = document.getElementById('customer-phone');
 const tripDiv = document.getElementById('trip-details');
@@ -1355,7 +1303,6 @@ phoneInput.oninput = () => {
   }
 };
 
-// Setup autocomplete for pickup/destination inputs
 function setupAuto(inputId, containerId, listId) {
   const input = document.getElementById(inputId);
   const container = document.getElementById(containerId);
@@ -1398,140 +1345,6 @@ function setupAuto(inputId, containerId, listId) {
   };
 }
 
-// NEW: Save location to sheet function
-function saveLocationToSheet(lat, lon, mapLink, phone, timestamp) {
-  const status = document.getElementById("locationStatus");
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-  
-  const payload = {
-    // Shared location fields
-    sharedLocation: mapLink,
-    locationLatitude: lat,
-    locationLongitude: lon,
-    locationTimestamp: timestamp,
-    locationPhone: phone,
-    requestType: "location_share",
-    // Include current booking context if available
-    bookingFrom: currentPickup || "",
-    bookingTo: currentDestination || "",
-    timestamp: timestamp,
-    phone: phone,
-    from: currentPickup || "Location Share",
-    to: currentDestination || "N/A",
-    preferredMode: document.querySelector('input[name="mode"]:checked')?.value || "N/A",
-    hub: rideData?.hub || "Unknown"
-  };
-  
-  fetch(scriptURL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: new URLSearchParams(payload)
-  }).then(() => {
-    status.innerHTML = `✅ Location saved to sheet! Ready to share.`;
-  }).catch((error) => {
-    console.error("Save failed:", error);
-    status.innerHTML = "⚠️ Location saved locally. Will sync when online.";
-    let pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
-    pending.push(payload);
-    localStorage.setItem("pendingLocations", JSON.stringify(pending));
-  });
-}
-
-// Modified getLocation function
-function getLocation() {
-  const status = document.getElementById("locationStatus");
-  
-  const phone = document.getElementById('customer-phone').value;
-  if (!phone || !/^0[0-9]{9}$/.test(phone)) {
-    status.innerHTML = "⚠️ Please enter your phone number first!";
-    status.style.color = "orange";
-    return;
-  }
-  
-  if (navigator.geolocation) {
-    status.innerHTML = "📍 Getting location...";
-    status.style.color = "#2563eb";
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        let lat = position.coords.latitude;
-        let lon = position.coords.longitude;
-        let timestamp = new Date().toISOString();
-        
-        sharedLocationLink = `https://www.google.com/maps?q=${lat},${lon}`;
-        sharedLocationTimestamp = timestamp;
-        
-        status.innerHTML = `🌐 ✅ Location ready! Saving to sheet...`;
-        status.style.color = "green";
-        
-        saveLocationToSheet(lat, lon, sharedLocationLink, phone, timestamp);
-      },
-      (error) => {
-        let errorMsg = "";
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMsg = "Permission denied. Please allow location access.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMsg = "Location unavailable. Try again.";
-            break;
-          case error.TIMEOUT:
-            errorMsg = "Location request timed out.";
-            break;
-        }
-        status.innerHTML = `❌ ${errorMsg}`;
-        status.style.color = "red";
-      }
-    );
-  } else {
-    status.innerHTML = "❌ Geolocation not supported";
-    status.style.color = "red";
-  }
-}
-
-// Retry pending locations when online
-window.addEventListener("online", () => {
-  const pending = JSON.parse(localStorage.getItem("pendingLocations") || "[]");
-  if (pending.length > 0) {
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec";
-    pending.forEach(payload => {
-      fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: new URLSearchParams(payload)
-      });
-    });
-    localStorage.removeItem("pendingLocations");
-    console.log("Pending locations synced");
-  }
-});
-
-// Modified shareWhatsApp function
-function shareWhatsApp() {
-  if (!sharedLocationLink) {
-    alert("Please get your location first using 'Get My Location'");
-    return;
-  }
-  
-  let driverNumber = getDriverContactForHub();
-  driverNumber = formatForWhatsApp(driverNumber);
-  
-  let message = encodeURIComponent("📍 My current location: " + sharedLocationLink);
-  window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
-}
-
-// Modified shareSMS function
-function shareSMS() {
-  if (!sharedLocationLink) {
-    alert("Please get your location first using 'Get My Location'");
-    return;
-  }
-  
-  let driverNumber = getDriverContactForHub();
-  window.location.href = `sms:${driverNumber}?body=📍 My location: ${sharedLocationLink}`;
-}
-
-// Modified updateRouteInfo function (unchanged, keep as is)
 function updateRouteInfo(pickup, destination) {
   if (!pickup || !destination) return;
   
@@ -1635,7 +1448,6 @@ function calculate(from, to, mode) {
   }, 500);
 }
 
-// Modified handleRequest function - includes sharedLocation in payload
 async function handleRequest() {
   submitBtn.disabled = true;
   btnIcon.style.display = "none";
@@ -1649,13 +1461,12 @@ async function handleRequest() {
       progressTextSpan.textContent = p + "%";
   }, 100);
   
-  // Include sharedLocation in the booking payload
   const payload = { 
     ...rideData, 
     timestamp: new Date().toISOString(),
-    sharedLocation: sharedLocationLink || "",  // NEW: Add shared location
-    sharedLocationTimestamp: sharedLocationTimestamp || "",  // NEW: When location was shared
-    requestType: "booking"  // NEW: Distinguish from location shares
+    sharedLocation: sharedLocationLink || "",
+    sharedLocationTimestamp: sharedLocationTimestamp || "",
+    requestType: "booking"
   };
   
   let timeoutTriggered = false;
@@ -1748,9 +1559,6 @@ window.onclick = (event) => {
 
 window.toggleDropdown = toggleDropdown;
 window.getLocation = getLocation;
-window.shareWhatsApp = shareWhatsApp;
-window.shareSMS = shareSMS;
-
         
 </script>
 </body>
