@@ -1467,22 +1467,30 @@ segments.forEach((edge) => {
   
   function calculateTotalDistance(pickup, dest) {
     if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
-    let nearestHub = null, minTotal = Infinity;
+    
+    // Calculate trip distance ONCE outside the loop
+    const tripDist = findShortestDistance(pickup, dest);
+    if (tripDist === null) return { total: null, trip: null, hub: null };
+    
+    let nearestHub = null;
+    let minTotal = Infinity;
+    
     for (let hub of hubs) {
-      let hubToPickup = findShortestDistance(hub, pickup);
-      let tripDist = findShortestDistance(pickup, dest);
-      let destToHub = findShortestDistance(dest, hub);
-      if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-        let total = hubToPickup + tripDist + destToHub;
-        if (total < minTotal) {
-          minTotal = total;
-          nearestHub = hub;
+        let hubToPickup = findShortestDistance(hub, pickup);
+        let destToHub = findShortestDistance(dest, hub);
+        
+        if (hubToPickup !== null && destToHub !== null) {
+            let total = hubToPickup + tripDist + destToHub;
+            if (total < minTotal) {
+                minTotal = total;
+                nearestHub = hub;
+            }
         }
-      }
     }
+    
     if (!nearestHub) return { total: null, trip: null, hub: null };
-    return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
-  }
+    return { hub: nearestHub, trip: tripDist, total: minTotal };
+}
   
   const config = {
     vehiclePricePerKm: 3.90,
