@@ -1395,16 +1395,12 @@ const hubs = [
 ];
      
   const graph = {};
-segments.forEach((edge) => {
-  // Read BOTH distance_km and distance fields
-  const dist = edge.distance_km !== undefined ? edge.distance_km : edge.distance;
-  if (dist === undefined || dist === null) return;
-  
-  if (!graph[edge.from]) graph[edge.from] = [];
-  if (!graph[edge.to]) graph[edge.to] = [];
-  graph[edge.from].push({ node: edge.to, distance: dist });
-  graph[edge.to].push({ node: edge.from, distance: dist });
-});
+  segments.forEach(({ from, to, distance }) => {
+    if (!graph[from]) graph[from] = [];
+    if (!graph[to]) graph[to] = [];
+    graph[from].push({ node: to, distance });
+    graph[to].push({ node: from, distance });
+  });
   
   function findShortestDistance(start, end) {
     if (start === end) return 0;
