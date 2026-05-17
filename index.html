@@ -1428,23 +1428,45 @@ const hubs = [
   }
   
   function calculateTotalDistance(pickup, dest) {
-    if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
-    let nearestHub = null, minTotal = Infinity;
-    for (let hub of hubs) {
-      let hubToPickup = findShortestDistance(hub, pickup);
-      let tripDist = findShortestDistance(pickup, dest);
-      let destToHub = findShortestDistance(dest, hub);
-      if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-        let total = hubToPickup + tripDist + destToHub;
-        if (total < minTotal) {
-          minTotal = total;
-          nearestHub = hub;
-        }
+  if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
+  
+  const tripDist = findShortestDistance(pickup, dest);
+  if (tripDist === null) return { total: null, trip: null, hub: null };
+  
+  // If pickup is a hub, return to same hub (no extra return trip calculation needed)
+  if (hubs.includes(pickup)) {
+    // Need distance from destination back to pickup hub
+    const returnDist = findShortestDistance(dest, pickup);
+    if (returnDist === null) return { total: null, trip: null, hub: null };
+    const total = tripDist + returnDist;
+    return { hub: pickup, trip: tripDist, total: total };
+  }
+  
+  // If destination is a hub, calculate from pickup to destination and back
+  if (hubs.includes(dest)) {
+    const toDest = findShortestDistance(pickup, dest);
+    const fromDest = findShortestDistance(dest, pickup);
+    if (toDest === null || fromDest === null) return { total: null, trip: null, hub: null };
+    const total = toDest + fromDest;
+    return { hub: dest, trip: tripDist, total: total };
+  }
+  
+  // Otherwise find best hub for non-hub locations
+  let nearestHub = null, minTotal = Infinity;
+  for (let hub of hubs) {
+    let hubToPickup = findShortestDistance(hub, pickup);
+    let destToHub = findShortestDistance(dest, hub);
+    if (hubToPickup !== null && destToHub !== null) {
+      let total = hubToPickup + tripDist + destToHub;
+      if (total < minTotal) {
+        minTotal = total;
+        nearestHub = hub;
       }
     }
-    if (!nearestHub) return { total: null, trip: null, hub: null };
-    return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
   }
+  if (!nearestHub) return { total: null, trip: null, hub: null };
+  return { hub: nearestHub, trip: tripDist, total: minTotal };
+}
   
   const config = {
     vehiclePricePerKm: 3.90,
