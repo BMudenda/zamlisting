@@ -18,7 +18,6 @@
   <link rel="apple-touch-icon" href="lfr.jpg">
   
   <style>
-    /* ========== BASE STYLES ========== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --primary-color: #2563eb;
@@ -32,8 +31,8 @@
     }
     body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
-    /* ========== BILLBOARD HEADER STYLES ========== */
-    .billboard-header {
+    /* ========== INTEGRATED BILLBOARD HEADER ========== */
+    .header {
         position: relative;
         width: 100%;
         height: 320px;
@@ -42,6 +41,65 @@
         border-bottom: 4px solid #00ff99;
     }
 
+    /* COMPANY INFO - CLEAN */
+    .company-info-overlay {
+        position: absolute;
+        top: 12px;
+        left: 15px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: transparent;
+        padding: 5px 12px;
+    }
+
+    .corner-logo {
+        width: 38px;
+        height: 38px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid var(--secondary-color);
+    }
+
+    .zam {
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 1.2rem;
+    }
+
+    .z-green { color: #2ecc71; }
+    .z-red { color: #e74c3c; }
+    .z-black { color: #ffffff; }
+    .zam span:last-child { color: var(--secondary-color); }
+
+    /* MENU BUTTON */
+    .menu-dropdown-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1000;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+        opacity: 0.8;
+    }
+
+    .menu-dropdown-btn:hover {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    /* SLIDES - ENHANCED TIMING & EFFECTS */
     .slide {
         position: absolute;
         width: 100%;
@@ -62,37 +120,37 @@
 
     @keyframes s1 {
         0%, 5% { opacity: 1; transform: translateX(0); }
-        8% { opacity: 0; }
+        8% { opacity: 0; transform: translateX(0); }
         100% { opacity: 0; }
     }
     @keyframes s2 {
-        0%, 8% { opacity: 0; transform: scale(0.9); }
-        10%, 15% { opacity: 1; transform: scale(1); }
-        18% { opacity: 0; }
+        0%, 8% { opacity: 0; transform: scale(0.9) rotate(0deg); }
+        10%, 15% { opacity: 1; transform: scale(1) rotate(0deg); }
+        18% { opacity: 0; transform: scale(1) rotate(360deg); }
         100% { opacity: 0; }
     }
     @keyframes s3 {
-        0%, 18% { opacity: 0; transform: translateY(20px); }
-        20%, 25% { opacity: 1; transform: translateY(0); }
-        28% { opacity: 0; }
+        0%, 18% { opacity: 0; transform: translateY(20px) rotate(0deg); }
+        20%, 25% { opacity: 1; transform: translateY(0) rotate(0deg); }
+        28% { opacity: 0; transform: translateY(-10px) rotate(720deg); }
         100% { opacity: 0; }
     }
     @keyframes s4 {
-        0%, 28% { opacity: 0; transform: scale(0.5); }
-        30%, 35% { opacity: 1; transform: scale(1); text-shadow: 0 0 30px #00ffcc; }
-        38% { opacity: 0; }
+        0%, 28% { opacity: 0; text-shadow: 0 0 0px cyan; transform: scale(0.5); }
+        30%, 35% { opacity: 1; text-shadow: 0 0 30px #00ffcc; transform: scale(1); }
+        38% { opacity: 0; transform: scale(1.1); }
         100% { opacity: 0; }
     }
     @keyframes s5 {
         0%, 38% { opacity: 0; transform: scale(0.5) rotate(-180deg); }
         40%, 45% { opacity: 1; transform: scale(1) rotate(0deg); }
-        48% { opacity: 0; }
+        48% { opacity: 0; transform: scale(1.1) rotate(10deg); }
         100% { opacity: 0; }
     }
     @keyframes s6 {
         0%, 48% { opacity: 0; letter-spacing: -5px; transform: translateX(-50px); }
         50%, 55% { opacity: 1; letter-spacing: normal; transform: translateX(0); }
-        58% { opacity: 0; }
+        58% { opacity: 0; transform: translateX(50px); }
         100% { opacity: 0; }
     }
     @keyframes s7 {
@@ -100,169 +158,392 @@
         60%, 100% { opacity: 1; }
     }
 
+    /* SLIDE CONTENT STYLES WITH ENHANCED EFFECTS */
     .welcome {
         font-size: 45px;
         color: #00ff99;
         font-weight: bold;
         text-shadow: 0 0 20px rgba(0,255,153,0.7);
+        text-align: center;
+        padding: 20px;
+        background: transparent;
         animation: pulseGlow 2s infinite alternate;
     }
     @keyframes pulseGlow {
         from { text-shadow: 0 0 10px #00ff99; transform: scale(1); }
-        to { text-shadow: 0 0 40px #00ff99; transform: scale(1.05); }
+        to { text-shadow: 0 0 40px #00ff99, 0 0 60px #00ff99; transform: scale(1.05); }
     }
 
-    .car img { width: 200px; filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); animation: carDrive 2s infinite; }
-    @keyframes carDrive { 0%,100% { transform: translateX(0px); } 25% { transform: translateX(15px); } 75% { transform: translateX(-15px); } }
+    .car img {
+        width: 200px;
+        filter: drop-shadow(0 0 15px rgba(0,255,153,0.8));
+        animation: carDrive 2s infinite ease-in-out;
+    }
+    @keyframes carDrive {
+        0%,100% { transform: translateX(0px) rotate(0deg); }
+        25% { transform: translateX(15px) rotate(2deg); }
+        75% { transform: translateX(-15px) rotate(-2deg); }
+    }
 
-    .bike img { width: 180px; filter: drop-shadow(0 0 18px #ffcc00); animation: bikeFloat 2.5s infinite; }
-    @keyframes bikeFloat { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+    .bike img {
+        width: 180px;
+        filter: drop-shadow(0 0 18px #ffcc00);
+        animation: bikeFloat 2.5s infinite;
+    }
+    @keyframes bikeFloat {
+        0%,100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
 
-    .request { font-size: 38px; color: #ffcc00; background: rgba(0,0,0,0.4); padding: 15px 25px; border-radius: 60px; backdrop-filter: blur(10px); animation: requestPulse 1.2s infinite alternate; }
-    @keyframes requestPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+    .request {
+        font-size: 38px;
+        color: #ffcc00;
+        font-weight: bold;
+        background: rgba(0,0,0,0.4);
+        padding: 15px 25px;
+        border-radius: 60px;
+        backdrop-filter: blur(10px);
+        animation: requestPulse 1.2s infinite alternate;
+        box-shadow: 0 0 30px rgba(255,204,0,0.3);
+    }
+    @keyframes requestPulse {
+        from { text-shadow: 0 0 5px gold; transform: scale(1); box-shadow: 0 0 20px rgba(255,204,0,0.3); }
+        to { text-shadow: 0 0 30px orange; transform: scale(1.03); box-shadow: 0 0 50px rgba(255,204,0,0.7); }
+    }
 
-    .promo { background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00); padding: 20px 40px; border-radius: 60px; font-size: 44px; font-weight: bold; color: white; animation: promoZoom 2.5s infinite alternate; position: relative; }
-    @keyframes promoZoom { from { transform: scale(1); } to { transform: scale(1.06); } }
+    /* PROMO WITH FIREWORKS EFFECT - SLOWER ANIMATION */
+    .promo {
+        background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00);
+        padding: 20px 40px;
+        border-radius: 60px;
+        font-size: 44px;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 0 30px rgba(255,100,0,0.6);
+        animation: promoZoom 2.5s infinite alternate;
+        text-align: center;
+        position: relative;
+        overflow: visible;
+    }
+    
+    .fireworks {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: visible;
+    }
+    
+    .firework {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        animation: explode 2.5s ease-out infinite;
+    }
+    
+    @keyframes explode {
+        0% { transform: scale(0); opacity: 1; }
+        50% { transform: scale(18); opacity: 0.8; }
+        100% { transform: scale(35); opacity: 0; }
+    }
+    
+    @keyframes promoZoom {
+        from { transform: scale(1); box-shadow: 0 0 20px rgba(255,100,0,0.6); filter: brightness(1); }
+        to { transform: scale(1.06); box-shadow: 0 0 50px rgba(255,100,0,0.9); filter: brightness(1.15); }
+    }
 
-    .contact { font-size: 32px; color: #00ccff; background: rgba(0,0,0,0.4); padding: 15px 30px; border-radius: 50px; animation: contactFlicker 1.5s infinite; }
-    @keyframes contactFlicker { 0%,100% { opacity: 1; } 50% { opacity: 0.95; } }
+    .contact {
+        font-size: 32px;
+        color: #00ccff;
+        font-weight: bold;
+        background: rgba(0,0,0,0.4);
+        padding: 15px 30px;
+        border-radius: 50px;
+        backdrop-filter: blur(4px);
+        animation: contactFlicker 1.5s infinite, contactWave 2s infinite;
+        box-shadow: 0 0 20px rgba(0,204,255,0.3);
+    }
+    @keyframes contactFlicker {
+        0%,100% { opacity: 1; text-shadow: 0 0 5px cyan; }
+        50% { opacity: 0.95; text-shadow: 0 0 25px deepskyblue; }
+    }
+    @keyframes contactWave {
+        0%,100% { transform: translateX(0); }
+        25% { transform: translateX(10px); }
+        75% { transform: translateX(-10px); }
+    }
 
-    .products-slide { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; perspective: 1000px; }
-    .product-card { width: 280px; background: linear-gradient(135deg, #1e1e2f, #2a2a3e); border-radius: 24px; overflow: hidden; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0; animation-duration: 30s; animation-iteration-count: infinite; }
+    /* PRODUCT ADS SECTION - RELIABLE EMOJI IMAGES */
+    .products-slide {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
+    }
+
+    .product-card {
+        width: 280px;
+        background: linear-gradient(135deg, #1e1e2f, #2a2a3e);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(0,255,153,0.3);
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        animation-duration: 30s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+    }
+    .product-card:hover {
+        transform: translate(-50%, -50%) scale(1.05) rotateY(5deg);
+        box-shadow: 0 0 50px #00ff99;
+    }
     .ad1 { animation: adShow3D 30s infinite 0s; }
     .ad2 { animation: adShow3D 30s infinite 10s; }
     .ad3 { animation: adShow3D 30s infinite 20s; }
+
     @keyframes adShow3D {
         0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7) rotateY(-90deg); }
         10% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotateY(0deg); }
-        30% { opacity: 1; }
+        30% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotateY(0deg); }
         40% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) rotateY(90deg); }
         100% { opacity: 0; }
     }
-    .product-image { width: 100%; height: 160px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea, #764ba2); font-size: 80px; }
-    .product-info { padding: 15px; text-align: center; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; }
-    .product-info p { color: #00ff99; font-weight: bold; }
 
-    /* ========== YOUR ORIGINAL HEADER STYLES ========== */
-    .corner-logo { width: 32px; height: 32px; object-fit: contain; margin-right: 10px; }
-    .company-info { display: flex; align-items: center; gap: 10px; }
-    header { background: var(--primary-color); color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
-    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-    .zam { font-weight: 800; letter-spacing: 0.5px; color: #ffcc00; text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5); font-family: 'Segoe UI', Arial, sans-serif; }
-    .z-green { color: #198754; } .z-red { color: #dc3545; } .z-black { color: #000000; }
-    .transport-sub { display: block; font-size: 0.75rem; font-weight: 400; color: #e5e7eb; margin-top: 2px; }
+    .product-image {
+        width: 100%;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-size: 80px;
+    }
+    .product-info {
+        padding: 15px;
+        text-align: center;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+    }
+    .product-info h3 {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 6px;
+    }
+    .product-info p {
+        color: #00ff99;
+        font-weight: bold;
+        font-size: 1.1rem;
+        animation: pricePulse 2s infinite;
+    }
+    @keyframes pricePulse {
+        0%,100% { text-shadow: 0 0 5px #00ff99; }
+        50% { text-shadow: 0 0 15px #00ff99; }
+    }
+    a.product-link {
+        text-decoration: none;
+    }
+
+    /* ========== DROPDOWN MENU STYLES ========== */
     .menu-dropdown-container { position: relative; display: inline-block; }
-    .menu-button { background: none; border: none; color: white; cursor: pointer; padding: 5px; font-size: 1.4rem; }
-    .menu-dropdown { display: none; position: absolute; right: 0; top: 42px; background-color: white; width: 380px; max-height: 85vh; overflow-y: auto; box-shadow: 0px 8px 24px rgba(0,0,0,0.25); z-index: 1000; border-radius: 16px; color: #333; padding: 16px; }
+    .menu-dropdown {
+        display: none;
+        position: absolute;
+        right: 15px;
+        top: 335px;
+        background-color: white;
+        width: 380px;
+        max-height: 85vh; 
+        overflow-y: auto;
+        box-shadow: 0px 8px 24px rgba(0,0,0,0.15);
+        z-index: 1000;
+        border-radius: 16px;
+        color: #333;
+        padding: 16px;
+        border: 1px solid #e0e0e0;
+    }
     .menu-dropdown.show { display: block; }
     .dropdown-content-section { margin-bottom: 20px; }
-    .dropdown-content-section h4 { color: #2563eb; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .dropdown-content-section a { display: flex; align-items: center; gap: 12px; padding: 10px; text-decoration: none; color: #1f2937; border-radius: 8px; transition: background 0.2s; }
+    .dropdown-content-section h4 { color: #2563eb; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+    .dropdown-content-section p, .dropdown-content-section .map-note { font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px; color: #4b5563; }
+    .dropdown-content-section a { display: flex; align-items: center; gap: 12px; padding: 10px; text-decoration: none; color: #1f2937; font-size: 0.9rem; border-radius: 8px; transition: background 0.2s ease; }
     .dropdown-content-section a:hover { background-color: #f3f4f6; }
+    .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem;}
+    .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
     .route-container { margin-top: 8px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 12px; }
-    .route-info { font-size: 0.8rem; margin-bottom: 12px; padding: 8px; background: #f0f9ff; border-radius: 8px; text-align: center; }
-    .open-maps-link { display: block; padding: 12px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; text-align: center; }
+    .route-info { font-size: 0.8rem; margin-bottom: 12px; padding: 8px; background: #f0f9ff; border-radius: 8px; text-align: center; color: #1e293b; }
+    .open-maps-link { display: block; padding: 12px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-size: 0.85rem; text-align: center; transition: background 0.2s; font-weight: 500; }
+    .open-maps-link:hover { background: #1d4ed8; }
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; pointer-events: none; }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    /* Booking & form styles */
     .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
-    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
-    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; }
-    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; }
-    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; }
+    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 15px; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
     .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
-    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
     .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .icon-img { width: 40px; height: 40px; object-fit: contain; }
-    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; }
-    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
-    .suggestion:hover { background: #e8f0fe; }
-    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
+    .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.3s; position: relative; }
+    .submit-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
     .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
     #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
     .hidden-section { display: none; }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
-    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; }
+    .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.08); }
+    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 500; color: #ffecb3; font-family: 'Segoe UI', Arial, sans-serif; }
     @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; }
-    .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; }
-    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
   </style>
 </head>
 <body>
 
-<!-- ========== BILLBOARD HEADER (ADDED ABOVE YOUR EXISTING HEADER) ========== -->
-<div class="billboard-header">
-    <div class="slide slide1"><div class="welcome">🚖 WELCOME TO LUANGWA FEIRA RIDES</div></div>
-    <div class="slide slide2"><div class="car"><img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" alt="car"></div></div>
-    <div class="slide slide3"><div class="bike"><img src="https://cdn-icons-png.flaticon.com/512/2972/2972185.png" alt="bike"></div></div>
-    <div class="slide slide4"><div class="request">👉 PROCEED TO MAKE A REQUEST</div></div>
-    <div class="slide slide5"><div class="promo">🔥 50% DISCOUNT PROMOTION 🔥</div></div>
-    <div class="slide slide6"><div class="contact">📞 CALL NOW • FAST PICKUP • AVAILABLE 24/7</div></div>
+<!-- =============================================== -->
+<!-- BILLBOARD HEADER WITH ENHANCED EFFECTS          -->
+<!-- =============================================== -->
+<div class="header">
+    <div class="company-info-overlay">
+        <img src="lfr.jpg" alt="Logo" class="corner-logo">
+        <h2 class="zam">
+            <span class="z-green">Z</span>
+            <span class="z-black">a</span>
+            <span class="z-red">m</span>
+            <span>Listing Rides</span>
+        </h2>
+    </div>
+    <button class="menu-dropdown-btn" onclick="toggleDropdown()">⋮</button>
+
+    <!-- SLIDE 1 - WELCOME -->
+    <div class="slide slide1">
+        <div class="welcome">🚖 WELCOME TO LUANGWA FEIRA RIDES</div>
+    </div>
+    <!-- SLIDE 2 - CAR ANIMATION -->
+    <div class="slide slide2">
+        <div class="car">
+            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" alt="car">
+        </div>
+    </div>
+    <!-- SLIDE 3 - MOTORBIKE -->
+    <div class="slide slide3">
+        <div class="bike">
+            <img src="https://cdn-icons-png.flaticon.com/512/2972/2972185.png" alt="bike">
+        </div>
+    </div>
+    <!-- SLIDE 4 - REQUEST GLOW -->
+    <div class="slide slide4">
+        <div class="request">👉 PROCEED TO MAKE A REQUEST</div>
+    </div>
+    <!-- SLIDE 5 - PROMO DISCOUNT WITH FIREWORKS -->
+    <div class="slide slide5">
+        <div class="promo" id="promoWithFireworks">
+            🔥 50% DISCOUNT PROMOTION 🔥
+            <div class="fireworks" id="fireworksContainer"></div>
+        </div>
+    </div>
+    <!-- SLIDE 6 - CONTACT -->
+    <div class="slide slide6">
+        <div class="contact">📞 CALL NOW • FAST PICKUP • AVAILABLE 24/7</div>
+    </div>
+    <!-- SLIDE 7 - PRODUCT ADS ROTATION (RELIABLE EMOJI IMAGES) -->
     <div class="slide slide7">
         <div class="products-slide">
-            <div class="product-card ad1"><div class="product-image">📺</div><div class="product-info"><h3>Smart TV 55"</h3><p>K 3,500</p></div></div>
-            <div class="product-card ad2"><div class="product-image">📱</div><div class="product-info"><h3>Android Phone</h3><p>K 1,200</p></div></div>
-            <div class="product-card ad3"><div class="product-image">🧊</div><div class="product-info"><h3>Fridge Freezer</h3><p>K 4,800</p></div></div>
+            <a href="https://www.zamlisting.com/store" target="_blank" class="product-link">
+                <div class="product-card ad1">
+                    <div class="product-image">📺</div>
+                    <div class="product-info">
+                        <h3>Smart TV 55"</h3>
+                        <p>K 3,500</p>
+                    </div>
+                </div>
+            </a>
+            <a href="https://www.zamlisting.com/store" target="_blank" class="product-link">
+                <div class="product-card ad2">
+                    <div class="product-image">📱</div>
+                    <div class="product-info">
+                        <h3>Android Phone</h3>
+                        <p>K 1,200</p>
+                    </div>
+                </div>
+            </a>
+            <a href="https://www.zamlisting.com/store" target="_blank" class="product-link">
+                <div class="product-card ad3">
+                    <div class="product-image">🧊</div>
+                    <div class="product-info">
+                        <h3>Fridge Freezer</h3>
+                        <p>K 4,800</p>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
 
-<!-- ========== YOUR ORIGINAL HEADER WITH ZAMLISTING RIDES AND DOTS BUTTON ========== -->
-<header>
-  <div class="header-content">
-    <div class="company-info">
-      <img src="lfr.jpg" alt="Logo" class="corner-logo">
-      <h2 class="zam">
-        <span class="z-green">Z</span>
-        <span class="z-black">a</span>
-        <span class="z-red">m</span>
-        <span>Listing Rides</span>
-      </h2>
-    </div>
-    <div class="menu-dropdown-container">
-      <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu"><i class="fas fa-ellipsis-v"></i></button>
-      <div id="header-menu-dropdown" class="menu-dropdown">
+<!-- DROPDOWN MENU -->
+<div class="menu-dropdown-container">
+    <div id="header-menu-dropdown" class="menu-dropdown">
         <div class="dropdown-content-section">
-          <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-          <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
-          <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
-          <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
-          <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
-          <p><strong>Install App:</strong> Open the site using your browser, then tap the 📱 <strong>Install</strong> button.</p>
+            <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+            <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
+            <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
+            <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
+            <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
+            <p><strong>Install App:</strong> Open the site using your browser, then tap the 📱 <strong>Install</strong> button.</p>
         </div>
         <div class="dropdown-content-section">
-          <h4><i class="fas fa-headset"></i> Quick Contact</h4>
-          <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
-          <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
-          <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-          <div class="menu-divider"></div>
-          <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
-          <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
-          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
+            <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+            <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
+            <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
+            <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+            <div class="menu-divider"></div>
+            <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
+            <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
+            <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="dropdown-content-section">
+            <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+            <p style="font-size: 0.85rem;">Pickup/drop-off within 1 km: no extra charges.</p>
+            <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
+            <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+            <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
+            <a href="#" onclick="shareSMS()"><i class="fas fa-sms"></i><span>Share via SMS</span></a>
         </div>
         <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;">Pickup/drop-off within 1 km: no extra charges.</p>
-          <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
-          <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
-          <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
-          <a href="#" onclick="shareSMS()"><i class="fas fa-sms"></i><span>Share via SMS</span></a>
-        </div>
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
-          <div class="route-container">
-            <div id="map-route-info" class="route-info"><i class="fas fa-route"></i> Select pickup & destination to see route details</div>
-            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 Click to View Map</a>
-          </div>
+            <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
+            <div class="route-container">
+                <div id="map-route-info" class="route-info"><i class="fas fa-route"></i> Select pickup & destination</div>
+                <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 Click to View Map</a>
+            </div>
         </div>
         <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides</p>
-      </div>
     </div>
-  </div>
-  <div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍Welcome ♥ Kindly make your request.🚗 </span></div>
-</header>
+</div>
 
-<!-- ========== YOUR MAIN BOOKING FORM ========== -->
+<div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍Welcome ♥ Kindly make your request.🚗 </span></div>
+
+<!-- =============================================== -->
+<!-- SECTION 1: MAIN BOOKING FORM                    -->
+ <!-- =============================================== -->
 <main class="product-container">
   <div class="booking-container">
     <fieldset><legend><span class="material-icons">account_circle</span> Phone Number</legend>
@@ -270,432 +551,253 @@
     </fieldset>
     <div id="trip-details" class="hidden-section">
       <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
-        <p style="font-size:0.8rem; color:#999; text-align:center;">Choose your preferred transport mode</p>
+          <p style="font-size:0.8rem; color:#999; text-align:center;">Choose your preferred transport mode</p>
         <div id="mode-group" style="display:flex; justify-content:space-around;">
           <label class="mode-option"><input type="radio" name="mode" value="motorbike" checked><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
           <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
         </div>
       </fieldset>
-      <fieldset><legend>Pickup Location</legend>
-        <div class="input-box" id="origin-container"><span class="material-icons">my_location</span><input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off"><div id="originList" class="autocomplete-list"></div></div>
-      </fieldset>
-      <fieldset><legend>Destination</legend>
-        <div class="input-box" id="dest-container"><span class="material-icons">pin_drop</span><input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off"><div id="destinationList" class="autocomplete-list"></div></div>
-      </fieldset>
+      <fieldset><legend>Pickup Location</legend><div class="input-box" id="origin-container"><span class="material-icons">my_location</span><input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off"><div id="originList" class="autocomplete-list"></div></div></fieldset>
+      <fieldset><legend>Destination</legend><div class="input-box" id="dest-container"><span class="material-icons">pin_drop</span><input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off"><div id="destinationList" class="autocomplete-list"></div></div></fieldset>
     </div>
     <div id="summary-section" class="hidden-section">
-      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
-        <div id="summary-cards"></div>
-      </fieldset>
-      <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
-        <button class="submit-btn" id="submit-btn"><i class="fas fa-paper-plane" id="btn-icon"></i><div class="btn-loader" id="btn-loader"></div><span id="progress-text">0%</span></button>
-        <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
-      </div>
+      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary</legend><div id="summary-cards"></div></fieldset>
+      <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;"><button class="submit-btn" id="submit-btn"><i class="fas fa-paper-plane" id="btn-icon"></i><div class="btn-loader" id="btn-loader"></div><span id="progress-text">0%</span></button><p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p></div>
     </div>
+    <div class="calc-loader" id="spinner"></div>
     <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height:40px;"></p>
   </div>
 </main>
 
+<!-- =============================================== -->
+<!-- SECTION 2: JAVASCRIPT - PASTE YOUR LUANGWA      -->
+<!--              FEIRA RIDES CODE HERE              -->
+<!-- =============================================== -->
 <script>
-  // ============================================
-  // PLACE YOUR COMPLETE JAVASCRIPT CODE HERE
-  // INCLUDING: placesWithCoords, segments, all functions
-  // ============================================
-  
-  // Service Worker Registration
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function() {
-      navigator.serviceWorker.register("sw.js").then(
-        function(reg) { console.log("ServiceWorker registered"); },
-        function(err) { console.log("ServiceWorker registration failed:", err); }
-      );
-    });
-  }
-
-  // App Install Prompt
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    const deferredPrompt = e;
-    const installBox = document.createElement("div");
-    installBox.style.position = "fixed";
-    installBox.style.top = "15px";
-    installBox.style.right = "15px";
-    installBox.style.background = "#2b6ef6";
-    installBox.style.color = "#fff";
-    installBox.style.borderRadius = "8px";
-    installBox.style.padding = "8px 14px";
-    installBox.style.fontFamily = "system-ui, sans-serif";
-    installBox.style.fontSize = "14px";
-    installBox.style.cursor = "pointer";
-    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-    installBox.style.zIndex = "9999";
-    installBox.style.display = "flex";
-    installBox.style.alignItems = "center";
-    installBox.style.gap = "8px";
-    installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
-    document.body.appendChild(installBox);
-
-    document.getElementById("installText").addEventListener("click", async () => {
-      installBox.remove();
-      deferredPrompt.prompt();
-    });
-    document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
-  });
-
-  // ============================================
-  // PASTE YOUR placesWithCoords ARRAY HERE
-  // ============================================
-  const placesWithCoords = [
-    // PASTE ALL YOUR PLACES WITH COORDINATES HERE
-    // Example: { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
-  ];
-
-  // ============================================
-  // PASTE YOUR MASTER PLACES LIST HERE
-  // ============================================
-  const MASTER_PLACES_LIST = [
-    // PASTE ALL YOUR PLACE NAMES HERE
-  ];
-
-  // ============================================
-  // PASTE YOUR segments (distances) ARRAY HERE
-  // ============================================
-  const segments = [
-    // PASTE ALL YOUR DISTANCE CONNECTIONS HERE
-  ];
-
-  // ============================================
-  // PASTE ALL YOUR FUNCTIONS HERE
-  // ============================================
-  
-  function getDriverContactForHub() {
-    if (!rideData || !rideData.hub) return "0978167546";
-    const hubDriverNumbers = {
-      "Luangwa Bus Station": "0978167546",
-      "Chitope, Luangwa": "0978167546",
-      "Luangwa Bridge Market": "0978167546",
-      "Luangwa Town": "0978167546",
-      "Rufunsa Town": "0978167546"
-    };
-    return hubDriverNumbers[rideData.hub] || "0978167546";
-  }
-
-  function formatForWhatsApp(number) {
-    if (number.startsWith('0')) return '260' + number.substring(1);
-    return number;
-  }
-
-  let mapLink = "";
-
-  function getLocation() {
-    const status = document.getElementById("locationStatus");
-    if (navigator.geolocation) {
-      status.innerHTML = "📍 Getting location...";
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          let lat = position.coords.latitude;
-          let lon = position.coords.longitude;
-          mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-          const hubName = rideData?.hub || "Main Office";
-          status.innerHTML = `🌐 ✅ Location ready! share to ${hubName}`;
-        },
-        () => { status.innerHTML = "❌ Failed to get location!"; }
-      );
-    } else {
-      status.innerHTML = "❌ Geolocation not supported!";
-    }
-  }
-
-  function shareWhatsApp() {
-    if (!mapLink) { alert("Please get your location first using 'Get My Location'"); return; }
-    let driverNumber = getDriverContactForHub();
-    driverNumber = formatForWhatsApp(driverNumber);
-    let message = encodeURIComponent("📍 Here is my current location: " + mapLink);
-    window.open(`https://wa.me/${driverNumber}?text=${message}`, "_blank");
-  }
-
-  function shareSMS() {
-    if (!mapLink) { alert("Please get your location first using 'Get My Location'"); return; }
-    let driverNumber = getDriverContactForHub();
-    window.location.href = `sms:${driverNumber}?body=📍 Here is my location: ${mapLink}`;
-  }
-
-  function getCoordinates(placeName) {
-    const found = placesWithCoords.find(p => p.name === placeName);
-    if (found) return { lat: found.lat, lng: found.lng };
-    return { lat: -15.8167, lng: 30.7167 };
-  }
-
-  // Graph and distance functions
-  const graph = {};
-  segments.forEach(({ from, to, distance }) => {
-    if (!graph[from]) graph[from] = [];
-    if (!graph[to]) graph[to] = [];
-    graph[from].push({ node: to, distance });
-    graph[to].push({ node: from, distance });
-  });
-
-  function findShortestDistance(start, end) {
-    if (start === end) return 0;
-    if (!graph[start] || !graph[end]) return null;
-    const direct = graph[start].find(n => n.node === end);
-    if (direct) return direct.distance;
-    const distances = {};
-    const unvisited = new Set(Object.keys(graph));
-    for (let node of unvisited) distances[node] = Infinity;
-    distances[start] = 0;
-    while (unvisited.size) {
-      let current = null;
-      for (let node of unvisited) {
-        if (current === null || distances[node] < distances[current]) current = node;
-      }
-      if (!current || distances[current] === Infinity) break;
-      if (current === end) return distances[end];
-      unvisited.delete(current);
-      for (let neighbor of graph[current]) {
-        let newDist = distances[current] + neighbor.distance;
-        if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
-      }
-    }
-    return null;
-  }
-
-  const hubs = [
-    "Luangwa Bus Station", "Luangwa Bridge Market", "Rufunsa Town", "Chongwe Town",
-    "Lusaka Town", "Nyimba Town", "Petauke Town", "Chipata Town", "Katete Town",
-    "Lundazi Town", "Kabwe Town", "Kapiri Mposhi Town", "Ndola Town", "Mpongwe Town",
-    "Masaiti Town", "Luanshya Town"
-  ];
-
-  function calculateTotalDistance(pickup, dest) {
-    if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
-    let nearestHub = null, minTotal = Infinity;
-    for (let hub of hubs) {
-      let hubToPickup = findShortestDistance(hub, pickup);
-      let tripDist = findShortestDistance(pickup, dest);
-      let destToHub = findShortestDistance(dest, hub);
-      if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-        let total = hubToPickup + tripDist + destToHub;
-        if (total < minTotal) { minTotal = total; nearestHub = hub; }
-      }
-    }
-    if (!nearestHub) return { total: null, trip: null, hub: null };
-    return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
-  }
-
-  const config = {
-    vehiclePricePerKm: 3.90,
-    motorbikePricePerKm: 1.54,
-    vehicleMinPrice: 25,
-    motorbikeMinPrice: 15,
-    vehicleExtra: 6.00,
-    motorbikeExtra: 3.00,
-    avgSpeed: 60
-  };
-
-  let rideData = null;
-  let currentPickup = "";
-  let currentDestination = "";
-
-  const phoneInput = document.getElementById('customer-phone');
-  const tripDiv = document.getElementById('trip-details');
-  const summaryDiv = document.getElementById('summary-section');
-  const statusText = document.getElementById('status');
-  const submitBtn = document.getElementById('submit-btn');
-  const btnIcon = document.getElementById('btn-icon');
-  const btnLoader = document.getElementById('btn-loader');
-  const progressTextSpan = document.getElementById('progress-text');
-
-  phoneInput.oninput = () => {
-    if (/^0[0-9]{9}$/.test(phoneInput.value)) {
-      tripDiv.classList.remove('hidden-section');
-    } else {
-      tripDiv.classList.add('hidden-section');
-      summaryDiv.classList.add('hidden-section');
-    }
-  };
-
-  function setupAuto(inputId, containerId, listId) {
-    const input = document.getElementById(inputId);
-    const container = document.getElementById(containerId);
-    const list = document.getElementById(listId);
+  // ========== FIREWORKS EFFECT FOR PROMO SLIDE ==========
+  function createFireworks() {
+    const container = document.getElementById('fireworksContainer');
+    if (!container) return;
+    container.innerHTML = '';
     
-    input.oninput = () => {
-      const val = input.value.toLowerCase().trim();
-      list.innerHTML = '';
-      container.classList.remove('field-error');
-      if (!val || val.length < 1) return;
-      const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 8);
-      matches.forEach(place => {
-        const div = document.createElement('div');
-        div.className = 'suggestion';
-        div.textContent = place;
-        div.onclick = () => {
-          input.value = place;
-          list.innerHTML = '';
-          if (inputId === 'gm-origin') currentPickup = place;
-          if (inputId === 'gm-destination') currentDestination = place;
-          checkReady();
-        };
-        list.appendChild(div);
-      });
-    };
-  }
-
-  function updateRouteInfo(pickup, destination) {
-    if (!pickup || !destination) return;
-    const pickupCoords = getCoordinates(pickup);
-    const destCoords = getCoordinates(destination);
-    const totalDist = calculateTotalDistance(pickup, destination);
-    const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv && totalDist.total) {
-      const avgSpeedKmh = 60;
-      const tripDistanceKm = totalDist.trip || 0;
-      const estimatedMinutes = Math.ceil((tripDistanceKm / avgSpeedKmh) * 60);
-      const hours = Math.floor(estimatedMinutes / 60);
-      const mins = estimatedMinutes % 60;
-      const estTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
-      infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estTimeStr}`;
-    }
-    const openLink = document.getElementById('openMapsLink');
-    openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-  }
-
-  function checkReady() {
-    const from = document.getElementById('gm-origin').value;
-    const to = document.getElementById('gm-destination').value;
-    const mode = document.querySelector('input[name="mode"]:checked');
-    if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
-      currentPickup = from;
-      currentDestination = to;
-      if (!mode) {
-        statusText.innerHTML = "⚠️ Please select a transport mode.";
-        summaryDiv.classList.add('hidden-section');
-      } else {
-        statusText.innerHTML = "";
-        calculate(from, to, mode.value);
-        updateRouteInfo(from, to);
-      }
-    } else {
-      summaryDiv.classList.add('hidden-section');
+    for (let i = 0; i < 20; i++) {
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      const colors = ['#ff0000', '#ff6600', '#ffcc00', '#00ff00', '#00ccff', '#ff00ff', '#ff3366', '#ffff00'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      firework.style.backgroundColor = randomColor;
+      firework.style.boxShadow = `0 0 10px ${randomColor}`;
+      
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 40 + Math.random() * 90;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      
+      firework.style.left = `calc(50% + ${x}px)`;
+      firework.style.top = `calc(50% + ${y}px)`;
+      firework.style.animationDelay = `${Math.random() * 3}s`;
+      firework.style.animationDuration = `${2 + Math.random() * 1.5}s`;
+      
+      container.appendChild(firework);
     }
   }
-
-  function calculate(from, to, mode) {
-    summaryDiv.classList.add('hidden-section');
-    setTimeout(() => {
-      const res = calculateTotalDistance(from, to);
-      if (res.total === null) {
-        statusText.innerHTML = "❌ Route not available. Please try different locations.";
-        return;
-      }
-      summaryDiv.classList.remove('hidden-section');
-      document.getElementById('hub-tooltip').textContent = `✨ 50% Discount! Calculated via: ${res.hub}`;
-      let rate, minPrice, extra;
-      if (mode === 'vehicle') { rate = config.vehiclePricePerKm; minPrice = config.vehicleMinPrice; extra = config.vehicleExtra; }
-      else { rate = config.motorbikePricePerKm; minPrice = config.motorbikeMinPrice; extra = config.motorbikeExtra; }
-      let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-      document.getElementById('summary-cards').innerHTML = `
-        <div class="summary-card"><span>Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
-        <div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
-      `;
-      let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
-      rideData = {
-        preferredMode: mode, phone: formattedPhone, hub: res.hub,
-        from: from, to: to, tripDistance: res.trip.toFixed(2),
-        totalDistance: res.total.toFixed(2), price: price,
-        estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
-      };
-      submitBtn.style.background = "var(--primary-color)";
-      btnIcon.className = "fas fa-paper-plane";
-      btnIcon.style.display = "block";
-      btnLoader.style.display = "none";
-      progressTextSpan.style.display = "none";
-      document.getElementById('action-label').innerHTML = `Request Now`;
-      submitBtn.onclick = handleRequest;
-    }, 500);
-  }
-
-  async function handleRequest() {
-    submitBtn.disabled = true;
-    btnIcon.style.display = "none";
-    btnLoader.style.display = "block";
-    progressTextSpan.style.display = "block";
-    const startTime = Date.now();
-    const duration = 13000;
-    const interval = setInterval(() => {
-      let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
-      progressTextSpan.textContent = p + "%";
-    }, 100);
-    const payload = { ...rideData, timestamp: new Date().toISOString() };
-    let timeoutTriggered = false;
-    const timeoutId = setTimeout(() => {
-      if (!timeoutTriggered) {
-        timeoutTriggered = true;
-        clearInterval(interval);
-        statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
-        finishRequestUI();
-      }
-    }, 15000);
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST', body: new URLSearchParams(payload), mode: 'no-cors'
-      });
-      clearTimeout(timeoutId);
-      if (!timeoutTriggered) {
-        clearInterval(interval);
-        progressTextSpan.textContent = "100%";
-        statusText.innerHTML = "✅ Request sent! Driver will contact you shortly.";
-        finishRequestUI();
-      }
-    } catch(e) {
-      clearTimeout(timeoutId);
-      if (!timeoutTriggered) {
-        clearInterval(interval);
-        statusText.innerHTML = "⚠️ Network issue. Please call!";
-        finishRequestUI();
-      }
-    }
-  }
-
-  function finishRequestUI() {
-    btnLoader.style.display = "none";
-    progressTextSpan.style.display = "none";
-    btnIcon.style.display = "block";
-    btnIcon.className = "fas fa-phone";
-    let callNumber = rideData && rideData.hub ? getDriverContactForHub() : "0978167546";
-    submitBtn.style.background = "var(--success-color)";
-    submitBtn.disabled = false;
-    document.getElementById('action-label').innerHTML = "Call Now";
-    submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
-  }
-
+  
+  setInterval(createFireworks, 5000);
+  createFireworks();
+  
+  // ========== DROPDOWN & UTILITIES ==========
   function toggleDropdown() {
     const menu = document.getElementById("header-menu-dropdown");
-    menu.classList.toggle("show");
-    if (menu.classList.contains("show") && currentPickup && currentDestination) {
-      setTimeout(() => updateRouteInfo(currentPickup, currentDestination), 150);
-    }
+    if (menu) menu.classList.toggle("show");
   }
-
+  
   window.onclick = (event) => {
     const menu = document.getElementById("header-menu-dropdown");
-    const btn = document.getElementById("menu-toggle-btn");
-    if (menu && menu.classList.contains('show') && !menu.contains(event.target) && !btn.contains(event.target)) {
+    const btn = document.querySelector(".menu-dropdown-btn");
+    if (menu && menu.classList.contains('show') && !menu.contains(event.target) && (!btn || !btn.contains(event.target))) {
       menu.classList.remove('show');
     }
   };
+  
+  function getLocation() { 
+    const status = document.getElementById("locationStatus"); 
+    if(status) status.innerHTML = "📍 Getting location..."; 
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => { if(status) status.innerHTML = "✅ Location ready!"; }, 
+        () => { if(status) status.innerHTML = "❌ Failed!"; }
+      );
+    }
+  }
+  
+  function shareWhatsApp() { 
+    alert("Share via WhatsApp - Add your WhatsApp sharing logic here"); 
+  }
+  
+  function shareSMS() { 
+    alert("Share via SMS - Add your SMS sharing logic here"); 
+  }
+  
+  /* =========================================================== */
+  /* === START OF DEMO BOOKING LOGIC (REPLACE WITH YOUR CODE) === */
+  /* =========================================================== */
+  
+  const phoneInput = document.getElementById('customer-phone');
+  const tripDetailsDiv = document.getElementById('trip-details');
+  const summaryDiv = document.getElementById('summary-section');
+  const submitBtn = document.getElementById('submit-btn');
+  const statusP = document.getElementById('status');
+  const originInput = document.getElementById('gm-origin');
+  const destInput = document.getElementById('gm-destination');
+  const modeRadios = document.querySelectorAll('input[name="mode"]');
+  const summaryCards = document.getElementById('summary-cards');
 
-  // Initialize autocomplete
-  setupAuto('gm-origin', 'origin-container', 'originList');
-  setupAuto('gm-destination', 'dest-container', 'destinationList');
-  document.getElementById('mode-group').onchange = checkReady;
-
-  window.toggleDropdown = toggleDropdown;
-  window.getLocation = getLocation;
-  window.shareWhatsApp = shareWhatsApp;
-  window.shareSMS = shareSMS;
+  let selectedMode = 'motorbike';
+  modeRadios.forEach(r => { 
+    if(r.checked) selectedMode = r.value; 
+    r.addEventListener('change', (e) => { 
+      selectedMode = e.target.value; 
+      updateSummary(); 
+    }); 
+  });
+  
+  function updateSummary() {
+    if(!originInput.value || !destInput.value) { 
+      summaryCards.innerHTML = '<p style="text-align:center;">📍 Enter pickup and destination</p>'; 
+      return; 
+    }
+    const baseFare = selectedMode === 'motorbike' ? 15 : 35;
+    const discount = 0.5;
+    const total = baseFare * (1 - discount);
+    summaryCards.innerHTML = `<div class="summary-card"><span>🚖 ${selectedMode === 'motorbike' ? 'Motorbike' : 'Car'}</span><span>K ${baseFare.toFixed(2)}</span></div>
+                              <div class="summary-card"><span>🔥 50% Promo</span><span>-K ${(baseFare * discount).toFixed(2)}</span></div>
+                              <div class="summary-card"><span><strong>Total (Final)</strong></span><span><strong>K ${total.toFixed(2)}</strong></span></div>`;
+  }
+  
+  originInput.addEventListener('input', updateSummary);
+  destInput.addEventListener('input', updateSummary);
+  
+  phoneInput.addEventListener('input', function() {
+    if(phoneInput.value.length >= 9) {
+      tripDetailsDiv.classList.remove('hidden-section');
+    } else {
+      tripDetailsDiv.classList.add('hidden-section');
+      summaryDiv.classList.add('hidden-section');
+    }
+  });
+  
+  const handleTripValid = () => {
+    if(originInput.value && destInput.value && phoneInput.value.length >= 9) {
+      summaryDiv.classList.remove('hidden-section');
+      updateSummary();
+    } else {
+      summaryDiv.classList.add('hidden-section');
+    }
+  };
+  
+  originInput.addEventListener('change', handleTripValid);
+  destInput.addEventListener('change', handleTripValid);
+  
+  submitBtn.addEventListener('click', () => {
+    if(!phoneInput.value || phoneInput.value.length < 9) { 
+      statusP.innerText = '❌ Enter valid phone number'; 
+      return; 
+    }
+    if(!originInput.value || !destInput.value) { 
+      statusP.innerText = '❌ Please provide pickup and destination'; 
+      return; 
+    }
+    statusP.innerText = '🚀 Requesting ride...';
+    submitBtn.disabled = true;
+    setTimeout(() => {
+      statusP.innerHTML = '✅ Ride requested! A driver will contact you shortly.';
+      submitBtn.disabled = false;
+      setTimeout(() => statusP.innerText = '', 4000);
+    }, 1500);
+  });
+  
+  // Mock autocomplete suggestions
+  const mockSuggestions = (input, listId) => {
+    const list = document.getElementById(listId);
+    if(!input.value) { 
+      if(list) list.innerHTML = ''; 
+      return; 
+    }
+    const places = [`${input.value} - Central`, `${input.value} - Market`, `${input.value} - Bus Stop`];
+    if(list) list.innerHTML = places.map(p => `<div class="suggestion" onclick="setValue('${listId === 'originList' ? 'gm-origin' : 'gm-destination'}','${p}')">${p}</div>`).join('');
+  };
+  
+  window.setValue = (fieldId, val) => { 
+    document.getElementById(fieldId).value = val; 
+    document.getElementById(fieldId === 'gm-origin' ? 'originList' : 'destinationList').innerHTML = ''; 
+    handleTripValid(); 
+    updateSummary(); 
+  };
+  
+  originInput.addEventListener('input', () => mockSuggestions(originInput, 'originList'));
+  destInput.addEventListener('input', () => mockSuggestions(destInput, 'destinationList'));
+  document.addEventListener('click', (e) => { 
+    if(!e.target.closest('.input-box')) { 
+      document.getElementById('originList').innerHTML = ''; 
+      document.getElementById('destinationList').innerHTML = ''; 
+    } 
+  });
+  
+  /* =========================================================== */
+  /* === END OF DEMO BOOKING LOGIC                             === */
+  /* === REPLACE EVERYTHING ABOVE WITH YOUR LUANGWA FEIRA     === */
+  /* === RIDES COMPLETE JAVASCRIPT CODE                       === */
+  /* =========================================================== */
+  
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  // >>> PASTE YOUR COMPLETE LUANGWA FEIRA RIDES CODE BELOW   >>>
+  // >>> (API calls, database functions, booking logic, etc.) >>>
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  
+  // YOUR CODE GOES HERE
+  
 </script>
+
+<!-- =============================================== -->
+<!-- SECTION 3: ADDITIONAL HTML CONTENT             -->
+<!-- =============================================== -->
+<!-- 
+  ============================================================
+  INSTRUCTIONS FOR PASTING YOUR LUANGWA FEIRA RIDES CODE:
+  ============================================================
+  
+  1. TO REPLACE SLIDES:
+     - Edit lines 280-350 (inside <div class="header">)
+     - Modify slide content while keeping slide1-slide7 classes
+  
+  2. TO ADD YOUR JAVASCRIPT:
+     - Replace everything between the "START OF DEMO BOOKING LOGIC"
+       and "END OF DEMO BOOKING LOGIC" markers (around line 750-850)
+     - OR paste your code after the "YOUR CODE GOES HERE" line
+  
+  3. TO ADD MORE HTML SECTIONS:
+     - Add them below this comment section
+     - Keep the existing structure for consistency
+  
+  4. TO MODIFY PRODUCT ADS:
+     - Edit lines 340-370 (inside slide7)
+     - Change emojis, prices, or links as needed
+  
+  5. TO UPDATE CONTACT INFO:
+     - Edit dropdown menu sections (lines 400-480)
+     - Update phone numbers, email, social links
+  
+  ============================================================
+  FIREWORKS & ANIMATIONS:
+  - Fireworks regenerate every 5 seconds (slower for better UX)
+  - Promo zoom animation: 2.5 seconds cycle
+  - All slides rotate on a 60-second cycle
+  
+  PRODUCT IMAGES:
+  - Using emoji + gradient background (100% reliable, no external images)
+  - Replace with actual product images by changing .product-image div
+  ============================================================
+-->
 
 </body>
 </html>
