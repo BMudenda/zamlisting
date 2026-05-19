@@ -388,6 +388,35 @@
     .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; pointer-events: none; }
     .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
+    /* Install button styles */
+    .install-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #2563eb, #1e3a8a);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        gap: 10px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        font-family: 'Roboto', sans-serif;
+    }
+    .install-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .install-btn i {
+        font-size: 20px;
+    }
+
     /* Booking & form styles */
      /* ========== YOUR ORIGINAL BOOKING FORM STYLES ========== */
     .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
@@ -508,7 +537,7 @@
             <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
             <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
             <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
-            <p><strong>Install App:</strong> Open the site using your browser, then tap the 📱 <strong>Install</strong> button.</p>
+            <p><strong>Install App:</strong> Click the <strong>📱 Install App</strong> button at the bottom right corner of your screen.</p>
         </div>
         <div class="dropdown-content-section">
             <h4><i class="fas fa-headset"></i> Quick Contact</h4>
@@ -569,10 +598,11 @@
   </div>
 </main>
 
-<!-- =============================================== -->
-<!-- SECTION 2: JAVASCRIPT - PASTE YOUR LUANGWA      -->
-<!--              FEIRA RIDES CODE HERE              -->
-<!-- =============================================== -->
+<!-- Install App Button -->
+<button id="installAppBtn" class="install-btn" style="display: none;">
+    <i class="fas fa-download"></i> 📱 Install App
+</button>
+
 <script>
   // ========== FIREWORKS EFFECT FOR PROMO SLIDE ==========
   function createFireworks() {
@@ -624,180 +654,171 @@
     if(status) status.innerHTML = "📍 Getting location..."; 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        () => { if(status) status.innerHTML = "✅ Location ready!"; }, 
-        () => { if(status) status.innerHTML = "❌ Failed!"; }
+        () => { if(status) status.innerHTML = "✅ Location ready! Share using WhatsApp or SMS"; }, 
+        () => { if(status) status.innerHTML = "❌ Failed to get location!"; }
       );
     }
   }
   
   function shareWhatsApp() { 
-    alert("Share via WhatsApp - Add your WhatsApp sharing logic here"); 
+    const locationStatus = document.getElementById("locationStatus");
+    if(locationStatus && locationStatus.innerHTML.includes("ready")) {
+      alert("WhatsApp sharing will open with your current location.\n\nMake sure you have WhatsApp installed.");
+    } else {
+      alert("Please get your location first using 'Get My Location'");
+    }
   }
   
   function shareSMS() { 
-    alert("Share via SMS - Add your SMS sharing logic here"); 
+    const locationStatus = document.getElementById("locationStatus");
+    if(locationStatus && locationStatus.innerHTML.includes("ready")) {
+      alert("SMS sharing will open with your current location.");
+    } else {
+      alert("Please get your location first using 'Get My Location'");
+    }
   }
   
-  /* =========================================================== */
-  /* === START OF DEMO BOOKING LOGIC (REPLACE WITH YOUR CODE) === */
-  /* =========================================================== */
+  // ========== PWA INSTALL LOGIC ==========
+  let deferredPrompt;
+  const installBtn = document.getElementById('installAppBtn');
   
-  const phoneInput = document.getElementById('customer-phone');
-  const tripDetailsDiv = document.getElementById('trip-details');
-  const summaryDiv = document.getElementById('summary-section');
-  const submitBtn = document.getElementById('submit-btn');
-  const statusP = document.getElementById('status');
-  const originInput = document.getElementById('gm-origin');
-  const destInput = document.getElementById('gm-destination');
-  const modeRadios = document.querySelectorAll('input[name="mode"]');
-  const summaryCards = document.getElementById('summary-cards');
-
-  let selectedMode = 'motorbike';
-  modeRadios.forEach(r => { 
-    if(r.checked) selectedMode = r.value; 
-    r.addEventListener('change', (e) => { 
-      selectedMode = e.target.value; 
-      updateSummary(); 
-    }); 
-  });
-  
-  function updateSummary() {
-    if(!originInput.value || !destInput.value) { 
-      summaryCards.innerHTML = '<p style="text-align:center;">📍 Enter pickup and destination</p>'; 
-      return; 
-    }
-    const baseFare = selectedMode === 'motorbike' ? 15 : 35;
-    const discount = 0.5;
-    const total = baseFare * (1 - discount);
-    summaryCards.innerHTML = `<div class="summary-card"><span>🚖 ${selectedMode === 'motorbike' ? 'Motorbike' : 'Car'}</span><span>K ${baseFare.toFixed(2)}</span></div>
-                              <div class="summary-card"><span>🔥 50% Promo</span><span>-K ${(baseFare * discount).toFixed(2)}</span></div>
-                              <div class="summary-card"><span><strong>Total (Final)</strong></span><span><strong>K ${total.toFixed(2)}</strong></span></div>`;
-  }
-  
-  originInput.addEventListener('input', updateSummary);
-  destInput.addEventListener('input', updateSummary);
-  
-  phoneInput.addEventListener('input', function() {
-    if(phoneInput.value.length >= 9) {
-      tripDetailsDiv.classList.remove('hidden-section');
-    } else {
-      tripDetailsDiv.classList.add('hidden-section');
-      summaryDiv.classList.add('hidden-section');
-    }
-  });
-  
-  const handleTripValid = () => {
-    if(originInput.value && destInput.value && phoneInput.value.length >= 9) {
-      summaryDiv.classList.remove('hidden-section');
-      updateSummary();
-    } else {
-      summaryDiv.classList.add('hidden-section');
-    }
-  };
-  
-  originInput.addEventListener('change', handleTripValid);
-  destInput.addEventListener('change', handleTripValid);
-  
-  submitBtn.addEventListener('click', () => {
-    if(!phoneInput.value || phoneInput.value.length < 9) { 
-      statusP.innerText = '❌ Enter valid phone number'; 
-      return; 
-    }
-    if(!originInput.value || !destInput.value) { 
-      statusP.innerText = '❌ Please provide pickup and destination'; 
-      return; 
-    }
-    statusP.innerText = '🚀 Requesting ride...';
-    submitBtn.disabled = true;
+  // Listen for the beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    // Show the install button
+    installBtn.style.display = 'flex';
+    
+    // Optional: Add animation to draw attention
+    installBtn.style.animation = 'pulse 0.5s ease-in-out';
     setTimeout(() => {
-      statusP.innerHTML = '✅ Ride requested! A driver will contact you shortly.';
-      submitBtn.disabled = false;
-      setTimeout(() => statusP.innerText = '', 4000);
-    }, 1500);
+      installBtn.style.animation = '';
+    }, 500);
   });
   
-  // Mock autocomplete suggestions
-  const mockSuggestions = (input, listId) => {
-    const list = document.getElementById(listId);
-    if(!input.value) { 
-      if(list) list.innerHTML = ''; 
-      return; 
+  // Handle install button click
+  installBtn.addEventListener('click', async () => {
+    // Hide the button
+    installBtn.style.display = 'none';
+    
+    // Show the install prompt
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to install prompt: ${outcome}`);
+      
+      // Clear the deferredPrompt variable - it can't be used again
+      deferredPrompt = null;
     }
-    const places = [`${input.value} - Central`, `${input.value} - Market`, `${input.value} - Bus Stop`];
-    if(list) list.innerHTML = places.map(p => `<div class="suggestion" onclick="setValue('${listId === 'originList' ? 'gm-origin' : 'gm-destination'}','${p}')">${p}</div>`).join('');
-  };
-  
-  window.setValue = (fieldId, val) => { 
-    document.getElementById(fieldId).value = val; 
-    document.getElementById(fieldId === 'gm-origin' ? 'originList' : 'destinationList').innerHTML = ''; 
-    handleTripValid(); 
-    updateSummary(); 
-  };
-  
-  originInput.addEventListener('input', () => mockSuggestions(originInput, 'originList'));
-  destInput.addEventListener('input', () => mockSuggestions(destInput, 'destinationList'));
-  document.addEventListener('click', (e) => { 
-    if(!e.target.closest('.input-box')) { 
-      document.getElementById('originList').innerHTML = ''; 
-      document.getElementById('destinationList').innerHTML = ''; 
-    } 
   });
   
+  // Also listen for successful app installation
+  window.addEventListener('appinstalled', (evt) => {
+    console.log('App was installed successfully');
+    // You could send analytics or show a thank you message
+    setTimeout(() => {
+      alert('Thank you for installing Luangwa Feira Rides App! 🎉');
+    }, 1000);
+  });
+  
+  // Hide install button on mobile if already installed (optional)
+  window.addEventListener('load', () => {
+    // Check if app is already installed (this is a heuristic)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      installBtn.style.display = 'none';
+    }
+  });
+  
+  // Add pulse animation keyframes if not already present
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+      100% { transform: scale(1); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // ===========================================================
+  // ========== 🔴🔴🔴 PASTE YOUR COMPLETE CODE BELOW 🔴🔴🔴 ==========
+  // ===========================================================
+  // 
+  // PASTE YOUR:
+  // - placesWithCoords array
+  // - MASTER_PLACES_LIST array  
+  // - segments array
+  // - All your functions (getDriverContactForHub, formatForWhatsApp, 
+  //   getCoordinates, findShortestDistance, calculateTotalDistance,
+  //   setupAuto, checkReady, calculate, handleRequest, etc.)
+  //
+  // ===========================================================
+  
   /* =========================================================== */
-  /* === END OF DEMO BOOKING LOGIC                             === */
-  /* === REPLACE EVERYTHING ABOVE WITH YOUR LUANGWA FEIRA     === */
-  /* === RIDES COMPLETE JAVASCRIPT CODE                       === */
+  /* === REPLACE EVERYTHING FROM HERE TO THE NEXT MARKER WITH === */
+  /* === YOUR COMPLETE LUANGWA FEIRA RIDES JAVASCRIPT CODE    === */
   /* =========================================================== */
   
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  // >>> PASTE YOUR COMPLETE LUANGWA FEIRA RIDES CODE BELOW   >>>
-  // >>> (API calls, database functions, booking logic, etc.) >>>
+  // >>> 🔴🔴🔴 START OF YOUR CODE - REPLACE THIS SECTION 🔴🔴🔴 >>>
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   
-  // YOUR CODE GOES HERE
+  // ===========================================================
+  // PASTE YOUR placesWithCoords ARRAY HERE
+  // ===========================================================
+  const placesWithCoords = [
+    { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
+    { name: "Luangwa Town Council", lat: -15.6267, lng: 30.4956 },
+    // ==========================================================
+    // PASTE YOUR REMAINING PLACES WITH COORDINATES HERE
+    // ==========================================================
+  ];
+  
+  // ===========================================================
+  // PASTE YOUR MASTER PLACES LIST HERE
+  // ===========================================================
+  const MASTER_PLACES_LIST = [
+    "Luangwa Bus Station",
+    "Luangwa Town Council",
+    // ==========================================================
+    // PASTE YOUR REMAINING PLACE NAMES HERE
+    // ==========================================================
+  ];
+  
+  // ===========================================================
+  // PASTE YOUR segments (distances) ARRAY HERE
+  // ===========================================================
+  const segments = [
+    { from: "Luangwa Bus Station", to: "Luangwa Town Council", distance: 2.00 },
+    // ==========================================================
+    // PASTE YOUR REMAINING DISTANCE SEGMENTS HERE
+    // ==========================================================
+  ];
+  
+  // ===========================================================
+  // PASTE ALL YOUR FUNCTIONS HERE
+  // ===========================================================
+  // (getDriverContactForHub, formatForWhatsApp, getCoordinates,
+  //  findShortestDistance, calculateTotalDistance, setupAuto,
+  //  checkReady, calculate, handleRequest, finishRequestUI, etc.)
+  // ===========================================================
+  
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  // >>> 🔴🔴🔴 END OF YOUR CODE - REPLACE ABOVE THIS LINE 🔴🔴🔴 >>>
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  
+  /* =========================================================== */
+  /* === END OF REPLACEMENT SECTION                           === */
+  /* =========================================================== */
+  
+  // Note: The demo booking logic has been removed. 
+  // Your complete code above will handle all booking functionality.
   
 </script>
-
-<!-- =============================================== -->
-<!-- SECTION 3: ADDITIONAL HTML CONTENT             -->
-<!-- =============================================== -->
-<!-- 
-  ============================================================
-  INSTRUCTIONS FOR PASTING YOUR LUANGWA FEIRA RIDES CODE:
-  ============================================================
-  
-  1. TO REPLACE SLIDES:
-     - Edit lines 280-350 (inside <div class="header">)
-     - Modify slide content while keeping slide1-slide7 classes
-  
-  2. TO ADD YOUR JAVASCRIPT:
-     - Replace everything between the "START OF DEMO BOOKING LOGIC"
-       and "END OF DEMO BOOKING LOGIC" markers (around line 750-850)
-     - OR paste your code after the "YOUR CODE GOES HERE" line
-  
-  3. TO ADD MORE HTML SECTIONS:
-     - Add them below this comment section
-     - Keep the existing structure for consistency
-  
-  4. TO MODIFY PRODUCT ADS:
-     - Edit lines 340-370 (inside slide7)
-     - Change emojis, prices, or links as needed
-  
-  5. TO UPDATE CONTACT INFO:
-     - Edit dropdown menu sections (lines 400-480)
-     - Update phone numbers, email, social links
-  
-  ============================================================
-  FIREWORKS & ANIMATIONS:
-  - Fireworks regenerate every 5 seconds (slower for better UX)
-  - Promo zoom animation: 2.5 seconds cycle
-  - All slides rotate on a 60-second cycle
-  
-  PRODUCT IMAGES:
-  - Using emoji + gradient background (100% reliable, no external images)
-  - Replace with actual product images by changing .product-image div
-  ============================================================
--->
 
 </body>
 </html>
