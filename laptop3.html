@@ -10,333 +10,575 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   
-  <!-- Google Maps API with provided key -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnNBbFvTjmvfv6Wfm72scc1Z-jY1z_eRA&libraries=places&callback=initGoogleMaps" async defer></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2b6ef6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+  <link rel="apple-touch-icon" href="lfr.jpg">
   
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --primary-color: #2563eb;
-    --secondary-color: #ff9900;
-    --error-color: #dc2626;
-    --success-color: #16a34a;
-    --bg-color-body: #f5f5f5;
-    --bg-color-card: #ffffff;
-    --border-color-light: #e0e0e0;
-    --font-color-dark: #333;
-  }
-  body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #ff9900;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --border-color-light: #e0e0e0;
+      --font-color-dark: #333;
+    }
+    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
-  .corner-logo { width: 32px; height: 32px; object-fit: contain; margin-right: 10px; }
-  .company-info { display: flex; align-items: center; gap: 10px; }
+    /* ========== INTEGRATED BILLBOARD HEADER ========== */
+    .header {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        overflow: hidden;
+        background: var(--primary-color);
+        border-bottom: 3px solid var(--secondary-color);
+    }
 
-  header {
-    background: var(--primary-color);
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-  }
-  
-  .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-  .company-info h2 { font-size: 1.15rem; line-height: 1.2; }
+    /* COMPANY INFO - NO BUTTON SHADOWS, JUST CLEAN */
+    .company-info-overlay {
+        position: absolute;
+        top: 12px;
+        left: 15px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: transparent;
+        padding: 5px 12px;
+    }
 
-  .zam {
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    color: #ffcc00;
-    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
-    font-family: 'Segoe UI', Arial, sans-serif;
-  }
+    .corner-logo {
+        width: 38px;
+        height: 38px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid var(--secondary-color);
+    }
 
-  .z-green { color: #198754; }
-  .z-red { color: #dc3545; }
-  .z-black { color: #000000; }
+    .zam {
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 1.2rem;
+    }
 
-  .menu-dropdown-container { position: relative; display: inline-block; }
-  .menu-button { background: none; border: none; color: white; cursor: pointer; padding: 5px; outline: none; font-size: 1.4rem; display: flex; align-items: center; }
-  .menu-dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 42px;
-    background-color: white;
-    width: 380px;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
-    z-index: 1000;
-    border-radius: 16px;
-    color: #333;
-    padding: 16px;
-    border: 1px solid #e0e0e0;
-  }
-  .menu-dropdown.show { display: block; }
-  .dropdown-content-section { margin-bottom: 20px; }
-  .dropdown-content-section h4 {
-    color: #2563eb;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-  }
-  .dropdown-content-section p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px; color: #4b5563; }
-  .dropdown-content-section a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    text-decoration: none;
-    color: #1f2937;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    transition: background 0.2s ease;
-  }
-  .dropdown-content-section a:hover { background-color: #f3f4f6; }
-  .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem; }
-  .contact-label-text { display: flex; flex-direction: column; }
-  .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
+    .z-green { color: #2ecc71; }
+    .z-red { color: #e74c3c; }
+    .z-black { color: #ffffff; }
+    .zam span:last-child { color: var(--secondary-color); }
 
-  .route-container {
-    margin-top: 8px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
-    padding: 12px;
-  }
-  .route-info {
-    font-size: 0.8rem;
-    margin-bottom: 12px;
-    padding: 8px;
-    background: #f0f9ff;
-    border-radius: 8px;
-    text-align: center;
-    color: #1e293b;
-  }
-  .open-maps-link {
-    display: block;
-    padding: 12px;
-    background: #2563eb;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    text-align: center;
-    transition: background 0.2s;
-    font-weight: 500;
-  }
-  .open-maps-link:hover { background: #1d4ed8; }
-  .open-maps-link i { margin-right: 8px; }
+    /* MENU BUTTON - NO SHADOW */
+    .menu-dropdown-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1000;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+        opacity: 0.8;
+    }
 
-  .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
-  .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
-  .tooltip-text {
-    visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px;
-    position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem;
-    pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  }
-  .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+    .menu-dropdown-btn:hover {
+        opacity: 1;
+        transform: scale(1.05);
+    }
 
-  .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
-  .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
-  fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
-  legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-  .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
-  .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
-  .input-box input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    font-weight: bold;
-    background: transparent;
-    width: 100%;
-  }
-  .input-box input::placeholder {
-    font-style: italic;
-    color: #999;
-    font-weight: normal;
-    font-size: 0.85rem;
-  }
-  .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .icon-img { width: 40px; height: 40px; object-fit: contain; }
-  .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-  .autocomplete-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
-  .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
-  .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
-  .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
-  .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-  #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
-  .hidden-section { display: none; }
-  .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
-  .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
-  @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-  
-  .location-status {
-    font-size: 0.75rem;
-    margin-top: 8px;
-    padding: 6px;
-    border-radius: 6px;
-    text-align: center;
-  }
-  .location-status.success { background: #d1fae5; color: #065f46; }
-  .location-status.error { background: #fee2e2; color: #991b1b; }
-  .location-status.info { background: #dbeafe; color: #1e40af; }
-  .location-status.warning { background: #fed7aa; color: #92400e; }
+    /* SLIDES */
+    .slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+    }
 
-  .auto-fetch-btn {
-    background: none;
-    border: none;
-    color: var(--primary-color);
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 5px;
-    margin-left: 5px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  .auto-fetch-btn:hover {
-    background: #e0e7ff;
-  }
-  .input-row {
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
-  .input-row input {
-    flex: 1;
-  }
-  
-  .visible-block { display: block; }
-</style>
+    /* TIMING BASE */
+    .slide1 { animation: s1 50s infinite; }
+    .slide2 { animation: s2 50s infinite; }
+    .slide3 { animation: s3 50s infinite; }
+    .slide4 { animation: s4 50s infinite; }
+    .slide5 { animation: s5 50s infinite; }
+    .slide6 { animation: s6 50s infinite; }
+
+    /* SLIDE 1 - WELCOME - WITH EFFECTS, NO BUTTON SHADOW */
+    .welcome {
+        font-size: 42px;
+        color: var(--secondary-color);
+        font-weight: bold;
+        text-shadow: 0 0 15px rgba(255,153,0,0.6);
+        text-align: center;
+        padding: 20px;
+        background: transparent;
+    }
+
+    @keyframes s1 {
+        0% { opacity: 1; transform: translateX(-100%); }
+        6% { opacity: 1; transform: translateX(0); }
+        10% { opacity: 1; transform: translateX(100%); }
+        11% { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    /* SLIDE 2 - CAR - WITH EFFECTS */
+    .car img {
+        width: 200px;
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        animation: carGlow 2s infinite;
+    }
+
+    @keyframes carGlow {
+        0%,100% { filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); }
+        50% { filter: drop-shadow(0 5px 25px rgba(255,153,0,0.5)); }
+    }
+
+    @keyframes s2 {
+        0%,12% { opacity: 0; transform: scale(0); }
+        16% { opacity: 1; transform: scale(1.1); }
+        22% { opacity: 1; transform: scale(1); }
+        26% { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    /* SLIDE 3 - MOTORBIKE - WITH EFFECTS */
+    .bike img {
+        width: 170px;
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        animation: float 2s infinite;
+    }
+
+    @keyframes float {
+        0%,100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+    }
+
+    @keyframes s3 {
+        0%,28% { opacity: 0; }
+        32% { opacity: 1; transform: scale(1.1); }
+        38% { opacity: 1; transform: scale(1); }
+        42% { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    /* SLIDE 4 - REQUEST - WITH GLOW EFFECT, NO BUTTON SHADOW */
+    .request {
+        font-size: 36px;
+        color: #00ffcc;
+        font-weight: bold;
+        text-align: center;
+        padding: 20px;
+        background: transparent;
+        text-shadow: 0 0 15px #00ffcc;
+        animation: requestPulse 1.5s infinite alternate;
+    }
+
+    @keyframes requestPulse {
+        from { text-shadow: 0 0 10px #00ffcc; }
+        to { text-shadow: 0 0 25px #00ffcc; }
+    }
+
+    @keyframes s4 {
+        0%,44% { opacity: 0; }
+        48% { opacity: 1; transform: translateY(0); }
+        54% { opacity: 1; }
+        58% { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    /* SLIDE 5 - PROMO - WITH EFFECTS */
+    .promo {
+        background: linear-gradient(135deg, #ff6b6b, #ff8c42, var(--secondary-color));
+        padding: 20px 40px;
+        border-radius: 60px;
+        font-size: 38px;
+        font-weight: bold;
+        color: #fff;
+        animation: pulse 1.5s infinite alternate;
+        text-align: center;
+    }
+
+    @keyframes pulse {
+        from { transform: scale(1); opacity: 0.95; }
+        to { transform: scale(1.05); opacity: 1; }
+    }
+
+    @keyframes s5 {
+        0%,60% { opacity: 0; }
+        64% { opacity: 1; }
+        72% { opacity: 1; }
+        76% { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    /* SLIDE 6 - CONTACT - WITH EFFECTS, NO BUTTON SHADOW */
+    .contact {
+        font-size: 28px;
+        color: #ffffff;
+        font-weight: bold;
+        text-align: center;
+        padding: 20px;
+        background: transparent;
+        text-shadow: 0 0 10px rgba(0,204,255,0.8);
+    }
+
+    @keyframes s6 {
+        0%,78% { opacity: 0; }
+        82% { opacity: 1; }
+        92% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    /* ========== DROPDOWN MENU STYLES ========== */
+    .menu-dropdown-container { 
+        position: relative; 
+        display: inline-block; 
+    }
+
+    .menu-dropdown {
+        display: none;
+        position: absolute;
+        right: 15px;
+        top: 295px;
+        background-color: white;
+        width: 380px;
+        max-height: 85vh; 
+        overflow-y: auto;
+        box-shadow: 0px 8px 24px rgba(0,0,0,0.15);
+        z-index: 1000;
+        border-radius: 16px;
+        color: #333;
+        padding: 16px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .menu-dropdown.show { 
+        display: block; 
+    }
+
+    .dropdown-content-section { 
+        margin-bottom: 20px; 
+    }
+
+    .dropdown-content-section h4 { 
+        color: #2563eb; 
+        border-bottom: 1px solid #f0f0f0; 
+        padding-bottom: 8px; 
+        margin-bottom: 12px; 
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+    }
+
+    .dropdown-content-section p, .dropdown-content-section .map-note { 
+        font-size: 0.85rem; 
+        line-height: 1.5; 
+        margin-bottom: 10px; 
+        color: #4b5563; 
+    }
+
+    .dropdown-content-section a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        text-decoration: none;
+        color: #1f2937;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: background 0.2s ease;
+    }
+    .dropdown-content-section a:hover { background-color: #f3f4f6; }
+    .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem;}
+
+    .contact-label-text { display: flex; flex-direction: column; }
+    .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
+
+    /* Route info container */
+    .route-container {
+        margin-top: 8px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        padding: 12px;
+    }
+    
+    .route-info {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+        padding: 8px;
+        background: #f0f9ff;
+        border-radius: 8px;
+        text-align: center;
+        color: #1e293b;
+    }
+    
+    .open-maps-link {
+        display: block;
+        padding: 12px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        text-align: center;
+        transition: background 0.2s;
+        font-weight: 500;
+    }
+    
+    .open-maps-link:hover {
+        background: #1d4ed8;
+    }
+    
+    .open-maps-link i {
+        margin-right: 8px;
+    }
+    
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { 
+        visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; 
+        position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem;
+        pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+    .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 15px; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
+    .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
+    .input-box input { 
+        flex: 1; 
+        border: none; 
+        outline: none; 
+        font-size: 1rem; 
+        font-weight: bold; 
+        background: transparent; 
+        width: 100%; 
+    }
+    .input-box input::placeholder {
+        font-style: italic;
+        color: #999;
+        font-weight: normal;
+        font-size: 0.85rem;
+    }
+    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .icon-img { width: 40px; height: 40px; object-fit: contain; }
+    .field-error { 
+        border: 2px solid var(--error-color) !important; 
+        background: #fff5f5 !important;
+        animation: shake 0.4s ease-in-out;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    .autocomplete-list { 
+        position: absolute; 
+        top: 100%; 
+        left: 0; 
+        right: 0;
+        background: white; 
+        border: 1px solid #ddd; 
+        z-index: 1000; 
+        max-height: 200px; 
+        overflow-y: auto; 
+        border-radius: 0 0 8px 8px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .suggestion { 
+        padding: 10px; 
+        cursor: pointer; 
+        border-bottom: 1px solid #eee; 
+        font-size: 0.9rem;
+        transition: background 0.2s;
+    }
+    .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.3s; position: relative; }
+    .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
+    .hidden-section { display: none; }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.08); }
+    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 500; color: #ffecb3; font-family: 'Segoe UI', Arial, sans-serif; }
+    @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+  </style>
 </head>
 <body>
-<header>
-  <div class="header-content">
-    <div class="company-info">
-      <img src="lfr.jpg" alt="Logo" class="corner-logo" onerror="this.style.display='none'">
-      <h2 class="zam">
-        <span class="z-green">Z</span>
-        <span class="z-black">a</span>
-        <span class="z-red">m</span>
-        <span>Listing Rides</span>
-      </h2>
-    </div>
-    
-    <div class="menu-dropdown-container">
-      <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu"><i class="fas fa-ellipsis-v"></i></button>
-      <div id="header-menu-dropdown" class="menu-dropdown">
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-          <p>A local company that provides passenger hailing services through motorbikes and cars.</p>
-          <p><strong>Coverage:</strong> Luangwa District and surrounding areas.</p>
-          <p><strong>Pricing:</strong> Affordable fixed rates.</p>
-        </div>
-        
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-headset"></i> Quick Contact</h4>
-          <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
-          <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
-          <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-        </div>
-        
-        <div class="menu-divider"></div>
 
+<!-- INTEGRATED BILLBOARD HEADER -->
+<div class="header">
+    <!-- Company Info - CLEAN, NO BUTTON SHADOWS -->
+    <div class="company-info-overlay">
+        <img src="lfr.jpg" alt="Logo" class="corner-logo">
+        <h2 class="zam">
+            <span class="z-green">Z</span>
+            <span class="z-black">a</span>
+            <span class="z-red">m</span>
+            <span>Listing Rides</span>
+        </h2>
+    </div>
+
+    <!-- Menu Button - CLEAN -->
+    <button class="menu-dropdown-btn" onclick="toggleDropdown()">⋮</button>
+
+    <!-- SLIDE 1 - WELCOME with glow effect -->
+    <div class="slide slide1">
+        <div class="welcome">🚖 WELCOME TO LUANGWA FEIRA RIDES</div>
+    </div>
+
+    <!-- SLIDE 2 - CAR with glow effect -->
+    <div class="slide slide2">
+        <div class="car">
+            <img src="https://cdn-icons-png.flaticon.com/512/2555/2555016.png" alt="car">
+        </div>
+    </div>
+
+    <!-- SLIDE 3 - MOTORBIKE with float effect -->
+    <div class="slide slide3">
+        <div class="bike">
+            <img src="https://cdn-icons-png.flaticon.com/512/2972/2972185.png" alt="bike">
+        </div>
+    </div>
+
+    <!-- SLIDE 4 - REQUEST with glow pulse -->
+    <div class="slide slide4">
+        <div class="request">
+            👉 PROCEED TO MAKE A REQUEST
+        </div>
+    </div>
+
+    <!-- SLIDE 5 - PROMO -->
+    <div class="slide slide5">
+        <div class="promo">
+            🔥 50% DISCOUNT PROMOTION 🔥
+        </div>
+    </div>
+
+    <!-- SLIDE 6 - CONTACT with subtle glow -->
+    <div class="slide slide6">
+        <div class="contact">
+            📞 CALL NOW • FAST PICKUP • AVAILABLE 24/7
+        </div>
+    </div>
+</div>
+
+<!-- DROPDOWN MENU -->
+<div class="menu-dropdown-container">
+    <div id="header-menu-dropdown" class="menu-dropdown">
+        <!-- About Section -->
         <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;">Click the button below to share your current location.</p>
-          <a href="#" onclick="fetchAndShareLocation()" title="Share Location">
-            <i class="fas fa-location-arrow"></i>
-            <span class="contact-label-text">Share My Location</span>
-          </a>
-          <div id="locationStatus" class="location-status info">📍 Ready to share location</div>
+            <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+            <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
+            <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
+            <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
+            <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
+            <p><strong>Install App:</strong> Open the site using your browser (such as Chrome or Edge), then tap the 📱 <strong>Install</strong> button that appears at the top right corner of your browser.</p>
         </div>
         
+        <!-- Contact Section -->
         <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
-          <div class="route-container">
-            <div id="map-route-info" class="route-info">
-              <i class="fas fa-route"></i> Select pickup & destination
+            <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+            <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
+            <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
+            <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+            
+            <div class="menu-divider"></div>
+            <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
+            <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
+            <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
+        </div>
+        
+        <!-- Share Location Section -->
+        <div class="menu-divider"></div>
+        <div class="dropdown-content-section">
+            <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+            <p style="font-size: 0.85rem;">Please note: Exact pickup or drop-off locations within a 1 km radius of the selected points will not incur any additional charges.</p>
+            <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
+            <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+            <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
+            <a href="#" onclick="shareSMS()"><i class="fas fa-sms"></i><span>Share via SMS</span></a>
+        </div>
+        
+        <!-- View Map Section -->
+        <div class="dropdown-content-section">
+            <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
+            <div class="route-container">
+                <div id="map-route-info" class="route-info">
+                    <i class="fas fa-route"></i> Select pickup & destination to see route details
+                </div>
+                <a id="openMapsLink" href="#" target="_blank" class="open-maps-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                    <i class="fas fa-globe" style="font-size: 1rem;"></i>
+                    <span>Click to View Map</span>
+                </a>
             </div>
-            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">
-              <i class="fas fa-globe"></i>
-              <span>View on Google Maps</span>
-            </a>
-          </div>
         </div>
         
         <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides</p>
-      </div>
     </div>
-  </div>
-  <div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍 Welcome to Luangwa Feira Rides. Kindly make your request.🚗 </span></div>
-</header>
+</div>
+
+<div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍Welcome ♥ Kindly make your request.🚗 </span></div>
 
 <main class="product-container">
   <div class="booking-container">
     <fieldset><legend><span class="material-icons">account_circle</span> Phone Number</legend>
       <div class="input-box" id="phone-box">
         <span class="material-icons">phone</span>
-        <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0978167546" inputmode="numeric">
+        <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
       </div>
     </fieldset>
     <div id="trip-details" class="hidden-section">
       <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
+          <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">
+            Choose your preferred transport mode
+          </p>
         <div id="mode-group" style="display:flex; justify-content:space-around;">
-          <label class="mode-option"><input type="radio" name="mode" value="motorbike" checked><img src="motorbike.png" class="icon-img" alt="bike" onerror="this.style.display='none'"><small>Motorbike</small></label>
-          <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car" onerror="this.style.display='none'"><small>Car</small></label>
+          <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
+          <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
         </div>
       </fieldset>
       <fieldset><legend> Pickup Location</legend>
         <div class="input-box" id="origin-container">
           <span class="material-icons">my_location</span>
-          <div class="input-row">
-            <input type="text" id="gm-origin" placeholder="Type pickup location" autocomplete="off">
-            <button type="button" class="auto-fetch-btn" onclick="fetchCurrentLocationAsPickup()" title="Use my current location">
-              <i class="fas fa-location-dot"></i>
-            </button>
-          </div>
+          <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
           <div id="originList" class="autocomplete-list"></div>
         </div>
       </fieldset>
       <fieldset><legend> Destination</legend>
         <div class="input-box" id="dest-container">
           <span class="material-icons">pin_drop</span>
-          <input type="text" id="gm-destination" placeholder="Type destination" autocomplete="off">
+          <input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off">
           <div id="destinationList" class="autocomplete-list"></div>
         </div>
       </fieldset>
     </div>
     <div id="summary-section" class="hidden-section">
-      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary</legend>
+      <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
         <div id="summary-cards"></div>
       </fieldset>
       <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
@@ -344,468 +586,60 @@
         <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
       </div>
     </div>
+    <div class="calc-loader" id="spinner"></div>
     <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height: 40px;"></p>
   </div>
 </main>
 
 <script>
-  // ==================== CONFIGURATION ====================
-  const customPlaces = [
-    { name: "Chidada Community, Luangwa", lat: -15.6250, lng: 30.4000 },
-    { name: "Chidada Ground, Luangwa", lat: -15.6240, lng: 30.3980 },
-    { name: "Mandombe Community, Luangwa", lat: -15.5900, lng: 30.3700 },
-    { name: "Kamoba Community, Luangwa", lat: -15.5950, lng: 30.3750 },
-    { name: "Soweto Community, Luangwa", lat: -15.6180, lng: 30.4050 },
-    { name: "Indeco Community, Luangwa", lat: -15.6220, lng: 30.4100 },
-    { name: "Feira Day Community, Luangwa", lat: -15.6140, lng: 30.3950 },
-    { name: "Kambolozo Community, Luangwa", lat: -15.6300, lng: 30.4200 }
-  ];
-  
-  const hubs = [
-    { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064, phone: "0978167546" },
-    { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055, phone: "0978167546" },
-    { name: "Luangwa Bridge Market", lat: -15.9853, lng: 30.2049, phone: "0978167546" },
-    { name: "Luangwa Town", lat: -15.6400, lng: 30.5000, phone: "0978167546" },
-    { name: "Rufunsa Town", lat: -15.2500, lng: 30.3000, phone: "0978167546" },
-    { name: "Chongwe Town", lat: -15.3600, lng: 28.6900, phone: "0978167546" },
-    { name: "Lusaka Town", lat: -15.3875, lng: 28.3228, phone: "0978167546" }
-  ];
-  
-  const allSuggestions = [...customPlaces, ...hubs];
-  
-  function getPlaceCoords(name) {
-    let found = allSuggestions.find(p => p.name.toLowerCase() === name.toLowerCase());
-    if (found) {
-      let isCustom = customPlaces.some(c => c.name.toLowerCase() === name.toLowerCase());
-      return { lat: found.lat, lng: found.lng, isCustom: isCustom };
-    }
-    return null;
-  }
-  
-  function getNearestHub(lat, lng) {
-    let nearest = hubs[0];
-    let minDist = Infinity;
-    for (let h of hubs) {
-      let dist = Math.hypot(h.lat - lat, h.lng - lng);
-      if (dist < minDist) { minDist = dist; nearest = h; }
-    }
-    return nearest;
-  }
-  
-  function getDriverContact(hubName) {
-    let hub = hubs.find(h => h.name === hubName);
-    return hub ? hub.phone : "0978167546";
-  }
-  
-  // ==================== GLOBAL STATE ====================
-  let originCoords = null, destCoords = null;
-  let originAddr = "", destAddr = "";
-  let originIsCustom = false, destIsCustom = false;
-  let assignedHub = null;
-  let tripDistance = null, hubToPickupDist = null, destToHubDist = null, totalDistance = null, estimatedTime = null;
-  let mapsApiReady = false;
-  let geocoder = null;
-  let autocompleteOrigin, autocompleteDest;
-  
-  // ==================== PRICING ====================
-  const PRICE_PER_KM = { vehicle: 3.90, motorbike: 1.54 };
-  const MIN_PRICE = { vehicle: 25, motorbike: 15 };
-  const EXTRA = { vehicle: 6.00, motorbike: 3.00 };
-  
-  function calculateAndShowPrice() {
-    let modeRadio = document.querySelector('input[name="mode"]:checked');
-    if (!modeRadio || !totalDistance) return;
-    let mode = modeRadio.value;
-    let rate = PRICE_PER_KM[mode];
-    let minP = MIN_PRICE[mode];
-    let extra = EXTRA[mode];
-    let price = Math.max(minP, Math.ceil((totalDistance * rate) + extra));
-    
-    // Show ONLY price and trip distance
-    document.getElementById('summary-cards').innerHTML = `
-      <div class="summary-card"><span>💰 Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
-      <div class="summary-card"><span>📏 Trip Distance</span><span>${tripDistance.toFixed(2)} km</span></div>
-    `;
-    
-    document.getElementById('summary-section').style.display = 'block';
-    
-    // Store ride data for submission
-    window.currentRide = {
-      preferredMode: mode,
-      phone: document.getElementById('customer-phone').value,
-      hub: assignedHub.name,
-      from: originAddr,
-      to: destAddr,
-      tripDistance: tripDistance.toFixed(2),
-      totalDistance: totalDistance.toFixed(2),
-      price: price,
-      estimatedTime: estimatedTime,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Reset button state
-    let btn = document.getElementById('submit-btn');
-    btn.style.background = "var(--primary-color)";
-    document.getElementById('btn-icon').className = "fas fa-paper-plane";
-    document.getElementById('btn-icon').style.display = "block";
-    document.getElementById('btn-loader').style.display = "none";
-    document.getElementById('progress-text').style.display = "none";
-    document.getElementById('action-label').innerHTML = "Request Now";
-    btn.onclick = handleRequest;
-    btn.disabled = false;
-  }
-  
-  // ==================== DISTANCE CALCULATION (Haversine) ====================
-  function haversineDistance(p1, p2) {
-    const R = 6371;
-    const dLat = (p2.lat - p1.lat) * Math.PI / 180;
-    const dLon = (p2.lng - p1.lng) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(p1.lat * Math.PI/180) * Math.cos(p2.lat * Math.PI/180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  }
-  
-  function computeAllDistances() {
-    if (!originCoords || !destCoords || !assignedHub) return;
-    
-    tripDistance = haversineDistance(originCoords, destCoords);
-    hubToPickupDist = haversineDistance(assignedHub, originCoords);
-    destToHubDist = haversineDistance(destCoords, assignedHub);
-    totalDistance = hubToPickupDist + tripDistance + destToHubDist;
-    
-    let minutes = Math.max(5, Math.round((tripDistance / 40) * 60));
-    estimatedTime = minutes >= 60 ? `${Math.floor(minutes/60)}h ${minutes%60}m` : `${minutes} mins`;
-    
-    // Update map info
-    let infoDiv = document.getElementById('map-route-info');
-    if (infoDiv) {
-      infoDiv.innerHTML = `<i class="fas fa-route"></i> ${originAddr} → ${destAddr}<br>
-      📏 Trip: ${tripDistance.toFixed(1)} km<br>
-      🚗 Pickup: ${hubToPickupDist.toFixed(1)} km from ${assignedHub.name}<br>
-      ⏱️ Est: ${estimatedTime}<br>
-      💰 Total: ${totalDistance.toFixed(1)} km`;
-    }
-    
-    let mapLink = `https://www.google.com/maps/dir/${originCoords.lat},${originCoords.lng}/${destCoords.lat},${destCoords.lng}`;
-    document.getElementById('openMapsLink').href = mapLink;
-    
-    // Trigger price calculation if conditions met
-    checkAndTriggerPrice();
-  }
-  
-  function checkAndTriggerPrice() {
-    let phoneValid = /^0[0-9]{9}$/.test(document.getElementById('customer-phone').value);
-    let modeSelected = document.querySelector('input[name="mode"]:checked');
-    if (totalDistance && phoneValid && modeSelected) {
-      calculateAndShowPrice();
-    }
-  }
-  
-  // ==================== AUTOCOMPLETE (Custom Places + Hubs) ====================
-  function setupCustomAutocomplete(inputElement, isOrigin) {
-    const listId = isOrigin ? 'originList' : 'destinationList';
-    const listEl = document.getElementById(listId);
-    
-    inputElement.addEventListener('input', function(e) {
-      let query = this.value.toLowerCase();
-      if (query.length < 2) {
-        listEl.style.display = 'none';
-        listEl.innerHTML = '';
-        return;
-      }
-      
-      let matches = allSuggestions.filter(p => p.name.toLowerCase().includes(query)).slice(0, 8);
-      if (matches.length > 0) {
-        listEl.innerHTML = '';
-        matches.forEach(match => {
-          let div = document.createElement('div');
-          div.className = 'suggestion';
-          div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right:8px; color:#2563eb;"></i>${match.name}`;
-          div.onclick = () => {
-            inputElement.value = match.name;
-            listEl.style.display = 'none';
-            let coords = getPlaceCoords(match.name);
-            if (coords) {
-              if (isOrigin) {
-                originCoords = { lat: coords.lat, lng: coords.lng };
-                originAddr = match.name;
-                originIsCustom = coords.isCustom;
-                assignedHub = getNearestHub(originCoords.lat, originCoords.lng);
-                document.getElementById('hub-tooltip').textContent = `Driver from ${assignedHub.name} will pick you up`;
-                if (destCoords) computeAllDistances();
-                else document.getElementById('status').innerHTML = "✅ Pickup set. Now enter destination.";
-              } else {
-                destCoords = { lat: coords.lat, lng: coords.lng };
-                destAddr = match.name;
-                destIsCustom = coords.isCustom;
-                if (originCoords) computeAllDistances();
-                else document.getElementById('status').innerHTML = "✅ Destination set. Now enter pickup.";
-              }
-              checkAndTriggerPrice();
-            }
-          };
-          listEl.appendChild(div);
-        });
-        listEl.style.display = 'block';
-      } else {
-        listEl.style.display = 'none';
-      }
-    });
-    
-    document.addEventListener('click', function(e) {
-      if (!inputElement.contains(e.target)) {
-        listEl.style.display = 'none';
-      }
-    });
-  }
-  
-  // ==================== GOOGLE MAPS PLACES ====================
-  function initGoogleMaps() {
-    mapsApiReady = true;
-    geocoder = new google.maps.Geocoder();
-    
-    const originInput = document.getElementById('gm-origin');
-    const destInput = document.getElementById('gm-destination');
-    
-    // Setup custom autocomplete (for local places)
-    setupCustomAutocomplete(originInput, true);
-    setupCustomAutocomplete(destInput, false);
-    
-    // Google Places Autocomplete
-    autocompleteOrigin = new google.maps.places.Autocomplete(originInput, {
-      componentRestrictions: { country: 'zm' },
-      fields: ['formatted_address', 'geometry', 'place_id']
-    });
-    autocompleteOrigin.addListener('place_changed', () => {
-      let place = autocompleteOrigin.getPlace();
-      if (place && place.geometry) {
-        originCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-        originAddr = place.formatted_address;
-        originIsCustom = false;
-        assignedHub = getNearestHub(originCoords.lat, originCoords.lng);
-        if (destCoords) computeAllDistances();
-        checkAndTriggerPrice();
-        document.getElementById('status').innerHTML = "✅ Pickup location set";
-      }
-    });
-    
-    autocompleteDest = new google.maps.places.Autocomplete(destInput, {
-      componentRestrictions: { country: 'zm' },
-      fields: ['formatted_address', 'geometry', 'place_id']
-    });
-    autocompleteDest.addListener('place_changed', () => {
-      let place = autocompleteDest.getPlace();
-      if (place && place.geometry) {
-        destCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-        destAddr = place.formatted_address;
-        destIsCustom = false;
-        if (originCoords) computeAllDistances();
-        checkAndTriggerPrice();
-        document.getElementById('status').innerHTML = "✅ Destination set";
-      }
-    });
-  }
-  
-  // ==================== GEOLOCATION ====================
-  function fetchCurrentLocationAsPickup() {
-    let phone = document.getElementById('customer-phone').value;
-    if (!/^0[0-9]{9}$/.test(phone)) {
-      document.getElementById('status').innerHTML = "⚠️ Please enter valid phone number first!";
-      return;
-    }
-    if (!navigator.geolocation) {
-      document.getElementById('status').innerHTML = "❌ Geolocation not supported";
-      return;
-    }
-    document.getElementById('status').innerHTML = "📍 Getting your location...";
-    navigator.geolocation.getCurrentPosition(pos => {
-      let lat = pos.coords.latitude, lng = pos.coords.longitude;
-      if (geocoder) {
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            let addr = results[0].formatted_address;
-            document.getElementById('gm-origin').value = addr;
-            originAddr = addr;
-            originCoords = { lat, lng };
-            originIsCustom = false;
-            assignedHub = getNearestHub(lat, lng);
-            if (destCoords) computeAllDistances();
-            checkAndTriggerPrice();
-            document.getElementById('status').innerHTML = "✅ Pickup set to your current location";
-          } else {
-            document.getElementById('gm-origin').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-            originAddr = document.getElementById('gm-origin').value;
-            originCoords = { lat, lng };
-            originIsCustom = true;
-            assignedHub = getNearestHub(lat, lng);
-            if (destCoords) computeAllDistances();
-            checkAndTriggerPrice();
-            document.getElementById('status').innerHTML = "✅ Pickup set (approximate)";
-          }
-        });
-      } else {
-        document.getElementById('gm-origin').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-        originAddr = document.getElementById('gm-origin').value;
-        originCoords = { lat, lng };
-        originIsCustom = true;
-        assignedHub = getNearestHub(lat, lng);
-        if (destCoords) computeAllDistances();
-        checkAndTriggerPrice();
-        document.getElementById('status').innerHTML = "✅ Pickup set";
-      }
-    }, () => {
-      document.getElementById('status').innerHTML = "❌ Could not get location";
-    });
-  }
-  
-  function fetchAndShareLocation() {
-    let phone = document.getElementById('customer-phone').value;
-    if (!/^0[0-9]{9}$/.test(phone)) {
-      updateLocationStatus("⚠️ Enter phone number first", "warning");
-      return;
-    }
-    if (!navigator.geolocation) {
-      updateLocationStatus("❌ Not supported", "error");
-      return;
-    }
-    updateLocationStatus("📍 Fetching location...", "info");
-    navigator.geolocation.getCurrentPosition(pos => {
-      let link = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-      updateLocationStatus("✅ Location shared with dispatch", "success");
-      // Send to backend (fire and forget)
-      fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST', mode: 'no-cors',
-        body: new URLSearchParams({
-          sharedLocation: link,
-          locationLatitude: pos.coords.latitude,
-          locationLongitude: pos.coords.longitude,
-          locationPhone: phone,
-          requestType: "location_share",
-          timestamp: new Date().toISOString()
-        })
-      }).catch(() => {});
-    }, () => updateLocationStatus("❌ Failed to get location", "error"));
-  }
-  
-  function updateLocationStatus(msg, type) {
-    let div = document.getElementById("locationStatus");
-    div.textContent = msg;
-    div.className = `location-status ${type}`;
-  }
-  
-  // ==================== REQUEST HANDLER ====================
-  async function handleRequest() {
-    let btn = document.getElementById('submit-btn');
-    let icon = document.getElementById('btn-icon');
-    let loader = document.getElementById('btn-loader');
-    let prog = document.getElementById('progress-text');
-    
-    btn.disabled = true;
-    icon.style.display = "none";
-    loader.style.display = "block";
-    prog.style.display = "block";
-    
-    let startTime = Date.now();
-    let interval = setInterval(() => {
-      let p = Math.min(98, Math.floor(((Date.now() - startTime) / 13000) * 98));
-      prog.textContent = p + "%";
-    }, 200);
-    
-    let payload = { ...window.currentRide, requestType: "booking" };
-    
-    let timeoutId = setTimeout(() => {
-      clearInterval(interval);
-      finishRequest(true);
-    }, 15000);
-    
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-        method: 'POST',
-        body: new URLSearchParams(payload),
-        mode: 'no-cors'
-      });
-      clearTimeout(timeoutId);
-      clearInterval(interval);
-      prog.textContent = "100%";
-      finishRequest(false);
-    } catch (err) {
-      clearTimeout(timeoutId);
-      clearInterval(interval);
-      finishRequest(true);
-    }
-  }
-  
-  function finishRequest(isError) {
-    let btn = document.getElementById('submit-btn');
-    let loader = document.getElementById('btn-loader');
-    let prog = document.getElementById('progress-text');
-    let icon = document.getElementById('btn-icon');
-    
-    loader.style.display = "none";
-    prog.style.display = "none";
-    icon.style.display = "block";
-    icon.className = "fas fa-phone";
-    
-    let phoneNumber = getDriverContact(assignedHub?.name);
-    btn.style.background = "var(--success-color)";
-    btn.disabled = false;
-    document.getElementById('action-label').innerHTML = "📞 Call Driver Now";
-    btn.onclick = () => window.location.href = `tel:${phoneNumber}`;
-    document.getElementById('status').innerHTML = isError ? "⚠️ Network issue. Please call driver directly." : "✅ Request sent! Driver will contact you shortly.";
-  }
-  
-  // ==================== PHONE VALIDATION & UI INIT ====================
-  function initUI() {
-    const phoneInput = document.getElementById('customer-phone');
-    const tripDetailsDiv = document.getElementById('trip-details');
-    
-    phoneInput.addEventListener('input', function() {
-      let isValid = /^0[0-9]{9}$/.test(this.value);
-      if (isValid) {
-        tripDetailsDiv.style.display = 'block';
-        // If both locations already exist, trigger price update
-        if (totalDistance && document.querySelector('input[name="mode"]:checked')) {
-          calculateAndShowPrice();
-        }
-      } else {
-        tripDetailsDiv.style.display = 'none';
-        document.getElementById('summary-section').style.display = 'none';
-      }
-    });
-    
-    // Mode change listener
-    document.getElementById('mode-group').addEventListener('change', function() {
-      let phoneValid = /^0[0-9]{9}$/.test(phoneInput.value);
-      if (totalDistance && phoneValid) {
-        calculateAndShowPrice();
-      }
-    });
-  }
-  
+  // ============================================
+  // TOGGLE DROPDOWN FUNCTION
+  // ============================================
   function toggleDropdown() {
-    document.getElementById("header-menu-dropdown").classList.toggle("show");
+    const menu = document.getElementById("header-menu-dropdown");
+    if (menu) {
+      menu.classList.toggle("show");
+    }
   }
   
-  window.onclick = (e) => {
-    let menu = document.getElementById("header-menu-dropdown");
-    let btn = document.getElementById("menu-toggle-btn");
-    if (menu && menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) {
+  // Close dropdown when clicking outside
+  window.onclick = (event) => {
+    const menu = document.getElementById("header-menu-dropdown");
+    const btn = document.querySelector(".menu-dropdown-btn");
+    if (menu && menu.classList.contains('show') && 
+        !menu.contains(event.target) && 
+        (!btn || !btn.contains(event.target))) {
       menu.classList.remove('show');
     }
   };
   
-  // Initialize everything when DOM ready
-  document.addEventListener('DOMContentLoaded', () => {
-    initUI();
-  });
+  // ============================================
+  // PLACE YOUR COMPLETE JAVASCRIPT CODE HERE
+  // ============================================
   
-  // Expose global functions
-  window.toggleDropdown = toggleDropdown;
-  window.fetchAndShareLocation = fetchAndShareLocation;
-  window.fetchCurrentLocationAsPickup = fetchCurrentLocationAsPickup;
-  window.initGoogleMaps = initGoogleMaps;
+  function getLocation() {
+    const status = document.getElementById("locationStatus");
+    if (status) status.innerHTML = "📍 Getting location...";
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (status) status.innerHTML = "🌐 ✅ Location ready!";
+        },
+        () => {
+          if (status) status.innerHTML = "❌ Failed to get location!";
+        }
+      );
+    }
+  }
+  
+  function shareWhatsApp() {
+    alert("WhatsApp sharing will be available when you add your complete code");
+  }
+  
+  function shareSMS() {
+    alert("SMS sharing will be available when you add your complete code");
+  }
 </script>
+
 </body>
 </html>
