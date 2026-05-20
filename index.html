@@ -16,253 +16,172 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
 <link rel="apple-touch-icon" href="lfr.jpg">
-  <style>
+  
+<style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --primary-color: #2563eb;
-      --secondary-color: #ff9900;
-      --error-color: #dc2626;
-      --success-color: #16a34a;
-      --bg-color-body: #f5f5f5;
-      --bg-color-card: #ffffff;
-      --border-color-light: #e0e0e0;
-      --font-color-dark: #333;
+        --primary-color: #2563eb;
+        --secondary-color: #ff9900;
+        --error-color: #dc2626;
+        --success-color: #16a34a;
+        --bg-color-body: #f5f5f5;
+        --bg-color-card: #ffffff;
+        --border-color-light: #e0e0e0;
+        --font-color-dark: #333;
     }
     body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
 
-   .corner-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    margin-right: 10px;
-  }
-  .company-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-    header {
-      background: var(--primary-color);
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    /* ========== BILLBOARD HEADER ========== */
+    .billboard-header {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: visible;
+        background: linear-gradient(135deg, #1e3a8a, #2563eb, #1e40af);
+        border-bottom: none;
     }
-    
-    .header-content { max-width: 1200px; margin: auto; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-    .company-info h2 {
-      font-size: 1.15rem;
-      line-height: 1.2;
+    .billboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+        animation: floatParticles 15s ease-in-out infinite;
     }
+    @keyframes floatParticles { 0%,100% { transform: translateX(0px) translateY(0px); opacity: 0.3; } 50% { transform: translateX(20px) translateY(-20px); opacity: 0.6; } }
 
-    .zam {
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: #ffcc00; /* taxi yellow */
-
-  /* Elegant shadow */
-  text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
-
-  /* Smooth look */
-  font-family: 'Segoe UI', Arial, sans-serif;
-}
-
-    .z-green { color: #198754; }
-    .z-red { color: #dc3545; }
-    .z-black { color: #000000; }
-    .z-orange { color: #ff9900; }
-
-    .transport-sub {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 400;
-      color: #e5e7eb;
-      margin-top: 2px;
-  
+    /* ========== HEADER OVERLAY LOGO & MENU ========== */
+    .header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: transparent;
     }
+    .company-info { display: flex; align-items: center; gap: 10px; }
+    .corner-logo { width: 38px; height: 38px; object-fit: cover; border-radius: 50%; border: 2px solid var(--secondary-color); }
+    .zam { font-weight: 800; letter-spacing: 0.5px; color: #ffcc00; text-shadow: 1px 2px 4px rgba(0,0,0,0.5); font-family: 'Segoe UI', Arial, sans-serif; font-size: 1.2rem; }
+    .z-green { color: #2ecc71; }
+    .z-red { color: #e74c3c; }
+    .z-black { color: #ffffff; }
 
-    .menu-dropdown-container { 
-      position: relative; 
-      display: inline-block; 
-    }
-
-    .menu-button { 
-      background: none; 
-      border: none; 
-      color: white; 
-      cursor: pointer; 
-      padding: 5px; 
-      outline: none; 
-      font-size: 1.4rem; 
-      display: flex;
-      align-items: center;
-    }
-
-    .menu-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 42px;
-      background-color: white;
-      width: 380px;
-      max-height: 85vh; 
-      overflow-y: auto;
-      box-shadow: 0px 8px 24px rgba(0,0,0,0.25);
-      z-index: 1000;
-      border-radius: 16px;
-      color: #333;
-      padding: 16px;
-      border: 1px solid #e0e0e0;
-    }
-
-    .menu-dropdown.show { 
-      display: block; 
-    }
-
-    .dropdown-content-section { 
-      margin-bottom: 20px; 
-    }
-
-    .dropdown-content-section h4 { 
-      color: #2563eb; 
-      border-bottom: 1px solid #f0f0f0; 
-      padding-bottom: 8px; 
-      margin-bottom: 12px; 
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-    }
-
-    .dropdown-content-section p, .dropdown-content-section .map-note { 
-      font-size: 0.85rem; 
-      line-height: 1.5; 
-      margin-bottom: 10px; 
-      color: #4b5563; 
-    }
-
-    .dropdown-content-section a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      text-decoration: none;
-      color: #1f2937;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      transition: background 0.2s ease;
-    }
+    /* ========== MENU DROPDOWN ========== */
+    .menu-dropdown-container { position: relative; display: inline-block; z-index: 100000; }
+    .menu-dropdown { display: none; position: fixed; right: 20px; top: 70px; background-color: white; width: 380px; max-height: 500px; overflow-y: auto; box-shadow: 0px 8px 24px rgba(0,0,0,0.3); z-index: 99999; border-radius: 16px; color: #333; padding: 16px; border: 1px solid #e0e0e0; }
+    .menu-dropdown.show { display: block; }
+    .menu-button:hover { opacity: 1; transform: scale(1.05); }
+    .dropdown-content-section { margin-bottom: 20px; }
+    .dropdown-content-section h4 { color: #2563eb; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+    .dropdown-content-section p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px; color: #4b5563; }
+    .dropdown-content-section a { display: flex; align-items: center; gap: 12px; padding: 10px; text-decoration: none; color: #1f2937; font-size: 0.9rem; border-radius: 8px; transition: background 0.2s ease; }
     .dropdown-content-section a:hover { background-color: #f3f4f6; }
-    .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem;}
-
-    .contact-label-text { display: flex; flex-direction: column; }
+    .dropdown-content-section a i { width: 20px; color: #2563eb; text-align: center; font-size: 1.1rem; }
     .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
+    .route-container { margin-top: 8px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 12px; }
+    .route-info { font-size: 0.8rem; margin-bottom: 12px; padding: 8px; background: #f0f9ff; border-radius: 8px; text-align: center; color: #1e293b; }
+    .open-maps-link { display: block; padding: 12px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-size: 0.85rem; text-align: center; transition: background 0.2s; font-weight: 500; }
+    .open-maps-link:hover { background: #1d4ed8; }
 
-    /* Route info container */
-    .route-container {
-      margin-top: 8px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      padding: 12px;
+    /* ========== SLIDES (SLOWER TRANSITION) ========== */
+    .billboard-slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
     }
-    
-    .route-info {
-      font-size: 0.8rem;
-      margin-bottom: 12px;
-      padding: 8px;
-      background: #f0f9ff;
-      border-radius: 8px;
-      text-align: center;
-      color: #1e293b;
-    }
-    
-    .open-maps-link {
-      display: block;
-      padding: 12px;
-      background: #2563eb;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      text-align: center;
-      transition: background 0.2s;
-      font-weight: 500;
-    }
-    
-    .open-maps-link:hover {
-      background: #1d4ed8;
-    }
-    
-    .open-maps-link i {
-      margin-right: 8px;
-    }
-    
+    .billboard-slide1 { animation: bs1 72s infinite; }
+    .billboard-slide2 { animation: bs2 72s infinite; }
+    .billboard-slide3 { animation: bs3 72s infinite; }
+    .billboard-slide4 { animation: bs4 72s infinite; }
+    .billboard-slide5 { animation: bs5 72s infinite; }
+    .billboard-slide6 { animation: bs6 72s infinite; }
+    .billboard-slide7 { animation: bs7 72s infinite; }
+    .billboard-slide8 { animation: bs8 72s infinite; }
+    .billboard-slide9 { animation: bs9 72s infinite; }
+
+    @keyframes bs1 { 0%,8% { opacity: 1; } 10% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs2 { 0%,10% { opacity: 0; } 12%,18% { opacity: 1; } 20% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs3 { 0%,20% { opacity: 0; } 22%,28% { opacity: 1; } 30% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs4 { 0%,30% { opacity: 0; } 32%,38% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs5 { 0%,40% { opacity: 0; } 42%,48% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs6 { 0%,50% { opacity: 0; } 52%,58% { opacity: 1; } 60% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs7 { 0%,60% { opacity: 0; } 62%,68% { opacity: 1; } 70% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs8 { 0%,70% { opacity: 0; } 72%,78% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes bs9 { 0%,80% { opacity: 0; } 82%,88% { opacity: 1; } 90% { opacity: 0; } 100% { opacity: 0; } }
+
+    /* ========== VEHICLE CONTAINER ========== */
+    .vehicle-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+
+    /* ========== SLIDE CONTENT ANIMATIONS (SLOWER) ========== */
+    .welcome-billboard { font-size: 45px; color: #ffd700; font-weight: bold; text-shadow: 0 0 20px rgba(255,215,0,0.7); text-align: center; padding: 20px; overflow: hidden; white-space: nowrap; animation: typing 5s steps(30, end) infinite, blink-cursor 1s step-end infinite; }
+    @keyframes typing { 0% { width: 0; } 30% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
+    @keyframes blink-cursor { 0%, 100% { border-right: 3px solid #ffd700; } 50% { border-right: 3px solid transparent; } }
+
+    .car-billboard img { width: 180px; filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); animation: smoothDrive 5s ease-in-out infinite; transition: all 0.3s ease; }
+    @keyframes smoothDrive { 0%,100% { transform: translateX(0px) translateY(0px); } 25% { transform: translateX(20px) translateY(-3px); } 50% { transform: translateX(0px) translateY(0px); } 75% { transform: translateX(-20px) translateY(-3px); } }
+
+    .motorbike-billboard img { width: 180px; filter: drop-shadow(0 0 18px #ffcc00); animation: bikeGlide 4s ease-in-out infinite; }
+    @keyframes bikeGlide { 0%,100% { transform: translateY(0px) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-3deg); } 75% { transform: translateY(-20px) rotate(3deg); } }
+
+    .request-billboard { font-size: 45px; color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: neonShake 3s ease-in-out infinite; text-align: center; padding: 20px; display: flex; justify-content: center; align-items: center; width: 100%; white-space: normal; word-wrap: break-word; }
+    @keyframes neonShake { 0%,100% { transform: translateX(0px) scale(1); text-shadow: 0 0 10px #00ff99; } 10%,30%,50%,70%,90% { transform: translateX(-3px) scale(1.02); text-shadow: 0 0 20px #00ff99; } 20%,40%,60%,80% { transform: translateX(3px) scale(1.02); text-shadow: 0 0 30px #00ff99; } 50% { transform: translateX(0px) scale(1.05); text-shadow: 0 0 50px #00ff99, 0 0 20px #00cc77; } }
+
+    .promo-billboard { background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00); padding: 20px 40px; border-radius: 60px; font-size: 44px; font-weight: bold; color: white; animation: promoPulse 3.5s ease-in-out infinite alternate; position: relative; box-shadow: 0 10px 30px rgba(255,68,68,0.3); text-align: center; display: flex; justify-content: center; align-items: center; width: auto; max-width: 95%; white-space: normal; word-wrap: break-word; }
+    @keyframes promoPulse { 0% { transform: scale(1) rotate(0deg); background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00); box-shadow: 0 5px 15px rgba(255,68,68,0.3); } 100% { transform: scale(1.08) rotate(1deg); background: linear-gradient(135deg, #ff6b6b, #ffaa00, #ffdd44); box-shadow: 0 15px 40px rgba(255,68,68,0.6); } }
+
+    .contact-billboard { font-size: 45px; color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: gentleFloat 5s ease-in-out infinite; text-align: center; padding: 20px; display: flex; justify-content: center; align-items: center; width: 100%; white-space: normal; word-wrap: break-word; }
+    @keyframes gentleFloat { 0%,100% { transform: translateY(0px) scale(1); text-shadow: 0 0 20px rgba(0,255,153,0.7); } 50% { transform: translateY(-15px) scale(1.02); text-shadow: 0 0 40px #00ff99, 0 0 20px #00cc77; } }
+
+    /* ========== STATUS TEXT ========== */
+    .status-text { margin-top: 0px; font-size: 14px; font-weight: bold; color: #ffcc00; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); animation: textPulse 2.5s ease-in-out infinite; }
+    @keyframes textPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); color: #ffaa00; } }
+
+    /* ========== HOVER EFFECTS ========== */
+    .motorbike-billboard img:hover, .car-billboard img:hover { animation-play-state: paused; transform: scale(1.1) rotate(3deg); filter: drop-shadow(0 0 25px rgba(0,255,153,1)); transition: all 0.3s ease; }
+
+    /* ========== PRODUCT STORE LINK ========== */
+    .product-store-link { text-decoration: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .product-store-link:hover .motorbike-billboard img, .product-store-link:hover .car-billboard img { transform: scale(1.05); transition: transform 0.3s ease; }
+
+    /* ========== TOOLTIP ========== */
     .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
     .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
-    .tooltip-text { 
-      visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; 
-      position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem;
-      pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
+    .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; pointer-events: none; }
     .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
+    /* ========== HIDE ORIGINAL HEADER ========== */
+    header { background: transparent !important; position: static !important; box-shadow: none !important; margin-top: 0 !important; }
+    header .header-content { display: none; }
+    .subtitle-wrapper { margin-top: 0; background: rgba(0,0,0,0.1); width: 100%; overflow: hidden; height: 20px; }
+    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 20s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
+    @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+
+    /* ========== BOOKING FORM STYLES ========== */
     .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
     .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
     fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
     legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
     .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
     .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
-    .input-box input { 
-      flex: 1; 
-      border: none; 
-      outline: none; 
-      font-size: 1rem; 
-      font-weight: bold; 
-      background: transparent; 
-      width: 100%; 
-    }
-    .input-box input::placeholder {
-      font-style: italic;
-      color: #999;
-      font-weight: normal;
-      font-size: 0.85rem;
-    }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: bold; background: transparent; width: 100%; }
+    .input-box input::placeholder { font-style: italic; color: #999; font-weight: normal; font-size: 0.85rem; }
     .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .icon-img { width: 40px; height: 40px; object-fit: contain; }
-    .field-error { 
-      border: 2px solid var(--error-color) !important; 
-      background: #fff5f5 !important;
-      animation: shake 0.4s ease-in-out;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    .autocomplete-list { 
-      position: absolute; 
-      top: 100%; 
-      left: 0; 
-      right: 0;
-      background: white; 
-      border: 1px solid #ddd; 
-      z-index: 1000; 
-      max-height: 200px; 
-      overflow-y: auto; 
-      border-radius: 0 0 8px 8px; 
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .suggestion { 
-      padding: 10px; 
-      cursor: pointer; 
-      border-bottom: 1px solid #eee; 
-      font-size: 0.9rem;
-      transition: background 0.2s;
-    }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
     .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
     .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; }
@@ -271,117 +190,185 @@
     .hidden-section { display: none; }
     .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .subtitle-wrapper { width: 100%; overflow: hidden; height: 20px; background: rgba(0,0,0,0.1); }
-    .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 14s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
-    @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-  </style>
+
+    /* ========== FIREWORKS ========== */
+    .fireworks-billboard { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+    .firework-billboard { position: absolute; width: 5px; height: 5px; border-radius: 50%; animation: explodeBillboard 4s ease-out infinite; }
+    @keyframes explodeBillboard { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(18); opacity: 0.8; } 100% { transform: scale(35); opacity: 0; } }
+
+    /* ========== RESPONSIVE FIXES FOR SMALLER RESOLUTIONS ========== */
+    @media (max-width: 768px) {
+        .billboard-header { height: 160px; }
+        .welcome-billboard { font-size: 22px; padding: 10px; white-space: normal; animation: none; }
+        .request-billboard, .contact-billboard { font-size: 16px; padding: 8px; }
+        .promo-billboard { font-size: 14px; padding: 6px 12px; width: auto; max-width: 95%; }
+        .car-billboard img, .motorbike-billboard img { width: 100px; }
+        .status-text { font-size: 10px; }
+        .vehicle-container { gap: 3px; }
+        .zam { font-size: 0.9rem; }
+        .corner-logo { width: 28px; height: 28px; }
+        .header-overlay { padding: 8px 12px; }
+        .menu-dropdown { width: 300px; right: 10px; top: 55px; }
+    }
+    
+    @media (max-width: 480px) {
+        .billboard-header { height: 140px; }
+        .welcome-billboard { font-size: 16px; padding: 5px; }
+        .request-billboard, .contact-billboard { font-size: 12px; padding: 5px; }
+        .promo-billboard { font-size: 10px; padding: 4px 8px; border-radius: 30px; }
+        .car-billboard img, .motorbike-billboard img { width: 70px; }
+        .status-text { font-size: 8px; }
+        .vehicle-container { gap: 2px; }
+        .zam { font-size: 0.7rem; }
+        .corner-logo { width: 22px; height: 22px; }
+        .menu-button { font-size: 14px; }
+        .menu-dropdown { width: 260px; max-height: 400px; padding: 12px; }
+        .dropdown-content-section h4 { font-size: 0.85rem; }
+        .dropdown-content-section a { font-size: 0.75rem; padding: 8px; }
+    }
+    
+    @media (max-width: 360px) {
+        .billboard-header { height: 120px; }
+        .welcome-billboard { font-size: 12px; }
+        .request-billboard, .contact-billboard { font-size: 10px; }
+        .promo-billboard { font-size: 8px; padding: 3px 6px; }
+        .car-billboard img, .motorbike-billboard img { width: 55px; }
+        .status-text { font-size: 7px; }
+        .zam { font-size: 0.6rem; }
+    }
+</style>
+      
 </head>
 <body>
-<header>
-  <div class="header-content">
-    <div class="company-info">
-  <img src="lfr.jpg" alt="Logo" class="corner-logo">
-<h2 class="zam">
-  <span class="z-green">Z</span>
-  <span class="z-black">a</span>
-  <span class="z-red">m</span>
-  <span class="z-yellow">Listing</span>
-  <span>&nbsp;Rides</span>
-</h2>
-   
-</div>
-    
-    <div class="menu-dropdown-container">
-      <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu"><i class="fas fa-ellipsis-v"></i></button>
-      <div id="header-menu-dropdown" class="menu-dropdown">
-        <!-- About Section FIRST -->
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-
-<p>
-  A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.
-</p>
-
-<p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
-
-<p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
-
-<p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
-
-<p>
-  <strong>Install App:</strong> Open the site using your browser 
-  (such as Chrome or Edge), then tap the 
-  📱 <strong>Install</strong> button 
-  that appears at the top right corner of your browser.
-</p>
-</div>
-        
-        <!-- Contact Section SECOND -->
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-headset"></i> Quick Contact</h4>
-          <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
-          <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
-          <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-          
-          <div class="menu-divider"></div>
-          <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
-          <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank" title="Visit Facebook">
-            <i class="fab fa-facebook"></i>
-            <span class="contact-label-text">Facebook Page</span>
-          </a>
-          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank" title="Visit TikTok">
-            <i class="fab fa-tiktok"></i>
-            <span class="contact-label-text">TikTok</span>
-          </a>
+  <!-- ========== BILLBOARD HEADER ========== -->
+<div class="billboard-header">
+    <!-- OVERLAY: Logo and Menu on TOP of slides -->
+    <div class="header-overlay">
+        <div class="company-info">
+            <img src="lfr.jpg" alt="Logo" class="corner-logo">
+            <h2 class="zam">
+                <span class="z-green">Z</span>
+                <span class="z-black">a</span>
+                <span class="z-red">m</span>
+                <span>Listing</span>
+            </h2>
         </div>
-        
-        <!-- Share Location Section THIRD -->
-        <div class="menu-divider"></div>
-
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;"> Please note: Exact pickup or drop-off locations within a 1 km radius of the selected points will not incur any additional charges.</p>
-
-          <a href="#" onclick="getLocation()" title="Get Location">
-            <i class="fas fa-location-arrow"></i>
-            <span class="contact-label-text">Get My Location</span>
-            <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
-          </a>
-          
-          <a href="#" onclick="shareWhatsApp()" title="Share via WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-            <span class="contact-label-text">Share via WhatsApp</span>
-          </a>
-
-          <a href="#" onclick="shareSMS()" title="Share via SMS">
-            <i class="fas fa-sms"></i>
-            <span class="contact-label-text">Share via SMS</span>
-          </a>
-
-          
-        </div>
-        
-        <!-- View Map Section - FIXED with centered text/icon AND estimated time display -->
-        <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
-          
-          <!-- Route Info Section with Map Button -->
-          <div class="route-container">
-            <div id="map-route-info" class="route-info">
-              <i class="fas fa-route"></i> Select pickup & destination to see route details
+        <div class="menu-dropdown-container">
+            <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()" title="Menu">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div id="header-menu-dropdown" class="menu-dropdown">
+                <!-- About Section -->
+                <div class="dropdown-content-section">
+                    <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+                    <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
+                    <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
+                    <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
+                    <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
+                    <p><strong>Install App:</strong> Open the site using your browser, then tap the 📱 <strong>Install</strong> button.</p>
+                </div>
+                
+                <!-- Contact Section -->
+                <div class="dropdown-content-section">
+                    <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+                    <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
+                    <a href="tel:0978167546"><i class="fas fa-phone"></i><span>Call Us</span></a>
+                    <a href="https://wa.me/260978167546" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+                    <div class="menu-divider"></div>
+                    <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
+                    <a href="https://www.facebook.com/profile.php?id=61581247756569" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
+                    <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
+                </div>
+                
+                <div class="menu-divider"></div>
+                
+                <!-- Share Location Section -->
+                <div class="dropdown-content-section">
+                    <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+                    <p style="font-size: 0.85rem;">Pickup/drop-off within 1 km: no extra charges.</p>
+                    <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
+                    <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+                    <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
+                    <a href="#" onclick="shareSMS()"><i class="fas fa-sms"></i><span>Share via SMS</span></a>
+                </div>
+                
+                <!-- View Map Section -->
+                <div class="dropdown-content-section">
+                    <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
+                    <div class="route-container">
+                        <div id="map-route-info" class="route-info"><i class="fas fa-route"></i> Select pickup & destination</div>
+                        <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 Click to View Map</a>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides</p>
             </div>
-            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
-              <i class="fas fa-globe" style="font-size: 1rem;"></i>
-              <span>Click to View Map</span>
-            </a>
-          </div>
         </div>
-        
-        <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">&copy; 2025 Luangwa Feira Rides</p>
-      </div>
     </div>
-  </div>
-  <div class="subtitle-wrapper"><span class="scroll-subtitle"> 🏍Welcome ♥  Kindly make your request.🚗 </span></div>
+
+<!-- SLIDES 1-9 -->
+<div class="billboard-slide billboard-slide1">
+    <div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div>
+</div>
+
+<div class="billboard-slide billboard-slide2">
+    <div class="vehicle-container">
+        <div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div>
+        <div class="status-text">Available - Book Now! </div>
+    </div>
+</div>
+
+<div class="billboard-slide billboard-slide3">
+    <div class="vehicle-container">
+        <div class="car-billboard"><img src="car.png" alt="Car"></div>
+        <div class="status-text">Not Available</div>
+    </div>
+</div>
+
+<div class="billboard-slide billboard-slide4">
+    <div class="request-billboard">👇 PROCEED TO MAKE A REQUEST WITH THE FORM BELOW👇 </div>
+</div>
+
+<div class="billboard-slide billboard-slide5">
+    <div class="promo-billboard">🔥 50% DISCOUNT PROMOTION ALL LOCAL RIDES 🔥</div>
+</div>
+
+<div class="billboard-slide billboard-slide6">
+    <div class="contact-billboard">📞 CONTACT NOW• FAST PICKUP • AVAILABLE 24/7</div>
+</div>
+
+<!-- Product Slides 7-9 with A tags and confirmation -->
+<div class="billboard-slide billboard-slide7">
+    <a href="#" class="product-store-link" onclick="return confirmStoreRedirect(event)">
+        <div class="vehicle-container">
+            <div class="motorbike-billboard"><img src="TV3.png" alt="Smart TV"></div>
+            <div class="status-text">HOT SALE SAMPLE! CLICK ME! K 3,000</div>
+        </div>
+    </a>
+</div>
+
+<div class="billboard-slide billboard-slide8">
+    <a href="#" class="product-store-link" onclick="return confirmStoreRedirect(event)">
+        <div class="vehicle-container">
+            <div class="car-billboard"><img src="S241S.png" alt="Android Phone"></div>
+            <div class="status-text"> HOT SALE! CLICK ME K 1,200</div>
+        </div>
+    </a>
+</div>
+
+<div class="billboard-slide billboard-slide9">
+    <a href="#" class="product-store-link" onclick="return confirmStoreRedirect(event)">
+        <div class="vehicle-container">
+            <div class="motorbike-billboard"><img src="fridge.png" alt="Fridge"></div>
+            <div class="status-text"> SALE! CLICK ME! K 2,600</div>
+        </div>
+    </a>
+</div>
+
+</div> <!-- This closes the billboard-header div -->
+
+
+
 </header>
 
 <main class="product-container">
@@ -1733,6 +1720,35 @@ function updateRouteInfo(pickup, destination) {
   window.getLocation = getLocation;
   window.shareWhatsApp = shareWhatsApp;
   window.shareSMS = shareSMS;
+
+window.toggleDropdown = toggleDropdown;
+window.getLocation = getLocation;
+window.shareWhatsApp = shareWhatsApp;
+window.shareSMS = shareSMS;
+
+// ========== ADD THIS FUNCTION HERE ==========
+// Confirm redirect to online store for slides 7-9
+function confirmStoreRedirect(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const userConfirmed = confirm(
+        "🛍️ Visit Our Online Store\n\n" +
+        "You will be redirected to www.zamlisting.com/store\n\n" +
+        "Click OK to continue or Cancel to stay on this page."
+    );
+    
+    if (userConfirmed) {
+        window.open("https://www.zamlisting.com/store", "_blank");
+    }
+    
+    return false;
+}
+// ========== END OF ADDED FUNCTION ==========
+
 </script>
 </body>
 </html>
+</script>
+</body>
+  </html>
