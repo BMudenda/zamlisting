@@ -1881,28 +1881,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ===== SWIPE SUPPORT =====
-    let startX = 0;
+let startX = 0;
+let endX = 0;
 
-    document.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-    }, { passive: true });
+document.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+}, { passive: true });
 
-    document.addEventListener('touchend', (e) => {
-        let endX = e.changedTouches[0].clientX;
-        let diff = startX - endX;
+document.addEventListener('touchend', function(e) {
+    endX = e.changedTouches[0].clientX;
+    handleSwipe();
+}, { passive: true });
 
-        if (diff > 50) {
-            nextSlide();
-            resetTimer();
-        }
+function handleSwipe() {
+    let diff = startX - endX;
 
-        if (diff < -50) {
-            prevSlide();
-            resetTimer();
-        }
-    }, { passive: true });
+    if (Math.abs(diff) < 60) return; // ignore small accidental swipes
 
-});
+    if (diff > 0) {
+        nextSlide(); // swipe left
+    } else {
+        prevSlide(); // swipe right
+    }
+
+    resetTimer();
+}
 </script>
 </body>
 </html>
