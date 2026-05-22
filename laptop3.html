@@ -1844,22 +1844,19 @@ function visitStore() {
 window.visitStore = visitStore;
   // ========== SLIDESHOW ==========
 document.addEventListener('DOMContentLoaded', function() {
-document.addEventListener('DOMContentLoaded', function() {
 
     let slides = document.querySelectorAll('.billboard-slide');
     let currentIndex = 0;
     let slideInterval = 5000;
 
     function showSlide(index) {
-        slides.forEach((slide, i) => {
+        slides.forEach((slide) => {
             slide.style.opacity = '0';
             slide.style.zIndex = '1';
-            slide.style.pointerEvents = 'none';
         });
 
         slides[index].style.opacity = '1';
         slides[index].style.zIndex = '2';
-        slides[index].style.pointerEvents = 'auto';
     }
 
     function nextSlide() {
@@ -1872,18 +1869,25 @@ document.addEventListener('DOMContentLoaded', function() {
         showSlide(currentIndex);
     }
 
-    showSlide(0);
+    // SHOW FIRST SLIDE
+    showSlide(currentIndex);
 
+    // AUTO PLAY (IMPORTANT FIX)
     let autoPlay = setInterval(nextSlide, slideInterval);
 
-    // ===== FIXED SWIPE AREA (USE FULL SCREEN) =====
+    function resetTimer() {
+        clearInterval(autoPlay);
+        autoPlay = setInterval(nextSlide, slideInterval);
+    }
+
+    // ===== SWIPE SUPPORT =====
     let startX = 0;
 
-    document.body.addEventListener('touchstart', function(e) {
+    document.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
     }, { passive: true });
 
-    document.body.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', (e) => {
         let endX = e.changedTouches[0].clientX;
         let diff = startX - endX;
 
@@ -1897,11 +1901,6 @@ document.addEventListener('DOMContentLoaded', function() {
             resetTimer();
         }
     }, { passive: true });
-
-    function resetTimer() {
-        clearInterval(autoPlay);
-        autoPlay = setInterval(nextSlide, slideInterval);
-    }
 
 });
 </script>
