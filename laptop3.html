@@ -1843,14 +1843,14 @@ function visitStore() {
 }
 window.visitStore = visitStore;
   // ========== SLIDESHOW ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     let slides = document.querySelectorAll('.billboard-slide');
     let currentIndex = 0;
-    let slideInterval = 5000;
+    let intervalTime = 5000;
 
     function showSlide(index) {
-        slides.forEach((slide) => {
+        slides.forEach((slide, i) => {
             slide.style.opacity = '0';
             slide.style.zIndex = '1';
         });
@@ -1869,43 +1869,40 @@ document.addEventListener('DOMContentLoaded', function() {
         showSlide(currentIndex);
     }
 
-    // SHOW FIRST SLIDE
+    // show first slide immediately
     showSlide(currentIndex);
 
-    // AUTO PLAY (IMPORTANT FIX)
-    let autoPlay = setInterval(nextSlide, slideInterval);
+    // autoplay
+    let autoPlay = setInterval(nextSlide, intervalTime);
 
     function resetTimer() {
         clearInterval(autoPlay);
-        autoPlay = setInterval(nextSlide, slideInterval);
+        autoPlay = setInterval(nextSlide, intervalTime);
     }
 
-    // ===== SWIPE SUPPORT =====
-let startX = 0;
-let endX = 0;
+    // swipe
+    let startX = 0;
 
-document.addEventListener('touchstart', function(e) {
-    startX = e.touches[0].clientX;
-}, { passive: true });
+    document.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+    }, { passive: true });
 
-document.addEventListener('touchend', function(e) {
-    endX = e.changedTouches[0].clientX;
-    handleSwipe();
-}, { passive: true });
+    document.addEventListener('touchend', function (e) {
+        let endX = e.changedTouches[0].clientX;
+        let diff = startX - endX;
 
-function handleSwipe() {
-    let diff = startX - endX;
+        if (Math.abs(diff) < 60) return;
 
-    if (Math.abs(diff) < 60) return; // ignore small accidental swipes
+        if (diff > 0) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
 
-    if (diff > 0) {
-        nextSlide(); // swipe left
-    } else {
-        prevSlide(); // swipe right
-    }
+        resetTimer();
+    }, { passive: true });
 
-    resetTimer();
-}
+});
 </script>
 </body>
 </html>
