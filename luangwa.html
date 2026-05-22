@@ -392,7 +392,8 @@
         </div>
         <div class="product-info">
             <div class="product-price">🔥 Hot sale sample. K3,000</div>
-            <button class="store-button" onclick="visitStore(); return false;">🛒 SHOP NOW</button>
+          <div class="product-price">📍 Luangwa Feira</div>
+            <button class="store-button" onclick="visitStore(); return false;">🛒 CLICK TO SHOP</button>
         </div>
     </div>
 </div>
@@ -405,7 +406,8 @@
         </div>
         <div class="product-info">
             <div class="product-price">🔥 Hot sale. K1,200</div>
-            <button class="store-button" onclick="visitStore(); return false;">🛒 SHOP NOW</button>
+           <div class="product-price">📍 Luangwa Feira</div>
+            <button class="store-button" onclick="visitStore(); return false;">🛒 CLICK TO SHOP</button>
         </div>
     </div>
 </div>
@@ -418,7 +420,8 @@
         </div>
         <div class="product-info">
             <div class="product-price">🔥 Sale. K2,600</div>
-            <button class="store-button" onclick="visitStore(); return false;">🛒 SHOP NOW</button>
+             <div class="product-price">📍 Luangwa Feira</div>
+            <button class="store-button" onclick="visitStore(); return false;">🛒 CLICK TO SHOP </button>
         </div>
     </div>
 </div>
@@ -1842,22 +1845,66 @@ function visitStore() {
     return false;
 }
 window.visitStore = visitStore;
-  
-// ========== SLIDESHOW ==========
-document.addEventListener('DOMContentLoaded', function() {
+  // ========== SLIDESHOW ==========
+document.addEventListener('DOMContentLoaded', function () {
+
     let slides = document.querySelectorAll('.billboard-slide');
     let currentIndex = 0;
-    let slideInterval = 5000;
+    let intervalTime = 5000;
+
     function showSlide(index) {
-        slides.forEach(slide => slide.style.opacity = '0');
+        slides.forEach((slide, i) => {
+            slide.style.opacity = '0';
+            slide.style.zIndex = '1';
+        });
+
         slides[index].style.opacity = '1';
+        slides[index].style.zIndex = '2';
     }
+
     function nextSlide() {
         currentIndex = (currentIndex + 1) % slides.length;
         showSlide(currentIndex);
     }
-    showSlide(0);
-    setInterval(nextSlide, slideInterval);
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        showSlide(currentIndex);
+    }
+
+    // show first slide immediately
+    showSlide(currentIndex);
+
+    // autoplay
+    let autoPlay = setInterval(nextSlide, intervalTime);
+
+    function resetTimer() {
+        clearInterval(autoPlay);
+        autoPlay = setInterval(nextSlide, intervalTime);
+    }
+
+    // swipe
+    let startX = 0;
+
+    document.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function (e) {
+        let endX = e.changedTouches[0].clientX;
+        let diff = startX - endX;
+
+        if (Math.abs(diff) < 60) return;
+
+        if (diff > 0) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+
+        resetTimer();
+    }, { passive: true });
+
 });
 </script>
 </body>
