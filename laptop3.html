@@ -1842,22 +1842,61 @@ function visitStore() {
     return false;
 }
 window.visitStore = visitStore;
-  
-// ========== SLIDESHOW ==========
+  // ========== SLIDESHOW ==========
 document.addEventListener('DOMContentLoaded', function() {
+
     let slides = document.querySelectorAll('.billboard-slide');
     let currentIndex = 0;
     let slideInterval = 5000;
+
     function showSlide(index) {
         slides.forEach(slide => slide.style.opacity = '0');
         slides[index].style.opacity = '1';
     }
+
     function nextSlide() {
         currentIndex = (currentIndex + 1) % slides.length;
         showSlide(currentIndex);
     }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        showSlide(currentIndex);
+    }
+
     showSlide(0);
-    setInterval(nextSlide, slideInterval);
+
+    let autoPlay = setInterval(nextSlide, slideInterval);
+
+    // ========== TOUCH SWIPE ==========
+    let startX = 0;
+    const container = document.querySelector('.billboard-header') || document.body;
+
+    container.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+    });
+
+    container.addEventListener('touchend', function(e) {
+        let endX = e.changedTouches[0].clientX;
+        let diff = startX - endX;
+
+        if (diff > 50) {
+            nextSlide(); // swipe left
+            resetAuto();
+        }
+
+        if (diff < -50) {
+            prevSlide(); // swipe right
+            resetAuto();
+        }
+    });
+
+    // ========== RESET TIMER AFTER MANUAL ACTION ==========
+    function resetAuto() {
+        clearInterval(autoPlay);
+        autoPlay = setInterval(nextSlide, slideInterval);
+    }
+
 });
 </script>
 </body>
