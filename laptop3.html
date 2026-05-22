@@ -1844,14 +1844,22 @@ function visitStore() {
 window.visitStore = visitStore;
   // ========== SLIDESHOW ==========
 document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
     let slides = document.querySelectorAll('.billboard-slide');
     let currentIndex = 0;
     let slideInterval = 5000;
 
     function showSlide(index) {
-        slides.forEach(slide => slide.style.opacity = '0');
+        slides.forEach((slide, i) => {
+            slide.style.opacity = '0';
+            slide.style.zIndex = '1';
+            slide.style.pointerEvents = 'none';
+        });
+
         slides[index].style.opacity = '1';
+        slides[index].style.zIndex = '2';
+        slides[index].style.pointerEvents = 'auto';
     }
 
     function nextSlide() {
@@ -1868,31 +1876,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let autoPlay = setInterval(nextSlide, slideInterval);
 
-    // ========== TOUCH SWIPE ==========
+    // ===== FIXED SWIPE AREA (USE FULL SCREEN) =====
     let startX = 0;
-    const container = document.querySelector('.billboard-header') || document.body;
 
-    container.addEventListener('touchstart', function(e) {
+    document.body.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
-    });
+    }, { passive: true });
 
-    container.addEventListener('touchend', function(e) {
+    document.body.addEventListener('touchend', function(e) {
         let endX = e.changedTouches[0].clientX;
         let diff = startX - endX;
 
         if (diff > 50) {
-            nextSlide(); // swipe left
-            resetAuto();
+            nextSlide();
+            resetTimer();
         }
 
         if (diff < -50) {
-            prevSlide(); // swipe right
-            resetAuto();
+            prevSlide();
+            resetTimer();
         }
-    });
+    }, { passive: true });
 
-    // ========== RESET TIMER AFTER MANUAL ACTION ==========
-    function resetAuto() {
+    function resetTimer() {
         clearInterval(autoPlay);
         autoPlay = setInterval(nextSlide, slideInterval);
     }
