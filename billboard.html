@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Spotify + YouTube Search</title>
+  <title>ZamListing – Full Screen Billboard | Working YouTube + Spotify</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * {
@@ -481,12 +481,6 @@
       background: #ff9900;
       color: #000;
     }
-    .loading-indicator {
-      text-align: center;
-      color: #ffdd99;
-      padding: 10px;
-      display: none;
-    }
 
     .audio-player-container {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -748,7 +742,7 @@
         <div class="info-text" id="playerStatus">✅ Ready to play music non-stop</div>
       </div>
       
-      <!-- YouTube Tab - Stays inside billboard -->
+      <!-- WORKING YOUTUBE TAB -->
       <div id="youtubeTab" class="tab-content">
         <div class="embed-container">
           <div class="embed-wrapper">
@@ -757,19 +751,19 @@
           </div>
         </div>
         <div class="url-input-area">
-          <input type="text" id="youtubeSearchInput" class="url-input" placeholder="Enter song name, artist, or YouTube URL" value="Zambian music">
-          <button class="load-btn" onclick="searchYouTubeDirect()"><i class="fa fa-search"></i> Play</button>
+          <input type="text" id="youtubeSearchInput" class="url-input" placeholder="Enter YouTube URL or video ID" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+          <button class="load-btn" onclick="loadYouTubeVideo()"><i class="fa fa-youtube-play"></i> Load Video</button>
         </div>
         <div class="suggestions">
-          <span class="suggestion-btn" onclick="playYouTubeVideo('Zambian music')">🎵 Zambian Music</span>
-          <span class="suggestion-btn" onclick="playYouTubeVideo('Diamond Platnumz')">🎤 Diamond Platnumz</span>
-          <span class="suggestion-btn" onclick="playYouTubeVideo('Burna Boy')">🔥 Burna Boy</span>
-          <span class="suggestion-btn" onclick="playYouTubeVideo('gospel songs')">⛪ Gospel</span>
+          <span class="suggestion-btn" onclick="loadYouTubeVideoById('dQw4w9WgXcQ')">🎵 Rick Astley</span>
+          <span class="suggestion-btn" onclick="loadYouTubeVideoById('JGwWNGJdvx8')">🎤 Ed Sheeran</span>
+          <span class="suggestion-btn" onclick="loadYouTubeVideoById('7qkVtVQoFok')">🌍 Zambian Music</span>
+          <span class="suggestion-btn" onclick="loadYouTubeVideoById('OPf0YbXqDm0')">🎸 Classic Hits</span>
         </div>
-        <div class="info-text">💡 Type any song/artist name and click Play - video plays here! Also accepts YouTube URLs.</div>
+        <div class="info-text">💡 Paste any YouTube URL or video ID | Click suggestions to try</div>
       </div>
       
-      <!-- Spotify Tab - Stays inside billboard with search -->
+      <!-- WORKING SPOTIFY TAB -->
       <div id="spotifyTab" class="tab-content">
         <div class="embed-container">
           <div class="embed-wrapper">
@@ -778,16 +772,16 @@
           </div>
         </div>
         <div class="url-input-area">
-          <input type="text" id="spotifySearchInput" class="url-input" placeholder="Enter song name, artist, album, or URL" value="African music">
-          <button class="load-btn" onclick="searchSpotifyDirect()"><i class="fa fa-search"></i> Play</button>
+          <input type="text" id="spotifyUrlInput" class="url-input" placeholder="Enter Spotify URL (track, playlist, album, artist)" value="https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT">
+          <button class="load-btn" onclick="loadSpotifyUrl()"><i class="fa fa-spotify"></i> Load</button>
         </div>
         <div class="suggestions">
-          <span class="suggestion-btn" onclick="playSpotifyTrack('Zambian music')">🎵 Zambian Music</span>
-          <span class="suggestion-btn" onclick="playSpotifyTrack('Diamond Platnumz')">🎤 Diamond Platnumz</span>
-          <span class="suggestion-btn" onclick="playSpotifyTrack('Burna Boy')">🔥 Burna Boy</span>
-          <span class="suggestion-btn" onclick="playSpotifyTrack('gospel')">⛪ Gospel</span>
+          <span class="suggestion-btn" onclick="loadSpotifyTrack('4cOdK2wGLETKBW3PvgPWqT')">🎵 Top Hit</span>
+          <span class="suggestion-btn" onclick="loadSpotifyPlaylist('37i9dQZF1DXcBWIGoYBM5M')">📻 Today's Hits</span>
+          <span class="suggestion-btn" onclick="loadSpotifyArtist('1dfeR4HaWDbWqFHLkxsg1d')">🎤 Diamond Platnumz</span>
+          <span class="suggestion-btn" onclick="loadSpotifyAlbum('4aKdxOX0UC2WzQ8jg0ayv')">💿 African Beats</span>
         </div>
-        <div class="info-text">💡 Type any song/artist name and click Play - music plays here! Also accepts Spotify URLs.</div>
+        <div class="info-text">💡 Paste any Spotify track/playlist/album/artist URL | Free users may see ads</div>
       </div>
     </div>
   </div>
@@ -852,7 +846,7 @@
     else if (tab === 'spotify') { document.getElementById('spotifyTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:nth-child(4)').classList.add('active'); }
   }
 
-  // Video Player
+  // Video Player (unchanged)
   let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
   const timeDisplay = document.getElementById('timeDisplay');
@@ -878,7 +872,7 @@
   function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } }
   function toggleFullscreen() { if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen(); else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen(); }
 
-  // Audio Player
+  // Audio Player (unchanged)
   let audioFiles = [], currentAudioIndex = 0, isShuffle = false, isRepeat = false, isCrossfade = true;
   const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
   const currentTrackTitle = document.getElementById('currentTrackTitle');
@@ -909,60 +903,74 @@
   document.getElementById('audioFileInput').addEventListener('change', function(e) { const files=Array.from(e.target.files); audioFiles=files.filter(f=>f.type.startsWith('audio/')); if(!audioFiles.length){alert('No audio files found!');return;} const ul=document.getElementById('audioPlaylist'); ul.innerHTML=''; audioFiles.forEach((f,i)=>{ let li=document.createElement('li'); li.innerHTML=`<i class="fa fa-music"></i> ${f.name.substring(0,50)}`; li.onclick=()=>{currentAudioIndex=i;loadAudioTrack(currentAudioIndex);}; ul.appendChild(li); }); document.getElementById('audioPlaylistBox').style.display='block'; currentAudioIndex=0; loadAudioTrack(0); statusSpan.innerHTML='✅ Loaded '+audioFiles.length+' songs'; });
   function clearAudio() { audioFiles=[]; document.getElementById('audioPlaylist').innerHTML=''; document.getElementById('audioPlaylistBox').style.display='none'; audio.src=''; currentTrackTitle.textContent='🎧 No track playing'; currentTimeSpan.textContent='0:00'; totalTimeSpan.textContent='0:00'; audioProgressFill.style.width='0%'; statusSpan.innerHTML='✅ Ready'; currentAudioIndex=0; }
 
-  // ========== YOUTUBE - STAYS INSIDE BILLBOARD ==========
-  function searchYouTubeDirect() {
-    let query = document.getElementById('youtubeSearchInput').value.trim();
-    if (!query) { alert('Please enter a song name, artist, or YouTube URL'); return; }
-    if (query.includes('youtu.be/') || query.includes('youtube.com/watch')) {
-      let videoId = '';
-      if (query.includes('youtu.be/')) videoId = query.split('youtu.be/')[1].split('?')[0];
-      else if (query.includes('v=')) videoId = query.split('v=')[1].split('&')[0];
-      if (videoId && videoId.length === 11) {
-        document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-        return;
-      }
+  // ========== YOUTUBE - WORKING ==========
+  function loadYouTubeVideo() {
+    let input = document.getElementById('youtubeSearchInput').value.trim();
+    let videoId = input;
+    if (input.includes('youtu.be/')) {
+      videoId = input.split('youtu.be/')[1].split('?')[0];
+    } else if (input.includes('youtube.com/watch?v=')) {
+      videoId = input.split('v=')[1].split('&')[0];
+    } else if (input.includes('youtube.com/embed/')) {
+      videoId = input.split('embed/')[1].split('?')[0];
     }
-    // Search YouTube and play first result using YouTube's search player
-    document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}&autoplay=1`;
-  }
-  
-  function playYouTubeVideo(query) {
-    document.getElementById('youtubeSearchInput').value = query;
-    document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}&autoplay=1`;
-  }
-
-  // ========== SPOTIFY - STAYS INSIDE BILLBOARD ==========
-  async function searchSpotifyDirect() {
-    const query = document.getElementById('spotifySearchInput').value.trim();
-    if (!query) { alert('Please enter a song name, artist, album, or Spotify URL'); return; }
-    if (query.includes('spotify.com')) {
-      let embedUrl = '';
-      if (query.includes('track/')) { let id = query.split('track/')[1].split('?')[0]; embedUrl = `https://open.spotify.com/embed/track/${id}`; }
-      else if (query.includes('playlist/')) { let id = query.split('playlist/')[1].split('?')[0]; embedUrl = `https://open.spotify.com/embed/playlist/${id}`; }
-      else if (query.includes('album/')) { let id = query.split('album/')[1].split('?')[0]; embedUrl = `https://open.spotify.com/embed/album/${id}`; }
-      else if (query.includes('artist/')) { let id = query.split('artist/')[1].split('?')[0]; embedUrl = `https://open.spotify.com/embed/artist/${id}`; }
-      if (embedUrl) { document.getElementById('spotifyPlayer').src = embedUrl + '?utm_source=generator'; return; }
-    }
-    // Search Spotify - use a track search and play first result
-    try {
-      const response = await fetch(`https://spotify-search-proxy.vercel.app/search?q=${encodeURIComponent(query)}&type=track`);
-      const data = await response.json();
-      if (data && data.tracks && data.tracks.items && data.tracks.items.length > 0) {
-        const trackId = data.tracks.items[0].id;
-        document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&autoplay=1`;
-      } else {
-        document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/search/${encodeURIComponent(query)}/tracks`;
-      }
-    } catch (error) {
-      document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/search/${encodeURIComponent(query)}/tracks`;
+    if (videoId && videoId.length === 11) {
+      document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    } else {
+      alert('Please enter a valid YouTube URL or 11-character video ID');
     }
   }
   
-  function playSpotifyTrack(query) {
-    document.getElementById('spotifySearchInput').value = query;
-    searchSpotifyDirect();
+  function loadYouTubeVideoById(videoId) {
+    document.getElementById('youtubeSearchInput').value = `https://www.youtube.com/watch?v=${videoId}`;
+    document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
   }
 
+  // ========== SPOTIFY - WORKING ==========
+  function loadSpotifyUrl() {
+    let url = document.getElementById('spotifyUrlInput').value.trim();
+    let embedUrl = '';
+    if (url.includes('track/')) {
+      let id = url.split('track/')[1].split('?')[0];
+      embedUrl = `https://open.spotify.com/embed/track/${id}`;
+    } else if (url.includes('playlist/')) {
+      let id = url.split('playlist/')[1].split('?')[0];
+      embedUrl = `https://open.spotify.com/embed/playlist/${id}`;
+    } else if (url.includes('album/')) {
+      let id = url.split('album/')[1].split('?')[0];
+      embedUrl = `https://open.spotify.com/embed/album/${id}`;
+    } else if (url.includes('artist/')) {
+      let id = url.split('artist/')[1].split('?')[0];
+      embedUrl = `https://open.spotify.com/embed/artist/${id}`;
+    }
+    if (embedUrl) {
+      document.getElementById('spotifyPlayer').src = embedUrl + '?utm_source=generator';
+    } else {
+      alert('Please enter a valid Spotify track, playlist, album, or artist URL');
+    }
+  }
+  
+  function loadSpotifyTrack(trackId) {
+    document.getElementById('spotifyUrlInput').value = `https://open.spotify.com/track/${trackId}`;
+    document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/track/${trackId}?utm_source=generator`;
+  }
+  
+  function loadSpotifyPlaylist(playlistId) {
+    document.getElementById('spotifyUrlInput').value = `https://open.spotify.com/playlist/${playlistId}`;
+    document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator`;
+  }
+  
+  function loadSpotifyArtist(artistId) {
+    document.getElementById('spotifyUrlInput').value = `https://open.spotify.com/artist/${artistId}`;
+    document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/artist/${artistId}?utm_source=generator`;
+  }
+  
+  function loadSpotifyAlbum(albumId) {
+    document.getElementById('spotifyUrlInput').value = `https://open.spotify.com/album/${albumId}`;
+    document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/album/${albumId}?utm_source=generator`;
+  }
+
+  // Expose functions
   window.toggleAudioPlay = toggleAudioPlay;
   window.prevAudioTrack = prevAudioTrack;
   window.nextAudioTrack = nextAudioTrack;
@@ -980,10 +988,13 @@
   window.setVideoVolume = setVideoVolume;
   window.setPlaybackSpeed = setPlaybackSpeed;
   window.searchAndShowOnMap = searchAndShowOnMap;
-  window.searchYouTubeDirect = searchYouTubeDirect;
-  window.playYouTubeVideo = playYouTubeVideo;
-  window.searchSpotifyDirect = searchSpotifyDirect;
-  window.playSpotifyTrack = playSpotifyTrack;
+  window.loadYouTubeVideo = loadYouTubeVideo;
+  window.loadYouTubeVideoById = loadYouTubeVideoById;
+  window.loadSpotifyUrl = loadSpotifyUrl;
+  window.loadSpotifyTrack = loadSpotifyTrack;
+  window.loadSpotifyPlaylist = loadSpotifyPlaylist;
+  window.loadSpotifyArtist = loadSpotifyArtist;
+  window.loadSpotifyAlbum = loadSpotifyAlbum;
 </script>
 </body>
 </html>
