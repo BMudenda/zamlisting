@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Working Crossfade Audio</title>
+  <title>ZamListing – Full Screen Billboard | Professional Crossfade Audio</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,6 +71,7 @@
     .mode-btn.active-mode { background: #00cc44; color: white; }
     .volume-control { display: inline-flex; align-items: center; gap: 8px; background: #333; padding: 5px 12px; border-radius: 30px; }
     .volume-control input { width: 80px; cursor: pointer; }
+    .crossfade-slider { width: 120px; margin: 0 10px; }
     .billboard-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 1.2s ease-in-out; z-index: 1; }
     .billboard-slide.active { opacity: 1; z-index: 2; }
     .billboard-slide .motorbike-billboard img, .billboard-slide .car-billboard img, .billboard-slide .product-image img { width: min(380px, 55vw); height: auto; max-height: 55vh; object-fit: contain; filter: drop-shadow(0 0 35px rgba(0, 255, 200, 0.9)); }
@@ -135,7 +136,7 @@
     <div class="panel-content">
       <div class="media-tabs">
         <button class="tab-btn active" onclick="switchTab('video')">🎬 Video Player</button>
-        <button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player</button>
+        <button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player (Web Audio API Crossfade)</button>
       </div>
       
       <div id="videoTab" class="tab-content active">
@@ -164,13 +165,13 @@
         <div class="now-playing-text" id="videoNowPlaying">🎬 No video loaded. Click above to load videos from USB</div>
       </div>
       
-      <!-- SIMPLE RELIABLE AUDIO PLAYER WITH WORKING CROSSFADE -->
+      <!-- PROFESSIONAL AUDIO PLAYER WITH WEB AUDIO API CROSSFADE -->
       <div id="audioTab" class="tab-content">
         <div class="file-upload-area" onclick="document.getElementById('audioFileInput').click()">
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
           <i class="fa fa-usb" style="font-size: 40px;"></i>
           <p>🎵 Click to load MUSIC from USB / Flash Disk</p>
-          <small>Supports MP3, WAV, OGG, M4A, FLAC</small>
+          <small>Supports MP3, WAV, OGG, M4A, FLAC | Professional crossfade</small>
         </div>
         
         <div class="playlist-box" id="audioPlaylistBox" style="display:none;">
@@ -198,8 +199,13 @@
             <button id="crossfadeBtn" class="mode-btn active-mode" onclick="toggleCrossfade()"><i class="fa fa-magic"></i> Crossfade ON</button>
             <button class="mode-btn" onclick="clearAudio()"><i class="fa fa-trash"></i> Clear</button>
           </div>
+          <div class="info-text" style="margin-top:10px;">
+            <span>Crossfade duration: </span>
+            <input type="range" id="crossfadeDuration" class="crossfade-slider" min="0" max="5" step="0.5" value="2">
+            <span id="crossfadeValue">2.0</span> seconds
+          </div>
         </div>
-        <div class="info-text" id="playerStatus">✅ Ready | Crossfade ON - 2 second smooth transition between songs</div>
+        <div class="info-text" id="playerStatus">✅ Professional crossfade active | Smooth transitions between songs</div>
       </div>
     </div>
   </div>
@@ -288,15 +294,25 @@
   function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } }
   function toggleFullscreen() { if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen(); else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen(); }
 
-  // ========== SIMPLE RELIABLE AUDIO PLAYER WITH CROSSFADE ==========
+  // ========== PROFESSIONAL AUDIO PLAYER WITH WEB AUDIO API CROSSFADE ==========
   let audioFiles = [];
   let currentAudioIndex = 0;
   let isShuffle = false;
   let isRepeat = false;
   let isCrossfade = true;
-  let crossfadeTimer = null;
+  let crossfadeDuration = 2.0;
+  let isDraggingSlider = false;
   
-  const audioElem = new Audio();
+  // Web Audio API variables
+  let audioContext = null;
+  let currentSource = null;
+  let currentBuffer = null;
+  let nextSource = null;
+  let nextBuffer = null;
+  let gainNode = null;
+  let isPlaying = false;
+  let nextScheduled = false;
+  
   const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
   const currentTrackTitle = document.getElementById('currentTrackTitle');
   const currentTimeSpan = document.getElementById('currentTime');
@@ -305,42 +321,72 @@
   const audioProgressBar = document.getElementById('audioProgressBar');
   const statusSpan = document.getElementById('playerStatus');
   
-  function formatTimeSec(sec) {
-    if (isNaN(sec)) return '0:00';
-    let mins = Math.floor(sec / 60);
-    let secs = Math.floor(sec % 60);
-    return mins + ':' + (secs < 10 ? '0' : '') + secs;
-  }
+  // Crossfade duration slider
+  const crossfadeSlider = document.getElementById('crossfadeDuration');
+  const crossfadeValue = document.getElementById('crossfadeValue');
+  crossfadeSlider.addEventListener('input', function() {
+    crossfadeDuration = parseFloat(this.value);
+    crossfadeValue.textContent = crossfadeDuration.toFixed(1);
+  });
   
-  function updateProgress() {
-    if (audioElem.duration) {
-      audioProgressFill.style.width = (audioElem.currentTime / audioElem.duration * 100) + '%';
-      currentTimeSpan.textContent = formatTimeSec(audioElem.currentTime);
-      totalTimeSpan.textContent = formatTimeSec(audioElem.duration);
+  // Initialize Web Audio Context (must be started after user interaction)
+  function initAudioContext() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      gainNode = audioContext.createGain();
+      gainNode.connect(audioContext.destination);
+      gainNode.gain.value = 0.7;
+    }
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
     }
   }
   
-  audioElem.addEventListener('timeupdate', updateProgress);
-  audioElem.addEventListener('loadedmetadata', updateProgress);
-  audioElem.addEventListener('play', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-pause"></i>'; });
-  audioElem.addEventListener('pause', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-play"></i>'; });
-  
-  // Progress bar seeking
-  function seekAudio(e) {
-    if (!audioElem.duration) return;
-    const rect = audioProgressBar.getBoundingClientRect();
-    let percent = (e.clientX - rect.left) / rect.width;
-    percent = Math.max(0, Math.min(1, percent));
-    audioElem.currentTime = percent * audioElem.duration;
+  // Load audio file into buffer
+  async function loadAudioBuffer(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const arrayBuffer = e.target.result;
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          resolve(audioBuffer);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
   }
-  audioProgressBar.addEventListener('click', seekAudio);
   
-  // Volume control
-  function setAudioVolume(val) { audioElem.volume = val / 100; }
+  // Play current track with Web Audio
+  async function playCurrentTrack() {
+    if (!audioFiles[currentAudioIndex]) return;
+    initAudioContext();
+    
+    if (currentSource) {
+      try { currentSource.stop(); } catch(e) {}
+    }
+    
+    currentBuffer = await loadAudioBuffer(audioFiles[currentAudioIndex]);
+    currentSource = audioContext.createBufferSource();
+    currentSource.buffer = currentBuffer;
+    currentSource.connect(gainNode);
+    currentSource.start();
+    isPlaying = true;
+    
+    currentTrackTitle.textContent = `🎵 ${audioFiles[currentAudioIndex].name.substring(0, 50)}`;
+    highlightPlaylistItem(currentAudioIndex);
+    
+    // Schedule next track
+    scheduleNextTrack();
+  }
   
-  // Play next track with crossfade effect
-  function playNextTrack() {
-    if (audioFiles.length === 0) return;
+  // Schedule next track with crossfade
+  async function scheduleNextTrack() {
+    if (!audioFiles.length) return;
+    if (nextScheduled) return;
     
     let nextIndex;
     if (isShuffle) {
@@ -353,62 +399,181 @@
     } else if (isRepeat) {
       nextIndex = 0;
     } else {
-      statusSpan.innerHTML = '✅ Playback finished. Enable repeat to continue.';
       return;
     }
     
-    currentAudioIndex = nextIndex;
-    const nextFile = audioFiles[currentAudioIndex];
-    const nextUrl = URL.createObjectURL(nextFile);
-    
-    if (isCrossfade && !audioElem.paused && audioElem.src) {
-      // Crossfade: fade out current, fade in next
-      const startVolume = audioElem.volume;
-      let step = 0;
-      const steps = 30;
-      const stepTime = 2000 / steps; // 2 second crossfade
+    const scheduleTime = currentBuffer.duration - crossfadeDuration;
+    if (scheduleTime > 0) {
+      nextScheduled = true;
       
-      if (crossfadeTimer) clearInterval(crossfadeTimer);
+      // Load next buffer
+      nextBuffer = await loadAudioBuffer(audioFiles[nextIndex]);
+      nextSource = audioContext.createBufferSource();
+      nextSource.buffer = nextBuffer;
       
-      crossfadeTimer = setInterval(() => {
-        step++;
-        if (step <= steps) {
-          audioElem.volume = Math.max(0, startVolume * (1 - step / steps));
+      const nextGain = audioContext.createGain();
+      nextSource.connect(nextGain);
+      nextGain.connect(audioContext.destination);
+      nextGain.gain.value = 0;
+      
+      // Schedule fade out of current
+      const currentGain = gainNode;
+      currentGain.gain.setValueAtTime(currentGain.gain.value, audioContext.currentTime + scheduleTime);
+      currentGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + scheduleTime + crossfadeDuration);
+      
+      // Schedule fade in of next
+      nextSource.start(audioContext.currentTime + scheduleTime);
+      nextGain.gain.setValueAtTime(0, audioContext.currentTime + scheduleTime);
+      nextGain.gain.linearRampToValueAtTime(0.7, audioContext.currentTime + scheduleTime + crossfadeDuration);
+      
+      // Schedule cleanup and transition
+      setTimeout(() => {
+        if (currentSource) {
+          try { currentSource.stop(); } catch(e) {}
         }
-        if (step === steps) {
-          clearInterval(crossfadeTimer);
-          audioElem.volume = startVolume;
-          audioElem.src = nextUrl;
-          audioElem.load();
-          audioElem.play().catch(e => console.log('play next'));
-          currentTrackTitle.textContent = `🎵 ${nextFile.name.substring(0, 50)}`;
-          statusSpan.innerHTML = '🎵 Playing | Crossfade: ON (smooth transition) | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
-          highlightPlaylistItem(currentAudioIndex);
-          updateProgress();
-        }
-      }, stepTime);
-    } else {
-      // No crossfade, just switch
-      audioElem.src = nextUrl;
-      audioElem.load();
-      audioElem.play().catch(e => console.log('play next'));
-      currentTrackTitle.textContent = `🎵 ${nextFile.name.substring(0, 50)}`;
-      statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
-      highlightPlaylistItem(currentAudioIndex);
+        currentBuffer = nextBuffer;
+        currentSource = nextSource;
+        currentAudioIndex = nextIndex;
+        gainNode = nextGain;
+        nextScheduled = false;
+        
+        currentTrackTitle.textContent = `🎵 ${audioFiles[currentAudioIndex].name.substring(0, 50)}`;
+        highlightPlaylistItem(currentAudioIndex);
+        
+        // Schedule next track again
+        scheduleNextTrack();
+      }, (scheduleTime + crossfadeDuration) * 1000);
     }
   }
   
-  audioElem.addEventListener('ended', () => { playNextTrack(); });
+  function formatTimeSec(sec) {
+    if (isNaN(sec)) return '0:00';
+    let mins = Math.floor(sec / 60);
+    let secs = Math.floor(sec % 60);
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
   
-  function loadAudioTrack(index) {
-    if (!audioFiles[index]) return;
-    const url = URL.createObjectURL(audioFiles[index]);
-    audioElem.src = url;
-    audioElem.load();
-    audioElem.play().catch(e => console.log('click play to start'));
-    currentTrackTitle.textContent = `🎵 ${audioFiles[index].name.substring(0, 50)}`;
-    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON - 2s smooth transition' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
-    highlightPlaylistItem(index);
+  // Progress update (simplified - uses timer)
+  let progressInterval;
+  function startProgressTimer() {
+    if (progressInterval) clearInterval(progressInterval);
+    progressInterval = setInterval(() => {
+      if (isPlaying && currentBuffer && !isDraggingSlider) {
+        const currentTime = audioContext ? audioContext.currentTime - (currentSource ? currentSource.startTime || 0 : 0) : 0;
+        if (currentBuffer && currentBuffer.duration) {
+          const percent = (currentTime / currentBuffer.duration) * 100;
+          audioProgressFill.style.width = Math.min(100, Math.max(0, percent)) + '%';
+          currentTimeSpan.textContent = formatTimeSec(Math.max(0, currentTime));
+          totalTimeSpan.textContent = formatTimeSec(currentBuffer.duration);
+        }
+      }
+    }, 100);
+  }
+  
+  // Progress bar seeking
+  function handleSliderStart(e) {
+    isDraggingSlider = true;
+    e.preventDefault();
+  }
+  
+  function handleSliderMove(e) {
+    if (!isDraggingSlider || !currentBuffer) return;
+    const rect = audioProgressBar.getBoundingClientRect();
+    let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    let percent = (clientX - rect.left) / rect.width;
+    percent = Math.max(0, Math.min(1, percent));
+    audioProgressFill.style.width = percent * 100 + '%';
+    currentTimeSpan.textContent = formatTimeSec(percent * currentBuffer.duration);
+  }
+  
+  function handleSliderEnd(e) {
+    if (!isDraggingSlider || !currentBuffer || !currentSource) {
+      isDraggingSlider = false;
+      return;
+    }
+    const rect = audioProgressBar.getBoundingClientRect();
+    let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    let percent = (clientX - rect.left) / rect.width;
+    percent = Math.max(0, Math.min(1, percent));
+    const seekTime = percent * currentBuffer.duration;
+    
+    // Stop current and restart at seek position
+    try { currentSource.stop(); } catch(e) {}
+    currentSource = audioContext.createBufferSource();
+    currentSource.buffer = currentBuffer;
+    currentSource.connect(gainNode);
+    currentSource.start(0, seekTime);
+    isPlaying = true;
+    isDraggingSlider = false;
+  }
+  
+  audioProgressBar.addEventListener('mousedown', handleSliderStart);
+  document.addEventListener('mousemove', handleSliderMove);
+  document.addEventListener('mouseup', handleSliderEnd);
+  audioProgressBar.addEventListener('touchstart', handleSliderStart);
+  document.addEventListener('touchmove', handleSliderMove);
+  document.addEventListener('touchend', handleSliderEnd);
+  
+  function setAudioVolume(val) { if (gainNode) gainNode.gain.value = val / 100; }
+  
+  function toggleAudioPlay() {
+    if (audioFiles.length === 0) { alert('Load music first'); return; }
+    initAudioContext();
+    if (!isPlaying) {
+      playCurrentTrack();
+      startProgressTimer();
+      audioPlayPauseBtn.innerHTML = '<i class="fa fa-pause"></i>';
+    } else {
+      if (currentSource) {
+        try { currentSource.stop(); } catch(e) {}
+        isPlaying = false;
+        audioPlayPauseBtn.innerHTML = '<i class="fa fa-play"></i>';
+      }
+    }
+  }
+  
+  function prevAudioTrack() {
+    if (audioFiles.length === 0) return;
+    if (currentSource) try { currentSource.stop(); } catch(e) {}
+    nextScheduled = false;
+    currentAudioIndex = isShuffle ? Math.floor(Math.random() * audioFiles.length) : (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length;
+    playCurrentTrack();
+  }
+  
+  function nextAudioTrack() {
+    if (audioFiles.length === 0) return;
+    if (currentSource) try { currentSource.stop(); } catch(e) {}
+    nextScheduled = false;
+    let nextIndex;
+    if (isShuffle) {
+      do { nextIndex = Math.floor(Math.random() * audioFiles.length); } 
+      while (nextIndex === currentAudioIndex && audioFiles.length > 1);
+    } else {
+      nextIndex = (currentAudioIndex + 1) % audioFiles.length;
+    }
+    currentAudioIndex = nextIndex;
+    playCurrentTrack();
+  }
+  
+  function toggleShuffle() {
+    isShuffle = !isShuffle;
+    const btn = document.getElementById('shuffleBtn');
+    if (isShuffle) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
+    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
+  }
+  
+  function toggleRepeat() {
+    isRepeat = !isRepeat;
+    const btn = document.getElementById('repeatBtn');
+    if (isRepeat) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
+    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
+  }
+  
+  function toggleCrossfade() {
+    isCrossfade = !isCrossfade;
+    const btn = document.getElementById('crossfadeBtn');
+    if (isCrossfade) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; btn.innerHTML = '<i class="fa fa-magic"></i> Crossfade ON'; } 
+    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; btn.innerHTML = '<i class="fa fa-magic"></i> Crossfade OFF'; }
   }
   
   function highlightPlaylistItem(index) {
@@ -419,57 +584,7 @@
     });
   }
   
-  function toggleAudioPlay() {
-    if (audioFiles.length === 0) { alert('Load music first'); return; }
-    if (audioElem.paused) audioElem.play();
-    else audioElem.pause();
-  }
-  
-  function prevAudioTrack() {
-    if (audioFiles.length === 0) return;
-    let prevIndex = isShuffle ? Math.floor(Math.random() * audioFiles.length) : (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length;
-    currentAudioIndex = prevIndex;
-    loadAudioTrack(currentAudioIndex);
-  }
-  
-  function nextAudioTrack() {
-    if (audioFiles.length === 0) return;
-    let nextIndex;
-    if (isShuffle) {
-      do { nextIndex = Math.floor(Math.random() * audioFiles.length); } 
-      while (nextIndex === currentAudioIndex && audioFiles.length > 1);
-    } else {
-      nextIndex = (currentAudioIndex + 1) % audioFiles.length;
-    }
-    currentAudioIndex = nextIndex;
-    loadAudioTrack(currentAudioIndex);
-  }
-  
-  function toggleShuffle() {
-    isShuffle = !isShuffle;
-    const btn = document.getElementById('shuffleBtn');
-    if (isShuffle) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
-    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
-    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
-  }
-  
-  function toggleRepeat() {
-    isRepeat = !isRepeat;
-    const btn = document.getElementById('repeatBtn');
-    if (isRepeat) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
-    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
-    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
-  }
-  
-  function toggleCrossfade() {
-    isCrossfade = !isCrossfade;
-    const btn = document.getElementById('crossfadeBtn');
-    if (isCrossfade) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; btn.innerHTML = '<i class="fa fa-magic"></i> Crossfade ON'; } 
-    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; btn.innerHTML = '<i class="fa fa-magic"></i> Crossfade OFF'; }
-    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON - 2s smooth transition' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
-  }
-  
-  document.getElementById('audioFileInput').addEventListener('change', function(e) {
+  document.getElementById('audioFileInput').addEventListener('change', async function(e) {
     const files = Array.from(e.target.files);
     audioFiles = files.filter(f => f.type.startsWith('audio/'));
     if (!audioFiles.length) { alert('No audio files found!'); return; }
@@ -478,26 +593,35 @@
     audioFiles.forEach((f, i) => {
       let li = document.createElement('li');
       li.innerHTML = `<i class="fa fa-music"></i> ${f.name.substring(0, 50)}${f.name.length > 50 ? '...' : ''}`;
-      li.onclick = () => { currentAudioIndex = i; loadAudioTrack(currentAudioIndex); };
+      li.onclick = () => { 
+        if (currentSource) try { currentSource.stop(); } catch(e) {}
+        nextScheduled = false;
+        currentAudioIndex = i; 
+        playCurrentTrack(); 
+      };
       ul.appendChild(li);
     });
     document.getElementById('audioPlaylistBox').style.display = 'block';
     currentAudioIndex = 0;
-    loadAudioTrack(0);
-    statusSpan.innerHTML = '✅ Loaded ' + audioFiles.length + ' songs | Crossfade: ON - 2 second smooth transition between songs';
+    initAudioContext();
+    playCurrentTrack();
+    startProgressTimer();
+    statusSpan.innerHTML = '✅ Loaded ' + audioFiles.length + ' songs | Professional crossfade active';
   });
   
   function clearAudio() {
     audioFiles = [];
     document.getElementById('audioPlaylist').innerHTML = '';
     document.getElementById('audioPlaylistBox').style.display = 'none';
-    audioElem.src = '';
+    if (currentSource) try { currentSource.stop(); } catch(e) {}
+    isPlaying = false;
     currentTrackTitle.textContent = '🎧 No track playing';
     currentTimeSpan.textContent = '0:00';
     totalTimeSpan.textContent = '0:00';
     audioProgressFill.style.width = '0%';
-    statusSpan.innerHTML = '✅ Ready | Crossfade ON - Load music to start';
+    statusSpan.innerHTML = '✅ Ready | Load music from USB';
     currentAudioIndex = 0;
+    nextScheduled = false;
   }
 
   // Expose functions globally
