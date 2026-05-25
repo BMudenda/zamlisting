@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Video + Audio + Map</title>
+  <title>ZamListing – Full Screen Billboard | Fixed Audio Progress Bar</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * {
@@ -412,7 +412,7 @@
       transform: scale(1.05);
     }
 
-    /* AUDIO PLAYER STYLES */
+    /* AUDIO PLAYER STYLES - FIXED PROGRESS BAR */
     .audio-player-container {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
       border-radius: 25px;
@@ -428,12 +428,13 @@
     }
     .audio-progress-container {
       margin: 15px 0;
+      width: 100%;
     }
     .audio-progress-bar {
       width: 100%;
-      height: 6px;
-      background: #333;
-      border-radius: 3px;
+      height: 8px;
+      background: #444;
+      border-radius: 4px;
       cursor: pointer;
       position: relative;
     }
@@ -441,8 +442,12 @@
       width: 0%;
       height: 100%;
       background: linear-gradient(90deg, #ff9900, #ff5500);
-      border-radius: 3px;
-      transition: width 0.1s linear;
+      border-radius: 4px;
+      position: relative;
+      pointer-events: none;
+    }
+    .audio-progress-bar:hover {
+      height: 10px;
     }
     .audio-time {
       display: flex;
@@ -558,6 +563,7 @@
       .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none}
       .audio-control-btn{width:40px;height:40px;font-size:16px}
       .mode-btn{padding:5px 12px;font-size:11px}
+      .audio-progress-bar{height:6px}
     }
     ::-webkit-scrollbar { display: none; }
   </style>
@@ -597,7 +603,7 @@
       <div class="map-container">
         <iframe class="map-iframe" id="mapIframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" loading="lazy" allowfullscreen></iframe>
         <div class="simple-search-panel">
-          <input type="text" id="searchLocation" class="search-input" placeholder="🔍 Search for a place (e.g., Lusaka, Chipata...)" value="">
+          <input type="text" id="searchLocation" class="search-input" placeholder="🔍 Search for a place..." value="">
           <button class="search-btn" onclick="searchAndShowOnMap()"><i class="fa fa-search"></i> Search</button>
           <button id="openMapsBtn" class="open-maps-btn"><i class="fa fa-external-link"></i> Open in Google Maps</button>
         </div>
@@ -606,7 +612,7 @@
     </div>
   </div>
 
-  <!-- MEDIA OVERLAY - Video + Audio Only -->
+  <!-- MEDIA OVERLAY -->
   <div id="mediaPanel" class="overlay-panel">
     <div class="panel-header"><span><i class="fa fa-headphones"></i> Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
     <div class="panel-content">
@@ -643,10 +649,9 @@
         </div>
         <div class="playlist-box" id="videoPlaylistBox" style="display:none;"><ul id="videoPlaylist"></ul></div>
         <div class="now-playing-text" id="videoNowPlaying">🎬 No video loaded. Click above to load videos from USB</div>
-        <div class="info-text">💡 Load videos from USB | Play, pause, fullscreen | Click playlist to play</div>
       </div>
       
-      <!-- Audio Player Tab -->
+      <!-- Audio Player Tab - FIXED PROGRESS BAR -->
       <div id="audioTab" class="tab-content">
         <div class="file-upload-area" onclick="document.getElementById('audioFileInput').click()">
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
@@ -688,7 +693,6 @@
           </div>
         </div>
         <div class="info-text" id="playerStatus">✅ Ready to play music non-stop from USB</div>
-        <div class="info-text">💡 Load music from USB | Auto-play next track | Shuffle | Repeat | Crossfade</div>
       </div>
     </div>
   </div>
@@ -780,7 +784,7 @@
   function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } }
   function toggleFullscreen() { if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen(); else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen(); }
 
-  // ========== AUDIO PLAYER ==========
+  // ========== AUDIO PLAYER - FIXED PROGRESS BAR ==========
   let audioFiles = [], currentAudioIndex = 0, isShuffle = false, isRepeat = false, isCrossfade = true;
   const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
   const currentTrackTitle = document.getElementById('currentTrackTitle');
@@ -798,7 +802,52 @@
   audio.addEventListener('ended', () => { playNextAudioTrack(); });
   audio.addEventListener('play', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-pause"></i>'; });
   audio.addEventListener('pause', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-play"></i>'; });
-  audioProgressBar.addEventListener('click', (e) => { if (audio.duration) { const rect = audioProgressBar.getBoundingClientRect(); audio.currentTime = ((e.clientX - rect.left)/rect.width) * audio.duration; } });
+  
+  // FIXED: Better progress bar seek functionality
+  function seekAudio(event) {
+    if (!audio.duration) return;
+    const rect = audioProgressBar.getBoundingClientRect();
+    let percent = (event.clientX - rect.left) / rect.width;
+    percent = Math.max(0, Math.min(1, percent));
+    audio.currentTime = percent * audio.duration;
+  }
+  
+  audioProgressBar.addEventListener('click', seekAudio);
+  // Also handle mousedown + mousemove for dragging
+  let isDragging = false;
+  audioProgressBar.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    seekAudio(e);
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging && audio.duration) {
+      const rect = audioProgressBar.getBoundingClientRect();
+      let percent = (e.clientX - rect.left) / rect.width;
+      percent = Math.max(0, Math.min(1, percent));
+      audio.currentTime = percent * audio.duration;
+    }
+  });
+  document.addEventListener('mouseup', () => { isDragging = false; });
+  // Touch events for mobile
+  audioProgressBar.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    const rect = audioProgressBar.getBoundingClientRect();
+    let percent = (e.touches[0].clientX - rect.left) / rect.width;
+    percent = Math.max(0, Math.min(1, percent));
+    audio.currentTime = percent * audio.duration;
+    e.preventDefault();
+  });
+  document.addEventListener('touchmove', (e) => {
+    if (isDragging && audio.duration) {
+      const rect = audioProgressBar.getBoundingClientRect();
+      let percent = (e.touches[0].clientX - rect.left) / rect.width;
+      percent = Math.max(0, Math.min(1, percent));
+      audio.currentTime = percent * audio.duration;
+    }
+  });
+  document.addEventListener('touchend', () => { isDragging = false; });
+  
   function setAudioVolume(val) { audio.volume = val/100; }
   
   function playNextAudioTrack() {
