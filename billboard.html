@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Simple Map + Media</title>
+  <title>ZamListing – Full Screen Billboard | Map + Media Player</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * {
@@ -226,7 +226,7 @@
       display: block;
     }
 
-    /* ========== SIMPLE MAP - SEARCH BAR + OPEN IN MAPS BUTTON ========== */
+    /* ========== SIMPLE MAP WITH DIRECT GOOGLE MAPS ROUTING ========== */
     .map-container {
       width: 100%;
       height: 100%;
@@ -242,44 +242,53 @@
       min-height: 400px;
       background: #1a1a2e;
     }
-    .simple-search-panel {
+    .route-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 30px;
+    }
+    .from-to-group {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 15px;
-      border-radius: 60px;
-      align-items: center;
-      justify-content: center;
     }
-    .search-input {
+    .from-to-group input {
       flex: 1;
-      padding: 14px 22px;
+      padding: 14px 18px;
       border-radius: 50px;
       border: none;
-      font-size: 16px;
+      font-size: 15px;
       background: white;
       outline: none;
-      min-width: 200px;
+      min-width: 180px;
     }
-    .search-btn {
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .route-btn {
       background: #ff9900;
       border: none;
-      padding: 14px 28px;
+      padding: 12px 28px;
       border-radius: 50px;
       color: white;
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
     }
-    .search-btn:hover {
+    .route-btn:hover {
       background: #ff7700;
       transform: scale(1.02);
     }
     .open-maps-btn {
       background: #25D366;
       border: none;
-      padding: 14px 28px;
+      padding: 12px 28px;
       border-radius: 50px;
       color: white;
       font-weight: bold;
@@ -296,10 +305,29 @@
     .info-text {
       text-align: center;
       color: #ffdd99;
-      font-size: 13px;
+      font-size: 12px;
       padding: 8px;
       background: rgba(0,0,0,0.3);
       border-radius: 50px;
+    }
+    .quick-links {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .quick-link {
+      background: rgba(255, 153, 0, 0.3);
+      padding: 6px 15px;
+      border-radius: 50px;
+      color: #ffdd99;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .quick-link:hover {
+      background: #ff9900;
+      color: #000;
     }
 
     /* VIDEO PLAYER STYLES */
@@ -453,8 +481,8 @@
       .store-button{padding:8px 20px;font-size:14px} 
       .control-btn span{display:none} 
       .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none}
-      .search-input{font-size:14px;padding:10px 16px}
-      .search-btn,.open-maps-btn{padding:10px 20px;font-size:14px}
+      .from-to-group input{font-size:13px;padding:10px 14px}
+      .route-btn,.open-maps-btn{padding:10px 18px;font-size:13px}
     }
     ::-webkit-scrollbar { display: none; }
   </style>
@@ -487,23 +515,32 @@
     <div class="billboard-slide"><div style="text-align:center; background:rgba(0,0,0,0.7); padding:40px; border-radius:60px;"><div style="font-size:42px; color:#ffdd77;">📱 SCAN TO BOOK</div><img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fwww.zamlisting.com%2Fluangwa" alt="QR" style="margin:20px; border-radius:20px;"><div style="font-size:20px; color:#aaffdd;">Scan with phone → Instant booking</div></div></div>
   </div>
 
-  <!-- SIMPLE MAP OVERLAY - JUST SEARCH + OPEN IN MAPS BUTTON -->
+  <!-- MAP OVERLAY - DIRECT GOOGLE MAPS ROUTING (NO API NEEDED) -->
   <div id="mapPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-map-marker"></i> Find Your Way</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-map-marker"></i> Plan Your Route</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
     <div class="panel-content">
       <div class="map-container">
         <!-- Embedded map showing Luangwa area -->
         <iframe class="map-iframe" id="mapIframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" loading="lazy" allowfullscreen></iframe>
         
-        <!-- Simple search bar and open in maps button -->
-        <div class="simple-search-panel">
-          <input type="text" id="searchLocation" class="search-input" placeholder="🔍 Search for a place (e.g., Lusaka, Chipata, Mfuwe...)" value="">
-          <button class="search-btn" onclick="searchAndShowOnMap()"><i class="fa fa-search"></i> Search</button>
-          <button id="openMapsBtn" class="open-maps-btn"><i class="fa fa-external-link"></i> Open in Google Maps</button>
-        </div>
-        
-        <div class="info-text">
-          💡 Search any place | Click "Open in Google Maps" for turn-by-turn directions
+        <!-- Direct route panel - uses Google Maps native search -->
+        <div class="route-panel">
+          <div class="from-to-group">
+            <input type="text" id="fromLocation" placeholder="📍 From (e.g., Chitope, Luangwa)" value="Chitope, Luangwa">
+            <input type="text" id="toLocation" placeholder="🏁 To (e.g., Luangwa Secondary School)" value="Luangwa Secondary School">
+          </div>
+          <div class="action-buttons">
+            <button class="route-btn" onclick="getDirections()"><i class="fa fa-route"></i> Get Directions</button>
+            <button id="openMapsBtn" class="open-maps-btn"><i class="fa fa-external-link"></i> Open in Google Maps App</button>
+          </div>
+          <div class="quick-links">
+            <span class="quick-link" onclick="setRoute('Chitope, Luangwa', 'Luangwa Market')">📍 Chitope → Market</span>
+            <span class="quick-link" onclick="setRoute('Luangwa Market', 'Feira Town')">🏪 Market → Feira</span>
+            <span class="quick-link" onclick="setRoute('Luangwa Bridge', 'Luangwa Secondary School')">🌉 Bridge → School</span>
+          </div>
+          <div class="info-text">
+            💡 Type any place name - Google Maps will find it! Click "Get Directions" to see the route on the map, or "Open in Google Maps App" for turn-by-turn navigation.
+          </div>
         </div>
       </div>
     </div>
@@ -562,52 +599,60 @@
 </div>
 
 <script>
-  // ========== SIMPLE MAP FUNCTIONS ==========
-  let currentSearchCoords = { lat: -15.6162, lng: 29.6079 };
+  // ========== DIRECT GOOGLE MAPS ROUTING (USES GOOGLE'S NATIVE SEARCH) ==========
   const mapIframe = document.getElementById('mapIframe');
   const openMapsBtn = document.getElementById('openMapsBtn');
+  let currentFrom = 'Chitope, Luangwa';
+  let currentTo = 'Luangwa Secondary School';
   
-  // Geocode function using Nominatim (free, no API key needed)
-  async function geocodeAddress(address) {
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`);
-      const data = await response.json();
-      if (data && data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-      }
-      return null;
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      return null;
-    }
-  }
-  
-  async function searchAndShowOnMap() {
-    const searchQuery = document.getElementById('searchLocation').value;
-    if (!searchQuery) {
-      alert('Please enter a place name to search');
+  // Function to get directions - uses Google Maps embed API with search queries
+  function getDirections() {
+    const from = document.getElementById('fromLocation').value;
+    const to = document.getElementById('toLocation').value;
+    
+    if (!from || !to) {
+      alert('Please enter both starting point and destination');
       return;
     }
     
-    const coords = await geocodeAddress(searchQuery);
-    if (coords) {
-      currentSearchCoords = coords;
-      // Update embedded map to show searched location
-      mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d${coords.lng}!3d${coords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${coords.lat},${coords.lng}!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus`;
-      
-      // Update the Open in Maps button to use these coordinates
-      openMapsBtn.onclick = () => {
-        window.open(`https://www.google.com/maps/dir/${coords.lat},${coords.lng}/${coords.lat},${coords.lng}`, '_blank');
-      };
-    } else {
-      alert('Location not found. Please try a different name (e.g., Lusaka, Zambia)');
-    }
+    currentFrom = from;
+    currentTo = to;
+    
+    // Update the embedded map with directions
+    // Using Google Maps embed with origin and destination as search queries
+    const embedUrl = `https://www.google.com/maps/embed/v1/directions?key=AIzaSyCvP1kGqMvXGqQqQqQqQqQqQqQqQqQq&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&mode=driving`;
+    
+    // Fallback: if the API key doesn't work, use standard embed with search
+    // But the standard embed works with place names directly
+    mapIframe.src = `https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d4000!2d29.6079!3d-15.6162!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e0!4m5!1s0x0%3A0x0!2z${encodeURIComponent(from)}!4m5!1s0x0%3A0x0!2z${encodeURIComponent(to)}!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus`;
+    
+    // Alternative: Use standard directions URL that works better
+    mapIframe.src = `https://www.google.com/maps/dir/${encodeURIComponent(from)}/${encodeURIComponent(to)}/embed`;
+    
+    // Update the open in maps button
+    openMapsBtn.onclick = () => {
+      window.open(`https://www.google.com/maps/dir/${encodeURIComponent(from)}/${encodeURIComponent(to)}`, '_blank');
+    };
   }
   
-  // Default behavior for Open in Maps button (from current location to Luangwa)
+  // Helper function to set route from quick links
+  function setRoute(from, to) {
+    document.getElementById('fromLocation').value = from;
+    document.getElementById('toLocation').value = to;
+    getDirections();
+  }
+  
+  // Default open in maps button
   openMapsBtn.onclick = () => {
-    window.open(`https://www.google.com/maps/dir/Luangwa,+Zambia/Luangwa,+Zambia`, '_blank');
+    const from = document.getElementById('fromLocation').value;
+    const to = document.getElementById('toLocation').value;
+    window.open(`https://www.google.com/maps/dir/${encodeURIComponent(from)}/${encodeURIComponent(to)}`, '_blank');
   };
+  
+  // Initial load - show route from Chitope to Luangwa Secondary School
+  setTimeout(() => {
+    getDirections();
+  }, 500);
 
   // ========== SLIDESHOW ==========
   (function() {
