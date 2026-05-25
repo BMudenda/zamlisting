@@ -3,10 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Map with Search + Media Player</title>
+  <title>ZamListing – Full Screen Billboard | Map + Media Player</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <!-- Google Maps API with Places library for search functionality -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbvybHf-e2RQDd0Lt2JcZCWYfEpiK66DU&libraries=places&callback=initMap" async defer></script>
   <style>
     * {
       margin: 0;
@@ -150,7 +148,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       width: 90%;
-      max-width: 1200px;
+      max-width: 1100px;
       height: 85%;
       max-height: 85vh;
       background: rgba(10, 15, 30, 0.98);
@@ -228,13 +226,21 @@
       display: block;
     }
 
-    /* ========== MAP WITH SEARCH - FULLY FUNCTIONAL ========== */
-    .map-full-container {
+    /* ========== MAP WITH NATIVE GOOGLE MAPS URL (NO API KEY) ========== */
+    .map-container {
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
       gap: 15px;
+    }
+    .map-iframe {
+      width: 100%;
+      flex: 1;
+      border-radius: 20px;
+      border: none;
+      min-height: 400px;
+      background: #1a1a2e;
     }
     .search-panel {
       display: flex;
@@ -272,31 +278,27 @@
       gap: 10px;
       flex-wrap: wrap;
       background: rgba(0, 0, 0, 0.3);
-      padding: 10px;
-      border-radius: 50px;
+      padding: 12px;
+      border-radius: 60px;
       align-items: center;
       justify-content: center;
     }
     .directions-panel input {
-      padding: 8px 15px;
+      padding: 10px 18px;
       border-radius: 50px;
       border: none;
       width: 200px;
       font-size: 14px;
+      background: white;
     }
     .directions-panel button {
       background: #ff9900;
       border: none;
-      padding: 8px 20px;
+      padding: 10px 22px;
       border-radius: 50px;
       color: white;
       cursor: pointer;
-    }
-    #map {
-      width: 100%;
-      height: 500px;
-      border-radius: 20px;
-      background: #333;
+      font-weight: bold;
     }
     .map-buttons {
       display: flex;
@@ -307,12 +309,28 @@
     }
     .map-nav-btn {
       background: #ff9900;
-      padding: 8px 20px;
+      padding: 10px 24px;
       border: none;
       border-radius: 50px;
       color: white;
       cursor: pointer;
       font-weight: bold;
+      transition: 0.2s;
+    }
+    .map-nav-btn:hover {
+      background: #ff7700;
+      transform: scale(1.02);
+    }
+    .open-maps-link {
+      display: inline-block;
+      background: #25D366;
+      padding: 12px 28px;
+      border-radius: 50px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
     }
 
     /* VIDEO PLAYER STYLES */
@@ -460,7 +478,7 @@
     @keyframes blink-cursor { 0%,100%{border-color:#ffcc33}50%{border-color:transparent} }
     .promo-billboard { background: linear-gradient(135deg,#ff4d4d,#ff8c00,#ffdd44); padding: 32px 65px; border-radius: 90px; font-size: clamp(28px,6vw,58px); font-weight: 800; color: white; }
     .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ffcc; font-weight: bold; }
-    @media (max-width:700px){ .product-price{font-size:18px} .status-text{font-size:14px} .store-button{padding:8px 20px;font-size:14px} .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none} .search-input{font-size:12px} .directions-panel input{width:120px;font-size:11px} }
+    @media (max-width:700px){ .product-price{font-size:18px} .status-text{font-size:14px} .store-button{padding:8px 20px;font-size:14px} .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none} .search-input{font-size:12px} .directions-panel input{width:130px;font-size:12px} .directions-panel button{padding:6px 12px;font-size:12px} }
     ::-webkit-scrollbar { display: none; }
   </style>
 </head>
@@ -492,29 +510,40 @@
     <div class="billboard-slide"><div style="text-align:center; background:rgba(0,0,0,0.7); padding:40px; border-radius:60px;"><div style="font-size:42px; color:#ffdd77;">📱 SCAN TO BOOK</div><img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fwww.zamlisting.com%2Fluangwa" alt="QR" style="margin:20px; border-radius:20px;"><div style="font-size:20px; color:#aaffdd;">Scan with phone → Instant booking</div></div></div>
   </div>
 
-  <!-- MAP OVERLAY WITH SEARCH - FULLY FUNCTIONAL -->
+  <!-- MAP OVERLAY WITH NATIVE GOOGLE MAPS URL (NO API KEY) -->
   <div id="mapPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-map"></i> Google Map - Search & Directions</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-map"></i> Navigation - Find Your Way</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
     <div class="panel-content">
-      <div class="map-full-container">
+      <div class="map-container">
+        <!-- Embedded Google Map (static view) -->
+        <iframe class="map-iframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" loading="lazy" allowfullscreen></iframe>
+        
+        <!-- Search and Directions Panel -->
         <div class="search-panel">
-          <input type="text" id="searchLocation" class="search-input" placeholder="🔍 Search for a place (e.g., Lusaka, Chipata, Chirundu...)">
-          <button class="search-btn" onclick="searchPlace()"><i class="fa fa-search"></i> Search</button>
+          <input type="text" id="searchLocation" class="search-input" placeholder="🔍 Search for a place (e.g., Lusaka, Chipata...)">
+          <button class="search-btn" onclick="searchAndNavigate()"><i class="fa fa-search"></i> Search</button>
         </div>
+        
         <div class="directions-panel">
-          <input type="text" id="startPoint" placeholder="📍 Start point" value="Luangwa, Zambia">
-          <input type="text" id="endPoint" placeholder="🏁 Destination">
-          <button onclick="getDirections()"><i class="fa fa-route"></i> Get Directions</button>
-          <button onclick="clearDirections()"><i class="fa fa-times"></i> Clear</button>
+          <input type="text" id="startPoint" placeholder="📍 From (e.g., Luangwa)" value="Luangwa, Zambia">
+          <input type="text" id="endPoint" placeholder="🏁 To (destination)">
+          <button onclick="getDirectionsNative()"><i class="fa fa-route"></i> Get Directions</button>
+          <button onclick="updateEmbedMap()"><i class="fa fa-map"></i> Show on Map</button>
         </div>
-        <div id="map"></div>
+        
         <div class="map-buttons">
-          <button class="map-nav-btn" onclick="goToPlace('Luangwa Market, Zambia')">📍 Luangwa Market</button>
-          <button class="map-nav-btn" onclick="goToPlace('Feira Town, Zambia')">🏁 Feira Town</button>
-          <button class="map-nav-btn" onclick="goToPlace('Chirundu, Zambia')">🛣️ Chirundu</button>
-          <button class="map-nav-btn" onclick="resetMapView()">🗺️ Reset Map</button>
+          <button class="map-nav-btn" onclick="navigateTo('Luangwa+Market,+Zambia')">📍 Luangwa Market</button>
+          <button class="map-nav-btn" onclick="navigateTo('Feira+Town,+Zambia')">🏁 Feira Town</button>
+          <button class="map-nav-btn" onclick="navigateTo('Chirundu,+Zambia')">🛣️ Chirundu</button>
+          <button class="map-nav-btn" onclick="resetEmbedMap()">🗺️ Reset Map</button>
         </div>
-        <div class="now-playing-text" style="font-size:12px;">💡 Type any place name and click Search | Use Directions to plan your route</div>
+        
+        <!-- Open in Google Maps App button -->
+        <a id="openMapsLink" class="open-maps-link" href="#" target="_blank">
+          <i class="fa fa-external-link"></i> Open in Google Maps App
+        </a>
+        
+        <div class="now-playing-text" style="font-size:12px; margin-top:8px;">💡 Search any place | Get turn-by-turn directions | Click the green button to open in Google Maps</div>
       </div>
     </div>
   </div>
@@ -530,6 +559,7 @@
           <input type="file" id="videoFileInput" accept="video/*" multiple style="display:none">
           <i class="fa fa-usb" style="font-size: 40px;"></i>
           <p>📀 Click to load VIDEOS from USB / Flash Disk</p>
+          <small>Supports MP4, AVI, MOV, MKV, WEBM</small>
         </div>
         <div class="video-container" id="videoContainer">
           <video id="videoPlayer" style="width:100%; min-height:350px; background:#000;">
@@ -545,6 +575,7 @@
         </div>
         <div class="playlist-box" id="videoPlaylistBox" style="display:none;"><ul id="videoPlaylist"></ul></div>
         <div class="now-playing-text" id="videoNowPlaying">🎬 No video loaded. Click above to load videos from USB</div>
+        <div class="now-playing-text" style="font-size:12px; opacity:0.7;">💡 Hover or tap on video to show controls</div>
       </div>
       
       <div id="audioTab" class="tab-content">
@@ -552,16 +583,17 @@
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
           <i class="fa fa-music" style="font-size: 40px;"></i>
           <p>🎵 Click to load MUSIC from USB / Flash Disk</p>
+          <small>Supports MP3, WAV, OGG, M4A</small>
         </div>
         <div class="playlist-box" id="audioPlaylistBox" style="display:none;"><ul id="audioPlaylist"></ul></div>
-        <div class="now-playing-text" id="audioNowPlaying">🎧 No music loaded</div>
+        <div class="now-playing-text" id="audioNowPlaying">🎧 No music loaded. Click above to add songs</div>
         <audio id="audioPlayer" controls style="width:100%"></audio>
         <div class="audio-controls">
-          <button class="media-btn" onclick="playAudio()">Play</button>
-          <button class="media-btn" onclick="pauseAudio()">Pause</button>
-          <button class="media-btn" onclick="prevAudio()">Previous</button>
-          <button class="media-btn" onclick="nextAudio()">Next</button>
-          <button class="media-btn" onclick="clearAudio()">Clear</button>
+          <button class="media-btn" onclick="playAudio()"><i class="fa fa-play"></i> Play</button>
+          <button class="media-btn" onclick="pauseAudio()"><i class="fa fa-pause"></i> Pause</button>
+          <button class="media-btn" onclick="prevAudio()"><i class="fa fa-backward"></i> Previous</button>
+          <button class="media-btn" onclick="nextAudio()"><i class="fa fa-forward"></i> Next</button>
+          <button class="media-btn" onclick="clearAudio()"><i class="fa fa-trash"></i> Clear</button>
         </div>
       </div>
     </div>
@@ -569,127 +601,84 @@
 </div>
 
 <script>
-  // ========== GOOGLE MAP WITH SEARCH ==========
-  let map, searchBox, directionsService, directionsRenderer;
-  let marker;
-
-  function initMap() {
-    const luangwa = { lat: -15.6162, lng: 29.6079 };
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: luangwa,
-      zoom: 12,
-      styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
-    });
-    
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-    
-    // Add marker at default location
-    marker = new google.maps.Marker({
-      position: luangwa,
-      map: map,
-      title: "Luangwa, Zambia",
-      animation: google.maps.Animation.DROP
-    });
-    
-    // Setup autocomplete for search
-    const searchInput = document.getElementById('searchLocation');
-    const autocomplete = new google.maps.places.Autocomplete(searchInput);
-    autocomplete.bindTo('bounds', map);
-    
-    autocomplete.addListener('place_changed', function() {
-      const place = autocomplete.getPlace();
-      if (!place.geometry) return;
-      if (place.geometry.viewport) map.fitBounds(place.geometry.viewport);
-      else {
-        map.setCenter(place.geometry.location);
-        map.setZoom(15);
+  // ========== NATIVE GOOGLE MAPS FUNCTIONS (NO API KEY) ==========
+  let currentPickupCoords = { lat: -15.6162, lng: 29.6079 };
+  let currentDestCoords = { lat: -15.6162, lng: 29.6079 };
+  const openLink = document.getElementById('openMapsLink');
+  const mapIframe = document.querySelector('#mapPanel .map-iframe');
+  
+  // Geocode function using Nominatim (free, no API key)
+  async function geocodeAddress(address) {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
       }
-      if (marker) marker.setMap(null);
-      marker = new google.maps.Marker({
-        position: place.geometry.location,
-        map: map,
-        title: place.name,
-        animation: google.maps.Animation.DROP
-      });
-    });
+      return null;
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return null;
+    }
   }
   
-  function searchPlace() {
-    const query = document.getElementById('searchLocation').value;
-    if (!query) return;
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: query }, function(results, status) {
-      if (status === 'OK' && results[0]) {
-        map.setCenter(results[0].geometry.location);
-        map.setZoom(14);
-        if (marker) marker.setMap(null);
-        marker = new google.maps.Marker({
-          position: results[0].geometry.location,
-          map: map,
-          title: query,
-          animation: google.maps.Animation.DROP
-        });
-      } else alert('Location not found: ' + status);
-    });
+  async function searchAndNavigate() {
+    const searchQuery = document.getElementById('searchLocation').value;
+    if (!searchQuery) return;
+    const coords = await geocodeAddress(searchQuery);
+    if (coords) {
+      currentDestCoords = coords;
+      // Update iframe to show searched location
+      mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10000!2d${coords.lng}!3d${coords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${coords.lat},${coords.lng}!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus`;
+      openLink.href = `https://www.google.com/maps/dir/${currentPickupCoords.lat},${currentPickupCoords.lng}/${coords.lat},${coords.lng}`;
+    } else {
+      alert('Location not found. Please try a different name.');
+    }
   }
   
-  function goToPlace(placeName) {
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: placeName }, function(results, status) {
-      if (status === 'OK' && results[0]) {
-        map.setCenter(results[0].geometry.location);
-        map.setZoom(15);
-        if (marker) marker.setMap(null);
-        marker = new google.maps.Marker({
-          position: results[0].geometry.location,
-          map: map,
-          title: placeName,
-          animation: google.maps.Animation.DROP
-        });
-        document.getElementById('searchLocation').value = placeName;
-      } else alert('Place not found');
-    });
-  }
-  
-  function getDirections() {
+  async function getDirectionsNative() {
     const start = document.getElementById('startPoint').value;
     const end = document.getElementById('endPoint').value;
     if (!end) { alert('Please enter a destination'); return; }
-    directionsService.route({
-      origin: start,
-      destination: end,
-      travelMode: google.maps.TravelMode.DRIVING
-    }, function(response, status) {
-      if (status === 'OK') {
-        directionsRenderer.setDirections(response);
-        const route = response.routes[0];
-        const bounds = new google.maps.LatLngBounds();
-        route.legs.forEach(leg => {
-          bounds.extend(leg.start_location);
-          bounds.extend(leg.end_location);
-        });
-        map.fitBounds(bounds);
-      } else alert('Directions failed: ' + status);
-    });
+    
+    const startCoords = await geocodeAddress(start);
+    const endCoords = await geocodeAddress(end);
+    
+    if (startCoords && endCoords) {
+      currentPickupCoords = startCoords;
+      currentDestCoords = endCoords;
+      openLink.href = `https://www.google.com/maps/dir/${startCoords.lat},${startCoords.lng}/${endCoords.lat},${endCoords.lng}`;
+      openLink.click(); // Open directions in Google Maps
+    } else {
+      alert('Could not find one of the locations. Please be more specific.');
+    }
   }
   
-  function clearDirections() {
-    directionsRenderer.setDirections(null);
+  async function navigateTo(placeName) {
+    const formattedPlace = placeName.replace(/\+/g, ' ');
+    const coords = await geocodeAddress(formattedPlace);
+    if (coords) {
+      currentDestCoords = coords;
+      mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10000!2d${coords.lng}!3d${coords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${coords.lat},${coords.lng}!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus`;
+      openLink.href = `https://www.google.com/maps/dir/${currentPickupCoords.lat},${currentPickupCoords.lng}/${coords.lat},${coords.lng}`;
+      document.getElementById('searchLocation').value = formattedPlace;
+    }
   }
   
-  function resetMapView() {
-    const luangwa = { lat: -15.6162, lng: 29.6079 };
-    map.setCenter(luangwa);
-    map.setZoom(12);
-    directionsRenderer.setDirections(null);
-    if (marker) marker.setMap(null);
-    marker = new google.maps.Marker({
-      position: luangwa,
-      map: map,
-      title: "Luangwa, Zambia"
-    });
+  function updateEmbedMap() {
+    const end = document.getElementById('endPoint').value;
+    if (end) {
+      navigateTo(end);
+    } else {
+      alert('Please enter a destination first');
+    }
+  }
+  
+  function resetEmbedMap() {
+    mapIframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus";
+    openLink.href = `https://www.google.com/maps/dir/${currentPickupCoords.lat},${currentPickupCoords.lng}/${currentPickupCoords.lat},${currentPickupCoords.lng}`;
     document.getElementById('searchLocation').value = '';
+    document.getElementById('endPoint').value = '';
   }
 
   // ========== SLIDESHOW ==========
@@ -729,6 +718,10 @@
   // Video Player
   let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
+  const videoContainer = document.getElementById('videoContainer');
+  
+  videoContainer.addEventListener('touchstart', function() { this.classList.add('touched'); setTimeout(() => this.classList.remove('touched'), 3000); });
+  
   document.getElementById('videoFileInput').addEventListener('change', function(e) {
     videoFiles = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
     if (!videoFiles.length) return;
@@ -743,11 +736,15 @@
     document.getElementById('videoPlaylistBox').style.display = 'block';
     loadVideo(0);
   });
+  
   function loadVideo(i) {
     let url = URL.createObjectURL(videoFiles[i]);
-    videoPlayer.src = url; videoPlayer.load(); videoPlayer.play();
+    videoPlayer.src = url; videoPlayer.load(); videoPlayer.play().catch(e=>console.log('click play'));
     document.getElementById('videoNowPlaying').innerHTML = `🎬 Now Playing: ${videoFiles[i].name}`;
+    const items = document.querySelectorAll('#videoPlaylist li');
+    items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
+  
   function playVideo() { videoPlayer.play(); }
   function pauseVideo() { videoPlayer.pause(); }
   function nextVideo() { if (videoFiles.length) { currentVideo = (currentVideo + 1) % videoFiles.length; loadVideo(currentVideo); } }
@@ -771,16 +768,20 @@
     document.getElementById('audioPlaylistBox').style.display = 'block';
     loadAudio(0);
   });
+  
   function loadAudio(i) {
     let url = URL.createObjectURL(audioFiles[i]);
-    audioPlayer.src = url; audioPlayer.load(); audioPlayer.play();
+    audioPlayer.src = url; audioPlayer.load(); audioPlayer.play().catch(e=>console.log('click play'));
     document.getElementById('audioNowPlaying').innerHTML = `🎵 Now Playing: ${audioFiles[i].name}`;
+    const items = document.querySelectorAll('#audioPlaylist li');
+    items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
+  
   function playAudio() { audioPlayer.play(); }
   function pauseAudio() { audioPlayer.pause(); }
   function nextAudio() { if (audioFiles.length) { currentAudio = (currentAudio + 1) % audioFiles.length; loadAudio(currentAudio); } }
   function prevAudio() { if (audioFiles.length) { currentAudio = (currentAudio - 1 + audioFiles.length) % audioFiles.length; loadAudio(currentAudio); } }
-  function clearAudio() { audioFiles = []; document.getElementById('audioPlaylist').innerHTML = ''; document.getElementById('audioPlaylistBox').style.display = 'none'; audioPlayer.src = ''; }
+  function clearAudio() { audioFiles = []; document.getElementById('audioPlaylist').innerHTML = ''; document.getElementById('audioPlaylistBox').style.display = 'none'; audioPlayer.src = ''; document.getElementById('audioNowPlaying').innerHTML = '🎧 No music loaded'; }
 </script>
 </body>
-</html>
+                                                                                       </html>
