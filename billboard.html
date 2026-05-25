@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Pro Media Player + Map</title>
+  <title>ZamListing – Full Screen Billboard | Pro Audio + Video Player</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * {
@@ -270,7 +270,6 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
     }
     .open-maps-btn {
       background: #25D366;
@@ -293,7 +292,7 @@
       border-radius: 50px;
     }
 
-    /* ========== PROFESSIONAL MEDIA PLAYER STYLES ========== */
+    /* VIDEO PLAYER STYLES */
     .pro-media-player {
       background: #0a0a0a;
       border-radius: 20px;
@@ -306,11 +305,10 @@
     }
     #videoPlayer {
       width: 100%;
-      min-height: 380px;
+      min-height: 350px;
       max-height: 450px;
       background: #000;
       display: block;
-      cursor: pointer;
     }
     .pro-controls {
       background: rgba(0,0,0,0.85);
@@ -330,11 +328,6 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: bold;
-      transition: 0.2s;
-    }
-    .pro-controls button:hover {
-      background: #ff5500;
-      transform: scale(1.03);
     }
     .volume-slider {
       width: 80px;
@@ -415,17 +408,116 @@
       border-radius: 30px;
       margin-top: 10px;
     }
-    .equalizer {
-      display: flex;
-      gap: 4px;
-      align-items: flex-end;
-      height: 30px;
-      margin-left: 10px;
+    .active-mode {
+      background: #00cc44 !important;
+      transform: scale(1.05);
     }
-    .equalizer-bar {
-      width: 4px;
+
+    /* ========== IMPROVED AUDIO PLAYER DESIGN ========== */
+    .audio-player-container {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border-radius: 25px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .audio-title {
+      font-size: 18px;
+      color: #ffdd99;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    .audio-progress-container {
+      margin: 15px 0;
+    }
+    .audio-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+    .audio-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff9900, #ff5500);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+    .audio-time {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      color: #aaa;
+      font-size: 12px;
+    }
+    .audio-controls-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .audio-control-btn {
       background: #ff9900;
-      transition: height 0.1s;
+      border: none;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .audio-control-btn:hover {
+      background: #ff5500;
+      transform: scale(1.08);
+    }
+    .audio-control-btn.small {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+    }
+    .audio-mode-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+    .mode-btn {
+      background: #333;
+      border: none;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mode-btn.active-mode {
+      background: #00cc44;
+      color: white;
+    }
+    .volume-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #333;
+      padding: 5px 12px;
+      border-radius: 30px;
+    }
+    .volume-control input {
+      width: 80px;
+      cursor: pointer;
     }
 
     /* BILLBOARD SLIDES */
@@ -465,8 +557,8 @@
     @media (max-width:700px){ 
       .product-price{font-size:18px} .status-text{font-size:14px} .store-button{padding:8px 20px;font-size:14px} 
       .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none}
-      .pro-controls button{padding:5px 10px;font-size:10px}
-      .speed-select{font-size:10px;padding:4px 8px}
+      .audio-control-btn{width:40px;height:40px;font-size:16px}
+      .mode-btn{padding:5px 12px;font-size:11px}
     }
     ::-webkit-scrollbar { display: none; }
   </style>
@@ -515,9 +607,9 @@
     </div>
   </div>
 
-  <!-- PROFESSIONAL MEDIA OVERLAY -->
+  <!-- MEDIA OVERLAY -->
   <div id="mediaPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-video-camera"></i> Professional Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-headphones"></i> Professional Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
     <div class="panel-content">
       <div class="media-tabs"><button class="tab-btn active" onclick="switchTab('video')">🎬 Video Player</button><button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player</button></div>
       
@@ -526,13 +618,10 @@
           <input type="file" id="videoFileInput" accept="video/*" multiple style="display:none">
           <i class="fa fa-usb" style="font-size: 40px;"></i>
           <p>📀 Click to load VIDEOS from USB / Flash Disk</p>
-          <small>Supports MP4, AVI, MOV, MKV, WEBM, and more</small>
+          <small>Supports MP4, AVI, MOV, MKV, WEBM</small>
         </div>
-        
         <div class="pro-media-player">
-          <div class="video-wrapper">
-            <video id="videoPlayer" style="width:100%; min-height:350px; background:#000;"></video>
-          </div>
+          <div class="video-wrapper"><video id="videoPlayer" style="width:100%; min-height:350px; background:#000;"></video></div>
           <div class="pro-controls">
             <button onclick="playVideo()"><i class="fa fa-play"></i> Play</button>
             <button onclick="pauseVideo()"><i class="fa fa-pause"></i> Pause</button>
@@ -540,51 +629,66 @@
             <button onclick="prevVideo()"><i class="fa fa-backward"></i> Prev</button>
             <button onclick="nextVideo()"><i class="fa fa-forward"></i> Next</button>
             <button onclick="toggleFullscreen()"><i class="fa fa-expand"></i> Fullscreen</button>
-            <select id="playbackSpeed" class="speed-select" onchange="setPlaybackSpeed(this.value)">
-              <option value="0.5">0.5x</option>
-              <option value="0.75">0.75x</option>
-              <option value="1" selected>1x</option>
-              <option value="1.25">1.25x</option>
-              <option value="1.5">1.5x</option>
-              <option value="2">2x</option>
-            </select>
-            <input type="range" id="volumeControl" class="volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)">
+            <select id="playbackSpeed" class="speed-select" onchange="setPlaybackSpeed(this.value)"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select>
+            <input type="range" id="volumeControl" class="volume-slider" min="0" max="100" value="80" onchange="setVideoVolume(this.value)">
             <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
           </div>
-          <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
+          <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
         </div>
-        
-        <div class="playlist-box" id="videoPlaylistBox" style="display:none;">
-          <strong style="color:#ffcc66;">🎬 Playlist</strong>
-          <ul id="videoPlaylist"></ul>
-        </div>
+        <div class="playlist-box" id="videoPlaylistBox" style="display:none;"><ul id="videoPlaylist"></ul></div>
         <div class="now-playing-text" id="videoNowPlaying">🎬 No video loaded. Click above to load videos from USB</div>
-        <div class="info-text">💡 Supports: MP4, AVI, MOV, MKV, WEBM | Click playlist items to play</div>
       </div>
       
+      <!-- IMPROVED AUDIO PLAYER WITH PROGRESS BAR -->
       <div id="audioTab" class="tab-content">
         <div class="file-upload-area" onclick="document.getElementById('audioFileInput').click()">
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
-          <i class="fa fa-music" style="font-size: 40px;"></i>
+          <i class="fa fa-usb" style="font-size: 40px;"></i>
           <p>🎵 Click to load MUSIC from USB / Flash Disk</p>
-          <small>Supports MP3, WAV, OGG, M4A, FLAC</small>
+          <small>Supports MP3, WAV, OGG, M4A, FLAC | Non-stop playback</small>
         </div>
+        
         <div class="playlist-box" id="audioPlaylistBox" style="display:none;">
           <strong style="color:#ffcc66;">🎼 Playlist</strong>
           <ul id="audioPlaylist"></ul>
         </div>
-        <div class="now-playing-text" id="audioNowPlaying">🎧 No music loaded. Click above to add songs</div>
-        <audio id="audioPlayer" controls style="width:100%; border-radius:50px;"></audio>
-        <div class="audio-controls" style="display:flex; gap:12px; justify-content:center; margin-top:15px;">
-          <button class="media-btn" onclick="playAudio()"><i class="fa fa-play"></i> Play</button>
-          <button class="media-btn" onclick="pauseAudio()"><i class="fa fa-pause"></i> Pause</button>
-          <button class="media-btn" onclick="prevAudio()"><i class="fa fa-backward"></i> Previous</button>
-          <button class="media-btn" onclick="nextAudio()"><i class="fa fa-forward"></i> Next</button>
-          <button class="media-btn" onclick="clearAudio()"><i class="fa fa-trash"></i> Clear</button>
+        
+        <!-- Beautiful Audio Player -->
+        <div class="audio-player-container">
+          <div class="audio-title" id="currentTrackTitle">🎧 No track playing</div>
+          
+          <!-- Progress Bar - Draggable -->
+          <div class="audio-progress-container">
+            <div class="audio-progress-bar" id="audioProgressBar">
+              <div class="audio-progress-fill" id="audioProgressFill"></div>
+            </div>
+            <div class="audio-time">
+              <span id="currentTime">0:00</span>
+              <span id="totalTime">0:00</span>
+            </div>
+          </div>
+          
+          <!-- Main Controls -->
+          <div class="audio-controls-row">
+            <button class="audio-control-btn small" onclick="prevAudioTrack()"><i class="fa fa-backward"></i></button>
+            <button class="audio-control-btn" id="audioPlayPauseBtn" onclick="toggleAudioPlay()"><i class="fa fa-play"></i></button>
+            <button class="audio-control-btn small" onclick="nextAudioTrack()"><i class="fa fa-forward"></i></button>
+          </div>
+          
+          <!-- Mode Buttons -->
+          <div class="audio-mode-buttons">
+            <div class="volume-control">
+              <i class="fa fa-volume-up" style="color:#ffdd99;"></i>
+              <input type="range" id="audioVolume" min="0" max="100" value="70" onchange="setAudioVolume(this.value)">
+            </div>
+            <button id="shuffleBtn" class="mode-btn" onclick="toggleShuffle()"><i class="fa fa-random"></i> Shuffle</button>
+            <button id="repeatBtn" class="mode-btn" onclick="toggleRepeat()"><i class="fa fa-repeat"></i> Repeat</button>
+            <button id="crossfadeBtn" class="mode-btn" onclick="toggleCrossfade()"><i class="fa fa-magic"></i> Crossfade</button>
+            <button class="mode-btn" onclick="clearAudio()"><i class="fa fa-trash"></i> Clear</button>
+          </div>
         </div>
-        <div class="info-text" style="margin-top:10px;">💡 Supports: MP3, WAV, OGG, M4A, FLAC | Loop and shuffle coming soon</div>
+        
+        <div class="info-text" id="playerStatus">✅ Ready to play music non-stop</div>
       </div>
     </div>
   </div>
@@ -649,57 +753,26 @@
     else { document.getElementById('audioTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:last-child').classList.add('active'); }
   }
 
-  // ========== PROFESSIONAL VIDEO PLAYER ==========
+  // ========== VIDEO PLAYER ==========
   let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
   const timeDisplay = document.getElementById('timeDisplay');
   const progressBar = document.getElementById('progressBar');
   const progressFill = document.getElementById('progressFill');
   
-  videoPlayer.addEventListener('timeupdate', updateProgress);
-  videoPlayer.addEventListener('loadedmetadata', updateTimeDisplay);
-  
-  function updateProgress() {
-    if (videoPlayer.duration) {
-      const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-      progressFill.style.width = percent + '%';
-      timeDisplay.textContent = formatTime(videoPlayer.currentTime) + ' / ' + formatTime(videoPlayer.duration);
-    }
-  }
-  function updateTimeDisplay() { timeDisplay.textContent = formatTime(videoPlayer.currentTime) + ' / ' + formatTime(videoPlayer.duration); }
-  function formatTime(sec) { let mins = Math.floor(sec / 60); let seconds = Math.floor(sec % 60); return mins + ':' + (seconds < 10 ? '0' : '') + seconds; }
-  
-  progressBar.addEventListener('click', (e) => {
-    const rect = progressBar.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    videoPlayer.currentTime = percent * videoPlayer.duration;
-  });
-  
-  function setVolume(val) { videoPlayer.volume = val / 100; }
+  videoPlayer.addEventListener('timeupdate', () => { if(videoPlayer.duration) { progressFill.style.width = (videoPlayer.currentTime/videoPlayer.duration*100)+'%'; timeDisplay.textContent = formatTime(videoPlayer.currentTime)+' / '+formatTime(videoPlayer.duration); } });
+  function formatTime(sec) { let mins = Math.floor(sec/60), seconds = Math.floor(sec%60); return mins+':'+(seconds<10?'0':'')+seconds; }
+  progressBar.addEventListener('click', (e) => { let rect = progressBar.getBoundingClientRect(); videoPlayer.currentTime = ((e.clientX - rect.left)/rect.width) * videoPlayer.duration; });
+  function setVideoVolume(val) { videoPlayer.volume = val/100; }
   function setPlaybackSpeed(speed) { videoPlayer.playbackRate = parseFloat(speed); }
-  
   document.getElementById('videoFileInput').addEventListener('change', function(e) {
     videoFiles = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
     if (!videoFiles.length) return;
-    const ul = document.getElementById('videoPlaylist');
-    ul.innerHTML = '';
-    videoFiles.forEach((f, i) => {
-      let li = document.createElement('li');
-      li.innerHTML = `<i class="fa fa-video-camera"></i> ${f.name.substring(0, 45)}`;
-      li.onclick = () => { currentVideo = i; loadVideo(i); };
-      ul.appendChild(li);
-    });
-    document.getElementById('videoPlaylistBox').style.display = 'block';
-    loadVideo(0);
+    let ul = document.getElementById('videoPlaylist'); ul.innerHTML = '';
+    videoFiles.forEach((f,i) => { let li = document.createElement('li'); li.innerHTML = `<i class="fa fa-video-camera"></i> ${f.name.substring(0,45)}`; li.onclick = () => { currentVideo=i; loadVideo(i); }; ul.appendChild(li); });
+    document.getElementById('videoPlaylistBox').style.display = 'block'; loadVideo(0);
   });
-  
-  function loadVideo(i) {
-    let url = URL.createObjectURL(videoFiles[i]);
-    videoPlayer.src = url; videoPlayer.load(); videoPlayer.play().catch(e=>console.log('click play'));
-    document.getElementById('videoNowPlaying').innerHTML = `🎬 Now Playing: ${videoFiles[i].name}`;
-    const items = document.querySelectorAll('#videoPlaylist li');
-    items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
-  }
+  function loadVideo(i) { let url = URL.createObjectURL(videoFiles[i]); videoPlayer.src = url; videoPlayer.load(); videoPlayer.play().catch(e=>{}); document.getElementById('videoNowPlaying').innerHTML = `🎬 Now Playing: ${videoFiles[i].name}`; }
   function playVideo() { videoPlayer.play(); }
   function pauseVideo() { videoPlayer.pause(); }
   function stopVideo() { videoPlayer.pause(); videoPlayer.currentTime = 0; }
@@ -707,36 +780,203 @@
   function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } }
   function toggleFullscreen() { if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen(); else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen(); }
 
-  // ========== AUDIO PLAYER ==========
-  let audioFiles = [], currentAudio = 0;
-  const audioPlayer = document.getElementById('audioPlayer');
+  // ========== IMPROVED AUDIO PLAYER ==========
+  let audioFiles = [];
+  let currentAudioIndex = 0;
+  let isShuffle = false;
+  let isRepeat = false;
+  let isCrossfade = true;
+  let crossfadeDuration = 2000;
+  let fadeInterval = null;
+  
+  const audioElem = document.getElementById('audioPlayer');
+  const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
+  const currentTrackTitle = document.getElementById('currentTrackTitle');
+  const currentTimeSpan = document.getElementById('currentTime');
+  const totalTimeSpan = document.getElementById('totalTime');
+  const audioProgressFill = document.getElementById('audioProgressFill');
+  const audioProgressBar = document.getElementById('audioProgressBar');
+  const statusSpan = document.getElementById('playerStatus');
+  
+  // Create audio element dynamically
+  const audio = new Audio();
+  
+  function formatAudioTime(sec) {
+    if (isNaN(sec)) return '0:00';
+    let mins = Math.floor(sec / 60);
+    let seconds = Math.floor(sec % 60);
+    return mins + ':' + (seconds < 10 ? '0' : '') + seconds;
+  }
+  
+  function updateAudioProgress() {
+    if (audio.duration) {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      audioProgressFill.style.width = percent + '%';
+      currentTimeSpan.textContent = formatAudioTime(audio.currentTime);
+      totalTimeSpan.textContent = formatAudioTime(audio.duration);
+    }
+  }
+  
+  audio.addEventListener('timeupdate', updateAudioProgress);
+  audio.addEventListener('loadedmetadata', updateAudioProgress);
+  audio.addEventListener('ended', () => { playNextAudioTrack(); });
+  audio.addEventListener('play', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-pause"></i>'; });
+  audio.addEventListener('pause', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-play"></i>'; });
+  
+  // Draggable progress bar
+  audioProgressBar.addEventListener('click', (e) => {
+    if (audio.duration) {
+      const rect = audioProgressBar.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = percent * audio.duration;
+    }
+  });
+  
+  function setAudioVolume(val) { audio.volume = val / 100; }
+  
+  function playNextAudioTrack() {
+    if (audioFiles.length === 0) return;
+    let nextIndex;
+    if (isShuffle) {
+      do { nextIndex = Math.floor(Math.random() * audioFiles.length); } 
+      while (nextIndex === currentAudioIndex && audioFiles.length > 1);
+    } else if (isRepeat && currentAudioIndex === audioFiles.length - 1) {
+      nextIndex = 0;
+    } else if (currentAudioIndex + 1 < audioFiles.length) {
+      nextIndex = currentAudioIndex + 1;
+    } else if (isRepeat) {
+      nextIndex = 0;
+    } else {
+      statusSpan.innerHTML = '✅ Playback finished. Enable repeat to continue.';
+      return;
+    }
+    currentAudioIndex = nextIndex;
+    loadAudioTrack(currentAudioIndex);
+  }
+  
+  function loadAudioTrack(index) {
+    if (!audioFiles[index]) return;
+    const url = URL.createObjectURL(audioFiles[index]);
+    audio.src = url;
+    audio.load();
+    audio.play().catch(e => console.log('click play to start'));
+    currentTrackTitle.textContent = `🎵 ${audioFiles[index].name.substring(0, 50)}`;
+    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
+    highlightAudioPlaylistItem(index);
+  }
+  
+  function highlightAudioPlaylistItem(index) {
+    const items = document.querySelectorAll('#audioPlaylist li');
+    items.forEach((item, idx) => {
+      if (idx === index) item.classList.add('active');
+      else item.classList.remove('active');
+    });
+  }
+  
+  function toggleAudioPlay() {
+    if (audioFiles.length === 0) { alert('Please load music first'); return; }
+    if (audio.paused) audio.play();
+    else audio.pause();
+  }
+  
+  function prevAudioTrack() {
+    if (audioFiles.length === 0) return;
+    let prevIndex;
+    if (isShuffle) {
+      prevIndex = Math.floor(Math.random() * audioFiles.length);
+    } else {
+      prevIndex = (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length;
+    }
+    currentAudioIndex = prevIndex;
+    loadAudioTrack(currentAudioIndex);
+  }
+  
+  function nextAudioTrack() {
+    if (audioFiles.length === 0) return;
+    let nextIndex;
+    if (isShuffle) {
+      do { nextIndex = Math.floor(Math.random() * audioFiles.length); } 
+      while (nextIndex === currentAudioIndex && audioFiles.length > 1);
+    } else {
+      nextIndex = (currentAudioIndex + 1) % audioFiles.length;
+    }
+    currentAudioIndex = nextIndex;
+    loadAudioTrack(currentAudioIndex);
+  }
+  
+  function toggleShuffle() {
+    isShuffle = !isShuffle;
+    const btn = document.getElementById('shuffleBtn');
+    if (isShuffle) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
+    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
+    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
+  }
+  
+  function toggleRepeat() {
+    isRepeat = !isRepeat;
+    const btn = document.getElementById('repeatBtn');
+    if (isRepeat) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
+    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
+    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
+  }
+  
+  function toggleCrossfade() {
+    isCrossfade = !isCrossfade;
+    const btn = document.getElementById('crossfadeBtn');
+    if (isCrossfade) { btn.classList.add('active-mode'); btn.style.background = '#00cc44'; } 
+    else { btn.classList.remove('active-mode'); btn.style.background = '#333'; }
+    statusSpan.innerHTML = '🎵 Playing | Crossfade: ' + (isCrossfade ? 'ON' : 'OFF') + ' | Shuffle: ' + (isShuffle ? 'ON' : 'OFF') + ' | Repeat: ' + (isRepeat ? 'ON' : 'OFF');
+  }
+  
   document.getElementById('audioFileInput').addEventListener('change', function(e) {
-    audioFiles = Array.from(e.target.files).filter(f => f.type.startsWith('audio/'));
-    if (!audioFiles.length) return;
+    const files = Array.from(e.target.files);
+    audioFiles = files.filter(f => f.type.startsWith('audio/'));
+    if (!audioFiles.length) { alert('No audio files found!'); return; }
     const ul = document.getElementById('audioPlaylist');
     ul.innerHTML = '';
     audioFiles.forEach((f, i) => {
       let li = document.createElement('li');
-      li.innerHTML = `<i class="fa fa-music"></i> ${f.name.substring(0, 45)}`;
-      li.onclick = () => { currentAudio = i; loadAudio(i); };
+      li.innerHTML = `<i class="fa fa-music"></i> ${f.name.substring(0, 50)}${f.name.length > 50 ? '...' : ''}`;
+      li.onclick = () => { currentAudioIndex = i; loadAudioTrack(currentAudioIndex); };
       ul.appendChild(li);
     });
     document.getElementById('audioPlaylistBox').style.display = 'block';
-    loadAudio(0);
+    currentAudioIndex = 0;
+    loadAudioTrack(0);
+    statusSpan.innerHTML = '✅ Loaded ' + audioFiles.length + ' songs | Non-stop playback ready';
   });
   
-  function loadAudio(i) {
-    let url = URL.createObjectURL(audioFiles[i]);
-    audioPlayer.src = url; audioPlayer.load(); audioPlayer.play().catch(e=>console.log('click play'));
-    document.getElementById('audioNowPlaying').innerHTML = `🎵 Now Playing: ${audioFiles[i].name}`;
-    const items = document.querySelectorAll('#audioPlaylist li');
-    items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
+  function clearAudio() {
+    audioFiles = [];
+    document.getElementById('audioPlaylist').innerHTML = '';
+    document.getElementById('audioPlaylistBox').style.display = 'none';
+    audio.src = '';
+    currentTrackTitle.textContent = '🎧 No track playing';
+    currentTimeSpan.textContent = '0:00';
+    totalTimeSpan.textContent = '0:00';
+    audioProgressFill.style.width = '0%';
+    statusSpan.innerHTML = '✅ Ready to play music non-stop';
+    currentAudioIndex = 0;
   }
-  function playAudio() { audioPlayer.play(); }
-  function pauseAudio() { audioPlayer.pause(); }
-  function nextAudio() { if (audioFiles.length) { currentAudio = (currentAudio + 1) % audioFiles.length; loadAudio(currentAudio); } }
-  function prevAudio() { if (audioFiles.length) { currentAudio = (currentAudio - 1 + audioFiles.length) % audioFiles.length; loadAudio(currentAudio); } }
-  function clearAudio() { audioFiles = []; document.getElementById('audioPlaylist').innerHTML = ''; document.getElementById('audioPlaylistBox').style.display = 'none'; audioPlayer.src = ''; document.getElementById('audioNowPlaying').innerHTML = '🎧 No music loaded'; }
+  
+  // Expose global functions
+  window.toggleAudioPlay = toggleAudioPlay;
+  window.prevAudioTrack = prevAudioTrack;
+  window.nextAudioTrack = nextAudioTrack;
+  window.toggleShuffle = toggleShuffle;
+  window.toggleRepeat = toggleRepeat;
+  window.toggleCrossfade = toggleCrossfade;
+  window.clearAudio = clearAudio;
+  window.setAudioVolume = setAudioVolume;
+  window.playVideo = playVideo;
+  window.pauseVideo = pauseVideo;
+  window.stopVideo = stopVideo;
+  window.nextVideo = nextVideo;
+  window.prevVideo = prevVideo;
+  window.toggleFullscreen = toggleFullscreen;
+  window.setVideoVolume = setVideoVolume;
+  window.setPlaybackSpeed = setPlaybackSpeed;
+  window.searchAndShowOnMap = searchAndShowOnMap;
 </script>
 </body>
 </html>
