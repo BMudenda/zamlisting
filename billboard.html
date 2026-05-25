@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Premium Media Player</title>
+  <title>ZamListing – Full Screen Billboard | Map with Search + Media Player</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Google Maps API with Places library for search functionality -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbvybHf-e2RQDd0Lt2JcZCWYfEpiK66DU&libraries=places&callback=initMap" async defer></script>
   <style>
     * {
       margin: 0;
@@ -148,7 +150,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       width: 90%;
-      max-width: 1100px;
+      max-width: 1200px;
       height: 85%;
       max-height: 85vh;
       background: rgba(10, 15, 30, 0.98);
@@ -196,7 +198,7 @@
       overflow-y: auto;
     }
 
-    /* Media Tabs - hidden by default in video mode, but accessible */
+    /* Media Tabs */
     .media-tabs {
       display: flex;
       gap: 10px;
@@ -226,48 +228,94 @@
       display: block;
     }
 
-    /* MAP STYLES */
-    .map-container {
+    /* ========== MAP WITH SEARCH - FULLY FUNCTIONAL ========== */
+    .map-full-container {
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
-    .map-iframe {
-      width: 100%;
+    .search-panel {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 60px;
+    }
+    .search-input {
       flex: 1;
-      border-radius: 20px;
+      padding: 12px 20px;
+      border-radius: 50px;
       border: none;
-      min-height: 400px;
+      font-size: 16px;
+      background: white;
+      outline: none;
+    }
+    .search-btn {
+      background: #ff9900;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .search-btn:hover {
+      background: #ff7700;
+      transform: scale(1.02);
+    }
+    .directions-panel {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 50px;
+      align-items: center;
+      justify-content: center;
+    }
+    .directions-panel input {
+      padding: 8px 15px;
+      border-radius: 50px;
+      border: none;
+      width: 200px;
+      font-size: 14px;
+    }
+    .directions-panel button {
+      background: #ff9900;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+    }
+    #map {
+      width: 100%;
+      height: 500px;
+      border-radius: 20px;
+      background: #333;
     }
     .map-buttons {
       display: flex;
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
+      margin-top: 10px;
     }
     .map-nav-btn {
       background: #ff9900;
-      padding: 10px 24px;
+      padding: 8px 20px;
       border: none;
       border-radius: 50px;
       color: white;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.2s;
-    }
-    .map-nav-btn:hover {
-      background: #ff7700;
-      transform: scale(1.02);
     }
 
-    /* ========== PREMIUM VIDEO PLAYER - FULL SCREEN WITH HOVER CONTROLS ========== */
-    .video-section {
-      background: #000;
-      border-radius: 20px;
-      overflow: hidden;
-    }
+    /* VIDEO PLAYER STYLES */
     .video-container {
       position: relative;
       background: #000;
@@ -276,25 +324,22 @@
     }
     #videoPlayer {
       width: 100%;
-      height: auto;
-      min-height: 400px;
-      max-height: 500px;
+      min-height: 350px;
+      max-height: 450px;
       background: #000;
       display: block;
       cursor: pointer;
     }
-    /* Floating control overlay - appears on hover/touch */
     .video-controls-overlay {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-      padding: 20px;
+      padding: 15px;
       display: flex;
-      gap: 15px;
+      gap: 12px;
       justify-content: center;
-      align-items: center;
       flex-wrap: wrap;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -309,31 +354,11 @@
       background: rgba(255, 153, 0, 0.9);
       border: none;
       color: white;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 40px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .video-controls-overlay button:hover {
-      background: #ff5500;
-      transform: scale(1.05);
-    }
-    .volume-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0,0,0,0.6);
-      padding: 5px 12px;
-      border-radius: 30px;
-    }
-    .volume-control input {
-      width: 80px;
-      cursor: pointer;
     }
     .file-upload-area {
       background: rgba(255, 255, 255, 0.1);
@@ -347,7 +372,6 @@
     }
     .file-upload-area:hover {
       background: rgba(255, 170, 68, 0.2);
-      border-color: #ffdd77;
     }
     .playlist-box {
       background: rgba(0, 0, 0, 0.5);
@@ -355,23 +379,22 @@
       padding: 12px;
       max-height: 180px;
       overflow-y: auto;
-      margin-top: 15px;
+      margin-top: 10px;
     }
     .playlist-box ul {
       list-style: none;
     }
     .playlist-box li {
-      padding: 10px;
+      padding: 8px;
       margin: 4px 0;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 25px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       color: white;
-      transition: 0.2s;
-      font-size: 14px;
+      font-size: 13px;
     }
     .playlist-box li:hover, .playlist-box li.active {
       background: #ff9900;
@@ -380,23 +403,11 @@
     .now-playing-text {
       text-align: center;
       color: #ffdd99;
-      padding: 10px;
+      padding: 8px;
       font-size: 14px;
       background: rgba(0,0,0,0.5);
       border-radius: 30px;
       margin-top: 10px;
-    }
-
-    /* Audio player section */
-    .audio-section {
-      background: rgba(0,0,0,0.3);
-      border-radius: 20px;
-      padding: 20px;
-    }
-    #audioPlayer {
-      width: 100%;
-      border-radius: 50px;
-      margin: 15px 0;
     }
     .audio-controls {
       display: flex;
@@ -413,24 +424,6 @@
       color: white;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.2s;
-    }
-    .media-btn:hover {
-      background: #ff7700;
-      transform: scale(1.02);
-    }
-
-    /* Fullscreen video */
-    #videoPlayer:fullscreen {
-      width: 100vw;
-      height: 100vh;
-      object-fit: contain;
-      background: black;
-    }
-    #videoPlayer:-webkit-full-screen {
-      width: 100vw;
-      height: 100vh;
-      object-fit: contain;
     }
 
     /* BILLBOARD SLIDES */
@@ -457,24 +450,17 @@
       object-fit: contain;
       filter: drop-shadow(0 0 35px rgba(0, 255, 200, 0.9));
     }
-    .billboard-slide .motorbike-billboard img { animation: bikeGlide 4s ease-in-out infinite; }
-    .billboard-slide .car-billboard img { animation: smoothDrive 5s ease-in-out infinite; }
-    @keyframes smoothDrive { 0%,100%{transform:translateX(0px)}25%{transform:translateX(35px)}75%{transform:translateX(-35px)}}
-    @keyframes bikeGlide { 0%,100%{transform:translateY(0px)rotate(0deg)}25%{transform:translateY(-18px)rotate(-4deg)}75%{transform:translateY(-28px)rotate(4deg)}}
     .product-row { display: flex; align-items: center; justify-content: center; gap: 50px; flex-wrap: wrap; padding: 30px; }
     .product-info { background: rgba(0,0,0,0.65); backdrop-filter: blur(20px); padding: 28px 48px; border-radius: 100px; text-align: center; }
-    .product-price { font-size: 32px; font-weight: bold; color: #ffdd66; animation: textPulse 2.5s infinite; }
-    .status-text { font-size: 26px; color: #ffdd88; animation: textPulse 2.5s infinite; }
-    @keyframes textPulse { 0%,100%{opacity:1}50%{opacity:0.85;color:#ffcc44} }
-    .store-button { background: linear-gradient(135deg,#ff9900,#ff4400); color: white; padding: 14px 38px; border: none; border-radius: 60px; font-size: 20px; cursor: pointer; margin-top: 10px; }
+    .product-price { font-size: 32px; font-weight: bold; color: #ffdd66; }
+    .status-text { font-size: 26px; color: #ffdd88; }
+    .store-button { background: linear-gradient(135deg,#ff9900,#ff4400); color: white; padding: 14px 38px; border: none; border-radius: 60px; font-size: 20px; cursor: pointer; }
     .welcome-billboard { font-size: clamp(32px,7vw,72px); color: #ffd966; font-weight: 800; text-align: center; white-space: nowrap; overflow: hidden; border-right: 5px solid #ffcc33; width: 0; animation: typing 5s steps(30,end) infinite, blink-cursor 0.8s step-end infinite; }
     @keyframes typing { 0%{width:0}30%{width:100%}70%{width:100%}100%{width:0} }
     @keyframes blink-cursor { 0%,100%{border-color:#ffcc33}50%{border-color:transparent} }
-    .promo-billboard { background: linear-gradient(135deg,#ff4d4d,#ff8c00,#ffdd44); padding: 32px 65px; border-radius: 90px; font-size: clamp(28px,6vw,58px); font-weight: 800; color: white; animation: promoPulse 3s infinite alternate; }
-    @keyframes promoPulse { 0%{transform:scale(1)}100%{transform:scale(1.07)} }
-    .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ffcc; font-weight: bold; animation: gentleFloat 4s infinite; }
-    @keyframes gentleFloat { 0%,100%{transform:translateY(0px)}50%{transform:translateY(-22px)} }
-    @media (max-width:700px){ .product-price{font-size:18px} .status-text{font-size:14px} .store-button{padding:8px 20px;font-size:14px} .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none} .video-controls-overlay button{padding:6px 12px;font-size:11px} .volume-control{display:none} }
+    .promo-billboard { background: linear-gradient(135deg,#ff4d4d,#ff8c00,#ffdd44); padding: 32px 65px; border-radius: 90px; font-size: clamp(28px,6vw,58px); font-weight: 800; color: white; }
+    .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ffcc; font-weight: bold; }
+    @media (max-width:700px){ .product-price{font-size:18px} .status-text{font-size:14px} .store-button{padding:8px 20px;font-size:14px} .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none} .search-input{font-size:12px} .directions-panel input{width:120px;font-size:11px} }
     ::-webkit-scrollbar { display: none; }
   </style>
 </head>
@@ -506,76 +492,76 @@
     <div class="billboard-slide"><div style="text-align:center; background:rgba(0,0,0,0.7); padding:40px; border-radius:60px;"><div style="font-size:42px; color:#ffdd77;">📱 SCAN TO BOOK</div><img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fwww.zamlisting.com%2Fluangwa" alt="QR" style="margin:20px; border-radius:20px;"><div style="font-size:20px; color:#aaffdd;">Scan with phone → Instant booking</div></div></div>
   </div>
 
-  <!-- MAP OVERLAY -->
+  <!-- MAP OVERLAY WITH SEARCH - FULLY FUNCTIONAL -->
   <div id="mapPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-map"></i> Google Map - Luangwa Area</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
-    <div class="panel-content"><div class="map-container"><iframe class="map-iframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" loading="lazy" allowfullscreen></iframe><div class="map-buttons"><button class="map-nav-btn" onclick="updateMapLocation('Luangwa+Market,+Zambia')">📍 Luangwa Market</button><button class="map-nav-btn" onclick="updateMapLocation('Feira+Town,+Zambia')">🏁 Feira Town</button><button class="map-nav-btn" onclick="resetMap()">🗺️ Reset</button></div></div></div>
+    <div class="panel-header"><span><i class="fa fa-map"></i> Google Map - Search & Directions</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
+    <div class="panel-content">
+      <div class="map-full-container">
+        <div class="search-panel">
+          <input type="text" id="searchLocation" class="search-input" placeholder="🔍 Search for a place (e.g., Lusaka, Chipata, Chirundu...)">
+          <button class="search-btn" onclick="searchPlace()"><i class="fa fa-search"></i> Search</button>
+        </div>
+        <div class="directions-panel">
+          <input type="text" id="startPoint" placeholder="📍 Start point" value="Luangwa, Zambia">
+          <input type="text" id="endPoint" placeholder="🏁 Destination">
+          <button onclick="getDirections()"><i class="fa fa-route"></i> Get Directions</button>
+          <button onclick="clearDirections()"><i class="fa fa-times"></i> Clear</button>
+        </div>
+        <div id="map"></div>
+        <div class="map-buttons">
+          <button class="map-nav-btn" onclick="goToPlace('Luangwa Market, Zambia')">📍 Luangwa Market</button>
+          <button class="map-nav-btn" onclick="goToPlace('Feira Town, Zambia')">🏁 Feira Town</button>
+          <button class="map-nav-btn" onclick="goToPlace('Chirundu, Zambia')">🛣️ Chirundu</button>
+          <button class="map-nav-btn" onclick="resetMapView()">🗺️ Reset Map</button>
+        </div>
+        <div class="now-playing-text" style="font-size:12px;">💡 Type any place name and click Search | Use Directions to plan your route</div>
+      </div>
+    </div>
   </div>
 
-  <!-- PREMIUM MEDIA OVERLAY - HOVER CONTROLS, FULLSCREEN VIDEO -->
+  <!-- MEDIA OVERLAY -->
   <div id="mediaPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-video-camera"></i> Premium Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-video-camera"></i> Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
     <div class="panel-content">
       <div class="media-tabs"><button class="tab-btn active" onclick="switchTab('video')">🎬 Video Player</button><button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player</button></div>
       
-      <!-- VIDEO TAB - HOVER CONTROLS, FULLSCREEN VIDEO -->
       <div id="videoTab" class="tab-content active">
         <div class="file-upload-area" onclick="document.getElementById('videoFileInput').click()">
           <input type="file" id="videoFileInput" accept="video/*" multiple style="display:none">
           <i class="fa fa-usb" style="font-size: 40px;"></i>
-          <p style="margin-top:10px;">📀 Click to load VIDEOS from USB / Flash Disk</p>
-          <small>Supports MP4, AVI, MOV, MKV, WEBM</small>
+          <p>📀 Click to load VIDEOS from USB / Flash Disk</p>
         </div>
-        
         <div class="video-container" id="videoContainer">
-          <video id="videoPlayer" style="width:100%; min-height:400px; max-height:500px; background:#000;">
+          <video id="videoPlayer" style="width:100%; min-height:350px; background:#000;">
             <source src="" type="video/mp4">
-            Your browser does not support video playback.
           </video>
-          <!-- Controls appear on hover/touch -->
           <div class="video-controls-overlay">
             <button onclick="playVideo()"><i class="fa fa-play"></i> Play</button>
             <button onclick="pauseVideo()"><i class="fa fa-pause"></i> Pause</button>
-            <button onclick="stopVideo()"><i class="fa fa-stop"></i> Stop</button>
             <button onclick="prevVideo()"><i class="fa fa-backward"></i> Previous</button>
             <button onclick="nextVideo()"><i class="fa fa-forward"></i> Next</button>
             <button onclick="toggleFullscreen()"><i class="fa fa-expand"></i> Fullscreen</button>
-            <div class="volume-control">
-              <i class="fa fa-volume-up"></i>
-              <input type="range" id="volumeSlider" min="0" max="100" value="100" onchange="setVolume(this.value)">
-            </div>
-            <button onclick="clearVideos()"><i class="fa fa-trash"></i> Clear</button>
           </div>
         </div>
-        
-        <div class="playlist-box" id="videoPlaylistBox" style="display:none;">
-          <strong style="color:#ffcc66;">🎬 Playlist</strong>
-          <ul id="videoPlaylist"></ul>
-        </div>
+        <div class="playlist-box" id="videoPlaylistBox" style="display:none;"><ul id="videoPlaylist"></ul></div>
         <div class="now-playing-text" id="videoNowPlaying">🎬 No video loaded. Click above to load videos from USB</div>
-        <div class="now-playing-text" style="font-size:12px; opacity:0.7;">💡 Hover or tap on video to show controls</div>
       </div>
       
-      <!-- AUDIO TAB -->
       <div id="audioTab" class="tab-content">
         <div class="file-upload-area" onclick="document.getElementById('audioFileInput').click()">
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
           <i class="fa fa-music" style="font-size: 40px;"></i>
-          <p style="margin-top:10px;">🎵 Click to load MUSIC from USB / Flash Disk</p>
-          <small>Supports MP3, WAV, OGG, M4A</small>
+          <p>🎵 Click to load MUSIC from USB / Flash Disk</p>
         </div>
-        <div class="playlist-box" id="audioPlaylistBox" style="display:none;">
-          <strong style="color:#ffcc66;">🎼 Playlist</strong>
-          <ul id="audioPlaylist"></ul>
-        </div>
-        <div class="now-playing-text" id="audioNowPlaying">🎧 No music loaded. Click above to add songs</div>
+        <div class="playlist-box" id="audioPlaylistBox" style="display:none;"><ul id="audioPlaylist"></ul></div>
+        <div class="now-playing-text" id="audioNowPlaying">🎧 No music loaded</div>
         <audio id="audioPlayer" controls style="width:100%"></audio>
         <div class="audio-controls">
-          <button class="media-btn" onclick="playAudio()"><i class="fa fa-play"></i> Play</button>
-          <button class="media-btn" onclick="pauseAudio()"><i class="fa fa-pause"></i> Pause</button>
-          <button class="media-btn" onclick="prevAudio()"><i class="fa fa-backward"></i> Previous</button>
-          <button class="media-btn" onclick="nextAudio()"><i class="fa fa-forward"></i> Next</button>
-          <button class="media-btn" onclick="clearAudio()"><i class="fa fa-trash"></i> Clear</button>
+          <button class="media-btn" onclick="playAudio()">Play</button>
+          <button class="media-btn" onclick="pauseAudio()">Pause</button>
+          <button class="media-btn" onclick="prevAudio()">Previous</button>
+          <button class="media-btn" onclick="nextAudio()">Next</button>
+          <button class="media-btn" onclick="clearAudio()">Clear</button>
         </div>
       </div>
     </div>
@@ -583,47 +569,155 @@
 </div>
 
 <script>
+  // ========== GOOGLE MAP WITH SEARCH ==========
+  let map, searchBox, directionsService, directionsRenderer;
+  let marker;
+
+  function initMap() {
+    const luangwa = { lat: -15.6162, lng: 29.6079 };
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: luangwa,
+      zoom: 12,
+      styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
+    });
+    
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+    
+    // Add marker at default location
+    marker = new google.maps.Marker({
+      position: luangwa,
+      map: map,
+      title: "Luangwa, Zambia",
+      animation: google.maps.Animation.DROP
+    });
+    
+    // Setup autocomplete for search
+    const searchInput = document.getElementById('searchLocation');
+    const autocomplete = new google.maps.places.Autocomplete(searchInput);
+    autocomplete.bindTo('bounds', map);
+    
+    autocomplete.addListener('place_changed', function() {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) return;
+      if (place.geometry.viewport) map.fitBounds(place.geometry.viewport);
+      else {
+        map.setCenter(place.geometry.location);
+        map.setZoom(15);
+      }
+      if (marker) marker.setMap(null);
+      marker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: map,
+        title: place.name,
+        animation: google.maps.Animation.DROP
+      });
+    });
+  }
+  
+  function searchPlace() {
+    const query = document.getElementById('searchLocation').value;
+    if (!query) return;
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: query }, function(results, status) {
+      if (status === 'OK' && results[0]) {
+        map.setCenter(results[0].geometry.location);
+        map.setZoom(14);
+        if (marker) marker.setMap(null);
+        marker = new google.maps.Marker({
+          position: results[0].geometry.location,
+          map: map,
+          title: query,
+          animation: google.maps.Animation.DROP
+        });
+      } else alert('Location not found: ' + status);
+    });
+  }
+  
+  function goToPlace(placeName) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: placeName }, function(results, status) {
+      if (status === 'OK' && results[0]) {
+        map.setCenter(results[0].geometry.location);
+        map.setZoom(15);
+        if (marker) marker.setMap(null);
+        marker = new google.maps.Marker({
+          position: results[0].geometry.location,
+          map: map,
+          title: placeName,
+          animation: google.maps.Animation.DROP
+        });
+        document.getElementById('searchLocation').value = placeName;
+      } else alert('Place not found');
+    });
+  }
+  
+  function getDirections() {
+    const start = document.getElementById('startPoint').value;
+    const end = document.getElementById('endPoint').value;
+    if (!end) { alert('Please enter a destination'); return; }
+    directionsService.route({
+      origin: start,
+      destination: end,
+      travelMode: google.maps.TravelMode.DRIVING
+    }, function(response, status) {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(response);
+        const route = response.routes[0];
+        const bounds = new google.maps.LatLngBounds();
+        route.legs.forEach(leg => {
+          bounds.extend(leg.start_location);
+          bounds.extend(leg.end_location);
+        });
+        map.fitBounds(bounds);
+      } else alert('Directions failed: ' + status);
+    });
+  }
+  
+  function clearDirections() {
+    directionsRenderer.setDirections(null);
+  }
+  
+  function resetMapView() {
+    const luangwa = { lat: -15.6162, lng: 29.6079 };
+    map.setCenter(luangwa);
+    map.setZoom(12);
+    directionsRenderer.setDirections(null);
+    if (marker) marker.setMap(null);
+    marker = new google.maps.Marker({
+      position: luangwa,
+      map: map,
+      title: "Luangwa, Zambia"
+    });
+    document.getElementById('searchLocation').value = '';
+  }
+
   // ========== SLIDESHOW ==========
   (function() {
     const slides = document.querySelectorAll('.billboard-slide');
     if (!slides.length) return;
-    let currentIndex = 0;
-    const totalSlides = slides.length;
-    let autoInterval;
-    const intervalTime = 6000;
+    let currentIndex = 0, autoInterval;
     function showSlide(index) {
-      if (index < 0) index = 0;
-      if (index >= totalSlides) index = totalSlides - 1;
-      slides.forEach((slide, i) => { slide.classList.remove('active'); slide.style.opacity = '0'; });
+      slides.forEach((s, i) => { s.classList.remove('active'); s.style.opacity = '0'; });
       slides[index].classList.add('active'); slides[index].style.opacity = '1';
       currentIndex = index;
     }
-    function nextSlide() { showSlide((currentIndex + 1) % totalSlides); }
-    function prevSlide() { showSlide((currentIndex - 1 + totalSlides) % totalSlides); }
-    function startAutoPlay() { if (autoInterval) clearInterval(autoInterval); autoInterval = setInterval(nextSlide, intervalTime); }
+    function nextSlide() { showSlide((currentIndex + 1) % slides.length); }
+    function startAutoPlay() { if (autoInterval) clearInterval(autoInterval); autoInterval = setInterval(nextSlide, 6000); }
     showSlide(0); startAutoPlay();
     let touchStartX = 0;
-    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
-    document.addEventListener('touchend', (e) => { const diff = touchStartX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) { clearInterval(autoInterval); diff > 0 ? nextSlide() : prevSlide(); startAutoPlay(); } });
-    let mouseDown = false, mouseStart = 0;
-    document.addEventListener('mousedown', (e) => { mouseDown = true; mouseStart = e.clientX; });
-    document.addEventListener('mouseup', (e) => { if (!mouseDown) return; mouseDown = false; const diff = mouseStart - e.clientX; if (Math.abs(diff) > 70) { clearInterval(autoInterval); diff > 0 ? nextSlide() : prevSlide(); startAutoPlay(); } });
-    document.body.style.overflow = 'hidden';
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      let diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) { clearInterval(autoInterval); diff > 0 ? nextSlide() : showSlide((currentIndex - 1 + slides.length) % slides.length); startAutoPlay(); }
+    });
   })();
 
-  // ========== MAP ==========
-  function updateMapLocation(location) {
-    const mapIframe = document.querySelector('#mapPanel .map-iframe');
-    if (location === 'Luangwa+Market,+Zambia') mapIframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2449.823456!2d29.6078!3d-15.6162!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%20Market!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus";
-    else if (location === 'Feira+Town,+Zambia') mapIframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2450.123456!2d29.6200!3d-15.6050!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5578e1e207f5%3A0x8b8e8b8b8b8b8b8b!2sFeira%20Town!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus";
-  }
-  function resetMap() { document.querySelector('#mapPanel .map-iframe').src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"; }
-
-  function openPanel(panelId) { document.getElementById(panelId).style.display = 'flex'; }
-  function closePanel(panelId) { document.getElementById(panelId).style.display = 'none'; }
+  function openPanel(id) { document.getElementById(id).style.display = 'flex'; }
+  function closePanel(id) { document.getElementById(id).style.display = 'none'; }
   document.getElementById('mapBtn').onclick = () => openPanel('mapPanel');
   document.getElementById('mediaBtn').onclick = () => openPanel('mediaPanel');
-  window.onclick = (e) => { if (e.target === document.getElementById('mapPanel')) closePanel('mapPanel'); if (e.target === document.getElementById('mediaPanel')) closePanel('mediaPanel'); }
+  window.onclick = (e) => { if (e.target.id === 'mapPanel') closePanel('mapPanel'); if (e.target.id === 'mediaPanel') closePanel('mediaPanel'); }
 
   function switchTab(tab) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -632,112 +726,61 @@
     else { document.getElementById('audioTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:last-child').classList.add('active'); }
   }
 
-  // ========== VIDEO PLAYER - HOVER CONTROLS, TOUCH ACTIVATED ==========
-  let videoFiles = [];
-  let currentVideo = 0;
+  // Video Player
+  let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
-  const videoContainer = document.getElementById('videoContainer');
-  const videoPlaylistUl = document.getElementById('videoPlaylist');
-  const videoPlaylistBox = document.getElementById('videoPlaylistBox');
-  const videoNowPlaying = document.getElementById('videoNowPlaying');
-
-  // Add touch class for mobile devices to show controls
-  videoContainer.addEventListener('touchstart', function() {
-    this.classList.add('touched');
-    setTimeout(() => { this.classList.remove('touched'); }, 3000);
-  });
-
   document.getElementById('videoFileInput').addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    videoFiles = files.filter(f => f.type.startsWith('video/'));
-    if (videoFiles.length === 0) { alert('No video files found!'); return; }
-    videoPlaylistUl.innerHTML = '';
-    videoFiles.forEach((file, idx) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<i class="fa fa-video-camera"></i> ${file.name.substring(0, 45)}${file.name.length > 45 ? '...' : ''}`;
-      li.onclick = () => { currentVideo = idx; loadVideo(currentVideo); };
-      videoPlaylistUl.appendChild(li);
+    videoFiles = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
+    if (!videoFiles.length) return;
+    const ul = document.getElementById('videoPlaylist');
+    ul.innerHTML = '';
+    videoFiles.forEach((f, i) => {
+      let li = document.createElement('li');
+      li.innerHTML = `<i class="fa fa-video-camera"></i> ${f.name.substring(0, 40)}`;
+      li.onclick = () => { currentVideo = i; loadVideo(i); };
+      ul.appendChild(li);
     });
-    videoPlaylistBox.style.display = 'block';
-    currentVideo = 0;
+    document.getElementById('videoPlaylistBox').style.display = 'block';
     loadVideo(0);
   });
-
-  function loadVideo(index) {
-    if (!videoFiles[index]) return;
-    const url = URL.createObjectURL(videoFiles[index]);
-    videoPlayer.src = url;
-    videoPlayer.load();
-    videoPlayer.play().catch(e => console.log('Click play to start'));
-    videoNowPlaying.innerHTML = `🎬 Now Playing: ${videoFiles[index].name}`;
-    const items = videoPlaylistUl.querySelectorAll('li');
-    items.forEach((item, i) => { if (i === index) item.classList.add('active'); else item.classList.remove('active'); });
+  function loadVideo(i) {
+    let url = URL.createObjectURL(videoFiles[i]);
+    videoPlayer.src = url; videoPlayer.load(); videoPlayer.play();
+    document.getElementById('videoNowPlaying').innerHTML = `🎬 Now Playing: ${videoFiles[i].name}`;
   }
-
-  function playVideo() { if (videoPlayer.src) videoPlayer.play(); else alert('Load video first'); }
+  function playVideo() { videoPlayer.play(); }
   function pauseVideo() { videoPlayer.pause(); }
-  function stopVideo() { videoPlayer.pause(); videoPlayer.currentTime = 0; }
-  function nextVideo() { if (videoFiles.length) { currentVideo = (currentVideo + 1) % videoFiles.length; loadVideo(currentVideo); } else alert('No videos'); }
-  function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } else alert('No videos'); }
-  function setVolume(val) { if (videoPlayer) videoPlayer.volume = val / 100; }
-  
-  function toggleFullscreen() {
-    if (!videoPlayer) return;
-    if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
-    else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
-    else if (videoPlayer.msRequestFullscreen) videoPlayer.msRequestFullscreen();
-    else alert('Fullscreen not supported');
-  }
-  
-  function clearVideos() { 
-    videoFiles = []; 
-    videoPlaylistUl.innerHTML = ''; 
-    videoPlaylistBox.style.display = 'none'; 
-    videoPlayer.src = ''; 
-    videoNowPlaying.innerHTML = '🎬 No video loaded. Click above to add videos from USB'; 
-    currentVideo = 0; 
-  }
+  function nextVideo() { if (videoFiles.length) { currentVideo = (currentVideo + 1) % videoFiles.length; loadVideo(currentVideo); } }
+  function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } }
+  function toggleFullscreen() { if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen(); else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen(); }
 
-  // ========== AUDIO PLAYER ==========
-  let audioFiles = [];
-  let currentAudio = 0;
+  // Audio Player
+  let audioFiles = [], currentAudio = 0;
   const audioPlayer = document.getElementById('audioPlayer');
-  const audioPlaylistUl = document.getElementById('audioPlaylist');
-  const audioPlaylistBox = document.getElementById('audioPlaylistBox');
-  const audioNowPlaying = document.getElementById('audioNowPlaying');
-
   document.getElementById('audioFileInput').addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    audioFiles = files.filter(f => f.type.startsWith('audio/'));
-    if (audioFiles.length === 0) { alert('No audio files found!'); return; }
-    audioPlaylistUl.innerHTML = '';
-    audioFiles.forEach((file, idx) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<i class="fa fa-music"></i> ${file.name.substring(0, 45)}`;
-      li.onclick = () => { currentAudio = idx; loadAudio(currentAudio); };
-      audioPlaylistUl.appendChild(li);
+    audioFiles = Array.from(e.target.files).filter(f => f.type.startsWith('audio/'));
+    if (!audioFiles.length) return;
+    const ul = document.getElementById('audioPlaylist');
+    ul.innerHTML = '';
+    audioFiles.forEach((f, i) => {
+      let li = document.createElement('li');
+      li.innerHTML = `<i class="fa fa-music"></i> ${f.name.substring(0, 40)}`;
+      li.onclick = () => { currentAudio = i; loadAudio(i); };
+      ul.appendChild(li);
     });
-    audioPlaylistBox.style.display = 'block';
-    currentAudio = 0;
+    document.getElementById('audioPlaylistBox').style.display = 'block';
     loadAudio(0);
   });
-
-  function loadAudio(index) {
-    if (!audioFiles[index]) return;
-    const url = URL.createObjectURL(audioFiles[index]);
-    audioPlayer.src = url;
-    audioPlayer.load();
-    audioPlayer.play().catch(e => console.log('Click play'));
-    audioNowPlaying.innerHTML = `🎵 Now Playing: ${audioFiles[index].name}`;
-    const items = audioPlaylistUl.querySelectorAll('li');
-    items.forEach((item, i) => { if (i === index) item.classList.add('active'); else item.classList.remove('active'); });
+  function loadAudio(i) {
+    let url = URL.createObjectURL(audioFiles[i]);
+    audioPlayer.src = url; audioPlayer.load(); audioPlayer.play();
+    document.getElementById('audioNowPlaying').innerHTML = `🎵 Now Playing: ${audioFiles[i].name}`;
   }
-
-  function playAudio() { if (audioPlayer.src) audioPlayer.play(); else alert('Load music first'); }
+  function playAudio() { audioPlayer.play(); }
   function pauseAudio() { audioPlayer.pause(); }
-  function nextAudio() { if (audioFiles.length) { currentAudio = (currentAudio + 1) % audioFiles.length; loadAudio(currentAudio); } else alert('No music'); }
-  function prevAudio() { if (audioFiles.length) { currentAudio = (currentAudio - 1 + audioFiles.length) % audioFiles.length; loadAudio(currentAudio); } else alert('No music'); }
-  function clearAudio() { audioFiles = []; audioPlaylistUl.innerHTML = ''; audioPlaylistBox.style.display = 'none'; audioPlayer.src = ''; audioNowPlaying.innerHTML = '🎧 No music loaded. Click above to add songs'; currentAudio = 0; }
+  function nextAudio() { if (audioFiles.length) { currentAudio = (currentAudio + 1) % audioFiles.length; loadAudio(currentAudio); } }
+  function prevAudio() { if (audioFiles.length) { currentAudio = (currentAudio - 1 + audioFiles.length) % audioFiles.length; loadAudio(currentAudio); } }
+  function clearAudio() { audioFiles = []; document.getElementById('audioPlaylist').innerHTML = ''; document.getElementById('audioPlaylistBox').style.display = 'none'; audioPlayer.src = ''; }
 </script>
 </body>
 </html>
