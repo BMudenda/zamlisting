@@ -77,7 +77,7 @@
       background: transparent;
       backdrop-filter: blur(6px);
       background: rgba(0, 0, 0, 0.2);
-      pointer-events: none; /* allows clicking through but logo still visible */
+      pointer-events: none;
     }
 
     .company-info {
@@ -138,37 +138,38 @@
       opacity: 0;
       transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       z-index: 1;
-      backdrop-filter: blur(2px);
     }
 
-    /* UNIFORM IMAGE SIZE (enhanced for fullscreen) */
+    /* ===== INCREASED IMAGE SIZES - PROPERLY LARGER FOR FULLSCREEN ===== */
     .billboard-slide .motorbike-billboard img,
     .billboard-slide .car-billboard img,
     .billboard-slide .product-image img,
     .billboard-slide .rotating-image img {
-      width: 220px;
-      height: 220px;
+      width: min(380px, 55vw);
+      height: auto;
+      max-height: 55vh;
       object-fit: contain;
-      filter: drop-shadow(0 0 25px rgba(0, 255, 200, 0.9));
+      filter: drop-shadow(0 0 35px rgba(0, 255, 200, 0.9));
     }
 
-    @media (min-width: 768px) {
+    /* Even larger on big screens */
+    @media (min-width: 1400px) {
       .billboard-slide .motorbike-billboard img,
       .billboard-slide .car-billboard img,
       .billboard-slide .product-image img,
       .billboard-slide .rotating-image img {
-        width: 280px;
-        height: 280px;
+        width: min(480px, 40vw);
+        max-height: 60vh;
       }
     }
 
-    @media (min-width: 1200px) {
+    @media (min-width: 1920px) {
       .billboard-slide .motorbike-billboard img,
       .billboard-slide .car-billboard img,
       .billboard-slide .product-image img,
       .billboard-slide .rotating-image img {
-        width: 340px;
-        height: 340px;
+        width: 550px;
+        max-height: 65vh;
       }
     }
 
@@ -180,15 +181,15 @@
 
     @keyframes smoothDrive {
       0%, 100% { transform: translateX(0px) translateY(0px); }
-      25% { transform: translateX(28px) translateY(-6px); }
+      25% { transform: translateX(35px) translateY(-8px); }
       50% { transform: translateX(0px) translateY(0px); }
-      75% { transform: translateX(-28px) translateY(-6px); }
+      75% { transform: translateX(-35px) translateY(-8px); }
     }
 
     @keyframes bikeGlide {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
-      25% { transform: translateY(-14px) rotate(-4deg); }
-      75% { transform: translateY(-28px) rotate(4deg); }
+      25% { transform: translateY(-18px) rotate(-5deg); }
+      75% { transform: translateY(-32px) rotate(5deg); }
     }
 
     @keyframes coinRotate {
@@ -202,74 +203,85 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 40px;
+      gap: 50px;
       flex-wrap: wrap;
-      padding: 20px;
+      padding: 30px;
     }
 
     .product-info {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(16px);
-      padding: 22px 38px;
-      border-radius: 90px;
-      border: 1px solid rgba(255, 200, 50, 0.4);
+      gap: 20px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(20px);
+      padding: 28px 48px;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 200, 50, 0.5);
+      min-width: 260px;
     }
 
     .product-price {
-      font-size: 26px;
+      font-size: 32px;
       font-weight: bold;
       color: #ffdd66;
-      text-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
+      text-shadow: 0 0 20px rgba(255, 204, 0, 0.9);
       white-space: nowrap;
       animation: textPulse 2.5s ease-in-out infinite;
     }
 
     .status-text {
-      font-size: 22px;
+      font-size: 26px;
       font-weight: bold;
       color: #ffdd88;
-      text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
       animation: textPulse 2.5s ease-in-out infinite;
     }
 
     @keyframes textPulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.85; transform: scale(1.05); color: #ffcc44; }
+      50% { opacity: 0.9; transform: scale(1.04); color: #ffcc44; }
     }
 
+    /* ===== FULLY FUNCTIONAL BUTTONS ===== */
     .store-button {
       background: linear-gradient(135deg, #ff9900, #ff4400);
       color: #fff;
       font-weight: bold;
-      padding: 12px 32px;
+      padding: 14px 38px;
       border: none;
       border-radius: 60px;
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .store-button:hover {
       transform: scale(1.08);
       background: linear-gradient(135deg, #ffaa22, #ff6600);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .store-button:active {
+      transform: scale(0.98);
     }
 
     /* SLIDE 1 - WELCOME (typing + blinking) */
     .welcome-billboard {
-      font-size: 58px;
+      font-size: clamp(32px, 7vw, 72px);
       color: #ffd966;
       font-weight: 800;
-      text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+      text-shadow: 0 0 35px rgba(255, 215, 0, 0.9);
       text-align: center;
-      padding: 20px;
+      padding: 25px;
       white-space: nowrap;
       overflow: hidden;
-      border-right: 4px solid #ffcc33;
+      border-right: 5px solid #ffcc33;
       width: 0;
       animation: typing 5s steps(30, end) infinite, blink-cursor 0.8s step-end infinite;
     }
@@ -288,30 +300,31 @@
 
     /* SLIDE 4 - REQUEST */
     .request-billboard {
-      font-size: 52px;
+      font-size: clamp(28px, 6vw, 58px);
       color: #00ffc3;
       font-weight: bold;
       text-align: center;
-      padding: 25px;
+      padding: 30px;
       animation: neonShake 3s ease-in-out infinite;
     }
 
     @keyframes neonShake {
-      0%, 100% { transform: translateX(0px); text-shadow: 0 0 10px #00ffaa; }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); text-shadow: 0 0 22px #00ffcc; }
-      20%, 40%, 60%, 80% { transform: translateX(5px); text-shadow: 0 0 30px #00ffcc; }
+      0%, 100% { transform: translateX(0px); text-shadow: 0 0 12px #00ffaa; }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); text-shadow: 0 0 28px #00ffcc; }
+      20%, 40%, 60%, 80% { transform: translateX(6px); text-shadow: 0 0 35px #00ffcc; }
     }
 
     /* SLIDE 5 - PROMO */
     .promo-billboard {
       background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffdd44);
-      padding: 28px 55px;
-      border-radius: 80px;
-      font-size: 52px;
+      padding: 32px 65px;
+      border-radius: 90px;
+      font-size: clamp(28px, 6vw, 58px);
       font-weight: 800;
       color: #fff;
       animation: promoPulse 3s infinite alternate;
-      box-shadow: 0 0 40px rgba(255, 80, 40, 0.6);
+      box-shadow: 0 0 55px rgba(255, 80, 40, 0.7);
+      text-align: center;
     }
 
     @keyframes promoPulse {
@@ -321,7 +334,7 @@
 
     /* SLIDE 6 - CONTACT */
     .contact-billboard {
-      font-size: 52px;
+      font-size: clamp(28px, 6vw, 58px);
       color: #00ffcc;
       font-weight: bold;
       animation: gentleFloat 4s ease-in-out infinite;
@@ -330,7 +343,7 @@
 
     @keyframes gentleFloat {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
+      50% { transform: translateY(-22px); }
     }
 
     /* SLIDE 11 - ROAD EFFECT */
@@ -341,27 +354,27 @@
 
     .road-track {
       position: absolute;
-      bottom: 45px;
+      bottom: 55px;
       left: 0;
       width: 100%;
-      height: 8px;
-      background: repeating-linear-gradient(90deg, #ffcc00 0px, #ffcc00 25px, #ff9900 25px, #ff9900 50px);
-      opacity: 0.9;
-      animation: roadMove 0.9s linear infinite;
+      height: 10px;
+      background: repeating-linear-gradient(90deg, #ffcc00 0px, #ffcc00 30px, #ff9900 30px, #ff9900 60px);
+      opacity: 0.95;
+      animation: roadMove 0.8s linear infinite;
     }
 
     @keyframes roadMove {
       0% { background-position: 0 0; }
-      100% { background-position: 50px 0; }
+      100% { background-position: 60px 0; }
     }
 
     .billboard-slide11 .motorbike-billboard img {
-      animation: bikeDrive 4s linear infinite;
+      animation: bikeDrive 5s linear infinite;
     }
 
     @keyframes bikeDrive {
-      0% { transform: translateX(-260px) scale(0.9); }
-      100% { transform: translateX(260px) scale(1.08); }
+      0% { transform: translateX(-320px) scale(0.9); }
+      100% { transform: translateX(320px) scale(1.1); }
     }
 
     /* SLIDE 12 - CAMPAIGN CARD FULLSCREEN EDITION */
@@ -373,68 +386,71 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 45px;
+      gap: 55px;
       flex-wrap: wrap;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(12px);
-      padding: 30px 55px;
-      border-radius: 100px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(15px);
+      padding: 35px 65px;
+      border-radius: 120px;
     }
 
     .billboard-slide12 .left img {
-      width: 130px;
-      height: 130px;
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
       border: 4px solid #ffcc44;
       animation: float 3s infinite;
     }
 
     .billboard-slide12 .name-tag {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
       color: #ffdd99;
+      margin-top: 12px;
     }
 
     .billboard-slide12 .right .title {
-      font-size: 28px;
+      font-size: 32px;
       color: #ffdd55;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
+      font-weight: 800;
     }
 
     .billboard-slide12 .list div {
-      font-size: 18px;
-      margin: 10px 0;
+      font-size: 20px;
+      margin: 12px 0;
       opacity: 0;
-      transform: translateX(25px);
+      transform: translateX(30px);
       animation: fadeSlide 14s infinite;
     }
 
     @keyframes fadeSlide {
-      0% { opacity: 0; transform: translateX(30px); }
+      0% { opacity: 0; transform: translateX(35px); }
       25% { opacity: 1; transform: translateX(0); }
       75% { opacity: 1; }
-      100% { opacity: 0; transform: translateX(-25px); }
+      100% { opacity: 0; transform: translateX(-30px); }
     }
 
     .billboard-slide12 .vote-ribbon {
       position: absolute;
-      top: 25px;
-      left: -55px;
+      top: 30px;
+      left: -65px;
       background: #ffcc33;
-      padding: 6px 75px;
+      padding: 6px 85px;
       transform: rotate(-42deg);
-      font-size: 14px;
+      font-size: 16px;
       font-weight: bold;
     }
 
     .billboard-slide12 .tag {
       position: absolute;
-      top: 25px;
-      right: 30px;
+      top: 30px;
+      right: 35px;
       background: #00ffaa;
-      padding: 6px 18px;
-      border-radius: 40px;
+      padding: 8px 22px;
+      border-radius: 50px;
       font-weight: bold;
+      font-size: 14px;
     }
 
     /* product store link */
@@ -445,29 +461,38 @@
       justify-content: center;
       width: 100%;
       height: 100%;
+      cursor: pointer;
     }
 
-    /* RESPONSIVE TWEAKS - NO DOTS, fullscreen only */
-    @media (max-width: 800px) {
-      .welcome-billboard, .request-billboard, .contact-billboard { font-size: 28px; white-space: normal; }
-      .promo-billboard { font-size: 26px; padding: 14px 24px; }
-      .product-price { font-size: 18px; white-space: normal; text-align: center; }
-      .status-text { font-size: 15px; }
-      .store-button { padding: 8px 20px; font-size: 14px; }
-      .product-row { gap: 20px; }
-      .billboard-slide12 .container { padding: 15px 25px; gap: 20px; }
-      .billboard-slide12 .left img { width: 80px; height: 80px; }
-      .billboard-slide12 .right .title { font-size: 20px; }
-      .billboard-slide12 .list div { font-size: 12px; }
-    }
-
-    @media (max-width: 550px) {
+    /* RESPONSIVE TWEAKS */
+    @media (max-width: 900px) {
+      .welcome-billboard, .request-billboard, .contact-billboard { white-space: normal; word-break: keep-all; }
+      .product-price { font-size: 22px; white-space: normal; text-align: center; }
+      .status-text { font-size: 18px; }
+      .store-button { padding: 10px 25px; font-size: 16px; }
+      .product-row { gap: 25px; }
+      .product-info { padding: 18px 30px; }
       .billboard-slide .motorbike-billboard img,
       .billboard-slide .car-billboard img,
       .billboard-slide .product-image img,
-      .billboard-slide .rotating-image img { width: 100px; height: 100px; }
-      .product-info { padding: 12px 20px; }
-      .welcome-billboard { font-size: 22px; }
+      .billboard-slide .rotating-image img { width: min(280px, 50vw); }
+      .promo-billboard { font-size: 24px; padding: 18px 30px; }
+      .billboard-slide12 .container { padding: 20px 30px; gap: 25px; }
+      .billboard-slide12 .left img { width: 100px; height: 100px; }
+      .billboard-slide12 .right .title { font-size: 22px; }
+      .billboard-slide12 .list div { font-size: 14px; }
+    }
+
+    @media (max-width: 600px) {
+      .product-price { font-size: 18px; }
+      .status-text { font-size: 14px; }
+      .store-button { padding: 8px 18px; font-size: 13px; }
+      .product-info { padding: 12px 20px; gap: 12px; }
+      .billboard-slide .motorbike-billboard img,
+      .billboard-slide .car-billboard img,
+      .billboard-slide .product-image img,
+      .billboard-slide .rotating-image img { width: min(180px, 45vw); }
+      .welcome-billboard { font-size: 22px; white-space: normal; border-right: none; animation: none; width: auto; text-align: center; }
     }
 
     /* hide scrollbar for clean fullscreen */
@@ -484,7 +509,7 @@
         <h2 class="zam"><span class="z-green">Z</span><span class="z-black">a</span><span class="z-red">m</span><span>Listing</span></h2>
       </div>
       <div class="header-controls">
-        <div class="cart-icon"><i class="fa fa-shopping-cart"></i><span class="cart-count">0</span></div>
+        <div class="cart-icon" onclick="alert('🛒 Shopping cart will be available soon!');"><i class="fa fa-shopping-cart"></i><span class="cart-count">0</span></div>
       </div>
     </div>
 
@@ -523,7 +548,7 @@
 
     <!-- SLIDE 4 - Request -->
     <div class="billboard-slide billboard-slide4">
-      <div class="request-billboard">👇👉 Click the available motorbike or Scroll Down 👇</div>
+      <div class="request-billboard">👇👉 Tap the available ride or Swipe 👈👇</div>
     </div>
 
     <!-- SLIDE 5 - Promo -->
@@ -543,7 +568,7 @@
         <div class="product-info">
           <div class="product-price">📺 Smart TV sample • K3,000</div>
           <div class="product-price">📍 Luangwa Feira</div>
-          <button class="store-button" onclick="alert('✨ Check ZamListing store for full deals!');">🛒 SEE DETAILS</button>
+          <button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 SEE DETAILS</button>
         </div>
       </div>
     </div>
@@ -555,7 +580,7 @@
         <div class="product-info">
           <div class="product-price">📱 Hot sale. K1,200</div>
           <div class="product-price">📍 Luangwa Feira</div>
-          <button class="store-button" onclick="alert('View phone & electronics deals');">🛒 VIEW DEAL</button>
+          <button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 VIEW DEAL</button>
         </div>
       </div>
     </div>
@@ -567,14 +592,14 @@
         <div class="product-info">
           <div class="product-price">❄️ Fridge Sale. K2,600</div>
           <div class="product-price">📍 Luangwa Feira</div>
-          <button class="store-button" onclick="alert('More appliances in store');">🛒 SHOP NOW</button>
+          <button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 SHOP NOW</button>
         </div>
       </div>
     </div>
 
     <!-- SLIDE 10 - Rotating Image -->
     <div class="billboard-slide billboard-slide10">
-      <a href="#" class="product-store-link" onclick="alert('Exclusive car deals at ZamListing'); return false;">
+      <a href="https://www.zamlisting.com" class="product-store-link" target="_blank">
         <div class="rotating-image"><img src="car.png" alt="Special car promo"></div>
       </a>
     </div>
@@ -612,7 +637,7 @@
           </div>
         </div>
       </div>
-      <div class="disclaimer" style="position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 10px; color: #ccc;">*Promotional content</div>
+      <div class="disclaimer" style="position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,200,0.7);">*Promotional content</div>
     </div>
 
   </div> <!-- end billboard-header -->
@@ -620,7 +645,7 @@
 
 <script>
   (function() {
-    // Full-screen billboard slideshow - NO DOTS, pure fullscreen auto-rotation with touch support
+    // Full-screen billboard slideshow - No visible dots, pure auto-rotation with touch & mouse swipe
     const slides = document.querySelectorAll('.billboard-slide');
     if (!slides.length) return;
     let currentIdx = 0;
@@ -680,7 +705,7 @@
       }
     });
 
-    // Mouse drag simulation for desktop (optional)
+    // Mouse drag simulation for desktop
     let mouseDown = false;
     let mouseStartX = 0;
     document.addEventListener('mousedown', (e) => {
@@ -703,8 +728,7 @@
       }
     });
 
-    // Also add a subtle pause on hover? not needed but ensures smooth
-    // Prevent accidental body scroll
+    // Prevent body scroll
     document.body.style.overflow = 'hidden';
   })();
 </script>
