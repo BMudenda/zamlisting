@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Pro Audio + Video Player</title>
+  <title>ZamListing – Full Screen Billboard | YouTube + Spotify + Media</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * {
@@ -196,13 +196,14 @@
       overflow-y: auto;
     }
 
-    /* Media Tabs */
+    /* Media Tabs - Updated with YouTube and Spotify */
     .media-tabs {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
       border-bottom: 2px solid rgba(255, 170, 68, 0.3);
       padding-bottom: 10px;
+      flex-wrap: wrap;
     }
     .tab-btn {
       background: rgba(255, 255, 255, 0.1);
@@ -413,7 +414,80 @@
       transform: scale(1.05);
     }
 
-    /* ========== IMPROVED AUDIO PLAYER DESIGN ========== */
+    /* YouTube and Spotify Embed Styles */
+    .embed-container {
+      background: #0a0a0a;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+    .embed-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      background: #000;
+    }
+    .embed-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .url-input-area {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 60px;
+    }
+    .url-input {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 50px;
+      border: none;
+      font-size: 14px;
+      background: white;
+      outline: none;
+    }
+    .load-btn {
+      background: #ff9900;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .load-btn:hover {
+      background: #ff5500;
+    }
+    .suggestions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .suggestion-btn {
+      background: #333;
+      border: none;
+      padding: 6px 15px;
+      border-radius: 50px;
+      color: #ffdd99;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .suggestion-btn:hover {
+      background: #ff9900;
+      color: #000;
+    }
+
+    /* Audio Player Styles */
     .audio-player-container {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
       border-radius: 25px;
@@ -559,6 +633,8 @@
       .control-btn span{display:none} .welcome-billboard{font-size:20px;white-space:normal;border-right:none;width:auto;animation:none}
       .audio-control-btn{width:40px;height:40px;font-size:16px}
       .mode-btn{padding:5px 12px;font-size:11px}
+      .url-input{font-size:12px;padding:8px 12px}
+      .load-btn{padding:8px 16px;font-size:12px}
     }
     ::-webkit-scrollbar { display: none; }
   </style>
@@ -607,12 +683,18 @@
     </div>
   </div>
 
-  <!-- MEDIA OVERLAY -->
+  <!-- MEDIA OVERLAY WITH YOUTUBE AND SPOTIFY TABS -->
   <div id="mediaPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-headphones"></i> Professional Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-headphones"></i> Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
     <div class="panel-content">
-      <div class="media-tabs"><button class="tab-btn active" onclick="switchTab('video')">🎬 Video Player</button><button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player</button></div>
+      <div class="media-tabs">
+        <button class="tab-btn active" onclick="switchTab('video')">🎬 Video Player</button>
+        <button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player</button>
+        <button class="tab-btn" onclick="switchTab('youtube')">▶️ YouTube</button>
+        <button class="tab-btn" onclick="switchTab('spotify')">🎧 Spotify</button>
+      </div>
       
+      <!-- Video Player Tab (unchanged) -->
       <div id="videoTab" class="tab-content active">
         <div class="file-upload-area" onclick="document.getElementById('videoFileInput').click()">
           <input type="file" id="videoFileInput" accept="video/*" multiple style="display:none">
@@ -639,7 +721,7 @@
         <div class="now-playing-text" id="videoNowPlaying">🎬 No video loaded. Click above to load videos from USB</div>
       </div>
       
-      <!-- IMPROVED AUDIO PLAYER WITH PROGRESS BAR -->
+      <!-- Audio Player Tab (unchanged) -->
       <div id="audioTab" class="tab-content">
         <div class="file-upload-area" onclick="document.getElementById('audioFileInput').click()">
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
@@ -653,11 +735,8 @@
           <ul id="audioPlaylist"></ul>
         </div>
         
-        <!-- Beautiful Audio Player -->
         <div class="audio-player-container">
           <div class="audio-title" id="currentTrackTitle">🎧 No track playing</div>
-          
-          <!-- Progress Bar - Draggable -->
           <div class="audio-progress-container">
             <div class="audio-progress-bar" id="audioProgressBar">
               <div class="audio-progress-fill" id="audioProgressFill"></div>
@@ -667,15 +746,11 @@
               <span id="totalTime">0:00</span>
             </div>
           </div>
-          
-          <!-- Main Controls -->
           <div class="audio-controls-row">
             <button class="audio-control-btn small" onclick="prevAudioTrack()"><i class="fa fa-backward"></i></button>
             <button class="audio-control-btn" id="audioPlayPauseBtn" onclick="toggleAudioPlay()"><i class="fa fa-play"></i></button>
             <button class="audio-control-btn small" onclick="nextAudioTrack()"><i class="fa fa-forward"></i></button>
           </div>
-          
-          <!-- Mode Buttons -->
           <div class="audio-mode-buttons">
             <div class="volume-control">
               <i class="fa fa-volume-up" style="color:#ffdd99;"></i>
@@ -687,15 +762,59 @@
             <button class="mode-btn" onclick="clearAudio()"><i class="fa fa-trash"></i> Clear</button>
           </div>
         </div>
-        
         <div class="info-text" id="playerStatus">✅ Ready to play music non-stop</div>
+      </div>
+      
+      <!-- NEW: YouTube Tab -->
+      <div id="youtubeTab" class="tab-content">
+        <div class="embed-container">
+          <div class="embed-wrapper" id="youtubeWrapper">
+            <iframe id="youtubePlayer" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0" 
+              title="YouTube video player" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="url-input-area">
+          <input type="text" id="youtubeUrl" class="url-input" placeholder="Enter YouTube URL or video ID (e.g., dQw4w9WgXcQ or https://youtu.be/...)" value="dQw4w9WgXcQ">
+          <button class="load-btn" onclick="loadYouTubeVideo()"><i class="fa fa-youtube-play"></i> Load Video</button>
+        </div>
+        <div class="suggestions">
+          <span class="suggestion-btn" onclick="loadSuggestedVideo('dQw4w9WgXcQ')">🎵 Rick Astley</span>
+          <span class="suggestion-btn" onclick="loadSuggestedVideo('JGwWNGJdvx8')">🎤 Ed Sheeran</span>
+          <span class="suggestion-btn" onclick="loadSuggestedVideo('7qkVtVQoFok')">🌍 Zambian Music</span>
+          <span class="suggestion-btn" onclick="loadSuggestedVideo('OPf0YbXqDm0')">🎸 Classic Hits</span>
+        </div>
+        <div class="info-text">💡 Paste any YouTube URL or video ID | Click suggestions to try popular videos</div>
+      </div>
+      
+      <!-- NEW: Spotify Tab -->
+      <div id="spotifyTab" class="tab-content">
+        <div class="embed-container">
+          <div class="embed-wrapper" id="spotifyWrapper">
+            <iframe id="spotifyPlayer" src="https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT?utm_source=generator" 
+              allow="encrypted-media" 
+              allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="url-input-area">
+          <input type="text" id="spotifyUrl" class="url-input" placeholder="Enter Spotify URL (track, playlist, album, artist)" value="https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT">
+          <button class="load-btn" onclick="loadSpotifyContent()"><i class="fa fa-spotify"></i> Load</button>
+        </div>
+        <div class="suggestions">
+          <span class="suggestion-btn" onclick="loadSuggestedSpotify('track/4cOdK2wGLETKBW3PvgPWqT')">🎵 Top Hit</span>
+          <span class="suggestion-btn" onclick="loadSuggestedSpotify('playlist/37i9dQZF1DXcBWIGoYBM5M')">📻 Today's Hits</span>
+          <span class="suggestion-btn" onclick="loadSuggestedSpotify('artist/1dfeR4HaWDbWqFHLkxsg1d')">🎤 Diamond Platnumz</span>
+          <span class="suggestion-btn" onclick="loadSuggestedSpotify('album/4aKdxOX0UC2WzQ8jg0ayv')">💿 African Beats</span>
+        </div>
+        <div class="info-text">💡 Paste any Spotify track/playlist/album/artist URL | Free users may see ads</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // ========== MAP FUNCTIONS ==========
+  // ========== MAP FUNCTIONS (unchanged) ==========
   const mapIframe = document.getElementById('mapIframe');
   const openMapsBtn = document.getElementById('openMapsBtn');
   
@@ -719,7 +838,7 @@
   }
   openMapsBtn.onclick = () => window.open(`https://www.google.com/maps/dir/Luangwa,+Zambia/Luangwa,+Zambia`, '_blank');
 
-  // ========== SLIDESHOW ==========
+  // ========== SLIDESHOW (unchanged) ==========
   (function() {
     const slides = document.querySelectorAll('.billboard-slide');
     if (!slides.length) return;
@@ -750,10 +869,12 @@
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (tab === 'video') { document.getElementById('videoTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:first-child').classList.add('active'); }
-    else { document.getElementById('audioTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:last-child').classList.add('active'); }
+    else if (tab === 'audio') { document.getElementById('audioTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:nth-child(2)').classList.add('active'); }
+    else if (tab === 'youtube') { document.getElementById('youtubeTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:nth-child(3)').classList.add('active'); }
+    else if (tab === 'spotify') { document.getElementById('spotifyTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:nth-child(4)').classList.add('active'); }
   }
 
-  // ========== VIDEO PLAYER ==========
+  // ========== VIDEO PLAYER (unchanged) ==========
   let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
   const timeDisplay = document.getElementById('timeDisplay');
@@ -780,16 +901,13 @@
   function prevVideo() { if (videoFiles.length) { currentVideo = (currentVideo - 1 + videoFiles.length) % videoFiles.length; loadVideo(currentVideo); } }
   function toggleFullscreen() { if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen(); else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen(); }
 
-  // ========== IMPROVED AUDIO PLAYER ==========
+  // ========== AUDIO PLAYER (unchanged) ==========
   let audioFiles = [];
   let currentAudioIndex = 0;
   let isShuffle = false;
   let isRepeat = false;
   let isCrossfade = true;
-  let crossfadeDuration = 2000;
-  let fadeInterval = null;
   
-  const audioElem = document.getElementById('audioPlayer');
   const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
   const currentTrackTitle = document.getElementById('currentTrackTitle');
   const currentTimeSpan = document.getElementById('currentTime');
@@ -798,7 +916,6 @@
   const audioProgressBar = document.getElementById('audioProgressBar');
   const statusSpan = document.getElementById('playerStatus');
   
-  // Create audio element dynamically
   const audio = new Audio();
   
   function formatAudioTime(sec) {
@@ -823,7 +940,6 @@
   audio.addEventListener('play', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-pause"></i>'; });
   audio.addEventListener('pause', () => { audioPlayPauseBtn.innerHTML = '<i class="fa fa-play"></i>'; });
   
-  // Draggable progress bar
   audioProgressBar.addEventListener('click', (e) => {
     if (audio.duration) {
       const rect = audioProgressBar.getBoundingClientRect();
@@ -867,10 +983,7 @@
   
   function highlightAudioPlaylistItem(index) {
     const items = document.querySelectorAll('#audioPlaylist li');
-    items.forEach((item, idx) => {
-      if (idx === index) item.classList.add('active');
-      else item.classList.remove('active');
-    });
+    items.forEach((item, idx) => { if (idx === index) item.classList.add('active'); else item.classList.remove('active'); });
   }
   
   function toggleAudioPlay() {
@@ -882,11 +995,8 @@
   function prevAudioTrack() {
     if (audioFiles.length === 0) return;
     let prevIndex;
-    if (isShuffle) {
-      prevIndex = Math.floor(Math.random() * audioFiles.length);
-    } else {
-      prevIndex = (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length;
-    }
+    if (isShuffle) { prevIndex = Math.floor(Math.random() * audioFiles.length); } 
+    else { prevIndex = (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length; }
     currentAudioIndex = prevIndex;
     loadAudioTrack(currentAudioIndex);
   }
@@ -894,12 +1004,8 @@
   function nextAudioTrack() {
     if (audioFiles.length === 0) return;
     let nextIndex;
-    if (isShuffle) {
-      do { nextIndex = Math.floor(Math.random() * audioFiles.length); } 
-      while (nextIndex === currentAudioIndex && audioFiles.length > 1);
-    } else {
-      nextIndex = (currentAudioIndex + 1) % audioFiles.length;
-    }
+    if (isShuffle) { do { nextIndex = Math.floor(Math.random() * audioFiles.length); } while (nextIndex === currentAudioIndex && audioFiles.length > 1); } 
+    else { nextIndex = (currentAudioIndex + 1) % audioFiles.length; }
     currentAudioIndex = nextIndex;
     loadAudioTrack(currentAudioIndex);
   }
@@ -959,6 +1065,64 @@
     currentAudioIndex = 0;
   }
   
+  // ========== YOUTUBE FUNCTIONS ==========
+  function loadYouTubeVideo() {
+    let url = document.getElementById('youtubeUrl').value.trim();
+    let videoId = url;
+    
+    if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1].split('?')[0];
+    } else if (url.includes('youtube.com/watch?v=')) {
+      videoId = url.split('v=')[1].split('&')[0];
+    } else if (url.includes('youtube.com/embed/')) {
+      videoId = url.split('embed/')[1].split('?')[0];
+    }
+    
+    if (videoId && videoId.length === 11) {
+      document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    } else {
+      alert('Invalid YouTube URL or ID. Please enter a valid YouTube video ID or URL');
+    }
+  }
+  
+  function loadSuggestedVideo(videoId) {
+    document.getElementById('youtubeUrl').value = videoId;
+    document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  }
+  
+  // ========== SPOTIFY FUNCTIONS ==========
+  function loadSpotifyContent() {
+    let url = document.getElementById('spotifyUrl').value.trim();
+    let embedUrl = '';
+    
+    if (url.includes('spotify.com')) {
+      if (url.includes('track/')) {
+        let trackId = url.split('track/')[1].split('?')[0];
+        embedUrl = `https://open.spotify.com/embed/track/${trackId}`;
+      } else if (url.includes('playlist/')) {
+        let playlistId = url.split('playlist/')[1].split('?')[0];
+        embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}`;
+      } else if (url.includes('album/')) {
+        let albumId = url.split('album/')[1].split('?')[0];
+        embedUrl = `https://open.spotify.com/embed/album/${albumId}`;
+      } else if (url.includes('artist/')) {
+        let artistId = url.split('artist/')[1].split('?')[0];
+        embedUrl = `https://open.spotify.com/embed/artist/${artistId}`;
+      } else {
+        alert('Please enter a valid Spotify track, playlist, album, or artist URL');
+        return;
+      }
+      document.getElementById('spotifyPlayer').src = embedUrl + '?utm_source=generator';
+    } else {
+      alert('Please enter a valid Spotify URL (e.g., https://open.spotify.com/track/... )');
+    }
+  }
+  
+  function loadSuggestedSpotify(path) {
+    document.getElementById('spotifyUrl').value = `https://open.spotify.com/${path}`;
+    document.getElementById('spotifyPlayer').src = `https://open.spotify.com/embed/${path}?utm_source=generator`;
+  }
+  
   // Expose global functions
   window.toggleAudioPlay = toggleAudioPlay;
   window.prevAudioTrack = prevAudioTrack;
@@ -977,6 +1141,10 @@
   window.setVideoVolume = setVideoVolume;
   window.setPlaybackSpeed = setPlaybackSpeed;
   window.searchAndShowOnMap = searchAndShowOnMap;
+  window.loadYouTubeVideo = loadYouTubeVideo;
+  window.loadSuggestedVideo = loadSuggestedVideo;
+  window.loadSpotifyContent = loadSpotifyContent;
+  window.loadSuggestedSpotify = loadSuggestedSpotify;
 </script>
 </body>
 </html>
