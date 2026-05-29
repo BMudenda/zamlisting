@@ -546,14 +546,16 @@
     });
   }
 
-      // App Install Prompt - KEEP auto banner + ADD menu button support
+      // App Install Prompt - Let browser help on small screens
 let deferredPrompt = null;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
+  // DO NOT prevent default - let browser show its own banner too
+  // e.preventDefault();  // ← KEEP THIS COMMENTED OUT
+  
   deferredPrompt = e;
   
-  // AUTO-DETECT FLOATING BANNER (KEEP THIS - UNCHANGED)
+  // Your custom banner (still works)
   const installBox = document.createElement("div");
   installBox.style.position = "fixed";
   installBox.style.top = "15px";
@@ -582,21 +584,6 @@ window.addEventListener("beforeinstallprompt", (e) => {
     }
   });
   document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
-});
-
-// Handle the menu install button - NO ALERT, just silent fail when not available
-document.addEventListener('DOMContentLoaded', function() {
-  const menuInstallBtn = document.getElementById('menu-install-btn');
-  if (menuInstallBtn) {
-    menuInstallBtn.addEventListener('click', async function() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-      }
-      // Do nothing when install prompt not available - silent fail
-    });
-  }
 });
 // Function to get driver contact based on selected hub
 // Function to get driver contact based on selected hub
