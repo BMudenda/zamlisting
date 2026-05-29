@@ -546,7 +546,7 @@
     });
   }
 
-      // App Install Prompt - KEEP auto banner + ADD menu button support
+  // App Install Prompt - KEEP auto banner + ADD menu button support
 let deferredPrompt = null;
 
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -582,6 +582,27 @@ window.addEventListener("beforeinstallprompt", (e) => {
     }
   });
   document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+});
+
+// ===== ADD THIS FUNCTION HERE =====
+function showManualInstructions() {
+  alert("To install:\n\n• Chrome: Tap ⋮ menu → 'Install App'\n• Safari: Tap Share → 'Add to Home Screen'");
+}
+// =================================
+
+// Handle the menu install button
+document.addEventListener('DOMContentLoaded', function() {
+  const menuInstallBtn = document.getElementById('menu-install-btn');
+  if (menuInstallBtn) {
+    menuInstallBtn.addEventListener('click', async function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      }
+      // Do nothing when install prompt not available - silent fail
+    });
+  }
 });
 // Function to get driver contact based on selected hub
 // Function to get driver contact based on selected hub
