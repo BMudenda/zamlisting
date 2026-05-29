@@ -313,9 +313,8 @@
                     <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
                     <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
                     <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
-                    <!-- Install App Button Section -->
-<button id="menu-install-btn" class="store-button" style="width: 100%; background: linear-gradient(135deg, #2b6ef6, #1a4fc1); padding: 10px; font-size: 14px; margin-top: 5px;">
-    📱 Install
+<button id="menu-install-btn" class="store-button" style="width: 100%; background: linear-gradient(135deg, #ff9900, #ff5500); padding: 10px; font-size: 14px; margin-top: 5px;">
+    ⬇️ Download APK
 </button>
                 </div>
                 
@@ -536,71 +535,77 @@
 </main>
 
 <script>
-  // Service Worker Registration
+// ========== SERVICE WORKER REGISTRATION ==========
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker.register("sw.js").then(
-      function(reg) { console.log("ServiceWorker registered"); },
-      function(err) { console.log("ServiceWorker registration failed:", err); }
+      function(reg) { 
+        console.log("ServiceWorker registered"); 
+      },
+      function(err) { 
+        console.log("ServiceWorker registration failed:", err); 
+      }
     );
   });
 }
 
-// App Install Prompt - KEEP auto banner + ADD menu button support
+// ========== AUTO BANNER - NATIVE INSTALL (TABLET ONLY) ==========
 let deferredPrompt = null;
 
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
   
-  const installBox = document.createElement("div");
-  installBox.style.position = "fixed";
-  installBox.style.top = "15px";
-  installBox.style.right = "15px";
-  installBox.style.background = "#2b6ef6";
-  installBox.style.color = "#fff";
-  installBox.style.borderRadius = "8px";
-  installBox.style.padding = "8px 14px";
-  installBox.style.fontFamily = "system-ui, sans-serif";
-  installBox.style.fontSize = "14px";
-  installBox.style.cursor = "pointer";
-  installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-  installBox.style.zIndex = "9999";
-  installBox.style.display = "flex";
-  installBox.style.alignItems = "center";
-  installBox.style.gap = "8px";
-  installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
-  document.body.appendChild(installBox);
+  // AUTO BANNER - Only shows on tablets, not on small phones
+  if (window.innerWidth > 600) {
+    const installBox = document.createElement("div");
+    installBox.style.position = "fixed";
+    installBox.style.top = "15px";
+    installBox.style.right = "15px";
+    installBox.style.background = "#2b6ef6";
+    installBox.style.color = "#fff";
+    installBox.style.borderRadius = "8px";
+    installBox.style.padding = "8px 14px";
+    installBox.style.fontFamily = "system-ui, sans-serif";
+    installBox.style.fontSize = "14px";
+    installBox.style.cursor = "pointer";
+    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+    installBox.style.zIndex = "9999";
+    installBox.style.display = "flex";
+    installBox.style.alignItems = "center";
+    installBox.style.gap = "8px";
+    installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
+    document.body.appendChild(installBox);
 
-  document.getElementById("installText").addEventListener("click", async () => {
-    installBox.remove();
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    }
-  });
-  document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
-});
-
-function showManualInstructions() {
-  alert("To install:\n\n• Chrome: Tap ⋮ menu → 'Install App'\n• Safari: Tap Share → 'Add to Home Screen'");
-}
-
-// Handle the menu install button - FIXED FOR SMALL PHONES
-document.addEventListener('DOMContentLoaded', function() {
-  const menuInstallBtn = document.getElementById('menu-install-btn');
-  if (menuInstallBtn) {
-    menuInstallBtn.addEventListener('click', async function() {
+    document.getElementById("installText").addEventListener("click", async () => {
+      installBox.remove();
       if (deferredPrompt) {
-        // Tablet - native install works
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         deferredPrompt = null;
-      } else {
-        // Small phone - show manual instructions
-        showManualInstructions();
       }
+    });
+    
+    document.getElementById("closeInstall").addEventListener("click", () => { 
+      installBox.remove(); 
+    });
+  }
+});
+
+// ========== MENU BUTTON - ALWAYS DOWNLOADS APK ==========
+document.addEventListener('DOMContentLoaded', function() {
+  const menuInstallBtn = document.getElementById('menu-install-btn');
+  if (menuInstallBtn) {
+    menuInstallBtn.addEventListener('click', function() {
+      // Download APK file (works on all devices)
+      const link = document.createElement('a');
+      link.href = 'luangwa-feira-rides.apk';
+      link.download = 'luangwa-feira-rides.apk';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert("📱 Download started!\n\nOpen the APK file to install the app.\n\nIf needed, enable 'Install from unknown sources' in Settings.");
     });
   }
 });
