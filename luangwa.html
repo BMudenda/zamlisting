@@ -588,7 +588,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
   document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
 });
 
-// NEW CODE: Handle the menu install button (add this after the above code)
+// Handle the menu install button - NO ALERT, just silent fail when not available
 document.addEventListener('DOMContentLoaded', function() {
   const menuInstallBtn = document.getElementById('menu-install-btn');
   if (menuInstallBtn) {
@@ -597,9 +597,8 @@ document.addEventListener('DOMContentLoaded', function() {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         deferredPrompt = null;
-      } else {
-        alert("Install prompt not available. You can still use the web app or add to home screen manually.");
       }
+      // Do nothing when install prompt not available - silent fail
     });
   }
 });
