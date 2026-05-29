@@ -550,36 +550,59 @@
     });
   }
 
-  // App Install Prompt
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    const deferredPrompt = e;
-    const installBox = document.createElement("div");
-    installBox.style.position = "fixed";
-    installBox.style.top = "15px";
-    installBox.style.right = "15px";
-    installBox.style.background = "#2b6ef6";
-    installBox.style.color = "#fff";
-    installBox.style.borderRadius = "8px";
-    installBox.style.padding = "8px 14px";
-    installBox.style.fontFamily = "system-ui, sans-serif";
-    installBox.style.fontSize = "14px";
-    installBox.style.cursor = "pointer";
-    installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
-    installBox.style.zIndex = "9999";
-    installBox.style.display = "flex";
-    installBox.style.alignItems = "center";
-    installBox.style.gap = "8px";
-    installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
-    document.body.appendChild(installBox);
+  // App Install Prompt - KEEP auto banner + ADD menu button support
+let deferredPrompt = null;
 
-    document.getElementById("installText").addEventListener("click", async () => {
-      installBox.remove();
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // AUTO-DETECT FLOATING BANNER (KEEP THIS - UNCHANGED)
+  const installBox = document.createElement("div");
+  installBox.style.position = "fixed";
+  installBox.style.top = "15px";
+  installBox.style.right = "15px";
+  installBox.style.background = "#2b6ef6";
+  installBox.style.color = "#fff";
+  installBox.style.borderRadius = "8px";
+  installBox.style.padding = "8px 14px";
+  installBox.style.fontFamily = "system-ui, sans-serif";
+  installBox.style.fontSize = "14px";
+  installBox.style.cursor = "pointer";
+  installBox.style.boxShadow = "0 3px 8px rgba(0,0,0,0.2)";
+  installBox.style.zIndex = "9999";
+  installBox.style.display = "flex";
+  installBox.style.alignItems = "center";
+  installBox.style.gap = "8px";
+  installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
+  document.body.appendChild(installBox);
+
+  document.getElementById("installText").addEventListener("click", async () => {
+    installBox.remove();
+    if (deferredPrompt) {
       deferredPrompt.prompt();
-    });
-    document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    }
   });
+  document.getElementById("closeInstall").addEventListener("click", () => { installBox.remove(); });
+});
 
+// NEW CODE: Handle the menu install button (add this after the above code)
+document.addEventListener('DOMContentLoaded', function() {
+  const menuInstallBtn = document.getElementById('menu-install-btn');
+  if (menuInstallBtn) {
+    menuInstallBtn.addEventListener('click', async function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      } else {
+        alert("Install prompt not available. You can still use the web app or add to home screen manually.");
+      }
+    });
+  }
+});
 // Function to get driver contact based on selected hub
 // Function to get driver contact based on selected hub
 function getDriverContactForHub() {
