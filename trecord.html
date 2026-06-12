@@ -1,726 +1,757 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>CashFlow Pro | Smart Cash Tracker</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CashFlow Hub | Smart Tracker + Share</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(145deg, #eef2f7 0%, #e0e7ef 100%);
-        padding: 24px 20px;
-        min-height: 100vh;
-    }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4fa;
+            padding: 20px 16px 40px;
+            min-height: 100vh;
+        }
 
-    .container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
+        .app-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
 
-    /* header badge */
-    .app-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        flex-wrap: wrap;
-        margin-bottom: 24px;
-    }
+        /* HEADER with 3-dots menu */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 14px 24px;
+            border-radius: 48px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            backdrop-filter: blur(2px);
+        }
 
-    .app-header h1 {
-        font-size: 1.85rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #1e2a3a, #0f172a);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        letter-spacing: -0.3px;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
+        .logo-area h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(130deg, #1f3b2c, #2c5a3e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
 
-    .app-header h1::before {
-        content: "💰";
-        font-size: 2rem;
-        background: none;
-        -webkit-background-clip: unset;
-        color: #2c3e4e;
-    }
+        .logo-area p {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+        }
 
-    .badge-version {
-        background: rgba(44,62,78,0.1);
-        backdrop-filter: blur(4px);
-        padding: 6px 12px;
-        border-radius: 40px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: #2c3e4e;
-    }
+        /* Three dots button */
+        .menu-dots {
+            background: #f1f5f9;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 40px;
+            font-size: 28px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: #1e2f3e;
+        }
 
-    /* cards modern */
-    .card {
-        background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(0px);
-        border-radius: 28px;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
-        padding: 24px 28px;
-        margin-bottom: 28px;
-        transition: all 0.2s ease;
-        border: 1px solid rgba(255,255,255,0.5);
-    }
+        .menu-dots:hover {
+            background: #e2e8f0;
+            transform: scale(0.96);
+        }
 
-    .card:hover {
-        box-shadow: 0 20px 32px rgba(0, 0, 0, 0.12);
-    }
+        /* Dropdown menu overlay */
+        .dropdown-menu {
+            position: absolute;
+            top: 85px;
+            right: 28px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            width: 320px;
+            z-index: 1000;
+            overflow: hidden;
+            transition: 0.2s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
 
-    h2, h3 {
-        font-weight: 600;
-        letter-spacing: -0.2px;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+        .dropdown-header {
+            background: #1e2f3c;
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
 
-    h2 { font-size: 1.6rem; color: #0f172a; border-left: 5px solid #2b6e3c; padding-left: 16px; }
-    h3 { font-size: 1.3rem; color: #1e293b; margin-bottom: 20px; }
+        .dropdown-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
 
-    /* form grid enhanced */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 20px 18px;
-        align-items: end;
-    }
+        .form-group {
+            margin-bottom: 16px;
+        }
 
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: block;
+            margin-bottom: 6px;
+            color: #2c3e4e;
+        }
 
-    .input-group label {
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #334155;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 20px;
+            border: 1.5px solid #e2edf2;
+            font-size: 0.85rem;
+        }
 
-    input, textarea {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 18px;
-        font-size: 0.95rem;
-        transition: all 0.2s;
-        background-color: #fefefe;
-        font-family: inherit;
-    }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
 
-    input:focus, textarea:focus {
-        outline: none;
-        border-color: #2b6e3c;
-        box-shadow: 0 0 0 3px rgba(43,110,60,0.2);
-    }
+        .dropdown-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
 
-    textarea {
-        border-radius: 20px;
-        resize: vertical;
-    }
+        .btn-sm {
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            background: #eef2ff;
+            cursor: pointer;
+        }
 
-    /* Button group modern */
-    .action-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 20px;
-        justify-content: flex-start;
-    }
+        .btn-primary {
+            background: #2b6e3c;
+            color: white;
+        }
 
-    button {
-        padding: 10px 24px;
-        border: none;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: #f1f5f9;
-        color: #1e293b;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
+        .close-menu {
+            background: none;
+            border: none;
+            float: right;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
 
-    .save-btn {
-        background: #2b6e3c;
-        color: white;
-        box-shadow: 0 4px 8px rgba(43,110,60,0.25);
-    }
+        /* Cards summary */
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
 
-    .save-btn:hover { background: #1f5430; transform: translateY(-2px); }
+        .stat-card {
+            background: white;
+            flex: 1;
+            min-width: 160px;
+            border-radius: 28px;
+            padding: 18px 12px;
+            text-align: center;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
+            border: 1px solid #eef2ff;
+        }
 
-    .export-btn {
-        background: #1e4a76;
-        color: white;
-    }
-    .export-btn:hover { background: #0f3b5e; transform: translateY(-2px);}
+        .stat-card h3 {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #4b5565;
+        }
 
-    .print-btn {
-        background: #475569;
-        color: white;
-    }
-    .print-btn:hover { background: #334155; }
+        .stat-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin-top: 8px;
+            color: #0f2c1f;
+        }
 
-    .edit-btn {
-        background: #f59e0b;
-        color: #2d1b00;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-    }
-    .delete-btn {
-        background: #dc2626;
-        color: white;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-    }
-    .edit-btn:hover, .delete-btn:hover { transform: translateY(-1px); filter: brightness(0.96);}
+        /* Share bar */
+        .share-bar {
+            background: white;
+            border-radius: 32px;
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
 
-    /* summary cards */
-    .summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-    }
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+        }
 
-    .summary-box {
-        background: linear-gradient(135deg, #f8fafc, #ffffff);
-        padding: 20px;
-        border-radius: 28px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        border: 1px solid #eef2ff;
-        transition: all 0.2s;
-    }
+        .share-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
 
-    .summary-box strong {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #475569;
-    }
+        .whatsapp { background: #25D366; color: white; }
+        .sms { background: #3b82f6; color: white; }
 
-    .summary-box h2 {
-        font-size: 2.4rem;
-        margin-top: 12px;
-        margin-bottom: 0;
-        color: #0f172a;
-        border-left: none;
-        padding-left: 0;
-        justify-content: center;
-    }
+        /* table */
+        .table-wrapper {
+            background: white;
+            border-radius: 28px;
+            padding: 8px 0;
+            overflow-x: auto;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
 
-    /* table responsive */
-    .table-wrapper {
-        overflow-x: auto;
-        border-radius: 20px;
-        margin-top: 6px;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-        background: white;
-        border-radius: 20px;
-    }
+        th {
+            background: #f8fafc;
+            padding: 14px 10px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+        }
 
-    th {
-        background: #1e293b;
-        color: white;
-        padding: 14px 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #edf2f7;
+            text-align: center;
+            font-size: 0.85rem;
+        }
 
-    td {
-        border-bottom: 1px solid #e9edf2;
-        padding: 12px 8px;
-        vertical-align: middle;
-    }
+        .checkbox-col {
+            width: 40px;
+            text-align: center;
+        }
 
-    tr:hover td {
-        background-color: #fafcff;
-    }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
 
-    .action-cell {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
+        .edit-small, .delete-small {
+            padding: 5px 12px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
 
-    /* empty state */
-    .empty-row td {
-        text-align: center;
-        padding: 32px;
-        color: #6c757d;
-        font-style: italic;
-    }
+        .edit-small { background: #fbbf24; }
+        .delete-small { background: #ef4444; color: white; }
 
-    /* footer & mobile */
-    .footer-note {
-        text-align: center;
-        font-size: 0.75rem;
-        color: #5b6e8c;
-        margin-top: 24px;
-    }
+        .footer-tip {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 20px;
+            color: #6c7a8e;
+        }
 
-    @media (max-width: 680px) {
-        body { padding: 16px; }
-        .card { padding: 18px; }
-        button { width: auto; padding: 8px 18px; }
-        .action-bar button { flex: 1 0 auto; }
-        .summary-box h2 { font-size: 1.8rem; }
-        th, td { font-size: 0.75rem; padding: 8px 4px; }
-    }
-
-    /* highlight when editing */
-    .card-editing {
-        border-left: 6px solid #f59e0b;
-        background: #fffdf7;
-    }
-
-    .clear-icon {
-        background: none;
-        box-shadow: none;
-        padding: 8px 16px;
-    }
-</style>
+        @media (max-width: 700px) {
+            .stat-value { font-size: 1.5rem; }
+            .share-bar { flex-direction: column; align-items: stretch; }
+            .dropdown-menu { right: 12px; width: 90vw; left: 5%; }
+        }
+        .hidden {
+            display: none;
+        }
+        .select-all-label {
+            font-size: 0.7rem;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="app-header">
-        <h1>CashFlow Pro · Tracker</h1>
-        <div class="badge-version">v2.0 · Real-time balance</div>
+<div class="app-container">
+    <!-- Top header with three dots -->
+    <div class="dashboard-header">
+        <div class="logo-area">
+            <h1>💰 CashFlow Hub</h1>
+            <p>track · share · decide</p>
+        </div>
+        <button class="menu-dots" id="menuDotsBtn" aria-label="Menu">⋮</button>
     </div>
 
-    <!-- Entry form card -->
-    <div class="card" id="formCard">
-        <h2>📋 Record Transaction</h2>
-        <div class="form-grid">
-            <div class="input-group">
+    <!-- Dropdown menu (input panel) -->
+    <div id="inputDropdown" class="dropdown-menu hidden">
+        <div class="dropdown-header">
+            <span>📝 Quick Record</span>
+            <button class="close-menu" id="closeMenuBtn">✕</button>
+        </div>
+        <div class="dropdown-content">
+            <div class="form-group">
                 <label>📅 Date</label>
-                <input type="date" id="date" autocomplete="off">
+                <input type="date" id="menuDate">
             </div>
-            <div class="input-group">
-                <label>⏱️ Time In</label>
-                <input type="time" id="timeIn">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>⏱️ Time In</label>
+                    <input type="time" id="menuTimeIn">
+                </div>
+                <div class="form-group">
+                    <label>⏲️ Time Out</label>
+                    <input type="time" id="menuTimeOut">
+                </div>
             </div>
-            <div class="input-group">
-                <label>⏲️ Time Out</label>
-                <input type="time" id="timeOut">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🎯 Target (K)</label>
+                    <input type="number" id="menuTarget" value="400">
+                </div>
+                <div class="form-group">
+                    <label>💰 Cash In (K)</label>
+                    <input type="number" id="menuCashIn" step="1">
+                </div>
             </div>
-            <div class="input-group">
-                <label>🎯 Cash Target (K)</label>
-                <input type="number" id="target" value="400" step="10">
+            <div class="form-group">
+                <label>⚖️ Balance (auto)</label>
+                <input type="number" id="menuBalance" readonly style="background:#f1f5f9;">
             </div>
-            <div class="input-group">
-                <label>💰 Cash In (K)</label>
-                <input type="number" id="cashIn" step="1" oninput="calculateBalance()">
+            <div class="form-group">
+                <label>💬 Comments</label>
+                <textarea id="menuComments" rows="2" placeholder="optional note..."></textarea>
             </div>
-            <div class="input-group">
-                <label>⚖️ Balance (K)</label>
-                <input type="number" id="balance" readonly style="background:#f1f5f9; font-weight:500;">
+            <div class="dropdown-actions">
+                <button class="btn-sm btn-primary" id="menuSaveBtn">💾 Save</button>
+                <button class="btn-sm" id="menuCancelBtn">Cancel</button>
             </div>
-        </div>
-        <div class="input-group" style="margin-top: 12px;">
-            <label>💬 Notes / Comments</label>
-            <textarea id="comments" rows="2" placeholder="Optional notes, customer info, etc..."></textarea>
-        </div>
-        <div class="action-bar">
-            <button class="save-btn" onclick="saveRecord()">💾 Save Record</button>
-            <button class="export-btn" onclick="exportCSV()">📎 Export CSV</button>
-            <button class="print-btn" onclick="window.print()">🖨️ Print / Report</button>
-            <button class="clear-icon" onclick="clearForm(true)" style="background:#eef2ff;">🗑️ Clear form</button>
-        </div>
-    </div>
-
-    <!-- Summary dashboard -->
-    <div class="card">
-        <h3>📊 Financial snapshot</h3>
-        <div class="summary">
-            <div class="summary-box">
-                <strong>💵 Total Cash In</strong>
-                <h2 id="totalCashIn">K0</h2>
-            </div>
-            <div class="summary-box">
-                <strong>🎯 Total Target</strong>
-                <h2 id="totalTarget">K0</h2>
-            </div>
-            <div class="summary-box">
-                <strong>📈 Overall Balance</strong>
-                <h2 id="overallBalance">K0</h2>
-            </div>
+            <div style="font-size:0.7rem; margin-top:12px; color:#6c7a8e;">*Editing mode: update selected</div>
         </div>
     </div>
 
-    <!-- Records table -->
-    <div class="card">
-        <h3>📋 Transaction history</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
-                        <th>Target (K)</th>
-                        <th>Cash In (K)</th>
-                        <th>Balance (K)</th>
-                        <th>Comments</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="recordTable"></tbody>
-            </table>
+    <!-- Summary stats -->
+    <div class="stats-grid">
+        <div class="stat-card"><h3>💰 Total Cash In</h3><div class="stat-value" id="totalCashIn">K0</div></div>
+        <div class="stat-card"><h3>🎯 Total Target</h3><div class="stat-value" id="totalTarget">K0</div></div>
+        <div class="stat-card"><h3>📊 Overall Balance</h3><div class="stat-value" id="overallBalance">K0</div></div>
+    </div>
+
+    <!-- Share Row + selection -->
+    <div class="share-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-weight:500;">📌 Share:</span>
+            <div class="share-buttons">
+                <button class="share-btn whatsapp" id="shareWhatsappBtn">💬 WhatsApp</button>
+                <button class="share-btn sms" id="shareSmsBtn">📱 SMS</button>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <input type="checkbox" id="selectAllCheckbox"> 
+            <label for="selectAllCheckbox" class="select-all-label">Select all records</label>
+            <span id="selectedCountBadge" style="background:#eef2ff; padding:4px 12px; border-radius:30px; font-size:0.7rem;">0 selected</span>
         </div>
     </div>
-    <div class="footer-note">
-        ⚡ Auto-calculates balance (Cash In - Target) | Data stored locally in your browser
+
+    <!-- Records table with checkboxes -->
+    <div class="table-wrapper">
+        <table id="recordsTable">
+            <thead>
+                <tr>
+                    <th class="checkbox-col"><span>✓</span></th>
+                    <th>Date</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>Target (K)</th>
+                    <th>Cash In (K)</th>
+                    <th>Balance (K)</th>
+                    <th>Comments</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="recordTableBody">
+                <tr><td colspan="9" style="text-align:center; padding:40px;">Loading records...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="footer-tip">
+        ✅ Click checkboxes → share totals & selected entries via WhatsApp/SMS. Three-dots menu adds/edits records.
     </div>
 </div>
 
 <script>
-    // ----- GLOBALS -----
-    let editIndex = -1;
+    // ---------- GLOBAL STATE ----------
+    let records = [];           // array of record objects
+    let editGlobalId = null;   // null = add mode, else id (index) for editing
+    let currentEditIndex = -1; // store index for easier
 
-    // ----- Helper functions -----
-    function calculateBalance() {
-        const target = parseFloat(document.getElementById("target").value) || 0;
-        const cashIn = parseFloat(document.getElementById("cashIn").value) || 0;
-        const balance = cashIn - target;
-        document.getElementById("balance").value = balance.toFixed(2);
-        return balance;
-    }
-
-    // Get records array from localStorage
-    function getRecords() {
-        const stored = localStorage.getItem("cashRecords");
-        if (!stored) return [];
-        try {
-            return JSON.parse(stored);
-        } catch(e) { return []; }
-    }
-
-    function setRecords(records) {
-        localStorage.setItem("cashRecords", JSON.stringify(records));
-    }
-
-    // clear form (reset editing mode)
-    function clearForm(resetEditFlag = true) {
-        document.getElementById("date").value = "";
-        document.getElementById("timeIn").value = "";
-        document.getElementById("timeOut").value = "";
-        document.getElementById("target").value = 400;
-        document.getElementById("cashIn").value = "";
-        document.getElementById("balance").value = "";
-        document.getElementById("comments").value = "";
-        if(resetEditFlag) {
-            editIndex = -1;
-            const formCard = document.getElementById("formCard");
-            formCard.classList.remove("card-editing");
-            // change save button text to default
-            const saveBtn = document.querySelector(".save-btn");
-            if(saveBtn) saveBtn.innerHTML = "💾 Save Record";
-        }
-        calculateBalance(); // set balance to 0 if needed (target 400, cashIn empty -> -400? but clear)
-        // after clear, re-calc balance to neutral (0 - target)
-        const targetVal = Number(document.getElementById("target").value) || 0;
-        const cashVal = Number(document.getElementById("cashIn").value) || 0;
-        document.getElementById("balance").value = (cashVal - targetVal).toFixed(2);
-    }
-
-    // load and render table + summary
-    function loadRecords() {
-        const records = getRecords();
-        const tableBody = document.getElementById("recordTable");
-        tableBody.innerHTML = "";
-
-        let totalCash = 0;
-        let totalTargetSum = 0;
-        let totalBal = 0;
-
-        if (records.length === 0) {
-            const emptyRow = document.createElement("tr");
-            emptyRow.innerHTML = `<td colspan="8" style="text-align:center; padding:32px;">✨ No records yet. Add your first transaction! ✨</td>`;
-            tableBody.appendChild(emptyRow);
+    // Helper: Load from localStorage
+    function loadDataFromStorage() {
+        const stored = localStorage.getItem("cashflow_records");
+        if(stored) {
+            records = JSON.parse(stored);
         } else {
-            records.forEach((record, idx) => {
-                const cashInVal = Number(record.cashIn) || 0;
-                const targetVal = Number(record.target) || 0;
-                const balanceVal = Number(record.balance) || 0;
-
-                totalCash += cashInVal;
-                totalTargetSum += targetVal;
-                totalBal += balanceVal;
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${escapeHtml(record.date)}</td>
-                    <td>${escapeHtml(record.timeIn || '—')}</td>
-                    <td>${escapeHtml(record.timeOut || '—')}</td>
-                    <td>K${targetVal.toFixed(2)}</td>
-                    <td>K${cashInVal.toFixed(2)}</td>
-                    <td style="font-weight:500; ${balanceVal < 0 ? 'color:#dc2626;' : 'color:#2b6e3c;'}">K${balanceVal.toFixed(2)}</td>
-                    <td style="max-width:180px; white-space:normal;">${escapeHtml(record.comments || '')}</td>
-                    <td class="action-cell">
-                        <button class="edit-btn" data-index="${idx}">✏️ Edit</button>
-                        <button class="delete-btn" data-index="${idx}">🗑️ Delete</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            // attach dynamic events (better than onclick attributes for large sets)
-            document.querySelectorAll(".edit-btn").forEach(btn => {
-                btn.removeEventListener("click", handleEditClick);
-                btn.addEventListener("click", handleEditClick);
-            });
-            document.querySelectorAll(".delete-btn").forEach(btn => {
-                btn.removeEventListener("click", handleDeleteClick);
-                btn.addEventListener("click", handleDeleteClick);
-            });
+            // demo sample records
+            records = [
+                { id: Date.now()+1, date: new Date().toISOString().slice(0,10), timeIn: "09:00", timeOut: "17:00", target: 400, cashIn: 560, balance: 160, comments: "Great day" },
+                { id: Date.now()+2, date: new Date().toISOString().slice(0,10), timeIn: "10:30", timeOut: "15:45", target: 350, cashIn: 300, balance: -50, comments: "Slow afternoon" }
+            ];
+            saveToLocalStorage();
         }
-
-        // update summary
-        document.getElementById("totalCashIn").innerHTML = `K${totalCash.toFixed(2)}`;
-        document.getElementById("totalTarget").innerHTML = `K${totalTargetSum.toFixed(2)}`;
-        const overallBalElement = document.getElementById("overallBalance");
-        overallBalElement.innerHTML = `K${totalBal.toFixed(2)}`;
-        if(totalBal < 0) overallBalElement.style.color = "#dc2626";
-        else overallBalElement.style.color = "#0f172a";
+        renderTableAndSummary();
     }
 
-    // Helper to escape HTML
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
+    function saveToLocalStorage() {
+        localStorage.setItem("cashflow_records", JSON.stringify(records));
+    }
+
+    // calculate balance from target & cashIn
+    function computeBalance(target, cashIn) {
+        return (Number(cashIn) - Number(target)).toFixed(2);
+    }
+
+    // render table with checkboxes & summary
+    function renderTableAndSummary() {
+        const tbody = document.getElementById("recordTableBody");
+        if(!tbody) return;
+        if(records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px;">✨ No records. Click ⋮ to add ✨</td></tr>`;
+            updateSummaryTotals();
+            updateSelectedCount();
+            return;
+        }
+
+        let html = "";
+        records.forEach((rec, idx) => {
+            const balVal = Number(rec.balance).toFixed(2);
+            const balanceClass = balVal < 0 ? "style='color:#dc2626; font-weight:600;'" : "style='color:#2b6e3c;'";
+            html += `
+                <tr data-record-idx="${idx}">
+                    <td class="checkbox-col"><input type="checkbox" class="record-checkbox" data-idx="${idx}"></td>
+                    <td>${escapeHtml(rec.date)}</td>
+                    <td>${escapeHtml(rec.timeIn || '—')}</td>
+                    <td>${escapeHtml(rec.timeOut || '—')}</td>
+                    <td>K${Number(rec.target).toFixed(2)}</td>
+                    <td>K${Number(rec.cashIn).toFixed(2)}</td>
+                    <td ${balanceClass}>K${balVal}</td>
+                    <td style="max-width:150px; white-space:nowrap; overflow-x:hidden; text-overflow:ellipsis;">${escapeHtml(rec.comments || '')}</td>
+                    <td class="action-btns">
+                        <button class="edit-small" data-edit-idx="${idx}">✏️ Edit</button>
+                        <button class="delete-small" data-del-idx="${idx}">🗑️ Del</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+        // attach checkbox events and button events
+        attachCheckboxEvents();
+        attachRowButtons();
+        updateSummaryTotals();
+        updateSelectedCount();
+    }
+
+    function attachCheckboxEvents() {
+        const checkboxes = document.querySelectorAll(".record-checkbox");
+        checkboxes.forEach(cb => {
+            cb.removeEventListener("change", handleCheckChange);
+            cb.addEventListener("change", handleCheckChange);
+        });
+        const selectAll = document.getElementById("selectAllCheckbox");
+        if(selectAll) {
+            selectAll.removeEventListener("change", handleSelectAll);
+            selectAll.addEventListener("change", handleSelectAll);
+        }
+    }
+
+    function handleCheckChange() {
+        updateSelectedCount();
+    }
+
+    function handleSelectAll(e) {
+        const isChecked = e.target.checked;
+        document.querySelectorAll(".record-checkbox").forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const checked = document.querySelectorAll(".record-checkbox:checked").length;
+        const badge = document.getElementById("selectedCountBadge");
+        if(badge) badge.innerText = `${checked} selected`;
+        const selectAllCheck = document.getElementById("selectAllCheckbox");
+        if(selectAllCheck) {
+            const total = document.querySelectorAll(".record-checkbox").length;
+            if(total > 0 && checked === total) selectAllCheck.checked = true;
+            else if(checked !== total) selectAllCheck.checked = false;
+        }
+    }
+
+    function attachRowButtons() {
+        // Edit buttons
+        document.querySelectorAll(".edit-small").forEach(btn => {
+            btn.removeEventListener("click", handleEditClick);
+            btn.addEventListener("click", handleEditClick);
+        });
+        // Delete buttons
+        document.querySelectorAll(".delete-small").forEach(btn => {
+            btn.removeEventListener("click", handleDeleteClick);
+            btn.addEventListener("click", handleDeleteClick);
         });
     }
 
-    // edit handler
     function handleEditClick(e) {
-        const btn = e.currentTarget;
-        const idxAttr = btn.getAttribute("data-index");
-        if (idxAttr === null) return;
-        const index = parseInt(idxAttr, 10);
-        const records = getRecords();
-        if (records[index]) {
-            editRecordById(index);
-        }
+        const idx = e.currentTarget.getAttribute("data-edit-idx");
+        if(idx !== null) openDropdownForEdit(parseInt(idx));
     }
 
     function handleDeleteClick(e) {
-        const btn = e.currentTarget;
-        const idxAttr = btn.getAttribute("data-index");
-        if (idxAttr !== null) {
-            const index = parseInt(idxAttr, 10);
-            deleteRecordById(index);
+        const idx = e.currentTarget.getAttribute("data-del-idx");
+        if(idx !== null && confirm("Delete this record?")) {
+            records.splice(parseInt(idx), 1);
+            saveToLocalStorage();
+            renderTableAndSummary();
+            if(currentEditIndex !== -1) closeDropdownAndResetEdit();
         }
     }
 
-    function editRecordById(index) {
-        const records = getRecords();
+    function openDropdownForEdit(index) {
         const rec = records[index];
-        if (!rec) return;
-
-        document.getElementById("date").value = rec.date || "";
-        document.getElementById("timeIn").value = rec.timeIn || "";
-        document.getElementById("timeOut").value = rec.timeOut || "";
-        document.getElementById("target").value = rec.target;
-        document.getElementById("cashIn").value = rec.cashIn;
-        document.getElementById("balance").value = rec.balance;
-        document.getElementById("comments").value = rec.comments || "";
-
-        editIndex = index;
-        const formCard = document.getElementById("formCard");
-        formCard.classList.add("card-editing");
-        const saveBtn = document.querySelector(".save-btn");
-        if(saveBtn) saveBtn.innerHTML = "✏️ Update Record";
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        if(!rec) return;
+        currentEditIndex = index;
+        editGlobalId = rec.id;
+        // populate dropdown fields
+        document.getElementById("menuDate").value = rec.date || "";
+        document.getElementById("menuTimeIn").value = rec.timeIn || "";
+        document.getElementById("menuTimeOut").value = rec.timeOut || "";
+        document.getElementById("menuTarget").value = rec.target;
+        document.getElementById("menuCashIn").value = rec.cashIn;
+        const bal = computeBalance(rec.target, rec.cashIn);
+        document.getElementById("menuBalance").value = bal;
+        document.getElementById("menuComments").value = rec.comments || "";
+        // show dropdown
+        const dropdown = document.getElementById("inputDropdown");
+        dropdown.classList.remove("hidden");
+        // change save button text momentarily
+        const saveBtn = document.getElementById("menuSaveBtn");
+        saveBtn.innerText = "✏️ Update Record";
     }
 
-    function deleteRecordById(index) {
-        if (confirm("⚠️ Permanently delete this transaction?")) {
-            let records = getRecords();
-            records.splice(index, 1);
-            setRecords(records);
-            if (editIndex === index) {
-                clearForm(true);
-            } else if (editIndex > index) {
-                editIndex = editIndex - 1;
-            }
-            loadRecords();
-            showToast("Record deleted", "#dc2626");
-        }
+    function closeDropdownAndResetEdit() {
+        const dropdown = document.getElementById("inputDropdown");
+        dropdown.classList.add("hidden");
+        currentEditIndex = -1;
+        editGlobalId = null;
+        const saveBtn = document.getElementById("menuSaveBtn");
+        saveBtn.innerText = "💾 Save";
+        // clear fields optionally, but keep for next add
+        document.getElementById("menuDate").value = "";
+        document.getElementById("menuTimeIn").value = "";
+        document.getElementById("menuTimeOut").value = "";
+        document.getElementById("menuTarget").value = 400;
+        document.getElementById("menuCashIn").value = "";
+        document.getElementById("menuBalance").value = "";
+        document.getElementById("menuComments").value = "";
     }
 
-    // show mini toast (non-intrusive)
-    function showToast(msg, bg = "#2b6e3c") {
-        let toast = document.getElementById("dynamicToast");
-        if (!toast) {
-            toast = document.createElement("div");
-            toast.id = "dynamicToast";
-            toast.style.position = "fixed";
-            toast.style.bottom = "24px";
-            toast.style.right = "24px";
-            toast.style.backgroundColor = bg;
-            toast.style.color = "white";
-            toast.style.padding = "10px 20px";
-            toast.style.borderRadius = "40px";
-            toast.style.fontWeight = "500";
-            toast.style.fontSize = "0.85rem";
-            toast.style.zIndex = "999";
-            toast.style.boxShadow = "0 8px 16px rgba(0,0,0,0.2)";
-            toast.style.transition = "opacity 0.2s";
-            document.body.appendChild(toast);
-        }
-        toast.style.backgroundColor = bg;
-        toast.innerText = msg;
-        toast.style.opacity = "1";
-        setTimeout(() => {
-            toast.style.opacity = "0";
-            setTimeout(() => { if(toast) toast.remove(); }, 400);
-        }, 2000);
+    // update balance in dropdown on cashIn/target change
+    function updateDropdownBalance() {
+        const target = parseFloat(document.getElementById("menuTarget").value) || 0;
+        const cashIn = parseFloat(document.getElementById("menuCashIn").value) || 0;
+        const balance = cashIn - target;
+        document.getElementById("menuBalance").value = balance.toFixed(2);
     }
 
-    // main save (create or update)
-    function saveRecord() {
-        // validate date
-        const dateVal = document.getElementById("date").value;
-        if (!dateVal) {
-            alert("❌ Please select a date before saving.");
+    // Save from dropdown
+    function saveFromDropdown() {
+        const dateVal = document.getElementById("menuDate").value;
+        if(!dateVal) {
+            alert("Please select a date.");
             return;
         }
-
-        // calculate fresh balance
-        const targetVal = parseFloat(document.getElementById("target").value) || 0;
-        const cashInVal = parseFloat(document.getElementById("cashIn").value) || 0;
+        const targetVal = parseFloat(document.getElementById("menuTarget").value) || 0;
+        const cashInVal = parseFloat(document.getElementById("menuCashIn").value) || 0;
         const balanceVal = cashInVal - targetVal;
-        document.getElementById("balance").value = balanceVal.toFixed(2);
-
         const newRecord = {
+            id: currentEditIndex !== -1 ? records[currentEditIndex].id : Date.now(),
             date: dateVal,
-            timeIn: document.getElementById("timeIn").value || "",
-            timeOut: document.getElementById("timeOut").value || "",
+            timeIn: document.getElementById("menuTimeIn").value || "",
+            timeOut: document.getElementById("menuTimeOut").value || "",
             target: targetVal,
             cashIn: cashInVal,
             balance: balanceVal,
-            comments: document.getElementById("comments").value || ""
+            comments: document.getElementById("menuComments").value || ""
         };
-
-        let records = getRecords();
-
-        if (editIndex === -1) {
-            records.push(newRecord);
-            showToast("✅ Record added", "#2b6e3c");
-        } else {
+        if(currentEditIndex !== -1 && records[currentEditIndex]) {
             // update existing
-            if (editIndex >= 0 && editIndex < records.length) {
-                records[editIndex] = newRecord;
-                showToast("✏️ Record updated", "#f59e0b");
-                editIndex = -1;
-                const formCard = document.getElementById("formCard");
-                formCard.classList.remove("card-editing");
-                const saveBtn = document.querySelector(".save-btn");
-                if(saveBtn) saveBtn.innerHTML = "💾 Save Record";
-            } else {
-                editIndex = -1;
-                records.push(newRecord);
-                showToast("✅ New record added", "#2b6e3c");
-            }
+            records[currentEditIndex] = newRecord;
+        } else {
+            records.push(newRecord);
         }
-
-        setRecords(records);
-        clearForm(true);
-        loadRecords();
-        // extra re-fresh for editing style
-        const btnUpdate = document.querySelector(".save-btn");
-        if(btnUpdate && editIndex === -1) btnUpdate.innerHTML = "💾 Save Record";
-        document.getElementById("formCard").classList.remove("card-editing");
+        saveToLocalStorage();
+        renderTableAndSummary();
+        closeDropdownAndResetEdit();
     }
 
-    // export CSV with enhanced formatting
-    function exportCSV() {
-        const records = getRecords();
-        if (records.length === 0) {
-            alert("📭 No records to export. Add some transactions first.");
+    // ------ SHARE LOGIC: SELECTED RECORDS + TOTAL COLUMNS -----
+    function getSelectedRecordsData() {
+        const checkboxes = document.querySelectorAll(".record-checkbox:checked");
+        const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute("data-idx")));
+        const selectedRecords = selectedIndices.map(idx => records[idx]).filter(r => r);
+        return selectedRecords;
+    }
+
+    function buildShareMessage(selectedRecords) {
+        if(selectedRecords.length === 0) {
+            return "⚠️ No records selected. Please check some transactions to share.";
+        }
+        let totalCashInSelected = 0;
+        let totalTargetSelected = 0;
+        let totalBalanceSelected = 0;
+        let details = "📋 *CASH TRACKER REPORT* 📋\n";
+        details += `📅 ${new Date().toLocaleDateString()}\n`;
+        details += `━━━━━━━━━━━━━━━━━━━━\n`;
+        details += `🔹 *Selected entries:* ${selectedRecords.length}\n\n`;
+        
+        selectedRecords.forEach((rec, idx) => {
+            totalCashInSelected += Number(rec.cashIn) || 0;
+            totalTargetSelected += Number(rec.target) || 0;
+            totalBalanceSelected += Number(rec.balance) || 0;
+            details += `${idx+1}. ${rec.date} | In: K${Number(rec.cashIn).toFixed(2)} | Target: K${Number(rec.target).toFixed(2)} | Bal: K${Number(rec.balance).toFixed(2)}\n`;
+            if(rec.comments) details += `   📝 ${rec.comments.substring(0,40)}\n`;
+        });
+        
+        details += `\n📊 *TOTALS (Selected)*\n`;
+        details += `💰 Total Cash In: K${totalCashInSelected.toFixed(2)}\n`;
+        details += `🎯 Total Target: K${totalTargetSelected.toFixed(2)}\n`;
+        details += `⚖️ Total Balance: K${totalBalanceSelected.toFixed(2)}\n`;
+        details += `━━━━━━━━━━━━━━━━━━━━\n`;
+        details += `✅ CashFlow Hub · Smart Tracker`;
+        return details;
+    }
+
+    function shareViaWhatsApp() {
+        const selected = getSelectedRecordsData();
+        if(selected.length === 0) {
+            alert("No records selected. Please check at least one record to share.");
             return;
         }
-
-        let csvRows = [];
-        csvRows.push(["Date", "Time In", "Time Out", "Target (K)", "Cash In (K)", "Balance (K)", "Comments"].join(","));
-
-        for (const r of records) {
-            const row = [
-                `"${(r.date || '').replace(/"/g, '""')}"`,
-                `"${(r.timeIn || '').replace(/"/g, '""')}"`,
-                `"${(r.timeOut || '').replace(/"/g, '""')}"`,
-                r.target,
-                r.cashIn,
-                r.balance,
-                `"${(r.comments || '').replace(/"/g, '""')}"`
-            ];
-            csvRows.push(row.join(","));
-        }
-
-        const blob = new Blob(["\uFEFF" + csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.setAttribute("download", `CashTracker_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        showToast("📁 CSV exported", "#1e4a76");
+        const message = buildShareMessage(selected);
+        const encodedMsg = encodeURIComponent(message);
+        window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
     }
 
-    // initial load and optional default values and event for cashIn changes
-    window.addEventListener("DOMContentLoaded", () => {
-        loadRecords();
-        // set default target readable
-        if (!document.getElementById("date").value) {
-            // optional prefill today's date for better UX
-            const today = new Date().toISOString().slice(0,10);
-            document.getElementById("date").value = today;
+    function shareViaSMS() {
+        const selected = getSelectedRecordsData();
+        if(selected.length === 0) {
+            alert("No records selected. Please select transactions to share via SMS.");
+            return;
         }
-        calculateBalance();
-        // attach cashIn realtime listener again for safety
-        const cashInField = document.getElementById("cashIn");
-        if(cashInField) cashInField.addEventListener("input", calculateBalance);
-        const targetField = document.getElementById("target");
-        if(targetField) targetField.addEventListener("input", calculateBalance);
-    });
+        const message = buildShareMessage(selected);
+        const encodedMsg = encodeURIComponent(message);
+        // sms: protocol works on mobile
+        window.open(`sms:?body=${encodedMsg}`, '_blank');
+    }
+
+    // Update summary totals (global)
+    function updateSummaryTotals() {
+        let totalCashIn = 0, totalTarget = 0, totalBalance = 0;
+        records.forEach(r => {
+            totalCashIn += Number(r.cashIn) || 0;
+            totalTarget += Number(r.target) || 0;
+            totalBalance += Number(r.balance) || 0;
+        });
+        document.getElementById("totalCashIn").innerHTML = `K${totalCashIn.toFixed(2)}`;
+        document.getElementById("totalTarget").innerHTML = `K${totalTarget.toFixed(2)}`;
+        const overallEl = document.getElementById("overallBalance");
+        overallEl.innerHTML = `K${totalBalance.toFixed(2)}`;
+        if(totalBalance < 0) overallEl.style.color = "#dc2626";
+        else overallEl.style.color = "#0f2c1f";
+    }
+
+    // Helper escape
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // UI Menus
+    function setupUIEvents() {
+        const menuBtn = document.getElementById("menuDotsBtn");
+        const dropdown = document.getElementById("inputDropdown");
+        const closeMenu = document.getElementById("closeMenuBtn");
+        const cancelBtn = document.getElementById("menuCancelBtn");
+        const saveBtn = document.getElementById("menuSaveBtn");
+        const cashInField = document.getElementById("menuCashIn");
+        const targetField = document.getElementById("menuTarget");
+        
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle("hidden");
+            if(!dropdown.classList.contains("hidden")) {
+                // prefill date if empty
+                if(!document.getElementById("menuDate").value) {
+                    document.getElementById("menuDate").value = new Date().toISOString().slice(0,10);
+                }
+                updateDropdownBalance();
+            }
+        });
+        function closeDropdownHandler() { dropdown.classList.add("hidden"); closeDropdownAndResetEdit(); }
+        closeMenu.addEventListener("click", closeDropdownHandler);
+        cancelBtn.addEventListener("click", closeDropdownHandler);
+        // update balance
+        if(cashInField) cashInField.addEventListener("input", updateDropdownBalance);
+        if(targetField) targetField.addEventListener("input", updateDropdownBalance);
+        saveBtn.addEventListener("click", saveFromDropdown);
+        // share
+        document.getElementById("shareWhatsappBtn").addEventListener("click", shareViaWhatsApp);
+        document.getElementById("shareSmsBtn").addEventListener("click", shareViaSMS);
+        // click outside close dropdown
+        document.addEventListener("click", function(e) {
+            if(!dropdown.contains(e.target) && e.target !== menuBtn && !dropdown.classList.contains("hidden")) {
+                dropdown.classList.add("hidden");
+                closeDropdownAndResetEdit();
+            }
+        });
+    }
+
+    // initial load
+    loadDataFromStorage();
+    setupUIEvents();
+    // recalc if needed
+    window.updateDropdownBalance = updateDropdownBalance;
 </script>
 </body>
 </html>
