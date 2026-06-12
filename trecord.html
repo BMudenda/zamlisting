@@ -1,132 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Name Submission Form</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
-      padding: 30px;
-    }
-
-    .card {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background: #218838;
-    }
-
-    #msg {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
+  <title>Simple Submit Form</title>
 </head>
 
 <body>
 
-<div class="card">
-  <h2>Submit Your Name</h2>
+<h3>Enter Your Details</h3>
 
-  <input type="text" id="first" placeholder="First Name">
-  <input type="text" id="last" placeholder="Last Name">
+<form id="form">
 
-  <button onclick="send()">Submit</button>
+  <input type="text" name="First Name" placeholder="First Name" required>
+  <br><br>
 
-  <p id="msg"></p>
-</div>
+  <input type="text" name="Last Name" placeholder="Last Name" required>
+  <br><br>
+
+  <button type="submit">Submit</button>
+
+</form>
+
+<p id="msg"></p>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
 
-function send() {
-  const msg = document.getElementById("msg");
+const form = document.getElementById("form");
+const msg = document.getElementById("msg");
 
-  const first = document.getElementById("first").value.trim();
-  const last = document.getElementById("last").value.trim();
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
 
-  if (!first || !last) {
-    msg.innerText = "⚠️ Please fill in both fields";
-    return;
-  }
-
-  msg.innerText = "Sending...";
-
-  const data = {
-    "First Name": first,
-    "Last Name": last
-  };
-
-  const body = Object.keys(data)
-    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
-    .join("&");
+  msg.innerText = "Submitting...";
 
   fetch(scriptURL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: body
+    body: new FormData(form)
   })
-  .then(res => res.text())   // IMPORTANT FIX
-  .then(text => {
-    console.log("RAW RESPONSE:", text);
-
-    try {
-      const res = JSON.parse(text);
-
-      if (res.result === "success") {
-        msg.innerText = "✅ Saved successfully!";
-        document.getElementById("first").value = "";
-        document.getElementById("last").value = "";
-      } else {
-        msg.innerText = "❌ Error: " + (res.error || "Unknown error");
-      }
-
-    } catch (e) {
-      msg.innerText = "❌ Server response error";
-      console.error("Parse error:", e, text);
+  .then(response => response.json())
+  .then(data => {
+    if (data.result === "success") {
+      msg.innerText = "✅ Submitted successfully!";
+      form.reset();
+    } else {
+      msg.innerText = "❌ Submission failed";
     }
   })
-  .catch(err => {
-    msg.innerText = "❌ Network error (check Apps Script deployment)";
-    console.error("Fetch error:", err);
+  .catch(() => {
+    msg.innerText = "❌ Network error";
   });
-}
+});
 </script>
 
 </body>
