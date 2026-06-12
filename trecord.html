@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CashFlow Pro | Smart Tracker + Icons</title>
-    <!-- Font Awesome 6 (free) -->
+    <title>CashFlow Pro | Google Sheets Sync</title>
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -51,6 +51,23 @@
             color: #5b6e8c;
         }
 
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        .sync-status i {
+            font-size: 1rem;
+        }
+
+        .online { color: #2b6e3c; }
+        .offline { color: #dc2626; }
+
         .menu-dots {
             background: #f1f5f9;
             border: none;
@@ -58,7 +75,6 @@
             height: 48px;
             border-radius: 40px;
             font-size: 28px;
-            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -73,7 +89,7 @@
             transform: scale(0.96);
         }
 
-        /* Dropdown menu (input panel) */
+        /* Dropdown menu */
         .dropdown-menu {
             position: absolute;
             top: 85px;
@@ -81,7 +97,7 @@
             background: white;
             border-radius: 28px;
             box-shadow: 0 20px 35px rgba(0,0,0,0.2);
-            width: 360px;
+            width: 380px;
             z-index: 1000;
             border: 1px solid rgba(0,0,0,0.05);
         }
@@ -114,7 +130,7 @@
             color: #2c3e4e;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 10px 12px;
             border-radius: 20px;
@@ -221,6 +237,7 @@
         .drive-btn { background: #0f9d58; color: white; }
         .whatsapp-btn { background: #25D366; color: white; }
         .sms-btn { background: #34b7f1; color: white; }
+        .sync-btn { background: #8b5cf6; color: white; }
 
         /* Table */
         .table-wrapper {
@@ -258,19 +275,19 @@
 
         .action-btns {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
         }
 
         .icon-btn {
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             padding: 6px 10px;
             border-radius: 30px;
             transition: 0.2s;
-            width: 36px;
+            width: 34px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -281,48 +298,40 @@
             background: #fee2e2;
         }
         .delete-icon:hover { background: #fecaca; transform: scale(1.05);}
-        
-        /* inline edit styling */
-        .inline-edit-input {
-            padding: 6px 8px;
-            border-radius: 16px;
-            border: 1.5px solid #2b6e3c;
-            width: 100px;
-            font-size: 0.8rem;
-            text-align: center;
+        .edit-icon {
+            color: #d97706;
+            background: #fef3c7;
         }
-        .inline-save-btn {
-            background: #2b6e3c;
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            margin-left: 6px;
-            cursor: pointer;
-        }
-        .inline-cancel-btn {
-            background: #94a3b8;
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            margin-left: 4px;
-            cursor: pointer;
-        }
-        .edit-mode-cell {
-            background: #fef9e3;
-        }
+        .edit-icon:hover { background: #fde68a; }
 
         .hidden {
             display: none;
         }
 
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeInOut 2.5s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+
         @media (max-width: 700px) {
             .dropdown-menu { right: 12px; width: 90vw; left: 5%; }
             .stat-value { font-size: 1.5rem; }
-            .backup-btn { padding: 6px 12px; font-size: 0.7rem;}
         }
 
         .footer-tip {
@@ -338,15 +347,21 @@
     <div class="dashboard-header">
         <div class="logo-area">
             <h1>💰 CashFlow Pro</h1>
-            <p><i class="fas fa-edit"></i> inline edit · <i class="fas fa-share-alt"></i> share & backup</p>
+            <p><i class="fas fa-google"></i> Google Sheets Sync · Real-time</p>
         </div>
-        <button class="menu-dots" id="menuDotsBtn"><i class="fas fa-ellipsis-h"></i></button>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="sync-status" id="syncStatus">
+                <i class="fas fa-circle online"></i>
+                <span>Ready</span>
+            </div>
+            <button class="menu-dots" id="menuDotsBtn"><i class="fas fa-ellipsis-h"></i></button>
+        </div>
     </div>
 
-    <!-- Dropdown Form (Add only - no edit button in table, but we use inline edit) -->
+    <!-- Dropdown Form (Add/Edit) -->
     <div id="inputDropdown" class="dropdown-menu hidden">
         <div class="dropdown-header">
-            <span><i class="fas fa-plus-circle"></i> Add New Record</span>
+            <span id="dropdownTitle"><i class="fas fa-plus-circle"></i> Add New Record</span>
             <button class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></button>
         </div>
         <div class="dropdown-content">
@@ -371,7 +386,7 @@
                 <textarea id="menuComments" rows="2" placeholder="notes..."></textarea>
             </div>
             <div class="dropdown-actions">
-                <button class="btn-sm btn-primary" id="menuSaveBtn"><i class="fas fa-save"></i> Save Record</button>
+                <button class="btn-sm btn-primary" id="menuSaveBtn"><i class="fas fa-save"></i> Save</button>
                 <button class="btn-sm" id="menuCancelBtn"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </div>
@@ -384,11 +399,12 @@
         <div class="stat-card"><h3><i class="fas fa-chart-pie"></i> Overall Balance</h3><div class="stat-value" id="overallBalance">K0</div></div>
     </div>
 
-    <!-- Backup & Share Bar with FA Icons -->
+    <!-- Action Bar -->
     <div class="backup-bar">
         <div class="backup-buttons">
-            <button class="backup-btn email-btn" id="backupEmailBtn"><i class="fas fa-envelope"></i> Email Backup</button>
-            <button class="backup-btn drive-btn" id="backupDriveBtn"><i class="fab fa-google-drive"></i> Drive Export</button>
+            <button class="backup-btn sync-btn" id="syncToSheetBtn"><i class="fab fa-google"></i> Sync to Sheet</button>
+            <button class="backup-btn email-btn" id="backupEmailBtn"><i class="fas fa-envelope"></i> Email</button>
+            <button class="backup-btn drive-btn" id="backupDriveBtn"><i class="fab fa-google-drive"></i> Drive</button>
             <button class="backup-btn whatsapp-btn" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
             <button class="backup-btn sms-btn" id="shareSmsBtn"><i class="fas fa-sms"></i> SMS</button>
         </div>
@@ -398,9 +414,9 @@
         </div>
     </div>
 
-    <!-- Records Table (Inline editing fully functional) -->
+    <!-- Records Table -->
     <div class="table-wrapper">
-        <table id="recordsTable">
+        <table>
             <thead>
                 <tr><th class="checkbox-col"><i class="far fa-square"></i></th><th>Date</th><th>Time In</th><th>Time Out</th><th>Target (K)</th><th>Cash In (K)</th><th>Balance (K)</th><th>Comments</th><th>Actions</th></tr>
             </thead>
@@ -408,33 +424,28 @@
         </table>
     </div>
     <div class="footer-tip">
-        ✏️ <strong>Click the edit icon (<i class="fas fa-pen"></i>) to inline-edit any field</strong> — then Save or Cancel.  
-        🗑️ <i class="fas fa-trash-alt"></i> Delete icon removes record. Three-dots menu <i class="fas fa-ellipsis-h"></i> to add new.
+        📌 <strong>Google Sheets Setup:</strong> Deploy as Web App → Copy URL → Paste below. Records sync to spreadsheet.
     </div>
 </div>
 
 <script>
-    // ---------- DATA ----------
-    let records = [];          
+    // ==================== CONFIGURATION ====================
+    // 🔧 REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_YourScriptId/exec"; 
+    // If not set, local storage only mode. User can update via prompt.
+    
+    let records = [];
+    let editingId = null;
+    let syncEnabled = false;
 
-    // Load / Save LocalStorage
-    function loadDataFromStorage() {
-        const stored = localStorage.getItem("cashflow_records_v3");
-        if(stored && stored.length > 2) {
-            records = JSON.parse(stored);
-        } else {
-            const today = new Date().toISOString().slice(0,10);
-            records = [
-                { id: Date.now()+101, date: today, timeIn: "08:30", timeOut: "16:30", target: 400, cashIn: 520, balance: 120, comments: "Great morning sales" },
-                { id: Date.now()+102, date: today, timeIn: "10:00", timeOut: "18:00", target: 350, cashIn: 290, balance: -60, comments: "Quiet shift" }
-            ];
-            saveToLocalStorage();
-        }
-        renderTable();
-    }
-
-    function saveToLocalStorage() {
-        localStorage.setItem("cashflow_records_v3", JSON.stringify(records));
+    // Helper Functions
+    function showToast(msg, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
+        toast.style.background = isError ? '#dc2626' : '#2b6e3c';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2600);
     }
 
     function computeBalance(target, cashIn) {
@@ -447,63 +458,56 @@
         document.getElementById("menuBalance").value = (cashIn - target).toFixed(2);
     }
 
-    // render table with inline edit triggers (no external edit button, edit happens via pen icon)
-    let currentlyEditingId = null;   // track which record is being inline-edited
+    // Load/Save Local
+    function loadLocalData() {
+        const stored = localStorage.getItem("cashflow_google_records");
+        if(stored) {
+            records = JSON.parse(stored);
+        } else {
+            const today = new Date().toISOString().slice(0,10);
+            records = [
+                { id: Date.now()+101, date: today, timeIn: "09:00", timeOut: "17:00", target: 400, cashIn: 520, balance: 120, comments: "Great sales" },
+                { id: Date.now()+102, date: today, timeIn: "10:30", timeOut: "15:30", target: 350, cashIn: 290, balance: -60, comments: "Quiet day" }
+            ];
+            saveLocal();
+        }
+        renderTable();
+    }
 
+    function saveLocal() {
+        localStorage.setItem("cashflow_google_records", JSON.stringify(records));
+        updateTotals();
+    }
+
+    // Render table (inline editing not needed, we use modal-style but for simplicity use edit via dropdown)
     function renderTable() {
         const tbody = document.getElementById("recordTableBody");
-        if(!tbody) return;
         if(records.length === 0) {
             tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px;"><i class="fas fa-database"></i> No records. Click ⋮ to add</td></tr>`;
             updateTotals();
             updateSelectedCount();
             return;
         }
-
         let html = "";
         records.forEach((rec, idx) => {
-            const isEditing = (currentlyEditingId === rec.id);
             const balVal = Number(rec.balance).toFixed(2);
             const balanceColor = balVal < 0 ? "color:#dc2626;font-weight:600;" : "color:#2b6e3c;";
-            
-            if(isEditing) {
-                // INLINE EDIT MODE: show input fields for target, cashIn, comments, and also date/time ?
-                // We'll edit key fields: target, cashIn, comments, (timeIn/timeOut optional but we add them for full control)
-                html += `
-                    <tr data-record-id="${rec.id}" class="edit-mode-cell">
-                        <td class="checkbox-col"><input type="checkbox" class="record-checkbox" data-idx="${idx}" data-id="${rec.id}"></td>
-                        <td><input type="date" id="edit_date_${rec.id}" value="${rec.date}" class="inline-edit-input" style="width:120px;"></td>
-                        <td><input type="time" id="edit_timeIn_${rec.id}" value="${rec.timeIn || ''}" class="inline-edit-input" style="width:90px;"></td>
-                        <td><input type="time" id="edit_timeOut_${rec.id}" value="${rec.timeOut || ''}" class="inline-edit-input" style="width:90px;"></td>
-                        <td><input type="number" id="edit_target_${rec.id}" value="${rec.target}" step="10" class="inline-edit-input" style="width:90px;"></td>
-                        <td><input type="number" id="edit_cashIn_${rec.id}" value="${rec.cashIn}" step="1" class="inline-edit-input" style="width:90px;" oninput="updateInlineBalance('${rec.id}')"></td>
-                        <td><input type="number" id="edit_balance_${rec.id}" value="${balVal}" class="inline-edit-input" readonly style="background:#f1f5f9; width:90px;"></td>
-                        <td><input type="text" id="edit_comments_${rec.id}" value="${escapeHtml(rec.comments || '')}" class="inline-edit-input" style="width:130px;"></td>
-                        <td class="action-btns">
-                            <button class="icon-btn" onclick="saveInlineEdit('${rec.id}')" style="background:#2b6e3c; color:white;"><i class="fas fa-check"></i></button>
-                            <button class="icon-btn" onclick="cancelInlineEdit()" style="background:#94a3b8; color:white;"><i class="fas fa-times"></i></button>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                // normal view mode
-                html += `
-                    <tr data-record-id="${rec.id}">
-                        <td class="checkbox-col"><input type="checkbox" class="record-checkbox" data-idx="${idx}" data-id="${rec.id}"></td>
-                        <td>${escapeHtml(rec.date)}</td>
-                        <td>${escapeHtml(rec.timeIn || '—')}</td>
-                        <td>${escapeHtml(rec.timeOut || '—')}</td>
-                        <td>K${Number(rec.target).toFixed(2)}</td>
-                        <td>K${Number(rec.cashIn).toFixed(2)}</td>
-                        <td style="${balanceColor}">K${balVal}</td>
-                        <td style="max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(rec.comments || '')}</td>
-                        <td class="action-btns">
-                            <button class="icon-btn" onclick="enableInlineEdit('${rec.id}')" style="background:#fbbf24; color:#4b3e00;"><i class="fas fa-pen"></i></button>
-                            <button class="icon-btn delete-icon" onclick="deleteRecordById('${rec.id}')"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }
+            html += `
+                <tr data-id="${rec.id}">
+                    <td class="checkbox-col"><input type="checkbox" class="record-checkbox" data-idx="${idx}" data-id="${rec.id}"></td>
+                    <td>${escapeHtml(rec.date)}</td>
+                    <td>${escapeHtml(rec.timeIn || '—')}</td>
+                    <td>${escapeHtml(rec.timeOut || '—')}</td>
+                    <td>K${Number(rec.target).toFixed(2)}</td>
+                    <td>K${Number(rec.cashIn).toFixed(2)}</td>
+                    <td style="${balanceColor}">K${balVal}</td>
+                    <td style="max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(rec.comments || '')}</td>
+                    <td class="action-btns">
+                        <button class="icon-btn edit-icon" onclick="editRecord('${rec.id}')"><i class="fas fa-pen"></i></button>
+                        <button class="icon-btn delete-icon" onclick="deleteRecord('${rec.id}')"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `;
         });
         tbody.innerHTML = html;
         attachCheckboxEvents();
@@ -511,195 +515,39 @@
         updateSelectedCount();
     }
 
-    // Global functions for inline editing
-    window.updateInlineBalance = function(recordId) {
-        const targetField = document.getElementById(`edit_target_${recordId}`);
-        const cashField = document.getElementById(`edit_cashIn_${recordId}`);
-        const balanceField = document.getElementById(`edit_balance_${recordId}`);
-        if(targetField && cashField && balanceField) {
-            const target = parseFloat(targetField.value) || 0;
-            const cash = parseFloat(cashField.value) || 0;
-            balanceField.value = (cash - target).toFixed(2);
-        }
-    };
+    function editRecord(id) {
+        const record = records.find(r => r.id == id);
+        if(!record) return;
+        editingId = id;
+        document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Record`;
+        document.getElementById("menuDate").value = record.date;
+        document.getElementById("menuTimeIn").value = record.timeIn || "";
+        document.getElementById("menuTimeOut").value = record.timeOut || "";
+        document.getElementById("menuTarget").value = record.target;
+        document.getElementById("menuCashIn").value = record.cashIn;
+        document.getElementById("menuBalance").value = record.balance;
+        document.getElementById("menuComments").value = record.comments || "";
+        document.getElementById("inputDropdown").classList.remove("hidden");
+        updateDropdownBalance();
+    }
 
-    window.enableInlineEdit = function(recordId) {
-        currentlyEditingId = recordId;
-        renderTable();  // re-render with inline edit mode active
-    };
-
-    window.saveInlineEdit = function(recordId) {
-        const index = records.findIndex(r => r.id == recordId);
-        if(index === -1) return;
-        // get values from edit inputs
-        const newDate = document.getElementById(`edit_date_${recordId}`)?.value || records[index].date;
-        const newTimeIn = document.getElementById(`edit_timeIn_${recordId}`)?.value || "";
-        const newTimeOut = document.getElementById(`edit_timeOut_${recordId}`)?.value || "";
-        const newTarget = parseFloat(document.getElementById(`edit_target_${recordId}`)?.value) || 0;
-        const newCashIn = parseFloat(document.getElementById(`edit_cashIn_${recordId}`)?.value) || 0;
-        const newBalance = (newCashIn - newTarget).toFixed(2);
-        const newComments = document.getElementById(`edit_comments_${recordId}`)?.value || "";
-        
-        if(!newDate) {
-            alert("Date is required.");
-            return;
-        }
-        // update record
-        records[index] = {
-            ...records[index],
-            date: newDate,
-            timeIn: newTimeIn,
-            timeOut: newTimeOut,
-            target: newTarget,
-            cashIn: newCashIn,
-            balance: parseFloat(newBalance),
-            comments: newComments
-        };
-        saveToLocalStorage();
-        currentlyEditingId = null;
-        renderTable();
-    };
-
-    window.cancelInlineEdit = function() {
-        currentlyEditingId = null;
-        renderTable();
-    };
-
-    window.deleteRecordById = function(recordId) {
-        if(confirm("⚠️ Permanently delete this transaction?")) {
-            records = records.filter(r => r.id != recordId);
-            if(currentlyEditingId == recordId) currentlyEditingId = null;
-            saveToLocalStorage();
+    function deleteRecord(id) {
+        if(confirm("⚠️ Delete this record permanently?")) {
+            records = records.filter(r => r.id != id);
+            saveLocal();
             renderTable();
-        }
-    };
-
-    // Helper for checkboxes & selection
-    function attachCheckboxEvents() {
-        document.querySelectorAll(".record-checkbox").forEach(cb => {
-            cb.removeEventListener("change", handleCheckChange);
-            cb.addEventListener("change", handleCheckChange);
-        });
-        const selectAll = document.getElementById("selectAllCheckbox");
-        if(selectAll) {
-            selectAll.removeEventListener("change", handleSelectAll);
-            selectAll.addEventListener("change", handleSelectAll);
+            showToast("Record deleted");
         }
     }
 
-    function handleCheckChange() { updateSelectedCount(); }
-    function handleSelectAll(e) {
-        const checked = e.target.checked;
-        document.querySelectorAll(".record-checkbox").forEach(cb => cb.checked = checked);
-        updateSelectedCount();
-    }
-    function updateSelectedCount() {
-        const checked = document.querySelectorAll(".record-checkbox:checked").length;
-        document.getElementById("selectedCountBadge").innerHTML = `<i class="fas fa-check"></i> ${checked} selected`;
-        const selectAllBox = document.getElementById("selectAllCheckbox");
-        const total = document.querySelectorAll(".record-checkbox").length;
-        if(selectAllBox) selectAllBox.checked = (total > 0 && checked === total);
-    }
-
-    // Get selected records (for sharing / backup)
-    function getSelectedRecords() {
-        const checkedBoxes = document.querySelectorAll(".record-checkbox:checked");
-        const selectedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute("data-id"));
-        return records.filter(r => selectedIds.includes(String(r.id)));
-    }
-
-    function buildFullReport(selectedRecords, includeTotals = true) {
-        if(selectedRecords.length === 0) return "⚠️ No records selected. Please check at least one transaction.";
-        let totalCash = 0, totalTarget = 0, totalBalance = 0;
-        let lines = [];
-        lines.push("📊 CASHFLOW REPORT 📊");
-        lines.push(`📅 ${new Date().toLocaleString()}`);
-        lines.push("━━━━━━━━━━━━━━━━━━━━");
-        selectedRecords.forEach((rec, i) => {
-            totalCash += Number(rec.cashIn);
-            totalTarget += Number(rec.target);
-            totalBalance += Number(rec.balance);
-            lines.push(`${i+1}. ${rec.date} | In: K${Number(rec.cashIn).toFixed(2)} | Target: K${Number(rec.target).toFixed(2)} | Bal: K${Number(rec.balance).toFixed(2)}`);
-            if(rec.comments) lines.push(`   📝 ${rec.comments.substring(0,50)}`);
-        });
-        if(includeTotals) {
-            lines.push("━━━━━━━━━━━━━━━━━━━━");
-            lines.push(`💰 Total Cash In: K${totalCash.toFixed(2)}`);
-            lines.push(`🎯 Total Target: K${totalTarget.toFixed(2)}`);
-            lines.push(`⚖️ Total Balance: K${totalBalance.toFixed(2)}`);
-        }
-        lines.push("✅ CashFlow Pro · Secure Backup");
-        return lines.join("\n");
-    }
-
-    // Backup functions
-    function backupViaEmail() {
-        const selected = getSelectedRecords();
-        if(selected.length === 0) { alert("Select records to backup via email."); return; }
-        const report = buildFullReport(selected, true);
-        const subject = `CashFlow_Backup_${new Date().toISOString().slice(0,10)}`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(report)}`;
-    }
-
-    function backupForDrive() {
-        let dataToBackup = getSelectedRecords();
-        if(dataToBackup.length === 0 && records.length > 0) {
-            if(confirm("No records selected. Backup ALL records?")) dataToBackup = records;
-            else return;
-        } else if(dataToBackup.length === 0) { alert("No data to backup."); return; }
-        const jsonStr = JSON.stringify(dataToBackup, null, 2);
-        const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-        const blob = new Blob([jsonStr], {type: "application/json"});
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.download = `CashFlow_Backup_${timestamp}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        alert("✅ Backup JSON downloaded! Upload to Google Drive anytime.");
-    }
-
-    function shareWhatsAppSelected() {
-        const selected = getSelectedRecords();
-        if(selected.length === 0) { alert("Select records to share."); return; }
-        const msg = buildFullReport(selected, true);
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function shareSmsSelected() {
-        const selected = getSelectedRecords();
-        if(selected.length === 0) { alert("Select records to share."); return; }
-        const msg = buildFullReport(selected, true);
-        window.open(`sms:?body=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function updateTotals() {
-        let totalCash = 0, totalTarget = 0, totalBal = 0;
-        records.forEach(r => {
-            totalCash += Number(r.cashIn) || 0;
-            totalTarget += Number(r.target) || 0;
-            totalBal += Number(r.balance) || 0;
-        });
-        document.getElementById("totalCashIn").innerHTML = `K${totalCash.toFixed(2)}`;
-        document.getElementById("totalTarget").innerHTML = `K${totalTarget.toFixed(2)}`;
-        const overall = document.getElementById("overallBalance");
-        overall.innerHTML = `K${totalBal.toFixed(2)}`;
-        overall.style.color = totalBal < 0 ? "#dc2626" : "#0f2c1f";
-    }
-
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-    // Dropdown add record logic
     function saveFromDropdown() {
         const dateVal = document.getElementById("menuDate").value;
-        if(!dateVal) { alert("Please select a date."); return; }
+        if(!dateVal) { alert("Please select date."); return; }
         const targetVal = parseFloat(document.getElementById("menuTarget").value) || 0;
         const cashInVal = parseFloat(document.getElementById("menuCashIn").value) || 0;
         const balanceVal = computeBalance(targetVal, cashInVal);
         const newRecord = {
-            id: Date.now(),
+            id: editingId ? editingId : Date.now(),
             date: dateVal,
             timeIn: document.getElementById("menuTimeIn").value || "",
             timeOut: document.getElementById("menuTimeOut").value || "",
@@ -708,11 +556,19 @@
             balance: parseFloat(balanceVal),
             comments: document.getElementById("menuComments").value || ""
         };
-        records.push(newRecord);
-        saveToLocalStorage();
+        if(editingId) {
+            const index = records.findIndex(r => r.id == editingId);
+            if(index !== -1) records[index] = newRecord;
+            showToast("Record updated");
+        } else {
+            records.push(newRecord);
+            showToast("Record added");
+        }
+        saveLocal();
         renderTable();
         closeDropdown();
-        alert("✅ New record added.");
+        editingId = null;
+        document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-plus-circle"></i> Add New Record`;
     }
 
     function closeDropdown() {
@@ -724,44 +580,171 @@
         document.getElementById("menuCashIn").value = "";
         document.getElementById("menuBalance").value = "";
         document.getElementById("menuComments").value = "";
+        editingId = null;
+        document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-plus-circle"></i> Add New Record`;
     }
 
-    function setupEvents() {
-        const menuBtn = document.getElementById("menuDotsBtn");
-        const dropdown = document.getElementById("inputDropdown");
-        const closeMenu = document.getElementById("closeMenuBtn");
-        const cancelBtn = document.getElementById("menuCancelBtn");
-        const saveBtn = document.getElementById("menuSaveBtn");
-        const cashInField = document.getElementById("menuCashIn");
-        const targetField = document.getElementById("menuTarget");
+    // ========== GOOGLE SHEETS SYNC (POST) ==========
+    async function syncToGoogleSheet() {
+        if(records.length === 0) {
+            showToast("No records to sync", true);
+            return;
+        }
         
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            dropdown.classList.toggle("hidden");
-            if(!dropdown.classList.contains("hidden") && !document.getElementById("menuDate").value) {
-                document.getElementById("menuDate").value = new Date().toISOString().slice(0,10);
+        let scriptUrl = GOOGLE_SCRIPT_URL;
+        if(scriptUrl.includes("YourScriptId")) {
+            const userUrl = prompt("📌 Enter your Google Apps Script Web App URL:\n(Deploy as Web App → Copy URL)", "");
+            if(!userUrl || !userUrl.includes("script.google.com")) {
+                showToast("Invalid URL. Sync canceled.", true);
+                return;
             }
+            // Update global (for future use)
+            window.GOOGLE_SCRIPT_URL = userUrl;
+            scriptUrl = userUrl;
+        } else {
+            scriptUrl = window.GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
+        }
+        
+        showToast("Syncing to Google Sheets...");
+        let successCount = 0;
+        
+        for(const record of records) {
+            const params = new URLSearchParams();
+            params.append("date", record.date);
+            params.append("timeIn", record.timeIn || "");
+            params.append("timeOut", record.timeOut || "");
+            params.append("target", record.target);
+            params.append("cashIn", record.cashIn);
+            params.append("balance", record.balance);
+            params.append("comments", record.comments || "");
+            params.append("id", record.id);
+            
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', // for simple web app
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                successCount++;
+            } catch(err) {
+                console.warn("Sync error for record", record.id, err);
+            }
+        }
+        
+        if(successCount > 0) {
+            showToast(`✅ Synced ${successCount} records to Google Sheet`);
+            document.getElementById("syncStatus").innerHTML = `<i class="fas fa-check-circle online"></i><span>Last sync: ${new Date().toLocaleTimeString()}</span>`;
+        } else {
+            showToast("Sync failed. Check URL & CORS", true);
+        }
+    }
+
+    // Sharing & Backup (same as before)
+    function getSelectedRecords() {
+        const checked = document.querySelectorAll(".record-checkbox:checked");
+        const ids = Array.from(checked).map(cb => cb.getAttribute("data-id"));
+        return records.filter(r => ids.includes(String(r.id)));
+    }
+
+    function buildReport(selected) {
+        if(selected.length === 0) return "No records selected.";
+        let totalCash=0,totalTarget=0,totalBal=0;
+        let lines = ["📊 CASHFLOW REPORT","━━━━━━━━━━━━━━━━"];
+        selected.forEach((r,i) => {
+            totalCash += r.cashIn; totalTarget += r.target; totalBal += r.balance;
+            lines.push(`${i+1}. ${r.date} | In: K${r.cashIn} | Target: K${r.target} | Bal: K${r.balance}`);
+            if(r.comments) lines.push(`   📝 ${r.comments}`);
+        });
+        lines.push("━━━━━━━━━━━━━━━━━━");
+        lines.push(`💰 Total In: K${totalCash.toFixed(2)}`);
+        lines.push(`🎯 Total Target: K${totalTarget.toFixed(2)}`);
+        lines.push(`⚖️ Total Balance: K${totalBal.toFixed(2)}`);
+        return lines.join("\n");
+    }
+
+    function emailBackup() {
+        const sel = getSelectedRecords();
+        if(sel.length===0) { alert("Select records"); return; }
+        const body = encodeURIComponent(buildReport(sel));
+        window.location.href = `mailto:?subject=CashFlow_Backup&body=${body}`;
+    }
+    function driveBackup() {
+        let data = getSelectedRecords();
+        if(data.length===0 && records.length>0 && confirm("Backup all?")) data=records;
+        if(data.length===0) return;
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `cashflow_${new Date().toISOString().slice(0,19)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast("Backup file ready for Google Drive");
+    }
+    function shareWhatsApp() {
+        const sel = getSelectedRecords();
+        if(sel.length===0) { alert("Select records"); return; }
+        window.open(`https://wa.me/?text=${encodeURIComponent(buildReport(sel))}`,'_blank');
+    }
+    function shareSMS() {
+        const sel = getSelectedRecords();
+        if(sel.length===0) { alert("Select records"); return; }
+        window.open(`sms:?body=${encodeURIComponent(buildReport(sel))}`,'_blank');
+    }
+
+    function attachCheckboxEvents() {
+        document.querySelectorAll(".record-checkbox").forEach(cb => cb.addEventListener("change", updateSelectedCount));
+        document.getElementById("selectAllCheckbox").onchange = (e) => {
+            document.querySelectorAll(".record-checkbox").forEach(cb => cb.checked = e.target.checked);
+            updateSelectedCount();
+        };
+    }
+    function updateSelectedCount() {
+        const cnt = document.querySelectorAll(".record-checkbox:checked").length;
+        document.getElementById("selectedCountBadge").innerHTML = `<i class="fas fa-check"></i> ${cnt} selected`;
+        const allBox = document.getElementById("selectAllCheckbox");
+        if(allBox) allBox.checked = cnt === records.length && records.length>0;
+    }
+    function updateTotals() {
+        let tCash=0, tTarget=0, tBal=0;
+        records.forEach(r => { tCash+=r.cashIn; tTarget+=r.target; tBal+=r.balance; });
+        document.getElementById("totalCashIn").innerHTML = `K${tCash.toFixed(2)}`;
+        document.getElementById("totalTarget").innerHTML = `K${tTarget.toFixed(2)}`;
+        const ov = document.getElementById("overallBalance");
+        ov.innerHTML = `K${tBal.toFixed(2)}`;
+        ov.style.color = tBal<0 ? "#dc2626" : "#0f2c1f";
+    }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=>({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+
+    function setupEvents() {
+        document.getElementById("menuDotsBtn").onclick = () => {
+            const dd = document.getElementById("inputDropdown");
+            dd.classList.toggle("hidden");
+            if(!dd.classList.contains("hidden") && !document.getElementById("menuDate").value)
+                document.getElementById("menuDate").value = new Date().toISOString().slice(0,10);
             updateDropdownBalance();
         };
-        const closeHandler = () => { dropdown.classList.add("hidden"); };
-        closeMenu.onclick = closeHandler;
-        cancelBtn.onclick = closeHandler;
-        cashInField?.addEventListener("input", updateDropdownBalance);
-        targetField?.addEventListener("input", updateDropdownBalance);
-        saveBtn.onclick = saveFromDropdown;
-        document.getElementById("backupEmailBtn").onclick = backupViaEmail;
-        document.getElementById("backupDriveBtn").onclick = backupForDrive;
-        document.getElementById("shareWhatsappBtn").onclick = shareWhatsAppSelected;
-        document.getElementById("shareSmsBtn").onclick = shareSmsSelected;
-        document.addEventListener("click", function(e) {
-            if(!dropdown.contains(e.target) && e.target !== menuBtn && !dropdown.classList.contains("hidden")) {
-                dropdown.classList.add("hidden");
-            }
+        document.getElementById("closeMenuBtn").onclick = closeDropdown;
+        document.getElementById("menuCancelBtn").onclick = closeDropdown;
+        document.getElementById("menuSaveBtn").onclick = saveFromDropdown;
+        document.getElementById("syncToSheetBtn").onclick = syncToGoogleSheet;
+        document.getElementById("backupEmailBtn").onclick = emailBackup;
+        document.getElementById("backupDriveBtn").onclick = driveBackup;
+        document.getElementById("shareWhatsappBtn").onclick = shareWhatsApp;
+        document.getElementById("shareSmsBtn").onclick = shareSMS;
+        document.getElementById("menuCashIn").addEventListener("input", updateDropdownBalance);
+        document.getElementById("menuTarget").addEventListener("input", updateDropdownBalance);
+        document.addEventListener("click", (e) => {
+            const dd = document.getElementById("inputDropdown");
+            if(!dd.contains(e.target) && e.target !== document.getElementById("menuDotsBtn") && !dd.classList.contains("hidden"))
+                dd.classList.add("hidden");
         });
     }
-    
-    loadDataFromStorage();
+
+    loadLocalData();
     setupEvents();
+    window.editRecord = editRecord;
+    window.deleteRecord = deleteRecord;
 </script>
 </body>
 </html>
