@@ -229,6 +229,10 @@
             color: #e2e8f0;
         }
 
+        tr.interactive-row {
+            cursor: pointer;
+        }
+
         tr.interactive-row:hover {
             background: #25334d;
         }
@@ -373,6 +377,97 @@
             cursor: pointer;
         }
 
+        /* --- NEW REDESIGNED CARD COMPONENT VIEW--- */
+        .card-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #0f172a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .card-date-badge {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-status-pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .pill-positive { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+        .pill-negative { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .pill-neutral { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        
+        .card-section-title {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 16px 0 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            background: #0f172a;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        .card-metric-block {
+            text-align: center;
+        }
+        .card-metric-lbl {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .card-metric-val {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+        .card-comment-box {
+            background: #0f172a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #6366f1;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            min-height: 50px;
+        }
+        .card-share-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-card-action {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
         /* Toasts & Loaders */
         .toast {
             position: fixed;
@@ -409,6 +504,7 @@
             .stats-grid { grid-template-columns: 1fr; }
             .action-bar { flex-direction: column; align-items: stretch; }
             .form-row { grid-template-columns: 1fr; }
+            .card-metrics-grid { grid-template-columns: 1fr; gap: 16px; }
         }
     </style>
 </head>
@@ -487,7 +583,7 @@
                     <th>Cum. Cash In</th>
                     <th>Cum. Net Balance</th>
                     <th>Comments</th>
-                    <th style="text-align: center;">Action</th>
+                    <th style="text-align: center;">View Card</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -513,10 +609,11 @@
 </div>
 
 <div id="overlay" class="overlay"></div>
+
 <div id="recordModal" class="modal">
     <div class="modal-header">
         <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> New Transaction Entry</h3>
-        <button class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i></button>
+        <button class="close-modal" id="closeFormModalBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
         <div class="form-group">
@@ -558,11 +655,79 @@
     </div>
 </div>
 
+<div id="viewCardModal" class="modal">
+    <div class="modal-header">
+        <h3><i class="fas fa-address-card"></i> Statement Explorer</h3>
+        <button class="close-modal" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="card-view-header">
+            <div class="card-date-badge">
+                <i class="far fa-calendar-check"></i> <span id="cardDateText">--</span>
+            </div>
+            <div id="cardStatusPill" class="card-status-pill">--</div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-clock"></i> Entry Logs Window</div>
+        <div class="card-metrics-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Time In</div>
+                <div class="card-metric-val" id="cardTimeIn" style="color:#e2e8f0;">--</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Time Out</div>
+                <div class="card-metric-val" id="cardTimeOut" style="color:#e2e8f0;">--</div>
+            </div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-coins"></i> Core Row Transaction Metrics</div>
+        <div class="card-metrics-grid">
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Target</div>
+                <div class="card-metric-val" id="cardTarget" style="color: #38bdf8;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cash In</div>
+                <div class="card-metric-val" id="cardCashIn" style="color: #10b981;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Net Balance</div>
+                <div class="card-metric-val" id="cardBalance">K0.00</div>
+            </div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-chart-line"></i> Timeline Aggregation Progress</div>
+        <div class="card-metrics-grid">
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cum. Target</div>
+                <div class="card-metric-val" id="cardCumTarget" style="color: #94a3b8;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cum. Cash In</div>
+                <div class="card-metric-val" id="cardCumCashIn" style="color: #94a3b8;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cum. Balance</div>
+                <div class="card-metric-val" id="cardCumBalance">K0.00</div>
+            </div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-comment-dots"></i> Internal Comments Log</div>
+        <div id="cardComments" class="card-comment-box">--</div>
+
+        <div class="card-share-bar">
+            <button class="btn-card-action" id="cardWhatsappBtn" style="background:#22c55e;"><i class="fab fa-whatsapp"></i> WhatsApp Node</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
     const PHONE_NUMBER = "0978167546";
     
     let allRecords = [];
+    let activeCardIndex = null;
+    let activeCardCumulate = {};
     
     function updateBalancePreview() {
         const target = parseFloat(document.getElementById('inputTarget').value) || 0;
@@ -721,9 +886,9 @@
             const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
             
             html += `
-                <tr class="interactive-row">
-                    <td class="checkbox-col">
-                        <input type="checkbox" class="record-checkbox" data-id="${record.Date}" data-index="${index}">
+                <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
+                    <td class="checkbox-col" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
                     </td>
                     <td>${record.Date}</td>
                     <td>${record['Time In'] || '-'}</td>
@@ -735,9 +900,9 @@
                     <td>K${cumulativeCashIn.toFixed(2)}</td>
                     <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
                     <td title="${comments}">${shortComments}</td>
-                    <td class="action-cell">
+                    <td class="action-cell" onclick="event.stopPropagation()">
                         <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
-                           <i class="fas fa-share-nodes"></i>
+                           <i class="fas fa-expand"></i> View
                         </button>
                     </td>
                 </tr>
@@ -760,6 +925,14 @@
         attachCheckboxEvents();
         updateSelectedCount();
     }
+
+    function toggleRowCheckbox(index) {
+        const checkbox = document.getElementById(`cb_row_${index}`);
+        if(checkbox) {
+            checkbox.checked = !checkbox.checked;
+            updateSelectedCount();
+        }
+    }
     
     function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
         const record = allRecords[index];
@@ -767,23 +940,47 @@
         const cashIn = Number(record['Cash In']) || 0;
         const transactionBalance = target - cashIn;
         
-        const message = `📋 TRANSACTION METADATA\n\n` +
-            `📅 Date: ${record.Date}\n` +
-            `⏰ Duration Interval: ${record['Time In'] || '-'} -> ${record['Time Out'] || '-'}\n` +
-            `━━━━━━━━━━━━━━━━━━\n` +
-            `🎯 Baseline Target: K${target.toFixed(2)}\n` +
-            `💰 Liquid Cash In: K${cashIn.toFixed(2)}\n` +
-            `⚖️ Row Balance Delta: K${transactionBalance.toFixed(2)}\n` +
-            `━━━━━━━━━━━━━━━━━━\n` +
-            `📈 CUMULATIVE CHRONOLOGY:\n` +
-            `🎯 Aggregated Target: K${cumTarget.toFixed(2)}\n` +
-            `💰 Aggregated Cash: K${cumCashIn.toFixed(2)}\n` +
-            `⚖️ Net Running Variance: K${cumBalance.toFixed(2)}\n` +
-            `${record.Comments ? `\n📝 Internal Notes: ${record.Comments}` : ''}`;
+        activeCardIndex = index;
+        activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
+
+        document.getElementById('cardDateText').innerText = record.Date;
+        document.getElementById('cardTimeIn').innerText = record['Time In'] || '-';
+        document.getElementById('cardTimeOut').innerText = record['Time Out'] || '-';
         
-        if (confirm(message + '\n\nRoute clean transmission to target WhatsApp node?')) {
-            shareSingleRecord(index, cumTarget, cumCashIn, cumBalance);
+        document.getElementById('cardTarget').innerText = `K${target.toFixed(2)}`;
+        document.getElementById('cardCashIn').innerText = `K${cashIn.toFixed(2)}`;
+        
+        const balElem = document.getElementById('cardBalance');
+        balElem.innerText = `K${transactionBalance.toFixed(2)}`;
+        
+        const statusPill = document.getElementById('cardStatusPill');
+        if (transactionBalance > 0) {
+            balElem.className = "card-metric-val val-negative";
+            statusPill.innerText = "Shortage";
+            statusPill.className = "card-status-pill pill-negative";
+        } else if (transactionBalance < 0) {
+            balElem.className = "card-metric-val val-positive";
+            statusPill.innerText = "Surplus";
+            statusPill.className = "card-status-pill pill-positive";
+        } else {
+            balElem.className = "card-metric-val val-neutral";
+            statusPill.innerText = "Balanced";
+            statusPill.className = "card-status-pill pill-neutral";
         }
+
+        document.getElementById('cardCumTarget').innerText = `K${cumTarget.toFixed(2)}`;
+        document.getElementById('cardCumCashIn').innerText = `K${cumCashIn.toFixed(2)}`;
+        
+        const cumBalElem = document.getElementById('cardCumBalance');
+        cumBalElem.innerText = `K${cumBalance.toFixed(2)}`;
+        if (cumBalance > 0) cumBalElem.className = "card-metric-val val-negative";
+        else if (cumBalance < 0) cumBalElem.className = "card-metric-val val-positive";
+        else cumBalElem.className = "card-metric-val val-neutral";
+
+        document.getElementById('cardComments').innerText = record.Comments || 'No logs configured for this string record entry.';
+
+        document.getElementById('viewCardModal').classList.add('show');
+        document.getElementById('overlay').classList.add('show');
     }
     
     function updateStats() {
@@ -813,8 +1010,9 @@
         });
     }
     
-    function shareSingleRecord(index, cumTarget, cumCashIn, cumBalance) {
-        const r = allRecords[index];
+    function shareSingleRecord() {
+        if(activeCardIndex === null) return;
+        const r = allRecords[activeCardIndex];
         const target = Number(r.Target) || 0;
         const cashIn = Number(r['Cash In']) || 0;
         const transactionBalance = target - cashIn;
@@ -827,9 +1025,9 @@
             `⚖️ Delta Offset: K${transactionBalance.toFixed(2)}\n` +
             `━━━━━━━━━━━━━━━━━━\n` +
             `📈 *RUNNING TIMELINE TOTALS*\n` +
-            `🎯 Cum. Target: K${cumTarget.toFixed(2)}\n` +
-            `💰 Cum. Cash In: K${cumCashIn.toFixed(2)}\n` +
-            `⚖️ Cum. Net Balance: K${cumBalance.toFixed(2)}\n` +
+            `🎯 Cum. Target: K${activeCardCumulate.cumTarget.toFixed(2)}\n` +
+            `💰 Cum. Cash In: K${activeCardCumulate.cumCashIn.toFixed(2)}\n` +
+            `⚖️ Cum. Net Balance: K${activeCardCumulate.cumBalance.toFixed(2)}\n` +
             `${r.Comments ? `\n📝 Remarks: ${r.Comments}` : ''}\n\n` +
             `_System Dispatch: CashFlow Pro_`;
         
@@ -901,7 +1099,10 @@
     
     function attachCheckboxEvents() {
         document.querySelectorAll('.record-checkbox').forEach(cb => {
-            cb.onchange = () => updateSelectedCount();
+            cb.onchange = (e) => {
+                e.stopPropagation();
+                updateSelectedCount();
+            };
         });
         
         const masterToggle = (eState) => {
@@ -936,11 +1137,14 @@
     
     function closeModal() {
         document.getElementById('recordModal').classList.remove('show');
+        document.getElementById('viewCardModal').classList.remove('show');
         document.getElementById('overlay').classList.remove('show');
+        activeCardIndex = null;
     }
     
     document.getElementById('openModalBtn').onclick = openModal;
-    document.getElementById('closeModalBtn').onclick = closeModal;
+    document.getElementById('closeFormModalBtn').onclick = closeModal;
+    document.getElementById('closeViewModalBtn').onclick = closeModal;
     document.getElementById('cancelBtn').onclick = closeModal;
     document.getElementById('saveBtn').onclick = saveRecord;
     document.getElementById('refreshBtn').onclick = loadRecords;
@@ -948,6 +1152,7 @@
     document.getElementById('smsBtn').onclick = shareSelectedSMS;
     document.getElementById('emailBtn').onclick = emailReport;
     document.getElementById('overlay').onclick = closeModal;
+    document.getElementById('cardWhatsappBtn').onclick = shareSingleRecord;
     
     loadRecords();
 </script>
