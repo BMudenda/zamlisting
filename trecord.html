@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Registration Form</title>
+    <title>Cash Tracker - Google Sheet</title>
     <style>
         * {
             margin: 0;
@@ -12,126 +12,207 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
-        .form-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-            max-width: 450px;
-            width: 100%;
-            animation: fadeIn 0.5s ease-out;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
 
         h1 {
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 28px;
-            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 22px;
         }
 
         .subtitle {
             color: #666;
-            text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
             font-size: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
         }
 
         label {
-            display: block;
-            margin-bottom: 8px;
+            font-weight: 600;
+            margin-bottom: 6px;
             color: #555;
-            font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        input {
-            width: 100%;
-            padding: 12px 16px;
+        input, textarea {
+            padding: 10px 12px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            outline: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
             font-family: inherit;
         }
 
-        input:focus {
+        input:focus, textarea:focus {
+            outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        input[readonly] {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
         button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 12px 20px;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         button:active {
             transform: translateY(0);
         }
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .btn-save {
+            background: #28a745;
+            color: white;
         }
 
-        .message {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 10px;
+        .btn-refresh {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-export {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-clear {
+            background: #6c757d;
+            color: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
+        }
+
+        .summary-box h3 {
             font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .summary-box .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #343a40;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
             display: none;
         }
 
-        .message.success {
+        .status.success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
             display: block;
         }
 
-        .message.error {
+        .status.error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
             display: block;
         }
 
@@ -139,85 +220,210 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 2px solid white;
-            border-top-color: transparent;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
             margin-left: 8px;
-            vertical-align: middle;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 480px) {
-            .form-container {
-                padding: 25px;
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0 5px 0 0;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
             }
             
-            h1 {
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+            
+            .summary-box .value {
                 font-size: 24px;
+            }
+            
+            .edit-btn, .delete-btn {
+                width: auto;
+                margin: 2px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Registration Form</h1>
-        <div class="subtitle">Please enter your details below</div>
-        
-        <form id="submissionForm">
-            <div class="form-group">
-                <label for="fname">First Name *</label>
-                <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-            </div>
+    <div class="container">
+        <!-- Form Card -->
+        <div class="card">
+            <h1>💰 Cash Tracker System</h1>
+            <div class="subtitle">Live Google Sheet Integration | Real-time Data Sync</div>
             
-            <div class="form-group">
-                <label for="lname">Last Name *</label>
-                <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-            </div>
+            <form id="cashForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>📅 Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>⏰ Time In</label>
+                        <input type="time" id="timeIn">
+                    </div>
+                    <div class="form-group">
+                        <label>⏰ Time Out</label>
+                        <input type="time" id="timeOut">
+                    </div>
+                    <div class="form-group">
+                        <label>🎯 Target Amount (K)</label>
+                        <input type="number" id="target" value="400" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Cash In (K)</label>
+                        <input type="number" id="cashIn" step="100" oninput="updateBalance()">
+                    </div>
+                    <div class="form-group">
+                        <label>⚖️ Balance (K)</label>
+                        <input type="number" id="balance" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>📝 Comments</label>
+                    <textarea id="comments" placeholder="Optional notes..."></textarea>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn-save">💾 Save Record</button>
+                    <button type="button" class="btn-refresh" onclick="loadData()">🔄 Refresh Data</button>
+                    <button type="button" class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
+                    <button type="button" class="btn-clear" onclick="clearForm()">🗑️ Clear Form</button>
+                </div>
+            </form>
             
-            <button type="submit" id="submitBtn">
-                Submit
-            </button>
-        </form>
+            <div id="status" class="status"></div>
+        </div>
         
-        <div id="message" class="message"></div>
+        <!-- Summary Card -->
+        <div class="card">
+            <h2>📊 Summary Dashboard</h2>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <h3>Total Cash In</h3>
+                    <div class="value" id="totalCashIn">K0</div>
+                </div>
+                <div class="summary-box">
+                    <h3>Total Target</h3>
+                    <div class="value" id="totalTarget">K0</div>
+                </div>
+                <div class="summary-box">
+                    <h3>Overall Balance</h3>
+                    <div class="value" id="overallBalance">K0</div>
+                </div>
+                <div class="summary-box">
+                    <h3>Total Records</h3>
+                    <div class="value" id="totalRecords">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Records Card -->
+        <div class="card">
+            <h2>📋 Cash Records</h2>
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
+                            <th>Target (K)</th>
+                            <th>Cash In (K)</th>
+                            <th>Balance (K)</th>
+                            <th>Comments</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable">
+                        <tr><td colspan="8" style="text-align: center;">Loading data from Google Sheet...<span class="loading"></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Your provided Google Apps Script URL
+        // Your Google Apps Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec';
         
-        const form = document.getElementById('submissionForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const messageDiv = document.getElementById('message');
+        let allRecords = [];
         
-        form.addEventListener('submit', async (e) => {
+        // Load data when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+        
+        // Update balance calculation
+        function updateBalance() {
+            const target = parseFloat(document.getElementById('target').value) || 0;
+            const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
+            const balance = cashIn - target;
+            document.getElementById('balance').value = balance;
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 4000);
+        }
+        
+        // Handle form submission
+        document.getElementById('cashForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Get form values
-            const fname = document.getElementById('fname').value.trim();
-            const lname = document.getElementById('lname').value.trim();
-            
-            // Basic validation
-            if (!fname || !lname) {
-                showMessage('Please fill in all fields', 'error');
+            const date = document.getElementById('date').value;
+            if (!date) {
+                showStatus('Please select a date', 'error');
                 return;
             }
             
-            // Disable button and show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Submitting <span class="loading"></span>';
-            
-            // Prepare form data
+            // Prepare data matching your sheet headers
             const formData = new URLSearchParams();
-            formData.append('fname', fname);
-            formData.append('lname', lname);
+            formData.append('Date', date);
+            formData.append('Time In', document.getElementById('timeIn').value);
+            formData.append('Time Out', document.getElementById('timeOut').value);
+            formData.append('Target', document.getElementById('target').value);
+            formData.append('Cash In', document.getElementById('cashIn').value);
+            formData.append('Balance', document.getElementById('balance').value);
+            formData.append('Comments', document.getElementById('comments').value);
+            
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'Saving... <span class="loading"></span>';
+            submitBtn.disabled = true;
             
             try {
-                const response = await fetch(SCRIPT_URL, {
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
@@ -226,38 +432,140 @@
                     body: formData.toString()
                 });
                 
-                showMessage('✅ Success! Your information has been submitted.', 'success');
-                form.reset();
+                showStatus('✅ Record saved successfully!', 'success');
+                clearForm();
+                await loadData();
                 
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('❌ Error submitting form. Please try again.', 'error');
+                showStatus('❌ Error saving record. Please try again.', 'error');
             } finally {
+                submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit';
-                
-                setTimeout(() => {
-                    if (messageDiv.classList.contains('success')) {
-                        messageDiv.className = 'message';
-                        messageDiv.style.display = 'none';
-                    }
-                }, 5000);
             }
         });
         
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
+        // Load data from Google Sheet
+        async function loadData() {
+            const tableBody = document.getElementById('recordsTable');
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Loading data from Google Sheet...<span class="loading"></span></td></tr>';
             
-            if (type === 'error') {
-                setTimeout(() => {
-                    if (messageDiv.classList.contains('error')) {
-                        messageDiv.className = 'message';
-                        messageDiv.style.display = 'none';
-                    }
-                }, 5000);
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+                
+                // Get all records and filter for cash records (those with Date field)
+                allRecords = (data.rows || []).filter(row => row.Date && row.Date !== '');
+                
+                displayRecords();
+                updateSummary();
+                
+                showStatus(`✅ Loaded ${allRecords.length} records from Google Sheet`, 'info');
+                
+            } catch (error) {
+                console.error('Load error:', error);
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">❌ Failed to load data from Google Sheet. Make sure the sheet exists and has data.</td></tr>';
+                showStatus('Failed to load data from Google Sheet', 'error');
             }
+        }
+        
+        // Display records in table
+        function displayRecords() {
+            const tableBody = document.getElementById('recordsTable');
+            
+            if (allRecords.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No records found. Add your first record above!</td></tr>';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            
+            // Sort by date (newest first)
+            const sortedRecords = [...allRecords].sort((a, b) => {
+                if (!a.Date) return 1;
+                if (!b.Date) return -1;
+                return b.Date.localeCompare(a.Date);
+            });
+            
+            sortedRecords.forEach(record => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = record.Date || '-';
+                row.insertCell(1).textContent = record['Time In'] || '-';
+                row.insertCell(2).textContent = record['Time Out'] || '-';
+                row.insertCell(3).textContent = `K${Number(record.Target || 0).toFixed(2)}`;
+                row.insertCell(4).textContent = `K${Number(record['Cash In'] || 0).toFixed(2)}`;
+                row.insertCell(5).textContent = `K${Number(record.Balance || 0).toFixed(2)}`;
+                row.insertCell(6).textContent = record.Comments || '-';
+                row.insertCell(7).textContent = record.Timestamp ? new Date(record.Timestamp).toLocaleString() : '-';
+            });
+        }
+        
+        // Update summary dashboard
+        function updateSummary() {
+            let totalCashIn = 0;
+            let totalTarget = 0;
+            let totalBalance = 0;
+            
+            allRecords.forEach(record => {
+                totalCashIn += Number(record['Cash In']) || 0;
+                totalTarget += Number(record.Target) || 0;
+                totalBalance += Number(record.Balance) || 0;
+            });
+            
+            document.getElementById('totalCashIn').textContent = `K${totalCashIn.toFixed(2)}`;
+            document.getElementById('totalTarget').textContent = `K${totalTarget.toFixed(2)}`;
+            document.getElementById('overallBalance').textContent = `K${totalBalance.toFixed(2)}`;
+            document.getElementById('totalRecords').textContent = allRecords.length;
+        }
+        
+        // Clear form
+        function clearForm() {
+            document.getElementById('date').value = '';
+            document.getElementById('timeIn').value = '';
+            document.getElementById('timeOut').value = '';
+            document.getElementById('target').value = '400';
+            document.getElementById('cashIn').value = '';
+            document.getElementById('balance').value = '';
+            document.getElementById('comments').value = '';
+        }
+        
+        // Export to CSV
+        function exportToCSV() {
+            if (allRecords.length === 0) {
+                showStatus('No records to export', 'error');
+                return;
+            }
+            
+            let csv = 'Date,Time In,Time Out,Target (K),Cash In (K),Balance (K),Comments,Timestamp\n';
+            
+            allRecords.forEach(record => {
+                csv += `"${record.Date || ''}",`;
+                csv += `"${record['Time In'] || ''}",`;
+                csv += `"${record['Time Out'] || ''}",`;
+                csv += `"${record.Target || 0}",`;
+                csv += `"${record['Cash In'] || 0}",`;
+                csv += `"${record.Balance || 0}",`;
+                csv += `"${record.Comments || ''}",`;
+                csv += `"${record.Timestamp || ''}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cash_tracker_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showStatus('CSV exported successfully!', 'success');
         }
     </script>
 </body>
