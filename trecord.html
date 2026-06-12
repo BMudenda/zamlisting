@@ -1,55 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Submit Form</title>
+  <title>Submit Form</title>
 </head>
 
 <body>
 
-<h3>Enter Your Details</h3>
+<h3>Enter Name</h3>
 
-<form id="form">
+<input id="first" placeholder="First Name"><br><br>
+<input id="last" placeholder="Last Name"><br><br>
 
-  <input type="text" name="First Name" placeholder="First Name" required>
-  <br><br>
-
-  <input type="text" name="Last Name" placeholder="Last Name" required>
-  <br><br>
-
-  <button type="submit">Submit</button>
-
-</form>
+<button onclick="send()">Submit</button>
 
 <p id="msg"></p>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
 
-const form = document.getElementById("form");
-const msg = document.getElementById("msg");
-
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-
+function send() {
+  const msg = document.getElementById("msg");
   msg.innerText = "Submitting...";
+
+  const first = document.getElementById("first").value;
+  const last = document.getElementById("last").value;
+
+  const data = {
+    "First Name": first,
+    "Last Name": last
+  };
+
+  const body = Object.keys(data)
+    .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+    .join("&");
 
   fetch(scriptURL, {
     method: "POST",
-    body: new FormData(form)
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: body
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.result === "success") {
-      msg.innerText = "✅ Submitted successfully!";
-      form.reset();
-    } else {
-      msg.innerText = "❌ Submission failed";
+  .then(res => res.text())
+  .then(text => {
+    console.log("RAW RESPONSE:", text);
+
+    try {
+      const res = JSON.parse(text);
+
+      if (res.result === "success") {
+        msg.innerText = "✅ Saved successfully!";
+        document.getElementById("first").value = "";
+        document.getElementById("last").value = "";
+      } else {
+        msg.innerText = "❌ Failed";
+      }
+
+    } catch (e) {
+      msg.innerText = "❌ Response error";
+      console.log(e, text);
     }
   })
-  .catch(() => {
-    msg.innerText = "❌ Network error";
+  .catch(err => {
+    msg.innerText = "❌ Network error (request blocked)";
+    console.error(err);
   });
-});
+}
 </script>
 
 </body>
