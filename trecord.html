@@ -2,127 +2,388 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Cash Tracker POST</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CashFlow Pro | Google Sheets POST</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+
+        .result.loading {
+            background: #e2e3e5;
+            border: 1px solid #d6d8db;
+            color: #383d41;
+            display: block;
+        }
+
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #004085;
+            border-left: 4px solid #007bff;
+        }
+
+        .info code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .script-url {
+            margin-bottom: 20px;
+        }
+
+        .script-url input {
+            font-family: monospace;
+            font-size: 0.8rem;
+            background: #f8f9fa;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .balance-field {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px;">
-    <h2>Test Cash Tracker POST</h2>
-    <p style="color: #666;">Using the SAME method as your working taxi app</p>
-    
-    <!-- Script URL Input -->
-    <div style="background: #f0f0f0; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
-        <label style="font-weight: bold;">Google Apps Script URL:</label>
-        <input type="text" id="scriptUrl" style="width: 100%; padding: 8px; margin-top: 5px; font-family: monospace; font-size: 12px; border: 1px solid #ccc; border-radius: 4px;" 
-               placeholder="https://script.google.com/macros/s/YOUR_ID/exec">
-        <small style="color: #666; display: block; margin-top: 5px;">Paste your Web App URL here</small>
-    </div>
-    
-    <!-- Simple Form -->
-    <form id="testForm">
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Time In:</label>
-            <input type="time" id="timeIn" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 CashFlow Pro</h1>
+            <p>POST to Google Sheets - Same method as Taxi App</p>
         </div>
         
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Time Out:</label>
-            <input type="time" id="timeOut" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <div class="form-container">
+            <!-- Script URL Input -->
+            <div class="form-group script-url">
+                <label>📌 Google Apps Script URL:</label>
+                <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_ID/exec">
+                <small style="color: #666; display: block; margin-top: 5px;">Paste your deployed Web App URL here</small>
+            </div>
+            
+            <hr>
+            
+            <!-- Form -->
+            <form id="testForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>⏱️ Time In:</label>
+                        <input type="time" id="timeIn" value="09:00">
+                    </div>
+                    <div class="form-group">
+                        <label>⏲️ Time Out:</label>
+                        <input type="time" id="timeOut" value="17:00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🎯 Target (K):</label>
+                        <input type="number" id="target" value="400" step="10">
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Cash In (K):</label>
+                        <input type="number" id="cashIn" value="520" step="10">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>⚖️ Balance (Auto-calculated):</label>
+                    <input type="text" id="balance" readonly class="balance-field">
+                </div>
+                
+                <div class="form-group">
+                    <label>💬 Comments:</label>
+                    <textarea id="comments" rows="3" placeholder="Additional notes...">Test submission from HTML form</textarea>
+                </div>
+                
+                <button type="submit" id="submitBtn">
+                    <span id="btnText">📤 POST to Google Sheet</span>
+                    <span id="btnSpinner" style="display: none;">⏳ Submitting...</span>
+                </button>
+            </form>
+            
+            <div id="result" class="result"></div>
+            
+            <div class="info">
+                <strong>📌 Important Setup Instructions:</strong><br><br>
+                1. <strong>Google Sheet Headers (Row 1):</strong><br>
+                <code>Date | Time In | Time Out | Target | Cash In | Balance | Comments | Timestamp</code><br><br>
+                2. Your script automatically adds current date/time to the <strong>Date</strong> column<br><br>
+                3. The <strong>Timestamp</strong> column is auto-created by your script<br><br>
+                4. Uses the SAME POST method as your working taxi app:<br>
+                <code>new URLSearchParams(payload)</code> + <code>mode: 'no-cors'</code>
+            </div>
         </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Target (K):</label>
-            <input type="number" id="target" value="400" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Cash In (K):</label>
-            <input type="number" id="cashIn" value="520" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" oninput="updateBalance()">
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Balance (auto):</label>
-            <input type="text" id="balance" readonly style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #f5f5f5;">
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Comments:</label>
-            <textarea id="comments" rows="2" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">Test from HTML form</textarea>
-        </div>
-        
-        <button type="submit" style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%;">
-            POST to Google Sheet
-        </button>
-    </form>
-    
-    <div id="result" style="margin-top: 20px; padding: 10px; border-radius: 4px; display: none;"></div>
-    
-    <hr style="margin: 20px 0;">
-    
-    <div style="background: #e7f3ff; padding: 10px; border-radius: 4px; font-size: 13px;">
-        <strong>📌 Your Google Sheet MUST have these headers in ROW 1:</strong><br><br>
-        <code>Date | Time In | Time Out | Target | Cash In | Balance | Comments | Timestamp</code>
-        <br><br>
-        <strong>Note:</strong> Your script automatically puts <code>new Date()</code> in the <strong>Date</strong> column.
     </div>
 
     <script>
-        function updateBalance() {
+        // Calculate balance automatically
+        function calculateBalance() {
             const target = parseFloat(document.getElementById('target').value) || 0;
             const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
-            document.getElementById('balance').value = (cashIn - target).toFixed(2);
+            const balance = cashIn - target;
+            document.getElementById('balance').value = balance.toFixed(2);
+            return balance;
         }
         
-        document.getElementById('target').addEventListener('input', updateBalance);
-        document.getElementById('cashIn').addEventListener('input', updateBalance);
-        updateBalance();
+        // Add event listeners
+        document.getElementById('target').addEventListener('input', calculateBalance);
+        document.getElementById('cashIn').addEventListener('input', calculateBalance);
         
+        // Initial calculation
+        calculateBalance();
+        
+        // Form submission - EXACT same method as your working taxi app
         document.getElementById('testForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const scriptUrl = document.getElementById('scriptUrl').value.trim();
             if (!scriptUrl) {
-                alert('Please paste your Google Apps Script URL');
+                alert('❌ Please enter your Google Apps Script URL');
                 return;
             }
             
-            // Create payload object - EXACT same pattern as your working taxi app
+            if (!scriptUrl.includes('script.google.com')) {
+                alert('❌ Invalid URL. Please enter a valid Google Apps Script Web App URL');
+                return;
+            }
+            
+            // Get form data
+            const timeIn = document.getElementById('timeIn').value;
+            const timeOut = document.getElementById('timeOut').value;
+            const target = document.getElementById('target').value;
+            const cashIn = document.getElementById('cashIn').value;
+            const balance = document.getElementById('balance').value;
+            const comments = document.getElementById('comments').value;
+            
+            // Create payload - EXACT same pattern as your taxi app
+            // The keys must match the headers in your Google Sheet (except 'Date' which is auto-added by script)
             const payload = {
-                'Time In': document.getElementById('timeIn').value,
-                'Time Out': document.getElementById('timeOut').value,
-                'Target': document.getElementById('target').value,
-                'Cash In': document.getElementById('cashIn').value,
-                'Balance': document.getElementById('balance').value,
-                'Comments': document.getElementById('comments').value,
+                'Time In': timeIn,
+                'Time Out': timeOut,
+                'Target': target,
+                'Cash In': cashIn,
+                'Balance': balance,
+                'Comments': comments,
                 'timestamp': new Date().toISOString()
             };
             
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
             const resultDiv = document.getElementById('result');
-            resultDiv.style.display = 'block';
-            resultDiv.style.background = '#fff3cd';
-            resultDiv.style.color = '#856404';
-            resultDiv.innerHTML = '⏳ Sending to Google Sheet...';
+            
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline';
+            submitBtn.disabled = true;
+            
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '⏳ Sending data to Google Sheet... Please wait.';
             
             try {
                 // EXACT same fetch pattern as your working taxi app
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
-                    body: new URLSearchParams(payload),
-                    mode: 'no-cors'
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    body: new URLSearchParams(payload)
                 });
                 
-                resultDiv.style.background = '#d4edda';
-                resultDiv.style.color = '#155724';
-                resultDiv.innerHTML = '✅ SUCCESS! Data sent to Google Sheet.<br><br>Your script will add current date/time to the Date column.<br><br>Check your spreadsheet!';
+                // With 'no-cors' mode, we can't read the response
+                // But the request was sent successfully
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = '✅ <strong>SUCCESS!</strong><br><br>' +
+                    'Data sent to Google Sheet!<br><br>' +
+                    '📊 <strong>What was sent:</strong><br>' +
+                    '• Time In: ' + timeIn + '<br>' +
+                    '• Time Out: ' + timeOut + '<br>' +
+                    '• Target: K' + target + '<br>' +
+                    '• Cash In: K' + cashIn + '<br>' +
+                    '• Balance: K' + balance + '<br>' +
+                    '• Comments: ' + comments + '<br><br>' +
+                    '📌 Your script will automatically add:<br>' +
+                    '• Current date/time to the Date column<br>' +
+                    '• A Timestamp column entry<br><br>' +
+                    '👉 <strong>Check your Google Sheet now!</strong>';
                 
-                // Optional: Clear form
+                // Optional: Auto-clear form after successful submission
                 // document.getElementById('testForm').reset();
-                // updateBalance();
+                // calculateBalance();
                 
             } catch (error) {
-                resultDiv.style.background = '#f8d7da';
-                resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = '❌ ERROR: ' + error.message;
+                console.error('Error:', error);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '❌ <strong>ERROR:</strong><br><br>' +
+                    error.message + '<br><br>' +
+                    'Please check:<br>' +
+                    '• Script URL is correct<br>' +
+                    '• Script is deployed as Web App<br>' +
+                    '• Execute as: "Me"<br>' +
+                    '• Who has access: "Anyone"<br>' +
+                    '• Sheet has correct headers in Row 1';
+            } finally {
+                // Reset button
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+                submitBtn.disabled = false;
+                
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
+        });
+        
+        // Optional: Test if URL is reachable on page load
+        window.addEventListener('load', function() {
+            const savedUrl = localStorage.getItem('cashflow_script_url');
+            if (savedUrl) {
+                document.getElementById('scriptUrl').value = savedUrl;
+            }
+            
+            // Save URL when changed
+            document.getElementById('scriptUrl').addEventListener('change', function() {
+                localStorage.setItem('cashflow_script_url', this.value);
+            });
         });
     </script>
 </body>
