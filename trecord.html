@@ -1,37 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Submit Form</title>
+  <title>Simple Name Form</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 30px;
+    }
+
+    .box {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    #loader {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    #msg {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-<h3>Enter Name</h3>
+<div class="box">
+  <h2>Submit Name</h2>
 
-<input id="first" placeholder="First Name"><br><br>
-<input id="last" placeholder="Last Name"><br><br>
+  <input type="text" id="firstName" placeholder="First Name">
+  <input type="text" id="lastName" placeholder="Last Name">
 
-<button onclick="send()">Submit</button>
+  <button id="submitBtn">Submit</button>
 
-<p id="msg"></p>
+  <div id="loader">Submitting...</div>
+  <p id="msg"></p>
+</div>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
 
-function send() {
-  const msg = document.getElementById("msg");
-  msg.innerText = "Submitting...";
+const firstNameInput = document.getElementById("firstName");
+const lastNameInput = document.getElementById("lastName");
+const loader = document.getElementById("loader");
+const msg = document.getElementById("msg");
+const btn = document.getElementById("submitBtn");
 
-  const first = document.getElementById("first").value;
-  const last = document.getElementById("last").value;
+function submitForm() {
+
+  const firstName = firstNameInput.value.trim();
+  const lastName = lastNameInput.value.trim();
+
+  if (!firstName || !lastName) {
+    msg.innerText = "⚠️ Please enter both First Name and Last Name.";
+    return;
+  }
+
+  loader.style.display = "block";
+  msg.innerText = "";
 
   const data = {
-    "First Name": first,
-    "Last Name": last
+    "First Name": firstName,
+    "Last Name": lastName
   };
 
-  const body = Object.keys(data)
-    .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+  const formBody = Object.keys(data)
+    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
     .join("&");
 
   fetch(scriptURL, {
@@ -39,33 +108,34 @@ function send() {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    body: body
+    body: formBody
   })
-  .then(res => res.text())
-  .then(text => {
-    console.log("RAW RESPONSE:", text);
+  .then(r => r.json())
+  .then(j => {
 
-    try {
-      const res = JSON.parse(text);
+    loader.style.display = "none";
 
-      if (res.result === "success") {
-        msg.innerText = "✅ Saved successfully!";
-        document.getElementById("first").value = "";
-        document.getElementById("last").value = "";
-      } else {
-        msg.innerText = "❌ Failed";
-      }
+    if (
+      j.result === "success" ||
+      (j.result && j.result.includes("success"))
+    ) {
+      msg.innerText = "✅ Submitted successfully!";
 
-    } catch (e) {
-      msg.innerText = "❌ Response error";
-      console.log(e, text);
+      firstNameInput.value = "";
+      lastNameInput.value = "";
+    } else {
+      msg.innerText = j.error || "❌ Submission failed";
     }
+
   })
   .catch(err => {
-    msg.innerText = "❌ Network error (request blocked)";
+    loader.style.display = "none";
+    msg.innerText = "❌ Network error / submission failed";
     console.error(err);
   });
 }
+
+btn.onclick = submitForm;
 </script>
 
 </body>
