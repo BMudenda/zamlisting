@@ -27,7 +27,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             background: white;
             border-radius: 20px;
@@ -71,7 +70,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* Modal for Add/Edit */
         .modal {
             position: fixed;
             top: 50%;
@@ -153,7 +151,6 @@
             background: #e0e0e0;
         }
 
-        /* Form */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -238,7 +235,6 @@
             color: white;
         }
 
-        /* Summary Cards */
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -278,7 +274,6 @@
             color: #333;
         }
 
-        /* Quick Actions */
         .quick-actions {
             display: flex;
             gap: 12px;
@@ -307,7 +302,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* Records Table */
         .records-section {
             background: white;
             border-radius: 20px;
@@ -346,10 +340,6 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        tr {
-            transition: background 0.3s;
-        }
-
         tr:hover {
             background: #f8f9fa;
         }
@@ -365,7 +355,6 @@
             cursor: pointer;
         }
 
-        /* Modal Card for Viewing Record */
         .view-card-modal {
             position: fixed;
             top: 50%;
@@ -485,11 +474,6 @@
             font-weight: bold;
         }
 
-        .detail-value.comments {
-            max-width: 250px;
-            word-wrap: break-word;
-        }
-
         .card-actions {
             display: flex;
             gap: 12px;
@@ -503,7 +487,6 @@
             justify-content: center;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -551,21 +534,6 @@
             }
         }
 
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -593,7 +561,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>
                 <i class="fas fa-coins"></i> 
@@ -604,7 +571,6 @@
             </button>
         </div>
 
-        <!-- Add/Edit Modal -->
         <div id="overlay" class="overlay" onclick="closeModal()"></div>
         <div id="recordModal" class="modal">
             <div class="modal-container">
@@ -616,7 +582,6 @@
                 </div>
                 
                 <form id="cashForm">
-                    <input type="hidden" id="editRowId" value="-1">
                     <div class="form-grid">
                         <div class="form-group">
                             <label><i class="fas fa-calendar-alt"></i> Date *</label>
@@ -640,7 +605,7 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-scale-balanced"></i> Balance (K)</label>
-                            <input type="number" id="balance" readonly>
+                            <input type="number" id="balance" readonly style="background: #f0f0f0; font-weight: bold;">
                         </div>
                     </div>
                     
@@ -650,7 +615,7 @@
                     </div>
                     
                     <div class="button-group">
-                        <button type="submit" class="btn-save" id="saveBtn">
+                        <button type="submit" class="btn-save">
                             <i class="fas fa-save"></i> Save Record
                         </button>
                         <button type="button" class="btn-clear" onclick="clearForm()">
@@ -661,7 +626,6 @@
             </div>
         </div>
 
-        <!-- View Card Modal (Hidden until View Card is clicked) -->
         <div id="cardOverlay" class="card-overlay" onclick="closeCardView()"></div>
         <div id="viewCardModal" class="view-card-modal">
             <div class="card-container">
@@ -673,9 +637,6 @@
                 </div>
                 <div id="recordDetails" class="record-details"></div>
                 <div class="card-actions">
-                    <button class="btn-save" onclick="editFromCard()">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
                     <button class="action-btn" onclick="shareFromCard()">
                         <i class="fab fa-whatsapp"></i> Share
                     </button>
@@ -683,7 +644,6 @@
             </div>
         </div>
 
-        <!-- Summary Cards -->
         <div class="summary-grid">
             <div class="summary-card" onclick="refreshData()">
                 <i class="fas fa-money-bill-wave" style="color: #28a745;"></i>
@@ -707,7 +667,6 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="quick-actions">
             <button class="action-btn" onclick="refreshData()">
                 <i class="fas fa-sync-alt"></i> Refresh
@@ -720,14 +679,13 @@
             </button>
         </div>
 
-        <!-- Records Table -->
         <div class="records-section">
             <div class="records-header">
                 <h2><i class="fas fa-table-list"></i> Cash Records</h2>
                 <span style="font-size: 12px; color: #999;">Click "View Card" to see record details</span>
             </div>
             <div class="table-wrapper">
-                <table id="dataTable">
+                <table>
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -748,10 +706,10 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
     <script>
+        // Your Google Apps Script URL (unchanged)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec';
         
         let allRecords = [];
@@ -761,27 +719,27 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
             
-            // Balance calculation - FIXED
-            const cashInInput = document.getElementById('cashIn');
-            const targetInput = document.getElementById('target');
-            
-            if (cashInInput) {
-                cashInInput.addEventListener('input', function() {
-                    const target = parseFloat(document.getElementById('target').value) || 0;
-                    const cashIn = parseFloat(this.value) || 0;
-                    const balance = cashIn - target;
-                    document.getElementById('balance').value = balance.toFixed(2);
-                });
+            // Balance calculation function
+            function calculateBalance() {
+                const target = parseFloat(document.getElementById('target').value) || 0;
+                const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
+                const balance = cashIn - target;
+                const balanceField = document.getElementById('balance');
+                balanceField.value = balance.toFixed(2);
+                
+                // Color code the balance field
+                if (balance > 0) {
+                    balanceField.style.color = '#28a745';
+                } else if (balance < 0) {
+                    balanceField.style.color = '#dc3545';
+                } else {
+                    balanceField.style.color = '#333';
+                }
             }
             
-            if (targetInput) {
-                targetInput.addEventListener('input', function() {
-                    const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
-                    const target = parseFloat(this.value) || 0;
-                    const balance = cashIn - target;
-                    document.getElementById('balance').value = balance.toFixed(2);
-                });
-            }
+            // Add event listeners for real-time balance calculation
+            document.getElementById('cashIn').addEventListener('input', calculateBalance);
+            document.getElementById('target').addEventListener('input', calculateBalance);
         });
         
         function showToast(message, type) {
@@ -792,24 +750,7 @@
         }
         
         function openAddModal() {
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Record';
-            document.getElementById('editRowId').value = '-1';
             clearForm();
-            document.getElementById('recordModal').classList.add('show');
-            document.getElementById('overlay').classList.add('show');
-        }
-        
-        function openEditModal(index) {
-            const record = allRecords[index];
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Record';
-            document.getElementById('editRowId').value = index;
-            document.getElementById('date').value = record.Date || '';
-            document.getElementById('timeIn').value = record['Time In'] || '';
-            document.getElementById('timeOut').value = record['Time Out'] || '';
-            document.getElementById('target').value = record.Target || 400;
-            document.getElementById('cashIn').value = record['Cash In'] || '';
-            document.getElementById('balance').value = record.Balance || 0;
-            document.getElementById('comments').value = record.Comments || '';
             document.getElementById('recordModal').classList.add('show');
             document.getElementById('overlay').classList.add('show');
         }
@@ -819,7 +760,7 @@
             document.getElementById('overlay').classList.remove('show');
         }
         
-        // Form submission (Add only - since edit requires DELETE + POST)
+        // Handle form submission - calculates balance on client side
         document.getElementById('cashForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -829,18 +770,18 @@
                 return;
             }
             
-            // Calculate balance one more time
+            // Calculate balance on client side
             const target = parseFloat(document.getElementById('target').value) || 0;
             const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
             const balance = cashIn - target;
-            document.getElementById('balance').value = balance.toFixed(2);
             
+            // Prepare data for your existing Apps Script
             const formData = new URLSearchParams();
             formData.append('Date', date);
             formData.append('Time In', document.getElementById('timeIn').value);
             formData.append('Time Out', document.getElementById('timeOut').value);
-            formData.append('Target', target);
-            formData.append('Cash In', cashIn);
+            formData.append('Target', target.toFixed(2));
+            formData.append('Cash In', cashIn.toFixed(2));
             formData.append('Balance', balance.toFixed(2));
             formData.append('Comments', document.getElementById('comments').value);
             
@@ -857,12 +798,13 @@
                     body: formData.toString()
                 });
                 
-                showToast('Record saved successfully!', 'success');
+                showToast('Record saved successfully! Balance: K' + balance.toFixed(2), 'success');
                 clearForm();
                 closeModal();
                 await loadData();
                 
             } catch (error) {
+                console.error('Error:', error);
                 showToast('Error saving record', 'error');
             } finally {
                 submitBtn.innerHTML = originalHTML;
@@ -953,20 +895,20 @@
                     <span class="detail-value">${record['Time Out'] || '-'}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-bullseye"></i> Target (K)</span>
+                    <span class="detail-label"><i class="fas fa-bullseye"></i> Target</span>
                     <span class="detail-value">K${target.toFixed(2)}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-money-bill-wave"></i> Cash In (K)</span>
+                    <span class="detail-label"><i class="fas fa-money-bill-wave"></i> Cash In</span>
                     <span class="detail-value">K${cashIn.toFixed(2)}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-scale-balanced"></i> Balance (K)</span>
+                    <span class="detail-label"><i class="fas fa-scale-balanced"></i> Balance</span>
                     <span class="detail-value ${balanceClass}">K${balance.toFixed(2)}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label"><i class="fas fa-comment"></i> Comments</span>
-                    <span class="detail-value comments">${record.Comments || '-'}</span>
+                    <span class="detail-value">${record.Comments || '-'}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label"><i class="fas fa-timestamp"></i> Timestamp</span>
@@ -983,13 +925,6 @@
             document.getElementById('viewCardModal').classList.remove('show');
             document.getElementById('cardOverlay').classList.remove('show');
             currentViewIndex = -1;
-        }
-        
-        function editFromCard() {
-            if (currentViewIndex >= 0) {
-                closeCardView();
-                openEditModal(currentViewIndex);
-            }
         }
         
         function shareFromCard() {
@@ -1024,20 +959,35 @@
         }
         
         function updateSummary() {
-            let totalCashIn = 0, totalTarget = 0, totalBalance = 0;
+            let totalCashIn = 0;
+            let totalTarget = 0;
+            let totalBalance = 0;
+            
             allRecords.forEach(record => {
                 totalCashIn += Number(record['Cash In']) || 0;
                 totalTarget += Number(record.Target) || 0;
                 totalBalance += Number(record.Balance) || 0;
             });
             
-            document.getElementById('totalCashIn').textContent = `K${totalCashIn.toFixed(2)}`;
-            document.getElementById('totalTarget').textContent = `K${totalTarget.toFixed(2)}`;
-            document.getElementById('overallBalance').textContent = `K${totalBalance.toFixed(2)}`;
-            document.getElementById('totalRecords').textContent = allRecords.length;
+            document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
+            document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
+            document.getElementById('overallBalance').innerHTML = `K${totalBalance.toFixed(2)}`;
+            document.getElementById('totalRecords').innerHTML = allRecords.length;
+            
+            // Color code overall balance
+            const overallBalanceElem = document.getElementById('overallBalance');
+            if (totalBalance > 0) {
+                overallBalanceElem.style.color = '#28a745';
+            } else if (totalBalance < 0) {
+                overallBalanceElem.style.color = '#dc3545';
+            } else {
+                overallBalanceElem.style.color = '#333';
+            }
         }
         
-        function refreshData() { loadData(); }
+        function refreshData() { 
+            loadData(); 
+        }
         
         function clearForm() {
             document.getElementById('date').value = '';
