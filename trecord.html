@@ -1,63 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Cash Tracker</title>
+  <title>Simple Form</title>
 </head>
-
 <body>
 
-<h2>Cash Entry</h2>
+<h3>Submit Name</h3>
 
-<form id="myForm">
+<input id="first" placeholder="First Name">
+<input id="last" placeholder="Last Name">
 
-  <input name="Time in" placeholder="Time In" required><br><br>
-
-  <input name="Time out" placeholder="Time Out" required><br><br>
-
-  <input name="Cash in Target" placeholder="Cash Target" required><br><br>
-
-  <input name="Cash in" placeholder="Cash In" required><br><br>
-
-  <input name="Balance" placeholder="Balance"><br><br>
-
-  <input name="Comments" placeholder="Comments"><br><br>
-
-  <button type="submit">Submit</button>
-
-</form>
+<button onclick="send()">Submit</button>
 
 <p id="msg"></p>
 
 <script>
-const scriptURL = "YOUR /exec URL HERE";
+const scriptURL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
 
-document.getElementById("myForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
+function send() {
   const msg = document.getElementById("msg");
-  msg.innerText = "Submitting...";
 
-  try {
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      body: new FormData(e.target)   // 🔥 THIS IS CRITICAL
-    });
+  const data = {
+    "First Name": document.getElementById("first").value,
+    "Last Name": document.getElementById("last").value
+  };
 
-    const text = await res.text();
-    const data = JSON.parse(text);
+  const body = Object.keys(data)
+    .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+    .join("&");
 
-    if (data.result === "success") {
-      msg.innerText = "✅ Saved successfully!";
-      e.target.reset();
+  fetch(scriptURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: body
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.result === "success") {
+      msg.innerText = "Saved successfully!";
     } else {
-      msg.innerText = "❌ Error: " + data.error;
+      msg.innerText = "Error: " + res.error;
     }
-
-  } catch (err) {
-    msg.innerText = "❌ Network error. Check console.";
+  })
+  .catch(err => {
+    msg.innerText = "Network error";
     console.error(err);
-  }
-});
+  });
+}
 </script>
 
 </body>
