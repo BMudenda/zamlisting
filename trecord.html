@@ -1,104 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sheet Submit Form</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #eef2f7;
-      padding: 20px;
-    }
-
-    .box {
-      max-width: 450px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
-
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background: #007bff;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    #msg {
-      margin-top: 10px;
-      text-align: center;
-      font-weight: bold;
-    }
-  </style>
+  <title>Cash Tracker</title>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>Cash Tracker Entry</h2>
+<h2>Cash Entry</h2>
 
-  <form id="myForm">
+<form id="myForm">
 
-    <!-- MUST MATCH SHEET HEADERS -->
-    <input type="text" name="Time in" placeholder="Time In" required>
+  <input name="Time in" placeholder="Time In" required><br><br>
 
-    <input type="text" name="Time out" placeholder="Time Out" required>
+  <input name="Time out" placeholder="Time Out" required><br><br>
 
-    <input type="number" name="Cash in Target" placeholder="Cash Target (e.g. 400)" required>
+  <input name="Cash in Target" placeholder="Cash Target" required><br><br>
 
-    <input type="number" name="Cash in" placeholder="Cash In" required>
+  <input name="Cash in" placeholder="Cash In" required><br><br>
 
-    <input type="text" name="Balance" placeholder="Balance">
+  <input name="Balance" placeholder="Balance"><br><br>
 
-    <textarea name="Comments" placeholder="Comments"></textarea>
+  <input name="Comments" placeholder="Comments"><br><br>
 
-    <button type="submit">Submit</button>
+  <button type="submit">Submit</button>
 
-    <div id="msg"></div>
-  </form>
-</div>
+</form>
+
+<p id="msg"></p>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbz-h296zixkMW-dixCkldzO6WMWZJujwVunSqjPN7E/dev";
+const scriptURL = "YOUR /exec URL HERE";
 
-const form = document.getElementById("myForm");
-const msg = document.getElementById("msg");
-
-form.addEventListener("submit", e => {
+document.getElementById("myForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const formData = new FormData(form);
+  const msg = document.getElementById("msg");
+  msg.innerText = "Submitting...";
 
-  fetch(scriptURL, {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    msg.innerHTML = data.result;
+  try {
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: new FormData(e.target)   // 🔥 THIS IS CRITICAL
+    });
 
-    if (data.result.includes("success")) {
-      form.reset();
+    const text = await res.text();
+    const data = JSON.parse(text);
+
+    if (data.result === "success") {
+      msg.innerText = "✅ Saved successfully!";
+      e.target.reset();
+    } else {
+      msg.innerText = "❌ Error: " + data.error;
     }
-  })
-  .catch(err => {
-    msg.innerHTML = "Error submitting form";
+
+  } catch (err) {
+    msg.innerText = "❌ Network error. Check console.";
     console.error(err);
-  });
+  }
 });
 </script>
 
