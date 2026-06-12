@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Cash Tracker - Simple & Working</title>
+    <title>CashFlow Pro | Complete Cumulative Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -11,129 +11,145 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
         }
+
         .container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
         }
-        /* Header */
+
         .header {
             background: white;
             border-radius: 20px;
-            padding: 16px 24px;
-            margin-bottom: 20px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
+
         .logo h1 {
-            font-size: 1.5rem;
-            color: #333;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+
         .logo p {
-            font-size: 0.7rem;
             color: #666;
+            font-size: 0.8rem;
         }
-        .add-btn {
-            background: #10b981;
+
+        .btn-add {
+            background: linear-gradient(135deg, #10b981, #059669);
             border: none;
-            padding: 12px 24px;
-            border-radius: 40px;
+            padding: 12px 28px;
+            border-radius: 50px;
             color: white;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
+            font-size: 1rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            transition: transform 0.2s;
         }
-        /* Stats */
-        .stats {
+
+        .btn-add:hover {
+            transform: scale(1.05);
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
         }
+
         .stat-card {
             background: white;
-            padding: 20px;
             border-radius: 20px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
         }
-        .stat-card .value {
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card h3 {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
             font-size: 28px;
             font-weight: bold;
-            margin-top: 8px;
         }
-        /* Action Bar */
+
         .action-bar {
             background: white;
             border-radius: 20px;
-            padding: 12px 20px;
-            margin-bottom: 20px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            padding: 8px 16px;
-            border-radius: 40px;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-        }
-        .btn-whatsapp { background: #25D366; color: white; }
-        .btn-sms { background: #34b7f1; color: white; }
-        .btn-refresh { background: #8b5cf6; color: white; }
-        /* Table */
-        .table-wrapper {
-            background: white;
-            border-radius: 20px;
-            overflow-x: auto;
+            gap: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        th {
-            background: #f8f9fa;
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        tr {
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
             cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
-        tr:hover {
-            background: #f9fafb;
+
+        .btn:hover {
+            transform: translateY(-2px);
         }
-        .balance-positive { color: #10b981; font-weight: bold; }
-        .balance-negative { color: #dc2626; font-weight: bold; }
-        .balance-zero { color: #f59e0b; font-weight: bold; }
-        /* Modal */
+
+        .btn-refresh { background: #8b5cf6; color: white; }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-sms { background: #34b7f1; color: white; }
+        .btn-email { background: #ea4335; color: white; }
+
+        .select-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .modal {
             position: fixed;
             top: 50%;
@@ -142,73 +158,133 @@
             background: white;
             border-radius: 24px;
             width: 90%;
-            max-width: 500px;
+            max-width: 550px;
             z-index: 1000;
             display: none;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: modalIn 0.3s ease;
         }
+
         .modal.show {
             display: block;
         }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
         .modal-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
-            padding: 20px;
+            padding: 20px 25px;
             border-radius: 24px 24px 0 0;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
         .modal-body {
-            padding: 20px;
+            padding: 25px;
         }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
+
         .form-group label {
             display: block;
             font-weight: 600;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 0.85rem;
         }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #2a5298;
+        }
+
         .form-group input, .form-group textarea {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 15px;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
             font-size: 0.9rem;
+            transition: border 0.2s;
         }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
         .form-group input[readonly] {
             background: #f3f4f6;
             font-weight: bold;
         }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 15px;
         }
+
         .modal-footer {
             display: flex;
             gap: 12px;
             margin-top: 20px;
         }
+
         .btn-save {
             flex: 1;
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             border: none;
             padding: 12px;
-            border-radius: 40px;
-            font-weight: 600;
+            border-radius: 50px;
+            font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
         .btn-cancel {
             flex: 1;
             background: #f3f4f6;
             border: none;
             padding: 12px;
-            border-radius: 40px;
+            border-radius: 50px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
         .overlay {
             position: fixed;
             top: 0;
@@ -219,59 +295,162 @@
             z-index: 999;
             display: none;
         }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #333;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 40px;
-            z-index: 1100;
-            animation: fadeOut 3s ease;
+
+        .overlay.show {
+            display: block;
         }
-        @keyframes fadeOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            15% { opacity: 1; transform: translateY(0); }
-            85% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(20px); }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        tr {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .cumulative-positive { background: #f0fdf4; font-weight: bold; color: #10b981; }
+        .cumulative-negative { background: #fef2f2; font-weight: bold; color: #ef4444; }
+        .balance-positive { color: #10b981; font-weight: bold; }
+        .balance-negative { color: #ef4444; font-weight: bold; }
+        .balance-zero { color: #f59e0b; font-weight: bold; }
+
         .checkbox-col {
             width: 40px;
             text-align: center;
         }
-        .selected {
+
+        .cumulative-row {
             background: #eef2ff;
+            font-weight: bold;
+        }
+
+        .cumulative-row td {
+            border-top: 2px solid #2a5298;
+            padding: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 30px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-bar {
+                flex-direction: column;
+            }
+            th, td {
+                font-size: 11px;
+                padding: 6px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <div class="logo">
-            <h1>💰 Cash Tracker</h1>
-            <p>Live Google Sheets Sync</p>
+            <h1><i class="fas fa-coins"></i> CashFlow Pro</h1>
+            <p><i class="fas fa-chart-line"></i> Complete Cumulative Tracker</p>
         </div>
-        <button class="add-btn" id="openModalBtn"><i class="fas fa-plus"></i> Add Record</button>
+        <button class="btn-add" id="openModalBtn"><i class="fas fa-plus-circle"></i> Add Transaction</button>
     </div>
 
-    <!-- Stats -->
-    <div class="stats">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
         <div class="stat-card">
             <i class="fas fa-chart-line" style="color: #10b981;"></i>
-            <h3>Total Cash In</h3>
-            <div class="value" id="totalCashIn">K0</div>
+            <h3>💰 TOTAL CASH IN</h3>
+            <div class="stat-value" id="totalCashIn">K0</div>
         </div>
         <div class="stat-card">
             <i class="fas fa-bullseye" style="color: #f59e0b;"></i>
-            <h3>Total Target</h3>
-            <div class="value" id="totalTarget">K0</div>
+            <h3>🎯 TOTAL TARGET</h3>
+            <div class="stat-value" id="totalTarget">K0</div>
         </div>
         <div class="stat-card">
-            <i class="fas fa-balance-scale" style="color: #667eea;"></i>
-            <h3>Overall Balance</h3>
-            <div class="value" id="overallBalance">K0</div>
+            <i class="fas fa-balance-scale" style="color: #8b5cf6;"></i>
+            <h3>📈 FINAL CUMULATIVE BALANCE</h3>
+            <div class="stat-value" id="finalCumulativeBalance">K0</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-database" style="color: #ef4444;"></i>
+            <h3>📊 TOTAL RECORDS</h3>
+            <div class="stat-value" id="totalRecords">0</div>
         </div>
     </div>
 
@@ -281,14 +460,16 @@
             <button class="btn btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
             <button class="btn btn-whatsapp" id="whatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
             <button class="btn btn-sms" id="smsBtn"><i class="fas fa-sms"></i> SMS</button>
+            <button class="btn btn-email" id="emailBtn"><i class="fas fa-envelope"></i> Email</button>
         </div>
-        <div>
-            <input type="checkbox" id="selectAll"> <label for="selectAll">Select All</label>
-            <span id="selectedCount" style="margin-left: 10px;">0 selected</span>
+        <div class="select-info">
+            <input type="checkbox" id="selectAllCheckbox"> 
+            <label for="selectAllCheckbox"><i class="far fa-check-square"></i> Select All</label>
+            <span id="selectedCount">0 selected</span>
         </div>
     </div>
 
-    <!-- Table -->
+    <!-- Records Table with Full Cumulative Tracking -->
     <div class="table-wrapper">
         <table>
             <thead>
@@ -299,27 +480,45 @@
                     <th>Time Out</th>
                     <th>Target (K)</th>
                     <th>Cash In (K)</th>
-                    <th>Balance (K)</th>
+                    <th>Transaction Balance</th>
+                    <th>Cumulative Target</th>
+                    <th>Cumulative Cash In</th>
+                    <th>Cumulative Balance</th>
                     <th>Comments</th>
+                    <th>Timestamp</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="8" style="text-align:center; padding:40px;">Loading...</td></tr>
+                <tr><td colspan="12" style="text-align:center; padding:50px;"><i class="fas fa-spinner fa-pulse"></i> Loading...</td</tr
             </tbody>
+            <tfoot id="tableFooter" style="display: none;">
+                <tr class="cumulative-row">
+                    <td colspan="4" style="text-align:right;"><strong>📊 FINAL TOTALS:</strong></td>
+                    <td id="footerTarget" style="font-weight:bold;">K0</td>
+                    <td id="footerCashIn" style="font-weight:bold;">K0</td>
+                    <td id="footerTransBal" style="font-weight:bold;">K0</td>
+                    <td colspan="2"></td>
+                    <td id="footerCumulative" style="font-weight:bold; font-size:1.1rem;">K0</td>
+                    <td colspan="2"></td>
+                </table>
+            </tfoot>
         </table>
+    </div>
+    <div style="text-align: center; margin-top: 15px; color: white; font-size: 12px;">
+        <i class="fas fa-info-circle"></i> Cumulative Target = Running total of Targets | Cumulative Cash In = Running total of Cash In | Cumulative Balance = Running total of (Target - Cash In)
     </div>
 </div>
 
 <!-- Modal -->
 <div id="overlay" class="overlay"></div>
-<div id="modal" class="modal">
+<div id="recordModal" class="modal">
     <div class="modal-header">
-        <h3 id="modalTitle"><i class="fas fa-plus"></i> Add Record</h3>
-        <button style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;" id="closeModalBtn">&times;</button>
+        <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Add Transaction</h3>
+        <button class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
         <div class="form-group">
-            <label><i class="fas fa-calendar"></i> Date *</label>
+            <label><i class="fas fa-calendar-alt"></i> Date *</label>
             <input type="date" id="inputDate">
         </div>
         <div class="form-row">
@@ -335,132 +534,91 @@
         <div class="form-row">
             <div class="form-group">
                 <label><i class="fas fa-bullseye"></i> Target (K)</label>
-                <input type="number" id="inputTarget" value="400" step="any">
+                <input type="number" id="inputTarget" value="400" step="any" oninput="updateBalancePreview()">
             </div>
             <div class="form-group">
-                <label><i class="fas fa-money-bill"></i> Cash In (K)</label>
-                <input type="number" id="inputCashIn" step="any">
+                <label><i class="fas fa-money-bill-wave"></i> Cash In (K)</label>
+                <input type="number" id="inputCashIn" step="any" oninput="updateBalancePreview()">
             </div>
         </div>
         <div class="form-group">
-            <label><i class="fas fa-balance-scale"></i> Balance (K) - Auto Calculated</label>
-            <input type="number" id="inputBalance" readonly style="background:#f0fdf4; color:#10b981;">
+            <label><i class="fas fa-balance-scale"></i> Transaction Balance (Target - Cash In)</label>
+            <input type="number" id="inputBalance" readonly style="background:#f0fdf4; font-weight:bold;">
         </div>
         <div class="form-group">
             <label><i class="fas fa-comment"></i> Comments</label>
-            <textarea id="inputComments" rows="2" placeholder="Notes..."></textarea>
+            <textarea id="inputComments" rows="3" placeholder="Add notes..."></textarea>
         </div>
         <div class="modal-footer">
-            <button class="btn-save" id="saveBtn"><i class="fas fa-save"></i> Save</button>
-            <button class="btn-cancel" id="cancelBtn">Cancel</button>
+            <button class="btn-save" id="saveBtn"><i class="fas fa-save"></i> Save Transaction</button>
+            <button class="btn-cancel" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ============ CONFIG ============
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
-    const SHARE_NUMBER = "0978167546";
+    const PHONE_NUMBER = "0978167546";
     
-    let records = [];
-    let editingId = null;
-
-    // ============ BALANCE CALCULATION - SIMPLE & GUARANTEED ============
-    function updateBalance() {
-        const target = parseFloat(document.getElementById("inputTarget").value) || 0;
-        const cashIn = parseFloat(document.getElementById("inputCashIn").value) || 0;
-        const balance = cashIn - target;
-        document.getElementById("inputBalance").value = balance.toFixed(2);
+    let allRecords = [];
+    
+    function updateBalancePreview() {
+        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        const balance = target - cashIn;
+        const balanceField = document.getElementById('inputBalance');
+        balanceField.value = balance.toFixed(2);
         
-        // Visual feedback
-        const balanceField = document.getElementById("inputBalance");
         if (balance > 0) {
+            balanceField.style.color = "#ef4444";
+            balanceField.style.background = "#fef2f2";
+        } else if (balance < 0) {
             balanceField.style.color = "#10b981";
             balanceField.style.background = "#f0fdf4";
-        } else if (balance < 0) {
-            balanceField.style.color = "#dc2626";
-            balanceField.style.background = "#fef2f2";
         } else {
             balanceField.style.color = "#f59e0b";
             balanceField.style.background = "#fffbeb";
         }
     }
-
-    // Attach balance calculation to input fields
-    document.getElementById("inputTarget").addEventListener("input", updateBalance);
-    document.getElementById("inputCashIn").addEventListener("input", updateBalance);
-
-    // ============ UI Helpers ============
-    function showToast(msg, isError = false) {
-        const toast = document.createElement("div");
-        toast.className = "toast";
-        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
-        toast.style.background = isError ? "#dc2626" : "#10b981";
+    
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${message}`;
+        toast.style.background = isError ? '#ef4444' : '#10b981';
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
-
+    
     function showLoading(show) {
-        let loader = document.getElementById("loader");
+        let loader = document.getElementById('globalLoader');
         if (show && !loader) {
-            loader = document.createElement("div");
-            loader.id = "loader";
-            loader.style.cssText = "position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:2000;";
-            loader.innerHTML = '<div style="background:white; padding:20px 30px; border-radius:30px;"><i class="fas fa-spinner fa-pulse"></i> Processing...</div>';
+            loader = document.createElement('div');
+            loader.id = 'globalLoader';
+            loader.className = 'loading';
+            loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Processing...</span></div>';
             document.body.appendChild(loader);
         } else if (!show && loader) {
             loader.remove();
         }
     }
-
-    // ============ GOOGLE SHEET OPERATIONS ============
-    async function loadFromSheet() {
-        const tbody = document.getElementById("tableBody");
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-pulse"></i> Loading...</td></tr>';
-        
-        try {
-            const response = await fetch(SCRIPT_URL, { method: "GET", mode: "cors" });
-            if (!response.ok) throw new Error();
-            const data = await response.json();
-            
-            records = (data.rows || []).filter(row => row.Date && row.Date !== "").map((row, idx) => ({
-                id: Date.now() + idx,
-                date: row.Date,
-                timeIn: row["Time In"] || "",
-                timeOut: row["Time Out"] || "",
-                target: Number(row.Target) || 0,
-                cashIn: Number(row["Cash In"]) || 0,
-                balance: Number(row.Balance) || 0,
-                comments: row.Comments || "",
-                timestamp: row.Timestamp || ""
-            }));
-            
-            renderTable();
-            updateStats();
-            showToast(`Loaded ${records.length} records`);
-            
-        } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red; padding:40px;">Failed to load data</td></tr>';
-            showToast("Failed to load from Google Sheet", true);
-        }
-    }
-
+    
     async function saveToSheet(record) {
         const params = new URLSearchParams();
-        params.append("Date", record.date);
-        params.append("Time In", record.timeIn);
-        params.append("Time Out", record.timeOut);
-        params.append("Target", record.target);
-        params.append("Cash In", record.cashIn);
-        params.append("Balance", record.balance);
-        params.append("Comments", record.comments);
+        params.append('Date', record.date);
+        params.append('Time In', record.timeIn);
+        params.append('Time Out', record.timeOut);
+        params.append('Target', record.target);
+        params.append('Cash In', record.cashIn);
+        params.append('Balance', record.balance);
+        params.append('Comments', record.comments);
         
         try {
             await fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
+                method: 'POST',
+                mode: 'no-cors',
                 body: params.toString(),
-                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
             return true;
         } catch (err) {
@@ -468,252 +626,317 @@
             return false;
         }
     }
-
-    async function addRecord(recordData) {
-        showLoading(true);
-        const success = await saveToSheet(recordData);
-        showLoading(false);
-        
-        if (success) {
-            showToast("✅ Record saved to Google Sheet!");
-            closeModal();
-            await loadFromSheet();
-        } else {
-            showToast("❌ Failed to save", true);
-        }
-    }
-
-    async function deleteRecordById(id) {
-        if (!confirm("Delete this record?")) return;
-        
-        const remaining = records.filter(r => r.id !== id);
-        showLoading(true);
-        
-        let allSuccess = true;
-        for (const record of remaining) {
-            const ok = await saveToSheet({
-                date: record.date,
-                timeIn: record.timeIn,
-                timeOut: record.timeOut,
-                target: record.target,
-                cashIn: record.cashIn,
-                balance: record.balance,
-                comments: record.comments
-            });
-            if (!ok) allSuccess = false;
-        }
-        
-        showLoading(false);
-        
-        if (allSuccess) {
-            showToast("✅ Record deleted");
-            await loadFromSheet();
-        } else {
-            showToast("❌ Error deleting", true);
-        }
-    }
-
-    // ============ RENDER TABLE ============
-    function renderTable() {
-        const tbody = document.getElementById("tableBody");
-        
-        if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">No records. Click + to add</td></tr>';
+    
+    async function saveRecord() {
+        const date = document.getElementById('inputDate').value;
+        if (!date) {
+            showToast('Please select a date', true);
             return;
         }
         
-        const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
+        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        const balance = target - cashIn;
         
-        tbody.innerHTML = sorted.map((rec, idx) => {
-            const originalIdx = records.findIndex(r => r.id === rec.id);
-            const balanceClass = rec.balance > 0 ? "balance-positive" : rec.balance < 0 ? "balance-negative" : "balance-zero";
-            const balanceSign = rec.balance > 0 ? "+" : "";
+        const record = {
+            date: date,
+            timeIn: document.getElementById('inputTimeIn').value || "",
+            timeOut: document.getElementById('inputTimeOut').value || "",
+            target: target,
+            cashIn: cashIn,
+            balance: balance,
+            comments: document.getElementById('inputComments').value || ""
+        };
+        
+        showLoading(true);
+        const success = await saveToSheet(record);
+        showLoading(false);
+        
+        if (success) {
+            showToast(`✅ Transaction saved! Balance: K${balance.toFixed(2)}`);
+            closeModal();
+            await loadRecords();
+        } else {
+            showToast('❌ Failed to save', true);
+        }
+    }
+    
+    async function loadRecords() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:50px;"><i class="fas fa-spinner fa-pulse"></i> Loading...</td</tr';
+        
+        try {
+            const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
+            if (!response.ok) throw new Error();
+            const data = await response.json();
             
-            return `
-                <tr onclick="selectRecord(${originalIdx})" id="row-${rec.id}">
+            allRecords = (data.rows || []).filter(row => row.Date && row.Date !== '');
+            allRecords.sort((a, b) => a.Date.localeCompare(b.Date));
+            
+            displayRecordsWithAllCumulatives();
+            updateStats();
+            showToast(`✅ Loaded ${allRecords.length} records`);
+            
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:red; padding:50px;">Failed to load</td</tr';
+            showToast('Failed to load', true);
+        }
+    }
+    
+    function displayRecordsWithAllCumulatives() {
+        const tbody = document.getElementById('tableBody');
+        
+        if (allRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:50px;">No records. Click + to add</td</tr';
+            document.getElementById('tableFooter').style.display = 'none';
+            return;
+        }
+        
+        let cumulativeTarget = 0;
+        let cumulativeCashIn = 0;
+        let cumulativeBalance = 0;
+        let html = '';
+        
+        allRecords.forEach((record, index) => {
+            const target = Number(record.Target) || 0;
+            const cashIn = Number(record['Cash In']) || 0;
+            const transactionBalance = target - cashIn;
+            
+            cumulativeTarget += target;
+            cumulativeCashIn += cashIn;
+            cumulativeBalance += transactionBalance;
+            
+            let balanceClass = '';
+            if (transactionBalance > 0) balanceClass = 'balance-positive';
+            else if (transactionBalance < 0) balanceClass = 'balance-negative';
+            else balanceClass = 'balance-zero';
+            
+            let cumulativeClass = '';
+            if (cumulativeBalance > 0) cumulativeClass = 'cumulative-positive';
+            else if (cumulativeBalance < 0) cumulativeClass = 'cumulative-negative';
+            
+            const comments = record.Comments || '-';
+            const shortComments = comments.length > 25 ? comments.substring(0,25) + '...' : comments;
+            
+            html += `
+                <tr onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
                     <td class="checkbox-col" onclick="event.stopPropagation()">
-                        <input type="checkbox" class="record-checkbox" data-id="${rec.id}">
+                        <input type="checkbox" class="record-checkbox" data-id="${record.Date}">
                     </td>
-                    <td>${rec.date}</td>
-                    <td>${rec.timeIn || "—"}</td>
-                    <td>${rec.timeOut || "—"}</td>
-                    <td>K${rec.target.toFixed(2)}</td>
-                    <td>K${rec.cashIn.toFixed(2)}</td>
-                    <td class="${balanceClass}">${balanceSign}K${Math.abs(rec.balance).toFixed(2)}</td>
-                    <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(rec.comments)}">
-                        ${rec.comments ? (rec.comments.length > 20 ? rec.comments.substring(0,20) + "..." : rec.comments) : "—"}
-                    </td>
+                    <td>${record.Date}</td>
+                    <td>${record['Time In'] || '-'}</td>
+                    <td>${record['Time Out'] || '-'}</td>
+                    <td>K${target.toFixed(2)}</td>
+                    <td>K${cashIn.toFixed(2)}</td>
+                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
+                    <td>K${cumulativeTarget.toFixed(2)}</td>
+                    <td>K${cumulativeCashIn.toFixed(2)}</td>
+                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
+                    <td title="${comments}">${shortComments}</td>
+                    <td>${record.Timestamp ? record.Timestamp.substring(0,16) : '-'}</td>
                 </tr>
             `;
-        }).join("");
+        });
+        
+        tbody.innerHTML = html;
+        
+        document.getElementById('tableFooter').style.display = 'table-footer-group';
+        document.getElementById('footerTarget').innerHTML = `K${cumulativeTarget.toFixed(2)}`;
+        document.getElementById('footerCashIn').innerHTML = `K${cumulativeCashIn.toFixed(2)}`;
+        document.getElementById('footerTransBal').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
+        document.getElementById('footerCumulative').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
+        
+        const footerElem = document.getElementById('footerCumulative');
+        if (cumulativeBalance > 0) footerElem.style.color = "#10b981";
+        else if (cumulativeBalance < 0) footerElem.style.color = "#ef4444";
+        else footerElem.style.color = "#f59e0b";
         
         attachCheckboxEvents();
         updateSelectedCount();
     }
-
-    function selectRecord(index) {
-        const record = records[index];
+    
+    function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
+        const record = allRecords[index];
+        const target = Number(record.Target) || 0;
+        const cashIn = Number(record['Cash In']) || 0;
+        const transactionBalance = target - cashIn;
         
-        // Show record details in a simple alert (or you can expand this)
-        const msg = `📋 RECORD DETAILS\n\nDate: ${record.date}\nTime In: ${record.timeIn || "—"}\nTime Out: ${record.timeOut || "—"}\nTarget: K${record.target.toFixed(2)}\nCash In: K${record.cashIn.toFixed(2)}\nBalance: K${record.balance.toFixed(2)}\nComments: ${record.comments || "—"}`;
+        const message = `📋 TRANSACTION DETAILS\n\n` +
+            `📅 Date: ${record.Date}\n` +
+            `⏰ Time In: ${record['Time In'] || '-'}\n` +
+            `⏰ Time Out: ${record['Time Out'] || '-'}\n` +
+            `━━━━━━━━━━━━━━━━━━\n` +
+            `🎯 Target: K${target.toFixed(2)}\n` +
+            `💰 Cash In: K${cashIn.toFixed(2)}\n` +
+            `⚖️ Transaction Balance: K${transactionBalance.toFixed(2)}\n` +
+            `━━━━━━━━━━━━━━━━━━\n` +
+            `📈 CUMULATIVE UP TO HERE:\n` +
+            `🎯 Cumulative Target: K${cumTarget.toFixed(2)}\n` +
+            `💰 Cumulative Cash In: K${cumCashIn.toFixed(2)}\n` +
+            `⚖️ Cumulative Balance: K${cumBalance.toFixed(2)}\n` +
+            `${record.Comments ? `\n📝 Comments: ${record.Comments}` : ''}`;
         
-        if (confirm(msg + "\n\nShare this record?")) {
-            shareRecord(record);
+        if (confirm(message + '\n\nShare this transaction via WhatsApp?')) {
+            shareSingleRecord(index, cumTarget, cumCashIn, cumBalance);
         }
     }
-
-    function shareRecord(record) {
-        const message = `📊 *CASH TRANSACTION*\n\nDate: ${record.date}\nTime In: ${record.timeIn || "—"}\nTime Out: ${record.timeOut || "—"}\nTarget: K${record.target.toFixed(2)}\nCash In: K${record.cashIn.toFixed(2)}\nBalance: K${record.balance.toFixed(2)}\n${record.comments ? `Notes: ${record.comments}` : ""}`;
+    
+    function updateStats() {
+        let totalTarget = 0, totalCashIn = 0, cumulativeBalance = 0;
+        allRecords.forEach(record => {
+            totalTarget += Number(record.Target) || 0;
+            totalCashIn += Number(record['Cash In']) || 0;
+            cumulativeBalance += (Number(record.Target) || 0) - (Number(record['Cash In']) || 0);
+        });
         
-        const choice = confirm("Share via WhatsApp? (Cancel for SMS)");
-        if (choice) {
-            window.open(`https://wa.me/${SHARE_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
-        } else {
-            window.open(`sms:${SHARE_NUMBER}?body=${encodeURIComponent(message)}`, "_blank");
-        }
+        document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
+        document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
+        document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
+        document.getElementById('totalRecords').innerHTML = allRecords.length;
+        
+        const cumulativeElem = document.getElementById('finalCumulativeBalance');
+        if (cumulativeBalance > 0) cumulativeElem.style.color = "#10b981";
+        else if (cumulativeBalance < 0) cumulativeElem.style.color = "#ef4444";
+        else cumulativeElem.style.color = "#f59e0b";
     }
-
-    // ============ SAVE RECORD (With Balance Submitted) ============
-    async function saveRecord() {
-        const date = document.getElementById("inputDate").value;
-        if (!date) {
-            showToast("Please select a date", true);
-            return;
-        }
-        
-        // Calculate balance one more time before saving
-        const target = parseFloat(document.getElementById("inputTarget").value) || 0;
-        const cashIn = parseFloat(document.getElementById("inputCashIn").value) || 0;
-        const balance = cashIn - target;
-        
-        const recordData = {
-            date: date,
-            timeIn: document.getElementById("inputTimeIn").value || "",
-            timeOut: document.getElementById("inputTimeOut").value || "",
-            target: target,
-            cashIn: cashIn,
-            balance: balance,  // BALANCE IS CALCULATED AND SUBMITTED
-            comments: document.getElementById("inputComments").value || ""
-        };
-        
-        await addRecord(recordData);
-    }
-
-    // ============ SHARE SELECTED ============
+    
     function getSelectedRecords() {
-        const checked = document.querySelectorAll(".record-checkbox:checked");
-        const ids = Array.from(checked).map(cb => cb.getAttribute("data-id"));
-        return records.filter(r => ids.includes(String(r.id)));
+        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
+        const selectedDates = Array.from(checkboxes).map(cb => cb.getAttribute('data-id'));
+        return allRecords.filter(r => selectedDates.includes(r.Date));
     }
-
+    
+    function shareSingleRecord(index, cumTarget, cumCashIn, cumBalance) {
+        const r = allRecords[index];
+        const target = Number(r.Target) || 0;
+        const cashIn = Number(r['Cash In']) || 0;
+        const transactionBalance = target - cashIn;
+        
+        const message = `📊 *CASH TRANSACTION*\n\n` +
+            `📅 Date: ${r.Date}\n` +
+            `⏰ Time: ${r['Time In'] || '-'} → ${r['Time Out'] || '-'}\n` +
+            `🎯 Target: K${target.toFixed(2)}\n` +
+            `💰 Cash In: K${cashIn.toFixed(2)}\n` +
+            `⚖️ Transaction: K${transactionBalance.toFixed(2)}\n` +
+            `━━━━━━━━━━━━━━━━━━\n` +
+            `📈 *CUMULATIVE TOTALS*\n` +
+            `🎯 Cumulative Target: K${cumTarget.toFixed(2)}\n` +
+            `💰 Cumulative Cash In: K${cumCashIn.toFixed(2)}\n` +
+            `⚖️ Cumulative Balance: K${cumBalance.toFixed(2)}\n` +
+            `${r.Comments ? `\n📝 Notes: ${r.Comments}` : ''}\n` +
+            `_Sent from CashFlow Pro_`;
+        
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+    
     function shareSelectedWhatsApp() {
         const selected = getSelectedRecords();
         if (selected.length === 0) {
-            showToast("Select records first", true);
+            showToast('Select records to share', true);
             return;
         }
         
-        let message = "📊 *CASHFLOW REPORT*\n\n";
-        let totalCash = 0, totalTarget = 0, totalBal = 0;
+        let cumulativeTarget = 0, cumulativeCashIn = 0, cumulativeBalance = 0;
+        let message = "📊 *CASHFLOW REPORT (FULL CUMULATIVE)*\n━━━━━━━━━━━━━━━━━━━━━━\n\n";
         
         selected.forEach((r, i) => {
-            totalCash += r.cashIn;
-            totalTarget += r.target;
-            totalBal += r.balance;
-            message += `${i+1}. ${r.date} | Cash: K${r.cashIn.toFixed(2)} | Bal: K${r.balance.toFixed(2)}\n`;
-            if (r.comments) message += `   📝 ${r.comments}\n`;
+            const target = Number(r.Target) || 0;
+            const cashIn = Number(r['Cash In']) || 0;
+            const transBal = target - cashIn;
+            cumulativeTarget += target;
+            cumulativeCashIn += cashIn;
+            cumulativeBalance += transBal;
+            
+            message += `${i+1}. *${r.Date}*\n`;
+            message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Bal: K${transBal.toFixed(2)}\n`;
+            if (r.Comments) message += `   📝 ${r.Comments}\n`;
         });
         
-        message += `\n📊 TOTALS:\n💰 Cash In: K${totalCash.toFixed(2)}\n⚖️ Balance: K${totalBal.toFixed(2)}`;
+        message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+        message += `📊 *FINAL CUMULATIVE TOTALS*\n`;
+        message += `🎯 Total Target: K${cumulativeTarget.toFixed(2)}\n`;
+        message += `💰 Total Cash In: K${cumulativeCashIn.toFixed(2)}\n`;
+        message += `⚖️ Final Balance: K${cumulativeBalance.toFixed(2)}\n`;
+        message += `\n_Sent from CashFlow Pro_`;
         
-        window.open(`https://wa.me/${SHARE_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     }
-
+    
     function shareSelectedSMS() {
         const selected = getSelectedRecords();
         if (selected.length === 0) {
-            showToast("Select records first", true);
+            showToast('Select records to share', true);
             return;
         }
         
         let message = "CASHFLOW REPORT\n\n";
         selected.forEach((r, i) => {
-            message += `${i+1}. ${r.date} | Cash: K${r.cashIn.toFixed(2)} | Bal: K${r.balance.toFixed(2)}\n`;
+            message += `${i+1}. ${r.Date} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
-        window.open(`sms:${SHARE_NUMBER}?body=${encodeURIComponent(message)}`, "_blank");
+        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
     }
-
-    // ============ STATS ============
-    function updateStats() {
-        let totalCash = 0, totalTarget = 0, totalBal = 0;
-        records.forEach(r => {
-            totalCash += r.cashIn;
-            totalTarget += r.target;
-            totalBal += r.balance;
+    
+    function emailReport() {
+        const selected = getSelectedRecords();
+        if (selected.length === 0) {
+            showToast('Select records to email', true);
+            return;
+        }
+        
+        let body = "CASHFLOW REPORT\n\n";
+        selected.forEach(r => {
+            body += `${r.Date} | Target: K${Number(r.Target).toFixed(2)} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
-        document.getElementById("totalCashIn").innerHTML = `K${totalCash.toFixed(2)}`;
-        document.getElementById("totalTarget").innerHTML = `K${totalTarget.toFixed(2)}`;
-        document.getElementById("overallBalance").innerHTML = `K${totalBal.toFixed(2)}`;
+        
+        window.location.href = `mailto:?subject=CashFlow Report&body=${encodeURIComponent(body)}`;
     }
-
-    // ============ UI HELPERS ============
+    
     function attachCheckboxEvents() {
-        document.querySelectorAll(".record-checkbox").forEach(cb => {
+        document.querySelectorAll('.record-checkbox').forEach(cb => {
             cb.onchange = () => updateSelectedCount();
         });
-        document.getElementById("selectAll").onchange = (e) => {
-            document.querySelectorAll(".record-checkbox").forEach(cb => cb.checked = e.target.checked);
+        document.getElementById('selectAllCheckbox').onchange = (e) => {
+            document.querySelectorAll('.record-checkbox').forEach(cb => cb.checked = e.target.checked);
             updateSelectedCount();
         };
     }
-
+    
     function updateSelectedCount() {
-        const count = document.querySelectorAll(".record-checkbox:checked").length;
-        document.getElementById("selectedCount").innerHTML = `${count} selected`;
+        const count = document.querySelectorAll('.record-checkbox:checked').length;
+        document.getElementById('selectedCount').innerHTML = `${count} selected`;
     }
-
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]));
-    }
-
+    
     function openModal() {
-        editingId = null;
-        document.getElementById("modalTitle").innerHTML = "<i class='fas fa-plus'></i> Add Record";
-        document.getElementById("inputDate").value = new Date().toISOString().slice(0,10);
-        document.getElementById("inputTimeIn").value = "";
-        document.getElementById("inputTimeOut").value = "";
-        document.getElementById("inputTarget").value = 400;
-        document.getElementById("inputCashIn").value = "";
-        document.getElementById("inputBalance").value = "";
-        document.getElementById("inputComments").value = "";
-        document.getElementById("modal").classList.add("show");
-        document.getElementById("overlay").classList.add("show");
-        updateBalance();
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
+        document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('inputTimeIn').value = '';
+        document.getElementById('inputTimeOut').value = '';
+        document.getElementById('inputTarget').value = '400';
+        document.getElementById('inputCashIn').value = '';
+        document.getElementById('inputBalance').value = '';
+        document.getElementById('inputComments').value = '';
+        document.getElementById('recordModal').classList.add('show');
+        document.getElementById('overlay').classList.add('show');
+        updateBalancePreview();
     }
-
+    
     function closeModal() {
-        document.getElementById("modal").classList.remove("show");
-        document.getElementById("overlay").classList.remove("show");
+        document.getElementById('recordModal').classList.remove('show');
+        document.getElementById('overlay').classList.remove('show');
     }
-
-    // ============ EVENT LISTENERS ============
-    document.getElementById("openModalBtn").onclick = openModal;
-    document.getElementById("closeModalBtn").onclick = closeModal;
-    document.getElementById("cancelBtn").onclick = closeModal;
-    document.getElementById("saveBtn").onclick = saveRecord;
-    document.getElementById("refreshBtn").onclick = loadFromSheet;
-    document.getElementById("whatsappBtn").onclick = shareSelectedWhatsApp;
-    document.getElementById("smsBtn").onclick = shareSelectedSMS;
-    document.getElementById("overlay").onclick = closeModal;
-
-    // Make functions global for onclick
-    window.selectRecord = selectRecord;
-    window.deleteRecordById = deleteRecordById;
-
-    // Initialize
-    loadFromSheet();
+    
+    document.getElementById('openModalBtn').onclick = openModal;
+    document.getElementById('closeModalBtn').onclick = closeModal;
+    document.getElementById('cancelBtn').onclick = closeModal;
+    document.getElementById('saveBtn').onclick = saveRecord;
+    document.getElementById('refreshBtn').onclick = loadRecords;
+    document.getElementById('whatsappBtn').onclick = shareSelectedWhatsApp;
+    document.getElementById('smsBtn').onclick = shareSelectedSMS;
+    document.getElementById('emailBtn').onclick = emailReport;
+    document.getElementById('overlay').onclick = closeModal;
+    
+    loadRecords();
 </script>
 </body>
 </html>
