@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CashFlow Pro | Google Sheets Sync Live</title>
+    <title>CashFlow Pro | Google Sheets Sync</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f4fa;
+            background: linear-gradient(135deg, #e8eef5 0%, #dce3ec 100%);
             padding: 20px 16px 40px;
             min-height: 100vh;
         }
@@ -30,10 +30,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
             padding: 14px 24px;
             border-radius: 48px;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
             margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 12px;
@@ -42,7 +43,7 @@
         .logo-area h1 {
             font-size: 1.6rem;
             font-weight: 700;
-            background: linear-gradient(130deg, #1f3b2c, #2c5a3e);
+            background: linear-gradient(130deg, #1e3a2f, #2c6e4f);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -61,10 +62,6 @@
             padding: 8px 18px;
             border-radius: 40px;
             font-size: 0.8rem;
-        }
-
-        .sync-status i {
-            font-size: 1rem;
         }
 
         .online { color: #2b6e3c; }
@@ -91,7 +88,7 @@
             transform: scale(0.96);
         }
 
-        /* Dropdown menu */
+        /* Dropdown menu (input form) */
         .dropdown-menu {
             position: absolute;
             top: 85px;
@@ -176,7 +173,7 @@
             color: white;
         }
 
-        /* Stats */
+        /* Stats Cards */
         .stats-grid {
             display: flex;
             flex-wrap: wrap;
@@ -191,8 +188,10 @@
             border-radius: 28px;
             padding: 18px 12px;
             text-align: center;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
         }
+        .stat-card:hover { transform: translateY(-3px); }
 
         .stat-value {
             font-size: 2rem;
@@ -201,7 +200,7 @@
             color: #0f2c1f;
         }
 
-        /* Action bar */
+        /* Action Bar */
         .action-bar {
             background: white;
             border-radius: 32px;
@@ -233,8 +232,7 @@
             font-size: 0.8rem;
             transition: 0.2s;
         }
-
-        .action-btn i { font-size: 1rem; }
+        .action-btn:hover { transform: translateY(-2px); filter: brightness(0.96); }
         .sync-btn { background: #8b5cf6; color: white; }
         .email-btn { background: #3b82f6; color: white; }
         .drive-btn { background: #0f9d58; color: white; }
@@ -306,9 +304,7 @@
         }
         .edit-icon:hover { background: #fde68a; }
 
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none; }
 
         .toast-msg {
             position: fixed;
@@ -371,12 +367,12 @@
     <div class="dashboard-header">
         <div class="logo-area">
             <h1>💰 CashFlow Pro</h1>
-            <p><i class="fab fa-google"></i> Live Google Sheets Sync</p>
+            <p><i class="fab fa-google"></i> Google Sheets Sync (POST Method)</p>
         </div>
         <div style="display: flex; gap: 12px; align-items: center;">
             <div class="sync-status" id="syncStatus">
                 <i class="fas fa-circle online"></i>
-                <span>Ready to sync</span>
+                <span>Ready</span>
             </div>
             <button class="menu-dots" id="menuDotsBtn"><i class="fas fa-ellipsis-h"></i></button>
         </div>
@@ -407,7 +403,7 @@
             </div>
             <div class="form-group">
                 <label><i class="fas fa-comment"></i> Comments</label>
-                <textarea id="menuComments" rows="2" placeholder="notes..."></textarea>
+                <textarea id="menuComments" rows="2" placeholder="Additional notes..."></textarea>
             </div>
             <div class="dropdown-actions">
                 <button class="btn-sm btn-primary" id="menuSaveBtn"><i class="fas fa-save"></i> Save</button>
@@ -416,7 +412,7 @@
         </div>
     </div>
 
-    <!-- Statistics -->
+    <!-- Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card"><h3><i class="fas fa-chart-line"></i> Total Cash In</h3><div class="stat-value" id="totalCashIn">K0</div></div>
         <div class="stat-card"><h3><i class="fas fa-flag-checkered"></i> Total Target</h3><div class="stat-value" id="totalTarget">K0</div></div>
@@ -426,7 +422,7 @@
     <!-- Action Bar -->
     <div class="action-bar">
         <div class="action-buttons">
-            <button class="action-btn sync-btn" id="syncToSheetBtn"><i class="fab fa-google"></i> Sync to Sheet</button>
+            <button class="action-btn sync-btn" id="syncToSheetBtn"><i class="fab fa-google"></i> POST to Sheet</button>
             <button class="action-btn email-btn" id="backupEmailBtn"><i class="fas fa-envelope"></i> Email</button>
             <button class="action-btn drive-btn" id="backupDriveBtn"><i class="fab fa-google-drive"></i> Drive</button>
             <button class="action-btn whatsapp-btn" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
@@ -448,13 +444,13 @@
         </table>
     </div>
     <div class="footer-tip">
-        📌 <strong>Google Sheets Active!</strong> All records sync to your spreadsheet. Click "Sync to Sheet" to push data.
+        📌 <strong>Google Apps Script POST Method:</strong> Sends data to your spreadsheet using e.parameter[header]. Headers expected: Date, Time In, Time Out, Target, Cash In, Balance, Comments.
     </div>
 </div>
 
 <script>
     // ==================== CONFIGURATION ====================
-    // YOUR GOOGLE APPS SCRIPT URL (Provided)
+    // REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL (doPost endpoint)
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
     
     let records = [];
@@ -477,7 +473,7 @@
                 loader = document.createElement('div');
                 loader.id = 'globalLoader';
                 loader.className = 'loading-overlay';
-                loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Syncing to Google Sheet...</span></div>';
+                loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Posting to Google Sheet...</span></div>';
                 document.body.appendChild(loader);
             } else {
                 loader.style.display = 'flex';
@@ -499,7 +495,7 @@
 
     // Load/Save Local Storage
     function loadLocalData() {
-        const stored = localStorage.getItem("cashflow_records");
+        const stored = localStorage.getItem("cashflow_records_v4");
         if(stored) {
             records = JSON.parse(stored);
         } else {
@@ -514,7 +510,7 @@
     }
 
     function saveLocal() {
-        localStorage.setItem("cashflow_records", JSON.stringify(records));
+        localStorage.setItem("cashflow_records_v4", JSON.stringify(records));
         updateTotals();
     }
 
@@ -623,10 +619,11 @@
         document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-plus-circle"></i> Add New Record`;
     }
 
-    // ========== GOOGLE SHEETS SYNC (POST using your script) ==========
-    async function syncToGoogleSheet() {
+    // ========== GOOGLE SHEETS POST (using doPost method from your script) ==========
+    // This sends data exactly as e.parameter[header] expects
+    async function postToGoogleSheet() {
         if(records.length === 0) {
-            showToast("No records to sync", true);
+            showToast("No records to post", true);
             return;
         }
         
@@ -634,22 +631,23 @@
         let successCount = 0;
         let errorCount = 0;
         
+        // Headers your script expects: Date, Time In, Time Out, Target, Cash In, Balance, Comments
         for(const record of records) {
-            // Create FormData or URL params matching your doPost e.parameter structure
+            // Create URLSearchParams matching the exact headers from your doPost
             const params = new URLSearchParams();
-            params.append("date", record.date);
-            params.append("timeIn", record.timeIn || "");
-            params.append("timeOut", record.timeOut || "");
-            params.append("target", record.target.toString());
-            params.append("cashIn", record.cashIn.toString());
-            params.append("balance", record.balance.toString());
-            params.append("comments", record.comments || "");
-            params.append("id", record.id.toString());
+            params.append("Date", record.date);
+            params.append("Time In", record.timeIn || "");
+            params.append("Time Out", record.timeOut || "");
+            params.append("Target", record.target.toString());
+            params.append("Cash In", record.cashIn.toString());
+            params.append("Balance", record.balance.toString());
+            params.append("Comments", record.comments || "");
             
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                // Using no-cors mode as your script is deployed as a web app
+                await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Required for Google Apps Script deployment
+                    mode: 'no-cors',
                     cache: 'no-cache',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -658,7 +656,7 @@
                 });
                 successCount++;
             } catch(err) {
-                console.error("Sync error for record", record.id, err);
+                console.error("POST error for record", record.id, err);
                 errorCount++;
             }
         }
@@ -666,9 +664,9 @@
         showLoading(false);
         
         if(successCount > 0) {
-            showToast(`✅ Synced ${successCount} record(s) to Google Sheet`);
+            showToast(`✅ Posted ${successCount} record(s) to Google Sheet`);
             const statusDiv = document.getElementById("syncStatus");
-            statusDiv.innerHTML = `<i class="fas fa-check-circle online"></i><span>Last sync: ${new Date().toLocaleTimeString()}</span>`;
+            statusDiv.innerHTML = `<i class="fas fa-check-circle online"></i><span>Last POST: ${new Date().toLocaleTimeString()}</span>`;
         }
         if(errorCount > 0) {
             showToast(`⚠️ ${errorCount} record(s) failed. Check console.`, true);
@@ -799,7 +797,7 @@
         document.getElementById("closeMenuBtn").onclick = closeDropdown;
         document.getElementById("menuCancelBtn").onclick = closeDropdown;
         document.getElementById("menuSaveBtn").onclick = saveFromDropdown;
-        document.getElementById("syncToSheetBtn").onclick = syncToGoogleSheet;
+        document.getElementById("syncToSheetBtn").onclick = postToGoogleSheet;
         document.getElementById("backupEmailBtn").onclick = emailBackup;
         document.getElementById("backupDriveBtn").onclick = driveBackup;
         document.getElementById("shareWhatsappBtn").onclick = shareWhatsApp;
@@ -807,7 +805,6 @@
         document.getElementById("menuCashIn").addEventListener("input", updateDropdownBalance);
         document.getElementById("menuTarget").addEventListener("input", updateDropdownBalance);
         
-        // Close dropdown when clicking outside
         document.addEventListener("click", (e) => {
             const dd = document.getElementById("inputDropdown");
             const menuBtn = document.getElementById("menuDotsBtn");
@@ -824,7 +821,7 @@
     // Make functions global for onclick
     window.editRecord = editRecord;
     window.deleteRecord = deleteRecord;
-    window.syncToGoogleSheet = syncToGoogleSheet;
+    window.postToGoogleSheet = postToGoogleSheet;
 </script>
 </body>
 </html>
