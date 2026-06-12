@@ -54,15 +54,16 @@
         .menu-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border-radius: 12px;
             color: white;
             margin: 0;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 600;
         }
 
         .menu-btn:hover {
@@ -232,18 +233,8 @@
             color: white;
         }
 
-        .btn-update {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            color: white;
-        }
-
         .btn-clear {
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            color: white;
-        }
-
-        .btn-delete {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
         }
 
@@ -353,7 +344,6 @@
         td {
             padding: 12px;
             border-bottom: 1px solid #e0e0e0;
-            cursor: pointer;
         }
 
         tr {
@@ -364,86 +354,153 @@
             background: #f8f9fa;
         }
 
-        tr.selected {
-            background: #e3f2fd;
-            border-left: 3px solid #667eea;
-        }
-
         .view-card-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 6px 12px;
             font-size: 12px;
             margin: 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
-        /* Selected Record Card */
-        .selected-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
-            color: white;
+        /* Modal Card for Viewing Record */
+        .view-card-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             display: none;
+            z-index: 1002;
+            animation: modalSlideIn 0.3s ease;
         }
 
-        .selected-card.show {
+        .view-card-modal.show {
             display: block;
-            animation: slideDown 0.3s ease;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .card-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1001;
         }
 
-        .selected-card h3 {
-            margin-bottom: 15px;
+        .card-overlay.show {
+            display: block;
+        }
+
+        .card-container {
+            padding: 30px;
+        }
+
+        .card-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
         }
 
-        .selected-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+        .card-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .card-header h2 i {
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .close-card {
+            background: #f0f0f0;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 10px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .close-card:hover {
+            background: #e0e0e0;
+        }
+
+        .record-details {
             margin-bottom: 20px;
         }
 
-        .selected-item {
-            background: rgba(255,255,255,0.2);
-            padding: 12px;
-            border-radius: 12px;
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .selected-item label {
-            font-size: 11px;
-            opacity: 0.8;
-            margin-bottom: 5px;
+        .detail-item:last-child {
+            border-bottom: none;
         }
 
-        .selected-item .value {
-            font-size: 18px;
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-label i {
+            color: #667eea;
+            width: 20px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #333;
+            text-align: right;
+        }
+
+        .detail-value.positive {
+            color: #28a745;
             font-weight: bold;
         }
 
-        .selected-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
+        .detail-value.negative {
+            color: #dc3545;
+            font-weight: bold;
         }
 
-        .selected-actions button {
-            background: white;
-            color: #667eea;
-            padding: 8px 16px;
+        .detail-value.comments {
+            max-width: 250px;
+            word-wrap: break-word;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .card-actions button {
+            flex: 1;
+            justify-content: center;
         }
 
         /* Toast */
@@ -456,7 +513,7 @@
             display: none;
             align-items: center;
             gap: 10px;
-            z-index: 1001;
+            z-index: 1003;
             animation: slideInRight 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
@@ -522,8 +579,14 @@
                 flex-direction: column;
             }
             
-            .selected-details {
-                grid-template-columns: 1fr;
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .detail-value {
+                text-align: left;
             }
         }
     </style>
@@ -598,6 +661,28 @@
             </div>
         </div>
 
+        <!-- View Card Modal (Hidden until View Card is clicked) -->
+        <div id="cardOverlay" class="card-overlay" onclick="closeCardView()"></div>
+        <div id="viewCardModal" class="view-card-modal">
+            <div class="card-container">
+                <div class="card-header">
+                    <h2><i class="fas fa-id-card"></i> Record Details</h2>
+                    <button class="close-card" onclick="closeCardView()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="recordDetails" class="record-details"></div>
+                <div class="card-actions">
+                    <button class="btn-save" onclick="editFromCard()">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn" onclick="shareFromCard()">
+                        <i class="fab fa-whatsapp"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Summary Cards -->
         <div class="summary-grid">
             <div class="summary-card" onclick="refreshData()">
@@ -630,33 +715,16 @@
             <button class="action-btn" onclick="exportToCSV()">
                 <i class="fas fa-file-csv"></i> Export CSV
             </button>
-            <button class="action-btn" onclick="shareSelectedRecord()">
-                <i class="fas fa-share-alt"></i> Share Selected
-            </button>
             <button class="action-btn" onclick="window.print()">
                 <i class="fas fa-print"></i> Print
             </button>
-        </div>
-
-        <!-- Selected Record Card View -->
-        <div id="selectedCard" class="selected-card">
-            <h3><i class="fas fa-id-card"></i> Selected Record Details</h3>
-            <div class="selected-details" id="selectedDetails"></div>
-            <div class="selected-actions">
-                <button onclick="editSelectedRecord()">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-                <button onclick="shareSelectedRecord()">
-                    <i class="fab fa-whatsapp"></i> Share
-                </button>
-            </div>
         </div>
 
         <!-- Records Table -->
         <div class="records-section">
             <div class="records-header">
                 <h2><i class="fas fa-table-list"></i> Cash Records</h2>
-                <span style="font-size: 12px; color: #999;">Click any row to select and view as card</span>
+                <span style="font-size: 12px; color: #999;">Click "View Card" to see record details</span>
             </div>
             <div class="table-wrapper">
                 <table id="dataTable">
@@ -687,21 +755,34 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec';
         
         let allRecords = [];
-        let selectedIndex = -1;
+        let currentViewIndex = -1;
         
         // Load data on page load
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
             
-            document.getElementById('cashIn').addEventListener('input', () => updateBalance());
-            document.getElementById('target').addEventListener('input', () => updateBalance());
+            // Balance calculation - FIXED
+            const cashInInput = document.getElementById('cashIn');
+            const targetInput = document.getElementById('target');
+            
+            if (cashInInput) {
+                cashInInput.addEventListener('input', function() {
+                    const target = parseFloat(document.getElementById('target').value) || 0;
+                    const cashIn = parseFloat(this.value) || 0;
+                    const balance = cashIn - target;
+                    document.getElementById('balance').value = balance.toFixed(2);
+                });
+            }
+            
+            if (targetInput) {
+                targetInput.addEventListener('input', function() {
+                    const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
+                    const target = parseFloat(this.value) || 0;
+                    const balance = cashIn - target;
+                    document.getElementById('balance').value = balance.toFixed(2);
+                });
+            }
         });
-        
-        function updateBalance() {
-            const target = parseFloat(document.getElementById('target').value) || 0;
-            const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
-            document.getElementById('balance').value = (cashIn - target).toFixed(2);
-        }
         
         function showToast(message, type) {
             const toast = document.getElementById('toast');
@@ -738,7 +819,7 @@
             document.getElementById('overlay').classList.remove('show');
         }
         
-        // Form submission (Add/Edit)
+        // Form submission (Add only - since edit requires DELETE + POST)
         document.getElementById('cashForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -748,15 +829,19 @@
                 return;
             }
             
-            updateBalance();
+            // Calculate balance one more time
+            const target = parseFloat(document.getElementById('target').value) || 0;
+            const cashIn = parseFloat(document.getElementById('cashIn').value) || 0;
+            const balance = cashIn - target;
+            document.getElementById('balance').value = balance.toFixed(2);
             
             const formData = new URLSearchParams();
             formData.append('Date', date);
             formData.append('Time In', document.getElementById('timeIn').value);
             formData.append('Time Out', document.getElementById('timeOut').value);
-            formData.append('Target', document.getElementById('target').value);
-            formData.append('Cash In', document.getElementById('cashIn').value);
-            formData.append('Balance', document.getElementById('balance').value);
+            formData.append('Target', target);
+            formData.append('Cash In', cashIn);
+            formData.append('Balance', balance.toFixed(2));
             formData.append('Comments', document.getElementById('comments').value);
             
             const submitBtn = document.querySelector('#cashForm button[type="submit"]');
@@ -811,7 +896,11 @@
                 return;
             }
             
-            const sortedRecords = [...allRecords].sort((a, b) => b.Date.localeCompare(a.Date));
+            const sortedRecords = [...allRecords].sort((a, b) => {
+                if (!a.Date) return 1;
+                if (!b.Date) return -1;
+                return b.Date.localeCompare(a.Date);
+            });
             
             tableBody.innerHTML = sortedRecords.map((record, idx) => {
                 const originalIndex = allRecords.findIndex(r => r.Date === record.Date && r['Time In'] === record['Time In']);
@@ -819,18 +908,20 @@
                 const target = Number(record.Target) || 0;
                 const balance = Number(record.Balance) || 0;
                 const balanceColor = balance > 0 ? '#28a745' : balance < 0 ? '#dc3545' : '#ffc107';
+                const comments = record.Comments || '-';
+                const shortComments = comments.length > 30 ? comments.substring(0, 30) + '...' : comments;
                 
                 return `
-                    <tr onclick="selectRecord(${originalIndex})" class="${selectedIndex === originalIndex ? 'selected' : ''}">
+                    <tr>
                         <td>${record.Date || '-'}</td>
                         <td>${record['Time In'] || '-'}</td>
                         <td>${record['Time Out'] || '-'}</td>
                         <td>K${target.toFixed(2)}</td>
                         <td>K${cashIn.toFixed(2)}</td>
-                        <td style="color: ${balanceColor}">K${balance.toFixed(2)}</td>
-                        <td>${record.Comments ? record.Comments.substring(0, 30) + (record.Comments.length > 30 ? '...' : '') : '-'}</td>
+                        <td style="color: ${balanceColor}; font-weight: bold;">K${balance.toFixed(2)}</td>
+                        <td>${shortComments}</td>
                         <td>
-                            <button class="view-card-btn" onclick="event.stopPropagation(); selectRecord(${originalIndex})">
+                            <button class="view-card-btn" onclick="viewCard(${originalIndex})">
                                 <i class="fas fa-eye"></i> View Card
                             </button>
                         </td>
@@ -839,75 +930,72 @@
             }).join('');
         }
         
-        function selectRecord(index) {
-            selectedIndex = index;
+        function viewCard(index) {
+            currentViewIndex = index;
             const record = allRecords[index];
-            
-            // Update table highlight
-            displayTable();
-            
-            // Show and populate the selected card
-            const selectedCard = document.getElementById('selectedCard');
-            const selectedDetails = document.getElementById('selectedDetails');
             
             const cashIn = Number(record['Cash In']) || 0;
             const target = Number(record.Target) || 0;
             const balance = Number(record.Balance) || 0;
+            const balanceClass = balance > 0 ? 'positive' : balance < 0 ? 'negative' : '';
             
-            selectedDetails.innerHTML = `
-                <div class="selected-item">
-                    <label><i class="fas fa-calendar"></i> Date</label>
-                    <div class="value">${record.Date || '-'}</div>
+            const detailsHtml = `
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-calendar-alt"></i> Date</span>
+                    <span class="detail-value">${record.Date || '-'}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-clock"></i> Time In</label>
-                    <div class="value">${record['Time In'] || '-'}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-clock"></i> Time In</span>
+                    <span class="detail-value">${record['Time In'] || '-'}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-clock"></i> Time Out</label>
-                    <div class="value">${record['Time Out'] || '-'}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-clock"></i> Time Out</span>
+                    <span class="detail-value">${record['Time Out'] || '-'}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-bullseye"></i> Target</label>
-                    <div class="value">K${target.toFixed(2)}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-bullseye"></i> Target (K)</span>
+                    <span class="detail-value">K${target.toFixed(2)}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-money-bill-wave"></i> Cash In</label>
-                    <div class="value">K${cashIn.toFixed(2)}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-money-bill-wave"></i> Cash In (K)</span>
+                    <span class="detail-value">K${cashIn.toFixed(2)}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-scale-balanced"></i> Balance</label>
-                    <div class="value" style="color: ${balance > 0 ? '#90ff90' : balance < 0 ? '#ffb3b3' : '#ffe69e'}">K${balance.toFixed(2)}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-scale-balanced"></i> Balance (K)</span>
+                    <span class="detail-value ${balanceClass}">K${balance.toFixed(2)}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-comment"></i> Comments</label>
-                    <div class="value">${record.Comments || '-'}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-comment"></i> Comments</span>
+                    <span class="detail-value comments">${record.Comments || '-'}</span>
                 </div>
-                <div class="selected-item">
-                    <label><i class="fas fa-timestamp"></i> Timestamp</label>
-                    <div class="value">${record.Timestamp || '-'}</div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-timestamp"></i> Timestamp</span>
+                    <span class="detail-value">${record.Timestamp || 'Not recorded'}</span>
                 </div>
             `;
             
-            selectedCard.classList.add('show');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('recordDetails').innerHTML = detailsHtml;
+            document.getElementById('viewCardModal').classList.add('show');
+            document.getElementById('cardOverlay').classList.add('show');
         }
         
-        function editSelectedRecord() {
-            if (selectedIndex >= 0) {
-                openEditModal(selectedIndex);
-            } else {
-                showToast('No record selected', 'error');
+        function closeCardView() {
+            document.getElementById('viewCardModal').classList.remove('show');
+            document.getElementById('cardOverlay').classList.remove('show');
+            currentViewIndex = -1;
+        }
+        
+        function editFromCard() {
+            if (currentViewIndex >= 0) {
+                closeCardView();
+                openEditModal(currentViewIndex);
             }
         }
         
-        function shareSelectedRecord() {
-            if (selectedIndex < 0) {
-                showToast('Please select a record first', 'error');
-                return;
-            }
+        function shareFromCard() {
+            if (currentViewIndex < 0) return;
             
-            const record = allRecords[selectedIndex];
+            const record = allRecords[currentViewIndex];
             const cashIn = Number(record['Cash In']) || 0;
             const target = Number(record.Target) || 0;
             const balance = Number(record.Balance) || 0;
@@ -924,7 +1012,7 @@
             
             const encodedMessage = encodeURIComponent(message);
             
-            const platform = prompt('Share via: (whatsapp, sms, email)', 'whatsapp');
+            const platform = prompt('Share via:\n1. whatsapp\n2. sms\n3. email', 'whatsapp');
             if (platform === 'whatsapp') {
                 window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
             } else if (platform === 'sms') {
