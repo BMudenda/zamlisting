@@ -1,142 +1,264 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Simple Name Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Registration Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f9;
-      padding: 30px;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    .box {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-    }
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
 
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
 
-    button:hover {
-      background: #218838;
-    }
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
 
-    #loader {
-      display: none;
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-    }
+        .form-group {
+            margin-bottom: 25px;
+        }
 
-    #msg {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-  </style>
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="form-container">
+        <h1>Registration Form</h1>
+        <div class="subtitle">Please enter your details below</div>
+        
+        <form id="submissionForm">
+            <div class="form-group">
+                <label for="fname">First Name *</label>
+                <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
+            </div>
+            
+            <div class="form-group">
+                <label for="lname">Last Name *</label>
+                <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
+            </div>
+            
+            <button type="submit" id="submitBtn">
+                Submit
+            </button>
+        </form>
+        
+        <div id="message" class="message"></div>
+    </div>
 
-<div class="box">
-  <h2>Submit Name</h2>
-
-  <input type="text" id="firstName" placeholder="First Name">
-  <input type="text" id="lastName" placeholder="Last Name">
-
-  <button id="submitBtn">Submit</button>
-
-  <div id="loader">Submitting...</div>
-  <p id="msg"></p>
-</div>
-
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
-
-const firstNameInput = document.getElementById("firstName");
-const lastNameInput = document.getElementById("lastName");
-const loader = document.getElementById("loader");
-const msg = document.getElementById("msg");
-const btn = document.getElementById("submitBtn");
-
-function submitForm() {
-
-  const firstName = firstNameInput.value.trim();
-  const lastName = lastNameInput.value.trim();
-
-  if (!firstName || !lastName) {
-    msg.innerText = "⚠️ Please enter both First Name and Last Name.";
-    return;
-  }
-
-  loader.style.display = "block";
-  msg.innerText = "";
-
-  const data = {
-    "First Name": firstName,
-    "Last Name": lastName
-  };
-
-  const formBody = Object.keys(data)
-    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
-    .join("&");
-
-  fetch(scriptURL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: formBody
-  })
-  .then(r => r.json())
-  .then(j => {
-
-    loader.style.display = "none";
-
-    if (
-      j.result === "success" ||
-      (j.result && j.result.includes("success"))
-    ) {
-      msg.innerText = "✅ Submitted successfully!";
-
-      firstNameInput.value = "";
-      lastNameInput.value = "";
-    } else {
-      msg.innerText = j.error || "❌ Submission failed";
-    }
-
-  })
-  .catch(err => {
-    loader.style.display = "none";
-    msg.innerText = "❌ Network error / submission failed";
-    console.error(err);
-  });
-}
-
-btn.onclick = submitForm;
-</script>
-
+    <script>
+        // Your provided Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec';
+        
+        const form = document.getElementById('submissionForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const fname = document.getElementById('fname').value.trim();
+            const lname = document.getElementById('lname').value.trim();
+            
+            // Basic validation
+            if (!fname || !lname) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting <span class="loading"></span>';
+            
+            // Prepare form data
+            const formData = new URLSearchParams();
+            formData.append('fname', fname);
+            formData.append('lname', lname);
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
+                });
+                
+                showMessage('✅ Success! Your information has been submitted.', 'success');
+                form.reset();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Error submitting form. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit';
+                
+                setTimeout(() => {
+                    if (messageDiv.classList.contains('success')) {
+                        messageDiv.className = 'message';
+                        messageDiv.style.display = 'none';
+                    }
+                }, 5000);
+            }
+        });
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'error') {
+                setTimeout(() => {
+                    if (messageDiv.classList.contains('error')) {
+                        messageDiv.className = 'message';
+                        messageDiv.style.display = 'none';
+                    }
+                }, 5000);
+            }
+        }
+    </script>
 </body>
 </html>
