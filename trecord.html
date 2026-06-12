@@ -367,12 +367,12 @@
     <div class="dashboard-header">
         <div class="logo-area">
             <h1>💰 CashFlow Pro</h1>
-            <p><i class="fab fa-google"></i> Google Sheets Sync (POST Method)</p>
+            <p><i class="fab fa-google"></i> Google Sheets Sync (doPost Method)</p>
         </div>
         <div style="display: flex; gap: 12px; align-items: center;">
             <div class="sync-status" id="syncStatus">
                 <i class="fas fa-circle online"></i>
-                <span>Ready</span>
+                <span>Ready to sync</span>
             </div>
             <button class="menu-dots" id="menuDotsBtn"><i class="fas fa-ellipsis-h"></i></button>
         </div>
@@ -386,8 +386,9 @@
         </div>
         <div class="dropdown-content">
             <div class="form-group">
-                <label><i class="far fa-calendar-alt"></i> Date *</label>
-                <input type="date" id="menuDate">
+                <label><i class="far fa-calendar-alt"></i> Date (will be auto-filled by script)</label>
+                <input type="date" id="menuDate" disabled style="background:#eef2ff;">
+                <small style="color:#6c7a8e;">Your script auto-adds current date/time</small>
             </div>
             <div class="form-row">
                 <div class="form-group"><label><i class="fas fa-clock"></i> Time In</label><input type="time" id="menuTimeIn"></div>
@@ -444,13 +445,14 @@
         </table>
     </div>
     <div class="footer-tip">
-        📌 <strong>Google Apps Script POST Method:</strong> Sends data to your spreadsheet using e.parameter[header]. Headers expected: Date, Time In, Time Out, Target, Cash In, Balance, Comments.
+        📌 <strong>Google Sheet Headers Required:</strong> Date | Time In | Time Out | Target | Cash In | Balance | Comments | Timestamp<br>
+        Your script automatically adds current date/time to the Date column and a Timestamp column.
     </div>
 </div>
 
 <script>
     // ==================== CONFIGURATION ====================
-    // REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL (doPost endpoint)
+    // REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
     
     let records = [];
@@ -495,7 +497,7 @@
 
     // Load/Save Local Storage
     function loadLocalData() {
-        const stored = localStorage.getItem("cashflow_records_v4");
+        const stored = localStorage.getItem("cashflow_records_v5");
         if(stored) {
             records = JSON.parse(stored);
         } else {
@@ -510,7 +512,7 @@
     }
 
     function saveLocal() {
-        localStorage.setItem("cashflow_records_v4", JSON.stringify(records));
+        localStorage.setItem("cashflow_records_v5", JSON.stringify(records));
         updateTotals();
     }
 
@@ -518,7 +520,7 @@
     function renderTable() {
         const tbody = document.getElementById("recordTableBody");
         if(records.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px;"><i class="fas fa-database"></i> No records. Click ⋮ to add</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px;"><i class="fas fa-database"></i> No records. Click ⋮ to add</td</tr>`;
             updateTotals();
             updateSelectedCount();
             return;
@@ -555,7 +557,7 @@
         if(!record) return;
         editingId = id;
         document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Record`;
-        document.getElementById("menuDate").value = record.date;
+        document.getElementById("menuDate").value = "";
         document.getElementById("menuTimeIn").value = record.timeIn || "";
         document.getElementById("menuTimeOut").value = record.timeOut || "";
         document.getElementById("menuTarget").value = record.target;
@@ -576,14 +578,12 @@
     }
 
     function saveFromDropdown() {
-        const dateVal = document.getElementById("menuDate").value;
-        if(!dateVal) { alert("Please select date."); return; }
         const targetVal = parseFloat(document.getElementById("menuTarget").value) || 0;
         const cashInVal = parseFloat(document.getElementById("menuCashIn").value) || 0;
         const balanceVal = computeBalance(targetVal, cashInVal);
         const newRecord = {
             id: editingId ? editingId : Date.now(),
-            date: dateVal,
+            date: new Date().toISOString().slice(0,10),
             timeIn: document.getElementById("menuTimeIn").value || "",
             timeOut: document.getElementById("menuTimeOut").value || "",
             target: targetVal,
@@ -608,7 +608,6 @@
 
     function closeDropdown() {
         document.getElementById("inputDropdown").classList.add("hidden");
-        document.getElementById("menuDate").value = "";
         document.getElementById("menuTimeIn").value = "";
         document.getElementById("menuTimeOut").value = "";
         document.getElementById("menuTarget").value = 400;
@@ -619,8 +618,8 @@
         document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-plus-circle"></i> Add New Record`;
     }
 
-    // ========== GOOGLE SHEETS POST (using doPost method from your script) ==========
-    // This sends data exactly as e.parameter[header] expects
+    // ========== GOOGLE SHEETS POST (using your exact doPost method) ==========
+    // Your script expects: headers from Row 1, and auto-adds Date = new Date()
     async function postToGoogleSheet() {
         if(records.length === 0) {
             showToast("No records to post", true);
@@ -631,11 +630,11 @@
         let successCount = 0;
         let errorCount = 0;
         
-        // Headers your script expects: Date, Time In, Time Out, Target, Cash In, Balance, Comments
+        // Your script reads headers from Row 1 and uses e.parameter[header]
+        // Headers needed: "Time In", "Time Out", "Target", "Cash In", "Balance", "Comments"
+        // The "Date" column is auto-filled by your script with new Date()
         for(const record of records) {
-            // Create URLSearchParams matching the exact headers from your doPost
             const params = new URLSearchParams();
-            params.append("Date", record.date);
             params.append("Time In", record.timeIn || "");
             params.append("Time Out", record.timeOut || "");
             params.append("Target", record.target.toString());
@@ -644,8 +643,7 @@
             params.append("Comments", record.comments || "");
             
             try {
-                // Using no-cors mode as your script is deployed as a web app
-                await fetch(GOOGLE_SCRIPT_URL, {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     cache: 'no-cache',
@@ -789,10 +787,9 @@
         document.getElementById("menuDotsBtn").onclick = () => {
             const dd = document.getElementById("inputDropdown");
             dd.classList.toggle("hidden");
-            if(!dd.classList.contains("hidden") && !document.getElementById("menuDate").value) {
-                document.getElementById("menuDate").value = new Date().toISOString().slice(0,10);
+            if(!dd.classList.contains("hidden")) {
+                updateDropdownBalance();
             }
-            updateDropdownBalance();
         };
         document.getElementById("closeMenuBtn").onclick = closeDropdown;
         document.getElementById("menuCancelBtn").onclick = closeDropdown;
