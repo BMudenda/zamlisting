@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CashFlow Pro | Google Sheets Sync</title>
+    <title>CashFlow Pro | Google Sheets Sync Live</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -35,6 +35,8 @@
             border-radius: 48px;
             box-shadow: 0 8px 18px rgba(0,0,0,0.05);
             margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .logo-area h1 {
@@ -130,7 +132,7 @@
             color: #2c3e4e;
         }
 
-        .form-group input, .form-group textarea, .form-group select {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 10px 12px;
             border-radius: 20px;
@@ -199,8 +201,8 @@
             color: #0f2c1f;
         }
 
-        /* Backup & share bar */
-        .backup-bar {
+        /* Action bar */
+        .action-bar {
             background: white;
             border-radius: 32px;
             padding: 12px 20px;
@@ -212,13 +214,13 @@
             gap: 14px;
         }
 
-        .backup-buttons {
+        .action-buttons {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
         }
 
-        .backup-btn {
+        .action-btn {
             background: #f1f5f9;
             border: none;
             padding: 8px 18px;
@@ -232,12 +234,12 @@
             transition: 0.2s;
         }
 
-        .backup-btn i { font-size: 1rem; }
+        .action-btn i { font-size: 1rem; }
+        .sync-btn { background: #8b5cf6; color: white; }
         .email-btn { background: #3b82f6; color: white; }
         .drive-btn { background: #0f9d58; color: white; }
         .whatsapp-btn { background: #25D366; color: white; }
         .sms-btn { background: #34b7f1; color: white; }
-        .sync-btn { background: #8b5cf6; color: white; }
 
         /* Table */
         .table-wrapper {
@@ -273,7 +275,7 @@
             text-align: center;
         }
 
-        .action-btns {
+        .table-actions {
             display: flex;
             gap: 8px;
             justify-content: center;
@@ -332,6 +334,7 @@
         @media (max-width: 700px) {
             .dropdown-menu { right: 12px; width: 90vw; left: 5%; }
             .stat-value { font-size: 1.5rem; }
+            .action-btn { padding: 6px 12px; font-size: 0.7rem; }
         }
 
         .footer-tip {
@@ -340,6 +343,27 @@
             margin-top: 20px;
             color: #6c7a8e;
         }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .loading-spinner {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 30px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -347,12 +371,12 @@
     <div class="dashboard-header">
         <div class="logo-area">
             <h1>💰 CashFlow Pro</h1>
-            <p><i class="fas fa-google"></i> Google Sheets Sync · Real-time</p>
+            <p><i class="fab fa-google"></i> Live Google Sheets Sync</p>
         </div>
         <div style="display: flex; gap: 12px; align-items: center;">
             <div class="sync-status" id="syncStatus">
                 <i class="fas fa-circle online"></i>
-                <span>Ready</span>
+                <span>Ready to sync</span>
             </div>
             <button class="menu-dots" id="menuDotsBtn"><i class="fas fa-ellipsis-h"></i></button>
         </div>
@@ -400,13 +424,13 @@
     </div>
 
     <!-- Action Bar -->
-    <div class="backup-bar">
-        <div class="backup-buttons">
-            <button class="backup-btn sync-btn" id="syncToSheetBtn"><i class="fab fa-google"></i> Sync to Sheet</button>
-            <button class="backup-btn email-btn" id="backupEmailBtn"><i class="fas fa-envelope"></i> Email</button>
-            <button class="backup-btn drive-btn" id="backupDriveBtn"><i class="fab fa-google-drive"></i> Drive</button>
-            <button class="backup-btn whatsapp-btn" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-            <button class="backup-btn sms-btn" id="shareSmsBtn"><i class="fas fa-sms"></i> SMS</button>
+    <div class="action-bar">
+        <div class="action-buttons">
+            <button class="action-btn sync-btn" id="syncToSheetBtn"><i class="fab fa-google"></i> Sync to Sheet</button>
+            <button class="action-btn email-btn" id="backupEmailBtn"><i class="fas fa-envelope"></i> Email</button>
+            <button class="action-btn drive-btn" id="backupDriveBtn"><i class="fab fa-google-drive"></i> Drive</button>
+            <button class="action-btn whatsapp-btn" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button class="action-btn sms-btn" id="shareSmsBtn"><i class="fas fa-sms"></i> SMS</button>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <input type="checkbox" id="selectAllCheckbox"> <label for="selectAllCheckbox"><i class="far fa-check-square"></i> Select all</label>
@@ -420,23 +444,21 @@
             <thead>
                 <tr><th class="checkbox-col"><i class="far fa-square"></i></th><th>Date</th><th>Time In</th><th>Time Out</th><th>Target (K)</th><th>Cash In (K)</th><th>Balance (K)</th><th>Comments</th><th>Actions</th></tr>
             </thead>
-            <tbody id="recordTableBody"><tr><td colspan="9" style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-pulse"></i> Loading...</td></tr</tbody>
+            <tbody id="recordTableBody"><tr><td colspan="9" style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-pulse"></i> Loading...</td</tr</tbody>
         </table>
     </div>
     <div class="footer-tip">
-        📌 <strong>Google Sheets Setup:</strong> Deploy as Web App → Copy URL → Paste below. Records sync to spreadsheet.
+        📌 <strong>Google Sheets Active!</strong> All records sync to your spreadsheet. Click "Sync to Sheet" to push data.
     </div>
 </div>
 
 <script>
     // ==================== CONFIGURATION ====================
-    // 🔧 REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_YourScriptId/exec"; 
-    // If not set, local storage only mode. User can update via prompt.
+    // YOUR GOOGLE APPS SCRIPT URL (Provided)
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6QEjxpzIODm7SZ0bq6DXJjnUPhZjY2pst-mYKwsCAfBj__uleIcKXQ_oiyrpoTAM/exec";
     
     let records = [];
     let editingId = null;
-    let syncEnabled = false;
 
     // Helper Functions
     function showToast(msg, isError = false) {
@@ -446,6 +468,23 @@
         toast.style.background = isError ? '#dc2626' : '#2b6e3c';
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2600);
+    }
+
+    function showLoading(show) {
+        let loader = document.getElementById('globalLoader');
+        if(show) {
+            if(!loader) {
+                loader = document.createElement('div');
+                loader.id = 'globalLoader';
+                loader.className = 'loading-overlay';
+                loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Syncing to Google Sheet...</span></div>';
+                document.body.appendChild(loader);
+            } else {
+                loader.style.display = 'flex';
+            }
+        } else if(loader) {
+            loader.style.display = 'none';
+        }
     }
 
     function computeBalance(target, cashIn) {
@@ -458,16 +497,16 @@
         document.getElementById("menuBalance").value = (cashIn - target).toFixed(2);
     }
 
-    // Load/Save Local
+    // Load/Save Local Storage
     function loadLocalData() {
-        const stored = localStorage.getItem("cashflow_google_records");
+        const stored = localStorage.getItem("cashflow_records");
         if(stored) {
             records = JSON.parse(stored);
         } else {
             const today = new Date().toISOString().slice(0,10);
             records = [
-                { id: Date.now()+101, date: today, timeIn: "09:00", timeOut: "17:00", target: 400, cashIn: 520, balance: 120, comments: "Great sales" },
-                { id: Date.now()+102, date: today, timeIn: "10:30", timeOut: "15:30", target: 350, cashIn: 290, balance: -60, comments: "Quiet day" }
+                { id: Date.now()+101, date: today, timeIn: "09:00", timeOut: "17:00", target: 400, cashIn: 520, balance: 120, comments: "Great sales day" },
+                { id: Date.now()+102, date: today, timeIn: "10:30", timeOut: "15:30", target: 350, cashIn: 290, balance: -60, comments: "Quiet afternoon" }
             ];
             saveLocal();
         }
@@ -475,11 +514,11 @@
     }
 
     function saveLocal() {
-        localStorage.setItem("cashflow_google_records", JSON.stringify(records));
+        localStorage.setItem("cashflow_records", JSON.stringify(records));
         updateTotals();
     }
 
-    // Render table (inline editing not needed, we use modal-style but for simplicity use edit via dropdown)
+    // Render table
     function renderTable() {
         const tbody = document.getElementById("recordTableBody");
         if(records.length === 0) {
@@ -502,7 +541,7 @@
                     <td>K${Number(rec.cashIn).toFixed(2)}</td>
                     <td style="${balanceColor}">K${balVal}</td>
                     <td style="max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(rec.comments || '')}</td>
-                    <td class="action-btns">
+                    <td class="table-actions">
                         <button class="icon-btn edit-icon" onclick="editRecord('${rec.id}')"><i class="fas fa-pen"></i></button>
                         <button class="icon-btn delete-icon" onclick="deleteRecord('${rec.id}')"><i class="fas fa-trash-alt"></i></button>
                     </td>
@@ -584,144 +623,177 @@
         document.getElementById("dropdownTitle").innerHTML = `<i class="fas fa-plus-circle"></i> Add New Record`;
     }
 
-    // ========== GOOGLE SHEETS SYNC (POST) ==========
+    // ========== GOOGLE SHEETS SYNC (POST using your script) ==========
     async function syncToGoogleSheet() {
         if(records.length === 0) {
             showToast("No records to sync", true);
             return;
         }
         
-        let scriptUrl = GOOGLE_SCRIPT_URL;
-        if(scriptUrl.includes("YourScriptId")) {
-            const userUrl = prompt("📌 Enter your Google Apps Script Web App URL:\n(Deploy as Web App → Copy URL)", "");
-            if(!userUrl || !userUrl.includes("script.google.com")) {
-                showToast("Invalid URL. Sync canceled.", true);
-                return;
-            }
-            // Update global (for future use)
-            window.GOOGLE_SCRIPT_URL = userUrl;
-            scriptUrl = userUrl;
-        } else {
-            scriptUrl = window.GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
-        }
-        
-        showToast("Syncing to Google Sheets...");
+        showLoading(true);
         let successCount = 0;
+        let errorCount = 0;
         
         for(const record of records) {
+            // Create FormData or URL params matching your doPost e.parameter structure
             const params = new URLSearchParams();
             params.append("date", record.date);
             params.append("timeIn", record.timeIn || "");
             params.append("timeOut", record.timeOut || "");
-            params.append("target", record.target);
-            params.append("cashIn", record.cashIn);
-            params.append("balance", record.balance);
+            params.append("target", record.target.toString());
+            params.append("cashIn", record.cashIn.toString());
+            params.append("balance", record.balance.toString());
             params.append("comments", record.comments || "");
-            params.append("id", record.id);
+            params.append("id", record.id.toString());
             
             try {
-                const response = await fetch(scriptUrl, {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // for simple web app
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    mode: 'no-cors', // Required for Google Apps Script deployment
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
                     body: params.toString()
                 });
                 successCount++;
             } catch(err) {
-                console.warn("Sync error for record", record.id, err);
+                console.error("Sync error for record", record.id, err);
+                errorCount++;
             }
         }
         
+        showLoading(false);
+        
         if(successCount > 0) {
-            showToast(`✅ Synced ${successCount} records to Google Sheet`);
-            document.getElementById("syncStatus").innerHTML = `<i class="fas fa-check-circle online"></i><span>Last sync: ${new Date().toLocaleTimeString()}</span>`;
-        } else {
-            showToast("Sync failed. Check URL & CORS", true);
+            showToast(`✅ Synced ${successCount} record(s) to Google Sheet`);
+            const statusDiv = document.getElementById("syncStatus");
+            statusDiv.innerHTML = `<i class="fas fa-check-circle online"></i><span>Last sync: ${new Date().toLocaleTimeString()}</span>`;
+        }
+        if(errorCount > 0) {
+            showToast(`⚠️ ${errorCount} record(s) failed. Check console.`, true);
         }
     }
 
-    // Sharing & Backup (same as before)
+    // Sharing & Backup Functions
     function getSelectedRecords() {
         const checked = document.querySelectorAll(".record-checkbox:checked");
         const ids = Array.from(checked).map(cb => cb.getAttribute("data-id"));
         return records.filter(r => ids.includes(String(r.id)));
     }
 
-    function buildReport(selected) {
+    function buildReport(selected, includeTotals = true) {
         if(selected.length === 0) return "No records selected.";
-        let totalCash=0,totalTarget=0,totalBal=0;
-        let lines = ["📊 CASHFLOW REPORT","━━━━━━━━━━━━━━━━"];
-        selected.forEach((r,i) => {
-            totalCash += r.cashIn; totalTarget += r.target; totalBal += r.balance;
-            lines.push(`${i+1}. ${r.date} | In: K${r.cashIn} | Target: K${r.target} | Bal: K${r.balance}`);
+        let totalCash = 0, totalTarget = 0, totalBal = 0;
+        let lines = ["📊 CASHFLOW REPORT", "━━━━━━━━━━━━━━━━━━", ""];
+        selected.forEach((r, i) => {
+            totalCash += Number(r.cashIn);
+            totalTarget += Number(r.target);
+            totalBal += Number(r.balance);
+            lines.push(`${i+1}. ${r.date} | In: K${Number(r.cashIn).toFixed(2)} | Target: K${Number(r.target).toFixed(2)} | Bal: K${Number(r.balance).toFixed(2)}`);
             if(r.comments) lines.push(`   📝 ${r.comments}`);
         });
-        lines.push("━━━━━━━━━━━━━━━━━━");
-        lines.push(`💰 Total In: K${totalCash.toFixed(2)}`);
-        lines.push(`🎯 Total Target: K${totalTarget.toFixed(2)}`);
-        lines.push(`⚖️ Total Balance: K${totalBal.toFixed(2)}`);
+        if(includeTotals) {
+            lines.push("");
+            lines.push("━━━━━━━━━━━━━━━━━━");
+            lines.push(`💰 Total Cash In: K${totalCash.toFixed(2)}`);
+            lines.push(`🎯 Total Target: K${totalTarget.toFixed(2)}`);
+            lines.push(`⚖️ Total Balance: K${totalBal.toFixed(2)}`);
+        }
+        lines.push("", "✅ CashFlow Pro · Google Sheets Sync");
         return lines.join("\n");
     }
 
     function emailBackup() {
-        const sel = getSelectedRecords();
-        if(sel.length===0) { alert("Select records"); return; }
-        const body = encodeURIComponent(buildReport(sel));
-        window.location.href = `mailto:?subject=CashFlow_Backup&body=${body}`;
+        const selected = getSelectedRecords();
+        if(selected.length === 0) { alert("Please select records to email."); return; }
+        const subject = `CashFlow_Report_${new Date().toISOString().slice(0,10)}`;
+        const body = encodeURIComponent(buildReport(selected));
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
+        showToast("Email client opened");
     }
+    
     function driveBackup() {
         let data = getSelectedRecords();
-        if(data.length===0 && records.length>0 && confirm("Backup all?")) data=records;
-        if(data.length===0) return;
-        const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+        if(data.length === 0 && records.length > 0) {
+            if(confirm("No records selected. Backup ALL records?")) data = records;
+            else return;
+        }
+        if(data.length === 0) { alert("No data to backup."); return; }
+        const jsonStr = JSON.stringify(data, null, 2);
+        const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+        const blob = new Blob([jsonStr], {type: "application/json"});
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `cashflow_${new Date().toISOString().slice(0,19)}.json`;
+        a.download = `CashFlow_Backup_${timestamp}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
         showToast("Backup file ready for Google Drive");
     }
+    
     function shareWhatsApp() {
-        const sel = getSelectedRecords();
-        if(sel.length===0) { alert("Select records"); return; }
-        window.open(`https://wa.me/?text=${encodeURIComponent(buildReport(sel))}`,'_blank');
+        const selected = getSelectedRecords();
+        if(selected.length === 0) { alert("Select records to share."); return; }
+        const msg = buildReport(selected, true);
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
+    
     function shareSMS() {
-        const sel = getSelectedRecords();
-        if(sel.length===0) { alert("Select records"); return; }
-        window.open(`sms:?body=${encodeURIComponent(buildReport(sel))}`,'_blank');
+        const selected = getSelectedRecords();
+        if(selected.length === 0) { alert("Select records to share."); return; }
+        const msg = buildReport(selected, true);
+        window.open(`sms:?body=${encodeURIComponent(msg)}`, '_blank');
     }
 
+    // UI Helpers
     function attachCheckboxEvents() {
-        document.querySelectorAll(".record-checkbox").forEach(cb => cb.addEventListener("change", updateSelectedCount));
-        document.getElementById("selectAllCheckbox").onchange = (e) => {
-            document.querySelectorAll(".record-checkbox").forEach(cb => cb.checked = e.target.checked);
-            updateSelectedCount();
-        };
+        document.querySelectorAll(".record-checkbox").forEach(cb => {
+            cb.removeEventListener("change", updateSelectedCount);
+            cb.addEventListener("change", updateSelectedCount);
+        });
+        const selectAll = document.getElementById("selectAllCheckbox");
+        if(selectAll) {
+            selectAll.onchange = (e) => {
+                document.querySelectorAll(".record-checkbox").forEach(cb => cb.checked = e.target.checked);
+                updateSelectedCount();
+            };
+        }
     }
+    
     function updateSelectedCount() {
         const cnt = document.querySelectorAll(".record-checkbox:checked").length;
         document.getElementById("selectedCountBadge").innerHTML = `<i class="fas fa-check"></i> ${cnt} selected`;
         const allBox = document.getElementById("selectAllCheckbox");
-        if(allBox) allBox.checked = cnt === records.length && records.length>0;
+        if(allBox) allBox.checked = cnt === records.length && records.length > 0;
     }
+    
     function updateTotals() {
-        let tCash=0, tTarget=0, tBal=0;
-        records.forEach(r => { tCash+=r.cashIn; tTarget+=r.target; tBal+=r.balance; });
+        let tCash = 0, tTarget = 0, tBal = 0;
+        records.forEach(r => {
+            tCash += Number(r.cashIn) || 0;
+            tTarget += Number(r.target) || 0;
+            tBal += Number(r.balance) || 0;
+        });
         document.getElementById("totalCashIn").innerHTML = `K${tCash.toFixed(2)}`;
         document.getElementById("totalTarget").innerHTML = `K${tTarget.toFixed(2)}`;
         const ov = document.getElementById("overallBalance");
         ov.innerHTML = `K${tBal.toFixed(2)}`;
-        ov.style.color = tBal<0 ? "#dc2626" : "#0f2c1f";
+        ov.style.color = tBal < 0 ? "#dc2626" : "#0f2c1f";
     }
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=>({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
 
+    // Event Setup
     function setupEvents() {
         document.getElementById("menuDotsBtn").onclick = () => {
             const dd = document.getElementById("inputDropdown");
             dd.classList.toggle("hidden");
-            if(!dd.classList.contains("hidden") && !document.getElementById("menuDate").value)
+            if(!dd.classList.contains("hidden") && !document.getElementById("menuDate").value) {
                 document.getElementById("menuDate").value = new Date().toISOString().slice(0,10);
+            }
             updateDropdownBalance();
         };
         document.getElementById("closeMenuBtn").onclick = closeDropdown;
@@ -734,17 +806,25 @@
         document.getElementById("shareSmsBtn").onclick = shareSMS;
         document.getElementById("menuCashIn").addEventListener("input", updateDropdownBalance);
         document.getElementById("menuTarget").addEventListener("input", updateDropdownBalance);
+        
+        // Close dropdown when clicking outside
         document.addEventListener("click", (e) => {
             const dd = document.getElementById("inputDropdown");
-            if(!dd.contains(e.target) && e.target !== document.getElementById("menuDotsBtn") && !dd.classList.contains("hidden"))
+            const menuBtn = document.getElementById("menuDotsBtn");
+            if(!dd.contains(e.target) && e.target !== menuBtn && !dd.classList.contains("hidden")) {
                 dd.classList.add("hidden");
+            }
         });
     }
 
+    // Initialize
     loadLocalData();
     setupEvents();
+    
+    // Make functions global for onclick
     window.editRecord = editRecord;
     window.deleteRecord = deleteRecord;
+    window.syncToGoogleSheet = syncToGoogleSheet;
 </script>
 </body>
 </html>
