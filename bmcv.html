@@ -1,366 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brian Mudenda - Curriculum Vitae (3-Page A4)</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brian Mudenda - Curriculum Vitae</title>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f5f5f5;
+        font-size: 11pt;
+    }
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f5f5f5;
-            font-size: 11pt; /* Increased font size */
-        }
-        .container {
-            /* Standard screen view: Wide container */
-            max-width: 900px;
-            margin: 30px auto;
-            background: #fff;
-            padding: 40px; 
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .page {
-            /* Add some visual separation for the screen view */
-            margin-bottom: 50px; 
-            padding: 0; /* Content padding is handled by the JS margin logic */
-        }
+    .container {
+        max-width: 900px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 40px;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
+    .download-btn {
+        float: right;
+        background: #007bff;
+        color: #fff;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .download-btn:hover {
+        background: #0056b3;
+    }
+
+    h1 {
+        font-size: 24pt;
+        color: #333;
+    }
+
+    h2 {
+        font-size: 16pt;
+        color: #333;
+    }
+
+    .section-title {
+        border-bottom: 2px solid #555;
+        padding-bottom: 4px;
+        margin-top: 30px;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 11pt;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        border-bottom: 2px solid #333;
+        background-color: #f9f9f9;
+    }
+
+    td {
+        border-bottom: 1px solid #eee;
+    }
+
+    ul {
+        margin-top: 5px;
+        margin-bottom: 15px;
+        padding-left: 20px;
+        font-size: 11.5pt;
+    }
+
+    ul li {
+        margin-bottom: 3px;
+    }
+
+    /* =========================
+       REAL PDF PAGINATION FIX
+       ========================= */
+    .page {
+        page-break-after: always;
+        break-after: page;
+    }
+
+    .page:last-child {
+        page-break-after: auto;
+    }
+
+    /* PRINT SETTINGS */
+    @media print {
         .download-btn {
-            float: right;
-            background: #007bff;
-            color: #fff;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 20px;
+            display: none;
         }
-        .download-btn:hover {
-            background: #0056b3;
+
+        body {
+            background: white;
         }
-        .hide-for-print {
-            display: none !important;
+
+        .container {
+            box-shadow: none;
+            margin: 0;
+            max-width: 100%;
         }
-        
-        h1 {
-            font-size: 24pt;
-            color: #333;
-        }
-        h2 {
-            font-size: 16pt;
-            color: #333;
-        }
-        .section-title {
-            border-bottom: 2px solid #555;
-            padding-bottom: 4px;
-            margin-top: 30px;
-            margin-bottom: 10px;
-            font-size: 20px;
-        }
-        /* Table Redesign */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            border: none;
-            font-size: 11pt;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            border-bottom: 2px solid #333;
-            background-color: #f9f9f9;
-            font-weight: bold;
-        }
-        td {
-            border-bottom: 1px solid #eee;
-        }
-        table tr:last-child td {
-            border-bottom: none;
-        }
-        /* List Spacing */
-        ul {
-            margin-top: 5px;
-            margin-bottom: 15px;
-            padding-left: 20px;
-            font-size: 11.5pt;
-        }
-        ul li {
-            margin-bottom: 3px;
-        }
-    </style>
+    }
+</style>
 </head>
 
 <body>
 
-    <div class="container" id="cvContent">
+<div class="container">
 
-        <button class="download-btn" id="downloadBtn" onclick="downloadPDF()">⬇️ PDF (3 Pages)</button>
+    <button class="download-btn" onclick="window.print()">⬇️ Save as PDF</button>
 
-        <div id="page-one" class="page">
-            <h1>CURRICULUM VITAE (CV)</h1>
+    <!-- PAGE 1 -->
+    <div class="page">
+        <h1>CURRICULUM VITAE (CV)</h1>
 
-            <h2 class="section-title">PERSONAL DETAILS</h2>
-            <p><strong>Name:</strong> Brian Mudenda</p>
-            <p><strong>Gender:</strong> Male</p>
-            <p><strong>Date of Birth:</strong> 25 Apr 1987</p>
-            <p><strong>NRC No.:</strong> 993089/11/1</p>
-            <p><strong>Mobile:</strong> 0777737047</p>
-            <p><strong>Email:</strong> mudenda5brian@gmail.com</p>
-            <p><strong>Town:</strong> Luangwa</p>
-            <p><strong>Work Experience:</strong> 9 Years</p>
-            <p><strong>Highest Qualification:</strong> Degree</p>
+        <h2 class="section-title">PERSONAL DETAILS</h2>
+        <p><strong>Name:</strong> Brian Mudenda</p>
+        <p><strong>Gender:</strong> Male</p>
+        <p><strong>Date of Birth:</strong> 25 Apr 1987</p>
+        <p><strong>NRC No.:</strong> 993089/11/1</p>
+        <p><strong>Mobile:</strong> 0777737047</p>
+        <p><strong>Email:</strong> mudenda5brian@gmail.com</p>
+        <p><strong>Town:</strong> Luangwa</p>
+        <p><strong>Work Experience:</strong> 9 Years</p>
+        <p><strong>Highest Qualification:</strong> Degree</p>
 
-            <h2 class="section-title">EDUCATION BACKGROUND</h2>
-            <table>
-    <tr>
-        <th>NO.</th>
-        <th>INSTITUTION</th>
-        <th>PROGRAMME</th>
-        <th>START</th>
-        <th>END</th>
-        <th>QUALIFICATION</th>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>United Nations Department of Safety and Security (UNDSS)</td>
-        <td>Basic Security in the Field (BSITF II) & Advanced Security in the Field (ASITF)</td>
-        <td>2014</td>
-        <td>2014</td>
-        <td>Certificates</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>University of Zambia (UNZA)</td>
-        <td>Demography (Major) & Development Studies (Minor)</td>
-        <td>2009</td>
-        <td>2012</td>
-        <td>Degree</td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td>UNZA Short Courses</td>
-        <td>Introduction to SPSS, Excel, Word</td>
-        <td>2012</td>
-        <td>2012</td>
-        <td>Certificate</td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td>UNZA Short Courses</td>
-        <td>Introduction to Word, Excel, Eviews, STATA & SPSS</td>
-        <td>2012</td>
-        <td>2012</td>
-        <td>Certificate</td>
-    </tr>
-    <tr>
-        <td>5</td>
-        <td>Libala High School</td>
-        <td>Secondary Education</td>
-        <td>2005</td>
-        <td>2007</td>
-        <td>Certificate</td>
-    </tr>
-    <tr>
-        <td>6</td>
-        <td>New Kanyama Basic School</td>
-        <td>Basic Education</td>
-        <td>2003</td>
-        <td>2004</td>
-        <td>Certificate</td>
-    </tr>
-    <tr>
-        <td>7</td>
-        <td>New Kanyama Basic School</td>
-        <td>Primary Education</td>
-        <td>1996</td>
-        <td>2002</td>
-        <td>Certificate</td>
-    </tr>
-</table>
+        <h2 class="section-title">EDUCATION BACKGROUND</h2>
+        <table>
+            <tr>
+                <th>NO.</th>
+                <th>INSTITUTION</th>
+                <th>PROGRAMME</th>
+                <th>START</th>
+                <th>END</th>
+                <th>QUALIFICATION</th>
+            </tr>
 
-        </div>
-        
-        <div id="page-two" class="page">
-            <h2 class="section-title">WORK EXPERIENCE</h2>
+            <tr>
+                <td>1</td>
+                <td>United Nations Department of Safety and Security (UNDSS)</td>
+                <td>Basic Security in the Field (BSITF II) & Advanced Security in the Field (ASITF)</td>
+                <td>2014</td>
+                <td>2014</td>
+                <td>Certificates</td>
+            </tr>
 
-            <p><strong>FAO – Field Enumerator</strong> (Jan 2014 – Jun 2014)</p>
-            <ul>
-                <li>Technical and community field Data capture through focus discussions and interviews.</li>
-                <li>Data entry and analysis for Conservation Agriculture Scaling Up project.</li>
-            </ul>
+            <tr>
+                <td>2</td>
+                <td>University of Zambia (UNZA)</td>
+                <td>Demography (Major) & Development Studies (Minor)</td>
+                <td>2009</td>
+                <td>2012</td>
+                <td>Degree</td>
+            </tr>
 
-            <p><strong>ECZ – Assistant Registration Officer</strong> (Feb 2015 – Dec 2016)</p>
-            <ul>
-                <li>Biometric and demographic data capture and analysis for voter registration.</li>
-                
-                <li>Daily report compilation and Data Consolidation</li>
-            </ul>
+            <tr>
+                <td>3</td>
+                <td>UNZA Short Courses</td>
+                <td>Introduction to SPSS, Excel, Word</td>
+                <td>2012</td>
+                <td>2012</td>
+                <td>Certificate</td>
+            </tr>
 
-            <p><strong>CMMB USAID Z-CHPP – Field Data Associate</strong> (Apr 2017 – Sep 2017)</p>
-            <ul>
-                <li>Data entry, analysis, and report writing.</li>
-                <li>Data Quality Assurance (DQA) and program M&E.</li>
-                <li>Capacity building for data collectors.</li>
-            </ul>
+            <tr>
+                <td>4</td>
+                <td>UNZA Short Courses</td>
+                <td>Introduction to Word, Excel, Eviews, STATA & SPSS</td>
+                <td>2012</td>
+                <td>2012</td>
+                <td>Certificate</td>
+            </tr>
 
-            <p><strong>CMMB USAID Z-CHPP – District Coordinator</strong> (Oct 2017 – Sep 2018)</p>
-            <ul>
-                <li>Program coordination for HIV prevention activities.</li>
-                <li>Stakeholder collaboration and savings group coordination.</li>
-                 <li>Capacity Building and Training of Community Based Health Workers.</li>
-            </ul>
+            <tr>
+                <td>5</td>
+                <td>Libala High School</td>
+                <td>Secondary Education</td>
+                <td>2005</td>
+                <td>2007</td>
+                <td>Certificate</td>
+            </tr>
 
-            <p><strong>CMMB USAID Z-CHPP – Field Data Associate</strong> (Oct 2018 – Sep 2019)</p>
-            <ul>
-                <li>Data entry and Cleaning in <strong>DHIS2</strong> and <strong>SMARTCARE</strong> systems.</li>
-                <li>Conducting <strong>DQAs</strong> and providing technical support to volunteers.</li>
-            </ul>
+            <tr>
+                <td>6</td>
+                <td>New Kanyama Basic School</td>
+                <td>Basic Education</td>
+                <td>2003</td>
+                <td>2004</td>
+                <td>Certificate</td>
+            </tr>
 
-            <p><strong>CMMB USAID Z-CHPP – District Coordinator</strong> (Oct 2019 – Sep 2021)</p>
-            <ul>
-<li>Coordinated <strong>GBV LIVES</strong>, radio programs, <strong>COVID-19</strong> awareness, and <strong>HIV</strong> prevention.</li>
-<li>Led service promotion (<strong>HIVST</strong>, <strong>PEP</strong>, <strong>PrEP</strong>, <strong>PMTCT</strong>, <strong>VMMC</strong>, condom distribution).</li>
-<li>Led district-level implementation of USAID-funded Z-CHPP HIV prevention programmes, focusing on Adolescent Girls and Young Women (AGYW) and priority populations.</li>
-
-<li>Translated annual work plans into actionable monthly and quarterly implementation plans to ensure effective delivery of DREAMS and community-based interventions.</li>
-
-<li>Collaborated with partners, acting as a key liaison between District Health Offices, the Ministry of Health, and implementing partners to ensure seamless service delivery.</li>
-
-<li>Monitored programme performance through review of reports, field supervision, and tracking of key indicators to ensure compliance and achievement of targets.</li>
-
-<li>Strengthened data quality systems by conducting routine data verification, field monitoring visits, and ensuring accuracy of programme reporting.</li>
-
-<li>Supported financial management processes including budget development, expenditure tracking, and ensuring compliance with USAID financial guidelines.</li>
-
-<li>Implemented Quality Improvement (QI) initiatives and provided technical feedback to field teams to enhance the effectiveness of HIV prevention interventions.</li>
-            </ul>
-
-            <p><strong>CMMB ECAP1 – Strategic Information Officer</strong> (Jan 2022 – Present)</p>
-            <ul>
-                <li>Oversee the development, maintenance, and management of project and programme databases to ensure high-quality data capture, integrity, analysis, and reporting.</li>
-
-<li>Conduct Monitoring and Evaluation (M&E) activities, including analysis and interpretation of <strong>CommCare</strong> data to support evidence-based decision-making.</li>
-
-<li>Train and mentor staff on data collection tools, procedures, and best practices, while providing guidance and supervision during data collection activities.</li>
-
-<li>Lead Data Quality Assurance (DQA) processes and provide ongoing technical support and capacity building to field volunteers and project staff.</li>
-
-<li>Generate timely reports, dashboards, and data summaries to monitor programme performance and inform management decision-making.</li>
-
-<li>Support the implementation and continuous improvement of Strategic Information systems and processes at district level in line with organisational and donor requirements.</li>
-            </ul>
-
-            <h2 class="section-title">SKILLS</h2>
-            <ul>
-                <li>Monitoring & Evaluation, research, reporting, program coordination.</li>
-                <li>Data analysis (<strong>DHIS2</strong>, <strong>STATA</strong>, <strong>SPSS</strong>, <strong>CommCare</strong>, Excel).</li>
-                <li>Stakeholder engagement and capacity building.</li>
-                <li>Web Development, Data e-capture and <strong>Python</strong> (<strong>Pandas</strong>) analysis.</li>
-            </ul>
-        </div>
-
-        <div id="page-three" class="page">
-            <h2 class="section-title">REFEREES</h2>
-            <table>
-                <tr>
-                    <th>NO.</th>
-                    <th>NAME</th>
-                    <th>MOBILE</th>
-                    <th>EMAIL</th>
-                    <th>POSITION</th>
-                    <th>ORGANISATION</th>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>Angela Mwenya</td>
-                    <td>+260977518910</td>
-                    <td>angela.chapewa731@gmail.com</td>
-                    <td>District Lead</td>
-                    <td>CMMB ECAP1</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Milner Matambo</td>
-                    <td>0977532298</td>
-                    <td>milnermatambo@gmail.com</td>
-                    <td>Zonal Lead</td>
-                    <td>Project Concern</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Raison Kanyinji</td>
-                    <td>0977299280</td>
-                    <td>rkanyinji@cmmb.org</td>
-                    <td>DCOP</td>
-                    <td>A2Health Zambia</td>
-                </tr>
-            </table>
-        </div>
+            <tr>
+                <td>7</td>
+                <td>New Kanyama Basic School</td>
+                <td>Primary Education</td>
+                <td>1996</td>
+                <td>2002</td>
+                <td>Certificate</td>
+            </tr>
+        </table>
     </div>
 
-<script>
-async function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const downloadBtn = document.getElementById("downloadBtn");
-    
-    // Elements to be converted to separate pages
-    const pages = [
-        document.getElementById("page-one"),
-        document.getElementById("page-two"),
-        document.getElementById("page-three")
-    ];
+    <!-- PAGE 2 -->
+    <div class="page">
 
-    // Margins (in mm) for the final PDF page
-    const marginH = 15; // Horizontal margins (left/right)
-    const marginV = 20; // Vertical margins (top/bottom)
+        <h2 class="section-title">WORK EXPERIENCE</h2>
 
-    const a4Width = 210;
-    const a4Height = 297;
-    const contentWidth = a4Width - (2 * marginH);
+        <p><strong>FAO – Field Enumerator</strong> (Jan 2014 – Jun 2014)</p>
+        <ul>
+            <li>Technical and community field Data capture through focus discussions and interviews.</li>
+            <li>Data entry and analysis for Conservation Agriculture Scaling Up project.</li>
+        </ul>
 
-    // Temporarily hide the button
-    downloadBtn.classList.add("hide-for-print");
+        <p><strong>ECZ – Assistant Registration Officer</strong> (Feb 2015 – Dec 2016)</p>
+        <ul>
+            <li>Biometric and demographic data capture and analysis for voter registration.</li>
+            <li>Daily report compilation and Data Consolidation</li>
+        </ul>
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    
-    // Loop through each page element, capture it, and add it to the PDF
-    for (let i = 0; i < pages.length; i++) {
-        const pageElement = pages[i];
-        
-        // 1. Capture the HTML section as an image
-        const canvas = await html2canvas(pageElement, { scale: 2 });
-        const imgData = canvas.toDataURL("image/jpeg", 1.0);
-        
-        // 2. Calculate image dimensions maintaining aspect ratio
-        const imgHeight = canvas.height * contentWidth / canvas.width;
-        
-        // 3. Add a new page if it's not the first one
-        if (i > 0) {
-            pdf.addPage();
-        }
-        
-        // 4. Add the captured image to the current PDF page, inside the margins
-        // The image height must fit within a single page's content area (a4Height - 2*marginV)
-        // If the content is correctly sized, it will fit.
-        pdf.addImage(imgData, "JPEG", marginH, marginV, contentWidth, imgHeight);
-    }
-    
-    pdf.save("Brian_Mudenda_CV_3Page.pdf");
+        <p><strong>CMMB USAID Z-CHPP – Field Data Associate</strong> (Apr 2017 – Sep 2017)</p>
+        <ul>
+            <li>Data entry, analysis, and report writing.</li>
+            <li>Data Quality Assurance (DQA) and program M&E.</li>
+            <li>Capacity building for data collectors.</li>
+        </ul>
 
-    // Unhide the button
-    downloadBtn.classList.remove("hide-for-print");
-}
-</script>
+        <p><strong>CMMB USAID Z-CHPP – District Coordinator</strong> (Oct 2017 – Sep 2018)</p>
+        <ul>
+            <li>Program coordination for HIV prevention activities.</li>
+            <li>Stakeholder collaboration and savings group coordination.</li>
+            <li>Capacity Building and Training of Community Based Health Workers.</li>
+        </ul>
+
+        <p><strong>CMMB USAID Z-CHPP – Field Data Associate</strong> (Oct 2018 – Sep 2019)</p>
+        <ul>
+            <li>Data entry and Cleaning in DHIS2 and SMARTCARE systems.</li>
+            <li>Conducting DQAs and providing technical support to volunteers.</li>
+        </ul>
+
+        <p><strong>CMMB USAID Z-CHPP – District Coordinator</strong> (Oct 2019 – Sep 2021)</p>
+        <ul>
+            <li>Coordinated GBV LIVES, radio programs, COVID-19 awareness, and HIV prevention.</li>
+            <li>Led service promotion (HIVST, PEP, PrEP, PMTCT, VMMC, condom distribution).</li>
+            <li>Led implementation of HIV prevention programmes.</li>
+            <li>Work planning and implementation.</li>
+            <li>Stakeholder coordination.</li>
+            <li>Monitoring and reporting.</li>
+            <li>Data quality assurance.</li>
+            <li>Financial tracking and budgeting.</li>
+            <li>Quality improvement initiatives.</li>
+        </ul>
+
+        <p><strong>CMMB ECAP1 – Strategic Information Officer</strong> (Jan 2022 – Present)</p>
+        <ul>
+            <li>Database development and management.</li>
+            <li>Monitoring and Evaluation using CommCare data.</li>
+            <li>Training and mentoring staff.</li>
+            <li>Data Quality Assurance (DQA).</li>
+            <li>Report generation and dashboards.</li>
+            <li>Strategic Information systems management.</li>
+        </ul>
+
+        <h2 class="section-title">SKILLS</h2>
+        <ul>
+            <li>Monitoring & Evaluation, research, reporting, program coordination.</li>
+            <li>Data analysis (DHIS2, STATA, SPSS, CommCare, Excel).</li>
+            <li>Stakeholder engagement and capacity building.</li>
+            <li>Web Development, Data e-capture and Python (Pandas) analysis.</li>
+        </ul>
+    </div>
+
+    <!-- PAGE 3 -->
+    <div class="page">
+
+        <h2 class="section-title">REFEREES</h2>
+
+        <table>
+            <tr>
+                <th>NO.</th>
+                <th>NAME</th>
+                <th>MOBILE</th>
+                <th>EMAIL</th>
+                <th>POSITION</th>
+                <th>ORGANISATION</th>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td>Angela Mwenya</td>
+                <td>+260977518910</td>
+                <td>angela.chapewa731@gmail.com</td>
+                <td>District Lead</td>
+                <td>CMMB ECAP1</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>Milner Matambo</td>
+                <td>0977532298</td>
+                <td>milnermatambo@gmail.com</td>
+                <td>Zonal Lead</td>
+                <td>Project Concern</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>Raison Kanyinji</td>
+                <td>0977299280</td>
+                <td>rkanyinji@cmmb.org</td>
+                <td>DCOP</td>
+                <td>A2Health Zambia</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
 
 </body>
 </html>
