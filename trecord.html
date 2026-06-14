@@ -729,6 +729,35 @@
     let activeCardIndex = null;
     let activeCardCumulate = {};
     
+    // Helper: format time from raw value (handles empty, "HH:MM", or any partial)
+    function formatTimeString(timeValue) {
+        if (!timeValue || timeValue === "") return "—";
+        // If it already looks like HH:MM (with colon) just return trimmed
+        if (typeof timeValue === "string" && timeValue.includes(":")) {
+            return timeValue;
+        }
+        // If numeric or weird, attempt to parse as simple HHMM
+        let str = String(timeValue).trim();
+        if (str.length === 4 && !isNaN(parseInt(str))) {
+            return str.slice(0,2) + ":" + str.slice(2,4);
+        }
+        return str;
+    }
+    
+    // Helper: format date from raw string (YYYY-MM-DD) to DD/MM/YYYY for readability
+    function formatDateString(dateValue) {
+        if (!dateValue) return "—";
+        let str = String(dateValue).trim();
+        // if already YYYY-MM-DD format
+        let parts = str.split("-");
+        if (parts.length === 3) {
+            // Convert to DD/MM/YYYY
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        // fallback, maybe already formatted
+        return str;
+    }
+    
     function updateBalancePreview() {
         const target = parseFloat(document.getElementById('inputTarget').value) || 0;
         const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
@@ -831,7 +860,7 @@
     
     async function loadRecords() {
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td</tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td></tr>';
         
         try {
             const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
@@ -846,7 +875,7 @@
             showToast(`Active Ledger Loaded: ${allRecords.length} Rows`);
             
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td></tr>';
             showToast('Database link execution broken.', true);
         }
     }
@@ -885,21 +914,26 @@
             const comments = record.Comments || '-';
             const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
             
+            // FORMAT DATE and TIME IN/OUT using helpers
+            const formattedDate = formatDateString(record.Date);
+            const formattedTimeIn = formatTimeString(record['Time In']);
+            const formattedTimeOut = formatTimeString(record['Time Out']);
+            
             html += `
                 <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
                     <td class="checkbox-col" onclick="event.stopPropagation()">
                         <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
                     </td>
-                    <td>${record.Date}</td>
-                    <td>${record['Time In'] || '-'}</td>
-                    <td>${record['Time Out'] || '-'}</td>
+                    <td>${formattedDate}</td>
+                    <td>${formattedTimeIn}</td>
+                    <td>${formattedTimeOut}</td>
                     <td>K${target.toFixed(2)}</td>
                     <td>K${cashIn.toFixed(2)}</td>
                     <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
                     <td>K${cumulativeTarget.toFixed(2)}</td>
                     <td>K${cumulativeCashIn.toFixed(2)}</td>
                     <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
-                    <td title="${comments}">${shortComments}</td>
+                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</td>
                     <td class="action-cell" onclick="event.stopPropagation()">
                         <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
                            <i class="fas fa-expand"></i> View
@@ -943,9 +977,14 @@
         activeCardIndex = index;
         activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
 
-        document.getElementById('cardDateText').innerText = record.Date;
-        document.getElementById('cardTimeIn').innerText = record['Time In'] || '-';
-        document.getElementById('cardTimeOut').innerText = record['Time Out'] || '-';
+        // Apply formatting for modal as well
+        const formattedDate = formatDateString(record.Date);
+        const formattedTimeIn = formatTimeString(record['Time In']);
+        const formattedTimeOut = formatTimeString(record['Time Out']);
+        
+        document.getElementById('cardDateText').innerText = formattedDate;
+        document.getElementById('cardTimeIn').innerText = formattedTimeIn;
+        document.getElementById('cardTimeOut').innerText = formattedTimeOut;
         
         document.getElementById('cardTarget').innerText = `K${target.toFixed(2)}`;
         document.getElementById('cardCashIn').innerText = `K${cashIn.toFixed(2)}`;
@@ -1016,10 +1055,13 @@
         const target = Number(r.Target) || 0;
         const cashIn = Number(r['Cash In']) || 0;
         const transactionBalance = target - cashIn;
+        const formattedDate = formatDateString(r.Date);
+        const formattedTimeIn = formatTimeString(r['Time In']);
+        const formattedTimeOut = formatTimeString(r['Time Out']);
         
         const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
-            `📅 Date: ${r.Date}\n` +
-            `⏰ Window: ${r['Time In'] || '-'} → ${r['Time Out'] || '-'}\n` +
+            `📅 Date: ${formattedDate}\n` +
+            `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
             `🎯 Target Point: K${target.toFixed(2)}\n` +
             `💰 Realized Cash: K${cashIn.toFixed(2)}\n` +
             `⚖️ Delta Offset: K${transactionBalance.toFixed(2)}\n` +
@@ -1050,8 +1092,8 @@
             const transBal = target - cashIn;
             cumulativeTarget += target;
             cumulativeCashIn += cashIn;
-            
-            message += `${i+1}. *${r.Date}*\n`;
+            const formattedDate = formatDateString(r.Date);
+            message += `${i+1}. *${formattedDate}*\n`;
             message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
             if (r.Comments) message += `   📝 ${r.Comments}\n`;
         });
@@ -1076,7 +1118,8 @@
         
         let message = "CASHFLOW LEDGER BRIEF\n\n";
         selected.forEach((r, i) => {
-            message += `${i+1}. ${r.Date} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
+            const formattedDate = formatDateString(r.Date);
+            message += `${i+1}. ${formattedDate} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
         window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
@@ -1091,7 +1134,8 @@
         
         let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
         selected.forEach(r => {
-            body += `${r.Date} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
+            const formattedDate = formatDateString(r.Date);
+            body += `${formattedDate} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
         window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
