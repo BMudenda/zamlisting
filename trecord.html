@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CashFlow Pro | Complete Cumulative Tracker</title>
+    <title>CashFlow Pro | Expense-Aware Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -207,7 +207,7 @@
             border: 1px solid #334155;
         }
 
-        <table>
+        table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
@@ -501,6 +501,13 @@
             align-items: center;
         }
 
+        .expense-hint {
+            font-size: 0.7rem;
+            color: #f97316;
+            margin-top: 4px;
+            display: block;
+        }
+
         @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -516,7 +523,7 @@
     <div class="header">
         <div class="logo">
             <h1><i class="fas fa-wallet"></i> CashFlow Pro</h1>
-            <p>Complete Cumulative Cash Management System</p>
+            <p>Expense-aware cumulative cash management</p>
         </div>
         <button class="btn-add" id="openModalBtn"><i class="fas fa-plus"></i> Add Transaction</button>
     </div>
@@ -535,7 +542,7 @@
             <div class="stat-content">
                 <h3>Total Target</h3>
                 <div class="stat-value" id="totalTarget">K0.00</div>
-                <div class="stat-label">Expected target sum</div>
+                <div class="stat-label">Expected sum (excludes expenses)</div>
             </div>
         </div>
         <div class="stat-card">
@@ -543,7 +550,7 @@
             <div class="stat-content">
                 <h3>Cumulative Balance</h3>
                 <div class="stat-value" id="finalCumulativeBalance">K0.00</div>
-                <div class="stat-label">Net variance index</div>
+                <div class="stat-label">Total target - net cash</div>
             </div>
         </div>
         <div class="stat-card">
@@ -571,7 +578,7 @@
     </div>
 
     <div class="table-wrapper">
-        <table>
+        <table id="dataTable">
             <thead>
                 <tr>
                     <th class="checkbox-col"><input type="checkbox" id="headerMasterCheckbox"></th>
@@ -594,7 +601,7 @@
             <tbody id="tableBody">
                 <tr>
                     <td colspan="15" style="text-align:center; padding:48px; color: #94a3b8;">
-                        <i class="fas fa-spinner fa-pulse"></i> Resolving data layers...
+                        <i class="fas fa-spinner fa-pulse"></i> Loading data...
                     </td>
                 </tr>
             </tbody>
@@ -625,7 +632,7 @@
     <div class="modal-body">
         <div class="form-row">
             <div class="form-group">
-                <label><i class="fas fa-calendar-alt"></i> Value Date *</label>
+                <label><i class="fas fa-calendar-alt"></i> Date *</label>
                 <input type="date" id="inputDate">
             </div>
             <div class="form-group">
@@ -635,25 +642,26 @@
                     <option value="Brian">Brian</option>
                     <option value="Expenses">Expenses</option>
                 </select>
+                <span class="expense-hint" id="expenseHint"></span>
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label><i class="fas fa-clock"></i> Entry Time (In)</label>
+                <label><i class="fas fa-clock"></i> Time In</label>
                 <input type="time" id="inputTimeIn">
             </div>
             <div class="form-group">
-                <label><i class="fas fa-clock"></i> Exit Time (Out)</label>
+                <label><i class="fas fa-clock"></i> Time Out</label>
                 <input type="time" id="inputTimeOut">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label><i class="fas fa-crosshairs"></i> Target Frame (K)</label>
+                <label><i class="fas fa-crosshairs"></i> Target (K)</label>
                 <input type="number" id="inputTarget" value="400" step="any" oninput="updateBalancePreview()">
             </div>
             <div class="form-group">
-                <label><i class="fas fa-money-bill-wave"></i> Realized Cash In (K)</label>
+                <label><i class="fas fa-money-bill-wave"></i> Cash In (K)</label>
                 <input type="number" id="inputCashIn" step="any" oninput="updateBalancePreview()">
             </div>
         </div>
@@ -663,17 +671,17 @@
                 <input type="number" id="inputCashOut" step="any" oninput="updateBalancePreview()">
             </div>
             <div class="form-group">
-                <label><i class="fas fa-wallet"></i> Net Cash Computation (K)</label>
+                <label><i class="fas fa-wallet"></i> Net Cash (computed)</label>
                 <input type="number" id="inputNetCash" readonly style="font-weight:bold; background: #0f172a;">
             </div>
         </div>
         <div class="form-group">
-            <label><i class="fas fa-calculator"></i> Delta Target Computation Preview</label>
+            <label><i class="fas fa-calculator"></i> Transaction Balance (Target - Net)</label>
             <input type="number" id="inputBalance" readonly style="font-weight:bold;">
         </div>
         <div class="form-group">
-            <label><i class="fas fa-comment-alt"></i> Internal Logs / Comments</label>
-            <textarea id="inputComments" rows="3" placeholder="Append transaction metadata..."></textarea>
+            <label><i class="fas fa-comment-alt"></i> Comments</label>
+            <textarea id="inputComments" rows="3" placeholder="Notes..."></textarea>
         </div>
         <div class="modal-footer">
             <button class="btn-save" id="saveBtn"><i class="fas fa-check"></i> Commit Entry</button>
@@ -689,685 +697,300 @@
     </div>
     <div class="modal-body">
         <div class="card-view-header">
-            <div class="card-date-badge">
-                <i class="far fa-calendar-check"></i> <span id="cardDateText">--</span>
-            </div>
+            <div class="card-date-badge"><i class="far fa-calendar-check"></i> <span id="cardDateText">--</span></div>
             <div id="cardStatusPill" class="card-status-pill">--</div>
         </div>
-
-        <div class="card-section-title"><i class="fas fa-user"></i> Context Metadata</div>
-        <div class="card-metrics-grid" style="grid-template-columns: 1fr;">
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Assigned Operator / Target</div>
-                <div class="card-metric-val" id="cardNameText" style="color:#e2e8f0;">--</div>
-            </div>
-        </div>
-
-        <div class="card-section-title"><i class="fas fa-clock"></i> Entry Logs Window</div>
-        <div class="card-metrics-grid" style="grid-template-columns: 1fr 1fr;">
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Time In</div>
-                <div class="card-metric-val" id="cardTimeIn" style="color:#e2e8f0;">--</div>
-            </div>
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Time Out</div>
-                <div class="card-metric-val" id="cardTimeOut" style="color:#e2e8f0;">--</div>
-            </div>
-        </div>
-
-        <div class="card-section-title"><i class="fas fa-coins"></i> Core Row Transaction Metrics</div>
-        <div class="card-metrics-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Target</div>
-                <div class="card-metric-val" id="cardTarget" style="color: #38bdf8;">K0.00</div>
-            </div>
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Cash In</div>
-                <div class="card-metric-val" id="cardCashIn" style="color: #10b981;">K0.00</div>
-            </div>
-        </div>
-        <div class="card-metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Cash Out</div>
-                <div class="card-metric-val" id="cardCashOut" style="color: #f87171;">K0.00</div>
-            </div>
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Net Cash</div>
-                <div class="card-metric-val" id="cardNetCash" style="color: #fbbf24;">K0.00</div>
-            </div>
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Net Balance</div>
-                <div class="card-metric-val" id="cardBalance">K0.00</div>
-            </div>
-        </div>
-
-        <div class="card-section-title"><i class="fas fa-chart-line"></i> Timeline Aggregation Progress</div>
+        <div class="card-section-title"><i class="fas fa-user"></i> Context</div>
+        <div class="card-metrics-grid" style="grid-template-columns: 1fr;"><div class="card-metric-block"><div class="card-metric-lbl">Name</div><div class="card-metric-val" id="cardNameText">--</div></div></div>
+        <div class="card-section-title"><i class="fas fa-clock"></i> Time Logs</div>
+        <div class="card-metrics-grid"><div class="card-metric-block"><div class="card-metric-lbl">Time In</div><div class="card-metric-val" id="cardTimeIn">--</div></div><div class="card-metric-block"><div class="card-metric-lbl">Time Out</div><div class="card-metric-val" id="cardTimeOut">--</div></div></div>
+        <div class="card-section-title"><i class="fas fa-coins"></i> Core Metrics</div>
         <div class="card-metrics-grid">
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Cum. Target</div>
-                <div class="card-metric-val" id="cardCumTarget" style="color: #94a3b8;">K0.00</div>
-            </div>
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Cum. Cash In</div>
-                <div class="card-metric-val" id="cardCumCashIn" style="color: #94a3b8;">K0.00</div>
-            </div>
-            <div class="card-metric-block">
-                <div class="card-metric-lbl">Cum. Balance</div>
-                <div class="card-metric-val" id="cardCumBalance">K0.00</div>
-            </div>
+            <div class="card-metric-block"><div class="card-metric-lbl">Target</div><div class="card-metric-val" id="cardTarget">K0.00</div></div>
+            <div class="card-metric-block"><div class="card-metric-lbl">Cash In</div><div class="card-metric-val" id="cardCashIn">K0.00</div></div>
+            <div class="card-metric-block"><div class="card-metric-lbl">Cash Out</div><div class="card-metric-val" id="cardCashOut">K0.00</div></div>
+            <div class="card-metric-block"><div class="card-metric-lbl">Net Cash</div><div class="card-metric-val" id="cardNetCash">K0.00</div></div>
+            <div class="card-metric-block"><div class="card-metric-lbl">Tx Balance</div><div class="card-metric-val" id="cardBalance">K0.00</div></div>
         </div>
-
-        <div class="card-section-title"><i class="fas fa-comment-dots"></i> Internal Comments Log</div>
+        <div class="card-section-title"><i class="fas fa-chart-line"></i> Cumulative Progress</div>
+        <div class="card-metrics-grid"><div class="card-metric-block"><div class="card-metric-lbl">Cum. Target</div><div class="card-metric-val" id="cardCumTarget">K0.00</div></div><div class="card-metric-block"><div class="card-metric-lbl">Cum. Cash In</div><div class="card-metric-val" id="cardCumCashIn">K0.00</div></div><div class="card-metric-block"><div class="card-metric-lbl">Cum. Balance</div><div class="card-metric-val" id="cardCumBalance">K0.00</div></div></div>
+        <div class="card-section-title"><i class="fas fa-comment-dots"></i> Comments</div>
         <div id="cardComments" class="card-comment-box">--</div>
-
-        <div class="card-share-bar">
-            <button class="btn-card-action" id="cardWhatsappBtn" style="background:#22c55e;"><i class="fab fa-whatsapp"></i> WhatsApp Node</button>
-        </div>
+        <div class="card-share-bar"><button class="btn-card-action" id="cardWhatsappBtn" style="background:#22c55e;"><i class="fab fa-whatsapp"></i> Share this entry</button></div>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
     const PHONE_NUMBER = "0978167546";
-    
     let allRecords = [];
-    let activeCardIndex = null;
-    let activeCardCumulate = {};
-    
-    function parseExcelDate(excelDate) {
-        if (!excelDate) return null;
-        if (typeof excelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(excelDate)) {
-            return excelDate;
-        }
-        if (typeof excelDate === 'string' && excelDate.includes('T')) {
-            const dateObj = new Date(excelDate);
-            if (!isNaN(dateObj.getTime())) {
-                const year = dateObj.getFullYear();
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                if (year === 1899 && month === '12' && (day === '30' || day === '31')) {
-                    return null;
-                }
-                return `${year}-${month}-${day}`;
-            }
-        }
-        let numDays = parseFloat(excelDate);
-        if (!isNaN(numDays) && numDays > 0) {
-            const excelEpoch = new Date(1899, 11, 30);
-            const date = new Date(excelEpoch.getTime() + numDays * 86400000);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-        return excelDate;
-    }
-    
-    function parseTimeValue(timeValue) {
-        if (!timeValue || timeValue === "") return "";
-        if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
-            return timeValue;
-        }
-        if (typeof timeValue === 'string' && timeValue.includes('T')) {
-            const dateObj = new Date(timeValue);
-            if (!isNaN(dateObj.getTime())) {
-                const hours = String(dateObj.getUTCHours()).padStart(2, '0');
-                const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-        }
-        let numDays = parseFloat(timeValue);
-        if (!isNaN(numDays) && numDays >= 0 && numDays < 1) {
-            const totalSeconds = numDays * 86400;
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-        }
-        if (typeof timeValue === 'string' && timeValue.includes(':')) {
-            const parts = timeValue.split(':');
-            if (parts.length >= 2) {
-                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-            }
-        }
-        return timeValue;
-    }
-    
-    function formatDateForDisplay(dateValue) {
-        const parsed = parseExcelDate(dateValue);
-        if (!parsed) return "—";
-        if (parsed === dateValue && dateValue.includes('-')) {
-            const parts = dateValue.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-        }
-        if (parsed.includes('-')) {
-            const parts = parsed.split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
-        }
-        return parsed || "—";
-    }
-    
+    let activeCardData = null;
+
+    // Helper: format date & time (existing logic simplified but robust)
+    function formatDateDisplay(raw) { if(!raw) return "—"; let str=String(raw); if(str.includes('-')){ let p=str.split('-'); if(p.length===3) return `${p[2]}/${p[1]}/${p[0]}`;} return str; }
+    function parseTime(t) { if(!t) return ""; if(typeof t==='string' && t.includes(':')) return t.substring(0,5); if(typeof t==='number'){ let hrs=Math.floor(t*24); let mins=Math.round((t*24-hrs)*60); return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;} return String(t).substring(0,5); }
+
     function updateBalancePreview() {
-        // Simple and identical to Cash In: No locked options
-        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
-        const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
+        const isExpense = document.getElementById('inputName').value === 'Expenses';
+        let target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        let cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
+        
+        // EXPENSE MODE OVERRIDE: target=0, cashIn=0
+        if(isExpense){
+            target = 0;
+            cashIn = 0;
+            document.getElementById('inputTarget').value = 0;
+            document.getElementById('inputCashIn').value = 0;
+            document.getElementById('inputTarget').readOnly = true;
+            document.getElementById('inputCashIn').readOnly = true;
+            document.getElementById('expenseHint').innerHTML = '<i class="fas fa-info-circle"></i> Expenses: Target & Cash In forced to 0. Cash Out records spending.';
+        } else {
+            document.getElementById('inputTarget').readOnly = false;
+            document.getElementById('inputCashIn').readOnly = false;
+            document.getElementById('expenseHint').innerHTML = '';
+        }
         
         const netCash = cashIn - cashOut;
         document.getElementById('inputNetCash').value = netCash.toFixed(2);
-        
         const balance = target - netCash;
-        const balanceField = document.getElementById('inputBalance');
-        balanceField.value = balance.toFixed(2);
-        
-        if (balance > 0) {
-            balanceField.style.color = "#f87171";
-            balanceField.style.background = "#1e293b";
-        } else if (balance < 0) {
-            balanceField.style.color = "#4ade80";
-            balanceField.style.background = "#1e293b";
-        } else {
-            balanceField.style.color = "#fbbf24";
-            balanceField.style.background = "#1e293b";
-        }
+        const balField = document.getElementById('inputBalance');
+        balField.value = balance.toFixed(2);
+        balField.style.color = balance > 0 ? '#f87171' : (balance < 0 ? '#4ade80' : '#fbbf24');
     }
-    
-    function showToast(message, isError = false) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i class="fas ${isError ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> ${message}`;
-        toast.style.background = isError ? '#ef4444' : '#10b981';
-        toast.style.color = 'white';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function showLoading(show) {
-        let loader = document.getElementById('globalLoader');
-        if (show && !loader) {
-            loader = document.createElement('div');
-            loader.id = 'globalLoader';
-            loader.className = 'loading';
-            loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x" style="color:#38bdf8"></i><span>Running Operation Pipeline...</span></div>';
-            document.body.appendChild(loader);
-        } else if (!show && loader) {
-            loader.remove();
-        }
-    }
-    
-    async function saveToSheet(record) {
-        const params = new URLSearchParams();
-        params.append('Date', record.date);
-        params.append('Name', record.name);
-        params.append('Time In', record.timeIn);
-        params.append('Time Out', record.timeOut);
-        params.append('Target', record.target);
-        params.append('Cash In', record.cashIn);
-        params.append('Cash Out', record.cashOut);
-        params.append('Net Cash', record.netCash);
-        params.append('Balance', record.balance);
-        params.append('Comments', record.comments);
-        
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: params.toString(),
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            });
-            return true;
-        } catch (err) {
-            console.error(err);
-            return false;
-        }
-    }
-    
-    async function saveRecord() {
-        const date = document.getElementById('inputDate').value;
-        if (!date) {
-            showToast('A distinct validation date is required.', true);
-            return;
-        }
 
-        const nameValue = document.getElementById('inputName').value;
-        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
-        const timeIn = document.getElementById('inputTimeIn').value || "";
-        const timeOut = document.getElementById('inputTimeOut').value || "";
-        const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
-        
+    function showToast(msg, err=false) { let t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas ${err?'fa-circle-exclamation':'fa-circle-check'}"></i> ${msg}`; t.style.background=err?'#ef4444':'#10b981'; t.style.color='white'; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+    function showLoading(show){ let l=document.getElementById('globalLoader'); if(show && !l){ l=document.createElement('div'); l.id='globalLoader'; l.className='loading'; l.innerHTML='<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Processing...</span></div>'; document.body.appendChild(l);} else if(!show && l) l.remove(); }
+
+    async function saveToSheet(record){
+        let params=new URLSearchParams();
+        params.append('Date', record.date); params.append('Name', record.name); params.append('Time In', record.timeIn); params.append('Time Out', record.timeOut);
+        params.append('Target', record.target); params.append('Cash In', record.cashIn); params.append('Cash Out', record.cashOut);
+        params.append('Net Cash', record.netCash); params.append('Balance', record.balance); params.append('Comments', record.comments);
+        try { await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:params, headers:{'Content-Type':'application/x-www-form-urlencoded'}}); return true; } catch(e){ return false; }
+    }
+
+    async function saveRecord(){
+        const date = document.getElementById('inputDate').value;
+        if(!date){ showToast('Date required', true); return; }
+        let name = document.getElementById('inputName').value;
+        let target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        let cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
+        if(name === 'Expenses'){
+            target = 0;
+            cashIn = 0;
+        }
         const netCash = cashIn - cashOut;
         const balance = target - netCash;
-        
         const record = {
-            date: date,
-            name: nameValue,
-            timeIn: timeIn,
-            timeOut: timeOut,
-            target: target,
-            cashIn: cashIn,
-            cashOut: cashOut,
-            netCash: netCash,
-            balance: balance,
-            comments: document.getElementById('inputComments').value || ""
+            date, name, timeIn: document.getElementById('inputTimeIn').value || "", timeOut: document.getElementById('inputTimeOut').value || "",
+            target, cashIn, cashOut, netCash, balance, comments: document.getElementById('inputComments').value || ""
         };
-        
         showLoading(true);
-        const success = await saveToSheet(record);
+        let ok = await saveToSheet(record);
         showLoading(false);
-        
-        if (success) {
-            showToast(`Transaction synced explicitly.`);
-            closeModal();
-            await loadRecords();
-        } else {
-            showToast('Engine encountered connection synchronization fault.', true);
-        }
+        if(ok){ showToast('Saved!'); closeModal(); await loadRecords(); }
+        else showToast('Sync error', true);
     }
-    
-    async function loadRecords() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td></tr>';
-        
-        try {
-            const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
-            if (!response.ok) throw new Error();
-            const data = await response.json();
-            
-            allRecords = (data.rows || []).filter(row => row && row.Date && row.Date !== '');
-            allRecords.sort((a, b) => {
-                const dateA = parseExcelDate(a.Date) || '';
-                const dateB = parseExcelDate(b.Date) || '';
-                return dateA.localeCompare(dateB);
-            });
-            
-            displayRecordsWithAllCumulatives();
+
+    async function loadRecords(){
+        const tbody=document.getElementById('tableBody');
+        tbody.innerHTML='<tr><td colspan="15" style="text-align:center; padding:48px;"><i class="fas fa-spinner fa-pulse"></i> Fetching...</td></tr>';
+        try{
+            let resp=await fetch(SCRIPT_URL, {method:'GET', mode:'cors'});
+            if(!resp.ok) throw new Error();
+            let data=await resp.json();
+            allRecords=(data.rows||[]).filter(r=>r && r.Date);
+            allRecords.sort((a,b)=>String(a.Date).localeCompare(String(b.Date)));
+            renderTable();
             updateStats();
-            showToast(`Active Ledger Loaded: ${allRecords.length} Rows`);
-            
-        } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
-            showToast('Database link execution broken.', true);
-        }
+            showToast(`Loaded ${allRecords.length} entries`);
+        } catch(e){ tbody.innerHTML='<tr><td colspan="15" style="text-align:center;color:#f87171;">API connection failed</td></tr>'; showToast('Load failed', true); }
     }
-    
-    function displayRecordsWithAllCumulatives() {
-        const tbody = document.getElementById('tableBody');
-        
-        if (allRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-inbox"></i> Environment Empty. Tap action buttons to write.</div></td>';
-            document.getElementById('tableFooter').style.display = 'none';
-            return;
-        }
-        
-        let cumulativeTarget = 0;
-        let cumulativeCashIn = 0;
-        let cumulativeCashOut = 0;
-        let cumulativeNetCash = 0;
-        let cumulativeBalance = 0;
-        let html = '';
-        
-        allRecords.forEach((record, index) => {
-            const nameField = record.Name || '—';
+
+    function renderTable(){
+        let tbody=document.getElementById('tableBody');
+        if(allRecords.length===0){ tbody.innerHTML='<tr><td colspan="15" style="text-align:center; padding:48px;">No records</td></tr>'; document.getElementById('tableFooter').style.display='none'; return; }
+        let cumTarget=0, cumCashIn=0, cumCashOut=0, cumNet=0, cumBalance=0;
+        let html='';
+        allRecords.forEach((rec,idx)=>{
+            let name=rec.Name||'';
+            let target=Number(rec.Target)||0;
+            let cashIn=Number(rec['Cash In'])||0;
+            let cashOut=Number(rec['Cash Out'])||0;
+            // Expense correction: if name is Expenses, force target=0, cashIn=0 for cumulative consistency
+            let isExpenseRecord = (name === 'Expenses');
+            let effectiveTarget = isExpenseRecord ? 0 : target;
+            let effectiveCashIn = isExpenseRecord ? 0 : cashIn;
+            let netCash = effectiveCashIn - cashOut;
+            let txBalance = effectiveTarget - netCash;
             
-            const target = Number(record.Target) || 0;
-            const cashIn = Number(record['Cash In']) || 0;
-            const cashOut = Number(record['Cash Out']) || 0;
-            const netCash = cashIn - cashOut;
-            const transactionBalance = target - netCash;
+            cumTarget += effectiveTarget;
+            cumCashIn += effectiveCashIn;
+            cumCashOut += cashOut;
+            cumNet += netCash;
+            cumBalance += txBalance;
             
-            cumulativeTarget += target;
-            cumulativeCashIn += cashIn;
-            cumulativeCashOut += cashOut;
-            cumulativeNetCash += netCash;
-            cumulativeBalance += transactionBalance;
+            let balanceClass = txBalance>0?'val-negative':(txBalance<0?'val-positive':'val-neutral');
+            let cumClass = cumBalance>0?'val-negative':(cumBalance<0?'val-positive':'val-neutral');
+            let dateFmt=formatDateDisplay(rec.Date);
+            let timeIn=parseTime(rec['Time In']);
+            let timeOut=parseTime(rec['Time Out']);
+            let comments=rec.Comments||'-';
+            let shortComments=comments.length>20?comments.substring(0,20)+'...':comments;
             
-            let balanceClass = 'val-neutral';
-            if (transactionBalance > 0) balanceClass = 'val-negative';
-            else if (transactionBalance < 0) balanceClass = 'val-positive';
-            
-            let cumulativeClass = 'val-neutral';
-            if (cumulativeBalance > 0) cumulativeClass = 'val-negative';
-            else if (cumulativeBalance < 0) cumulativeClass = 'val-positive';
-            
-            const comments = record.Comments || '-';
-            const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
-            
-            const formattedDate = formatDateForDisplay(record.Date);
-            const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
-            const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
-            
-            html += `
-                <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
-                    <td class="checkbox-col" onclick="event.stopPropagation()">
-                        <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
-                    </td>
-                    <td>${formattedDate}</td>
-                    <td style="font-weight: 600; color: #38bdf8;">${nameField}</td>
-                    <td>${formattedTimeIn}</td>
-                    <td>${formattedTimeOut}</td>
-                    <td>K${target.toFixed(2)}</td>
-                    <td>K${cashIn.toFixed(2)}</td>
-                    <td style="color: #f87171;">K${cashOut.toFixed(2)}</td>
-                    <td style="color: #fbbf24; font-weight:600;">K${netCash.toFixed(2)}</td>
-                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
-                    <td>K${cumulativeTarget.toFixed(2)}</td>
-                    <td>K${cumulativeCashIn.toFixed(2)}</td>
-                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
-                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</td>
-                    <td class="action-cell" onclick="event.stopPropagation()">
-                        <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
-                           <i class="fas fa-expand"></i> View
-                        </button>
-                    </td>
-                </tr>
-            `;
+            html+=`<tr class="interactive-row" onclick="toggleCheckbox(${idx})">
+                <td class="checkbox-col" onclick="event.stopPropagation()"><input type="checkbox" class="record-checkbox" id="cb_${idx}" data-index="${idx}"></td>
+                <td>${dateFmt}</td><td style="font-weight:600;color:#38bdf8;">${name}</td>
+                <td>${timeIn||'—'}</td><td>${timeOut||'—'}</td>
+                <td>K${effectiveTarget.toFixed(2)}</td><td>K${effectiveCashIn.toFixed(2)}</td>
+                <td style="color:#f87171;">K${cashOut.toFixed(2)}</td>
+                <td style="color:#fbbf24;">K${netCash.toFixed(2)}</td>
+                <td class="${balanceClass}">K${txBalance.toFixed(2)}</td>
+                <td>K${cumTarget.toFixed(2)}</td><td>K${cumCashIn.toFixed(2)}</td>
+                <td class="${cumClass}">K${cumBalance.toFixed(2)}</td>
+                <td title="${comments.replace(/"/g,'&quot;')}">${shortComments}</td>
+                <td class="action-cell" onclick="event.stopPropagation()"><button class="btn-view" onclick="viewCard(${idx}, ${cumTarget}, ${cumCashIn}, ${cumBalance})"><i class="fas fa-expand"></i> View</button></td>
+            </tr>`;
         });
-        
-        tbody.innerHTML = html;
-        
-        document.getElementById('tableFooter').style.display = 'table-footer-group';
-        document.getElementById('footerTarget').innerHTML = `K${cumulativeTarget.toFixed(2)}`;
-        document.getElementById('footerCashIn').innerHTML = `K${cumulativeCashIn.toFixed(2)}`;
-        document.getElementById('footerCashOut').innerHTML = `K${cumulativeCashOut.toFixed(2)}`;
-        document.getElementById('footerNetCash').innerHTML = `K${cumulativeNetCash.toFixed(2)}`;
-        document.getElementById('footerTransBal').innerHTML = `K${(cumulativeTarget - cumulativeNetCash).toFixed(2)}`;
-        document.getElementById('footerCumulative').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
-        
-        const footerElem = document.getElementById('footerCumulative');
-        if (cumulativeBalance > 0) footerElem.className = "val-negative";
-        else if (cumulativeBalance < 0) footerElem.className = "val-positive";
-        else footerElem.className = "val-neutral";
-        
-        attachCheckboxEvents();
+        tbody.innerHTML=html;
+        document.getElementById('tableFooter').style.display='table-footer-group';
+        document.getElementById('footerTarget').innerHTML=`K${cumTarget.toFixed(2)}`;
+        document.getElementById('footerCashIn').innerHTML=`K${cumCashIn.toFixed(2)}`;
+        document.getElementById('footerCashOut').innerHTML=`K${cumCashOut.toFixed(2)}`;
+        document.getElementById('footerNetCash').innerHTML=`K${cumNet.toFixed(2)}`;
+        document.getElementById('footerTransBal').innerHTML=`K${(cumTarget-cumNet).toFixed(2)}`;
+        document.getElementById('footerCumulative').innerHTML=`K${cumBalance.toFixed(2)}`;
+        let footElem=document.getElementById('footerCumulative');
+        footElem.className = cumBalance>0?'val-negative':(cumBalance<0?'val-positive':'val-neutral');
+        attachEvents();
         updateSelectedCount();
     }
 
-    function toggleRowCheckbox(index) {
-        const checkbox = document.getElementById(`cb_row_${index}`);
-        if(checkbox) {
-            checkbox.checked = !checkbox.checked;
-            updateSelectedCount();
-        }
-    }
-    
-    function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
-        const record = allRecords[index];
-        const nameField = record.Name || '—';
+    function viewCard(idx, cumT, cumCI, cumBal){
+        let rec=allRecords[idx];
+        let name=rec.Name||'';
+        let isExp = (name === 'Expenses');
+        let targetRaw=Number(rec.Target)||0;
+        let cashInRaw=Number(rec['Cash In'])||0;
+        let cashOut=Number(rec['Cash Out'])||0;
+        let target= isExp ? 0 : targetRaw;
+        let cashIn = isExp ? 0 : cashInRaw;
+        let netCash = cashIn - cashOut;
+        let txBal = target - netCash;
         
-        const target = Number(record.Target) || 0;
-        const cashIn = Number(record['Cash In']) || 0;
-        const cashOut = Number(record['Cash Out']) || 0;
-        const netCash = cashIn - cashOut;
-        const transactionBalance = target - netCash;
-        
-        activeCardIndex = index;
-        activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
-
-        const formattedDate = formatDateForDisplay(record.Date);
-        const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
-        const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
-        
-        document.getElementById('cardDateText').innerText = formattedDate;
-        document.getElementById('cardNameText').innerText = nameField;
-        document.getElementById('cardTimeIn').innerText = formattedTimeIn;
-        document.getElementById('cardTimeOut').innerText = formattedTimeOut;
-        
-        document.getElementById('cardTarget').innerText = `K${target.toFixed(2)}`;
-        document.getElementById('cardCashIn').innerText = `K${cashIn.toFixed(2)}`;
-        document.getElementById('cardCashOut').innerText = `K${cashOut.toFixed(2)}`;
-        document.getElementById('cardNetCash').innerText = `K${netCash.toFixed(2)}`;
-        
-        const balElem = document.getElementById('cardBalance');
-        balElem.innerText = `K${transactionBalance.toFixed(2)}`;
-        
-        const statusPill = document.getElementById('cardStatusPill');
-        if (transactionBalance > 0) {
-            balElem.className = "card-metric-val val-negative";
-            statusPill.innerText = "Shortage";
-            statusPill.className = "card-status-pill pill-negative";
-        } else if (transactionBalance < 0) {
-            balElem.className = "card-metric-val val-positive";
-            statusPill.innerText = "Surplus";
-            statusPill.className = "card-status-pill pill-positive";
-        } else {
-            balElem.className = "card-metric-val val-neutral";
-            statusPill.innerText = "Balanced";
-            statusPill.className = "card-status-pill pill-neutral";
-        }
-
-        document.getElementById('cardCumTarget').innerText = `K${cumTarget.toFixed(2)}`;
-        document.getElementById('cardCumCashIn').innerText = `K${cumCashIn.toFixed(2)}`;
-        
-        const cumBalElem = document.getElementById('cardCumBalance');
-        cumBalElem.innerText = `K${cumBalance.toFixed(2)}`;
-        if (cumBalance > 0) cumBalElem.className = "card-metric-val val-negative";
-        else if (cumBalance < 0) cumBalElem.className = "card-metric-val val-positive";
-        else cumBalElem.className = "card-metric-val val-neutral";
-
-        document.getElementById('cardComments').innerText = record.Comments || 'No logs configured for this string record entry.';
-
+        activeCardData = { cumTarget:cumT, cumCashIn:cumCI, cumBalance:cumBal };
+        document.getElementById('cardDateText').innerText=formatDateDisplay(rec.Date);
+        document.getElementById('cardNameText').innerText=name;
+        document.getElementById('cardTimeIn').innerText=parseTime(rec['Time In'])||'—';
+        document.getElementById('cardTimeOut').innerText=parseTime(rec['Time Out'])||'—';
+        document.getElementById('cardTarget').innerHTML=`K${target.toFixed(2)}`;
+        document.getElementById('cardCashIn').innerHTML=`K${cashIn.toFixed(2)}`;
+        document.getElementById('cardCashOut').innerHTML=`K${cashOut.toFixed(2)}`;
+        document.getElementById('cardNetCash').innerHTML=`K${netCash.toFixed(2)}`;
+        let balSpan=document.getElementById('cardBalance');
+        balSpan.innerHTML=`K${txBal.toFixed(2)}`;
+        let pill=document.getElementById('cardStatusPill');
+        if(txBal>0){ balSpan.className="card-metric-val val-negative"; pill.innerText="Shortage"; pill.className="card-status-pill pill-negative"; }
+        else if(txBal<0){ balSpan.className="card-metric-val val-positive"; pill.innerText="Surplus"; pill.className="card-status-pill pill-positive"; }
+        else { balSpan.className="card-metric-val val-neutral"; pill.innerText="Balanced"; pill.className="card-status-pill pill-neutral"; }
+        document.getElementById('cardCumTarget').innerHTML=`K${cumT.toFixed(2)}`;
+        document.getElementById('cardCumCashIn').innerHTML=`K${cumCI.toFixed(2)}`;
+        let cumBalSpan=document.getElementById('cardCumBalance');
+        cumBalSpan.innerHTML=`K${cumBal.toFixed(2)}`;
+        cumBalSpan.className = cumBal>0?'card-metric-val val-negative':(cumBal<0?'card-metric-val val-positive':'card-metric-val val-neutral');
+        document.getElementById('cardComments').innerText=rec.Comments||'No comments';
         document.getElementById('viewCardModal').classList.add('show');
         document.getElementById('overlay').classList.add('show');
     }
-    
-    function updateStats() {
-        let totalTarget = 0, totalCashIn = 0, totalCashOut = 0, totalNetCash = 0, cumulativeBalance = 0;
-        allRecords.forEach(record => {
-            const target = Number(record.Target) || 0;
-            const cashIn = Number(record['Cash In']) || 0;
-            const cashOut = Number(record['Cash Out']) || 0;
-            
-            totalTarget += target;
-            totalCashIn += cashIn;
-            totalCashOut += cashOut;
-        });
-        totalNetCash = totalCashIn - totalCashOut;
-        cumulativeBalance = totalTarget - totalNetCash;
-        
-        document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
-        document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
-        document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
-        document.getElementById('totalRecords').innerHTML = allRecords.length;
-        
-        const cumulativeElem = document.getElementById('finalCumulativeBalance');
-        if (cumulativeBalance > 0) cumulativeElem.className = "stat-value val-negative";
-        else if (cumulativeBalance < 0) cumulativeElem.className = "stat-value val-positive";
-        else cumulativeElem.className = "stat-value val-neutral";
-    }
-    
-    function getSelectedRecords() {
-        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
-        return Array.from(checkboxes).map(cb => {
-            const idx = cb.getAttribute('data-index');
-            return allRecords[idx];
-        });
-    }
-    
-    function shareSingleRecord() {
-        if(activeCardIndex === null) return;
-        const r = allRecords[activeCardIndex];
-        const nameField = r.Name || '—';
-        const target = Number(r.Target) || 0;
-        const cashIn = Number(r['Cash In']) || 0;
-        const cashOut = Number(r['Cash Out']) || 0;
-        const netCash = cashIn - cashOut;
-        const transactionBalance = target - netCash;
-        const formattedDate = formatDateForDisplay(r.Date);
-        const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
-        const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
-        
-        const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
-            `📅 Date: ${formattedDate}\n` +
-            `👤 Name: ${nameField}\n` +
-            `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
-            `🎯 Target Point: K${target.toFixed(2)}\n` +
-            `💰 Realized Cash In: K${cashIn.toFixed(2)}\n` +
-            `💸 Cash Out: K${cashOut.toFixed(2)}\n` +
-            `⚖️ Net Cash Portfolio: K${netCash.toFixed(2)}\n` +
-            `⚖️ Delta Offset: K${transactionBalance.toFixed(2)}\n` +
-            `━━━━━━━━━━━━━━━━━━\n` +
-            `📈 *RUNNING TIMELINE TOTALS*\n` +
-            `🎯 Cum. Target: K${activeCardCumulate.cumTarget.toFixed(2)}\n` +
-            `💰 Cum. Cash In: K${activeCardCumulate.cumCashIn.toFixed(2)}\n` +
-            `⚖️ Cum. Net Balance: K${activeCardCumulate.cumBalance.toFixed(2)}\n` +
-            `${r.Comments ? `\n📝 Remarks: ${r.Comments}` : ''}\n\n` +
-            `_System Dispatch: CashFlow Pro_`;
-        
-        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
-    }
-    
-    function shareSelectedWhatsApp() {
-        const selected = getSelectedRecords();
-        if (selected.length === 0) {
-            showToast('Null selection parameter. Mark flags.', true);
-            return;
-        }
-        
-        let cumulativeTarget = 0, cumulativeCashIn = 0, cumulativeCashOut = 0, cumulativeNetCash = 0;
-        let message = "📊 *CASHFLOW LOG REPORT MATRIX*\n━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        
-        selected.forEach((r, i) => {
-            const nameField = r.Name || '—';
-            const target = Number(r.Target) || 0;
-            const cashIn = Number(r['Cash In']) || 0;
-            const cashOut = Number(r['Cash Out']) || 0;
-            const netCash = cashIn - cashOut;
-            const transBal = target - netCash;
-            
-            cumulativeTarget += target;
-            cumulativeCashIn += cashIn;
-            cumulativeCashOut += cashOut;
-            
-            const formattedDate = formatDateForDisplay(r.Date);
-            message += `${i+1}. *${formattedDate}* [${nameField}]\n`;
-            message += `   Target: K${target.toFixed(2)} | In: K${cashIn.toFixed(2)} | Out: K${cashOut.toFixed(2)} | Net: K${netCash.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
-            if (r.Comments) message += `   📝 ${r.Comments}\n`;
-        });
-        
-        cumulativeNetCash = cumulativeCashIn - cumulativeCashOut;
-        const cumulativeBalance = cumulativeTarget - cumulativeNetCash;
-        message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
-        message += `📊 *SUMMARY SEGMENT METRICS*\n`;
-        message += `🎯 Bound Target: K${cumulativeTarget.toFixed(2)}\n`;
-        message += `💰 Gross Liquid Cash In: K${cumulativeCashIn.toFixed(2)}\n`;
-        message += `💸 Gross Liquid Cash Out: K${cumulativeCashOut.toFixed(2)}\n`;
-        message += `💰 Compiled Net Cash: K${cumulativeNetCash.toFixed(2)}\n`;
-        message += `⚖️ Balance Delta Portfolio: K${cumulativeBalance.toFixed(2)}\n`;
-        message += `\n_System Dispatch: CashFlow Pro_`;
-        
-        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
-    }
-    
-    function shareSelectedSMS() {
-        const selected = getSelectedRecords();
-        if (selected.length === 0) {
-            showToast('Select target records first', true);
-            return;
-        }
-        
-        let message = "CASHFLOW LEDGER BRIEF\n\n";
-        selected.forEach((r, i) => {
-            const nameField = r.Name || '—';
-            const formattedDate = formatDateForDisplay(r.Date);
-            const cashIn = Number(r['Cash In']) || 0;
-            const cashOut = Number(r['Cash Out']) || 0;
-            const netCash = cashIn - cashOut;
-            message += `${i+1}. ${formattedDate} (${nameField}) | Net Cash: K${netCash.toFixed(2)}\n`;
-        });
-        
-        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
-    }
-    
-    function emailReport() {
-        const selected = getSelectedRecords();
-        if (selected.length === 0) {
-            showToast('Select records to route transmission', true);
-            return;
-        }
-        
-        let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
-        selected.forEach(r => {
-            const nameField = r.Name || '—';
-            const formattedDate = formatDateForDisplay(r.Date);
-            const target = Number(r.Target) || 0;
-            const cashIn = Number(r['Cash In']) || 0;
-            const cashOut = Number(r['Cash Out']) || 0;
-            const netCash = cashIn - cashOut;
-            body += `${formattedDate} | Name: ${nameField} | Target Base: K${target.toFixed(2)} | Net Cash: K${netCash.toFixed(2)}\n`;
-        });
-        
-        window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
-    }
-    
-    function attachCheckboxEvents() {
-        document.querySelectorAll('.record-checkbox').forEach(cb => {
-            cb.onchange = (e) => {
-                e.stopPropagation();
-                updateSelectedCount();
-            };
-        });
-        
-        const masterToggle = (eState) => {
-            document.querySelectorAll('.record-checkbox').forEach(cb => cb.checked = eState);
-            document.getElementById('selectAllCheckbox').checked = eState;
-            document.getElementById('headerMasterCheckbox').checked = eState;
-            updateSelectedCount();
-        };
 
-        document.getElementById('selectAllCheckbox').onchange = (e) => masterToggle(e.target.checked);
-        document.getElementById('headerMasterCheckbox').onchange = (e) => masterToggle(e.target.checked);
+    function shareSingleCard(){
+        if(!activeCardData) return;
+        let rec=allRecords.find((_,idx)=> idx===activeCardData?.idx);
+        if(!rec) return;
+        let name=rec.Name||'';
+        let isExp=(name==='Expenses');
+        let target=isExp?0:(Number(rec.Target)||0);
+        let cashIn=isExp?0:(Number(rec['Cash In'])||0);
+        let cashOut=Number(rec['Cash Out'])||0;
+        let net=cashIn-cashOut;
+        let txBal=target-net;
+        let msg=`📊 *CASHFLOW CARD*\n📅 ${formatDateDisplay(rec.Date)}\n👤 ${name}\n⏰ ${parseTime(rec['Time In'])} → ${parseTime(rec['Time Out'])}\n🎯 Target: K${target.toFixed(2)}\n💰 Cash In: K${cashIn.toFixed(2)}\n💸 Cash Out: K${cashOut.toFixed(2)}\n⚖️ Net: K${net.toFixed(2)}\n📉 Delta: K${txBal.toFixed(2)}\n📈 Cum Target: K${activeCardData.cumTarget.toFixed(2)}\n📈 Cum Cash In: K${activeCardData.cumCashIn.toFixed(2)}\n⚖️ Cum Balance: K${activeCardData.cumBalance.toFixed(2)}\n💬 ${rec.Comments||''}`;
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
     }
-    
-    function updateSelectedCount() {
-        const count = document.querySelectorAll('.record-checkbox:checked').length;
-        document.getElementById('selectedCount').innerHTML = `${count} targeted items`;
-    }
-    
-    function openModal() {
-        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Create Transaction Entry';
-        document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
-        document.getElementById('inputName').selectedIndex = 0;
-        document.getElementById('inputTimeIn').value = '';
-        document.getElementById('inputTimeOut').value = '';
-        document.getElementById('inputTarget').value = '400';
-        document.getElementById('inputCashIn').value = '';
-        document.getElementById('inputCashOut').value = '';
-        document.getElementById('inputNetCash').value = '';
-        document.getElementById('inputBalance').value = '';
-        document.getElementById('inputComments').value = '';
 
-        document.getElementById('recordModal').classList.add('show');
-        document.getElementById('overlay').classList.add('show');
-        updateBalancePreview();
+    function getSelected(){ let cbs=document.querySelectorAll('.record-checkbox:checked'); return Array.from(cbs).map(cb=>allRecords[parseInt(cb.getAttribute('data-index'))]); }
+    function shareWhatsAppBatch(){
+        let sel=getSelected();
+        if(sel.length===0){ showToast('Select records first',true); return; }
+        let msg="📊 *CASHFLOW BATCH REPORT*\n━━━━━━━━━━━━\n";
+        sel.forEach((r,i)=>{
+            let isExp=(r.Name==='Expenses');
+            let target=isExp?0:(Number(r.Target)||0);
+            let cashIn=isExp?0:(Number(r['Cash In'])||0);
+            let cashOut=Number(r['Cash Out'])||0;
+            let net=cashIn-cashOut;
+            msg+=`${i+1}. ${formatDateDisplay(r.Date)} | ${r.Name} | Net: K${net.toFixed(2)}\n`;
+        });
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
     }
-    
-    function closeModal() {
-        document.getElementById('recordModal').classList.remove('show');
-        document.getElementById('viewCardModal').classList.remove('show');
-        document.getElementById('overlay').classList.remove('show');
-        activeCardIndex = null;
+    function shareSMSBatch(){
+        let sel=getSelected();
+        if(sel.length===0){ showToast('Select records',true); return; }
+        let msg="CASHFLOW REPORT\n";
+        sel.forEach(r=>{ let isExp=(r.Name==='Expenses'); let net=(isExp?0:(Number(r['Cash In'])||0)) - (Number(r['Cash Out'])||0); msg+=`${formatDateDisplay(r.Date)} ${r.Name} Net:K${net.toFixed(2)}\n`; });
+        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(msg)}`,'_blank');
     }
-    
-    document.getElementById('openModalBtn').onclick = openModal;
-    document.getElementById('closeFormModalBtn').onclick = closeModal;
-    document.getElementById('closeViewModalBtn').onclick = closeModal;
-    document.getElementById('cancelBtn').onclick = closeModal;
-    document.getElementById('saveBtn').onclick = saveRecord;
-    document.getElementById('refreshBtn').onclick = loadRecords;
-    document.getElementById('whatsappBtn').onclick = shareSelectedWhatsApp;
-    document.getElementById('smsBtn').onclick = shareSelectedSMS;
-    document.getElementById('emailBtn').onclick = emailReport;
-    document.getElementById('overlay').onclick = closeModal;
-    document.getElementById('cardWhatsappBtn').onclick = shareSingleRecord;
-    
-    // Listeners to recalculate fields instantly on user input
-    document.getElementById('inputTarget').oninput = updateBalancePreview;
-    document.getElementById('inputCashIn').oninput = updateBalancePreview;
-    document.getElementById('inputCashOut').oninput = updateBalancePreview;
-    document.getElementById('inputName').onchange = updateBalancePreview;
-    
+    function emailBatch(){
+        let sel=getSelected();
+        if(sel.length===0){ showToast('Select records',true); return; }
+        let body="CashFlow Report\n\n";
+        sel.forEach(r=>{ let isExp=(r.Name==='Expenses'); let target=isExp?0:(Number(r.Target)||0); let cashIn=isExp?0:(Number(r['Cash In'])||0); let cashOut=Number(r['Cash Out'])||0; body+=`${formatDateDisplay(r.Date)} ${r.Name} | Target: K${target.toFixed(2)} | Net:K${(cashIn-cashOut).toFixed(2)}\n`; });
+        window.location.href=`mailto:?subject=CashFlow Report&body=${encodeURIComponent(body)}`;
+    }
+
+    function updateStats(){
+        let totalTarget=0, totalCashIn=0, totalCashOut=0, finalBal=0;
+        allRecords.forEach(r=>{
+            let isExp=(r.Name==='Expenses');
+            let t=isExp?0:(Number(r.Target)||0);
+            let ci=isExp?0:(Number(r['Cash In'])||0);
+            let co=Number(r['Cash Out'])||0;
+            totalTarget+=t; totalCashIn+=ci; totalCashOut+=co;
+        });
+        let totalNet=totalCashIn-totalCashOut;
+        finalBal=totalTarget-totalNet;
+        document.getElementById('totalCashIn').innerHTML=`K${totalCashIn.toFixed(2)}`;
+        document.getElementById('totalTarget').innerHTML=`K${totalTarget.toFixed(2)}`;
+        document.getElementById('finalCumulativeBalance').innerHTML=`K${finalBal.toFixed(2)}`;
+        document.getElementById('totalRecords').innerHTML=allRecords.length;
+        let balElem=document.getElementById('finalCumulativeBalance');
+        balElem.className = finalBal>0?'stat-value val-negative':(finalBal<0?'stat-value val-positive':'stat-value val-neutral');
+    }
+
+    function toggleCheckbox(idx){ let cb=document.getElementById(`cb_${idx}`); if(cb) cb.checked=!cb.checked; updateSelectedCount(); }
+    function updateSelectedCount(){ document.getElementById('selectedCount').innerHTML=`${document.querySelectorAll('.record-checkbox:checked').length} selected`; }
+    function attachEvents(){
+        document.querySelectorAll('.record-checkbox').forEach(cb=>cb.onchange=()=>updateSelectedCount());
+        let masterSel=()=>{ let chk=document.getElementById('selectAllCheckbox').checked; document.querySelectorAll('.record-checkbox').forEach(c=>c.checked=chk); document.getElementById('headerMasterCheckbox').checked=chk; updateSelectedCount(); };
+        document.getElementById('selectAllCheckbox').onchange=masterSel;
+        document.getElementById('headerMasterCheckbox').onchange=masterSel;
+    }
+    function openModal(){ 
+        document.getElementById('inputDate').value=new Date().toISOString().slice(0,10);
+        document.getElementById('inputName').value='Bernald';
+        document.getElementById('inputTimeIn').value=''; document.getElementById('inputTimeOut').value='';
+        document.getElementById('inputTarget').value='400'; document.getElementById('inputCashIn').value=''; document.getElementById('inputCashOut').value='';
+        document.getElementById('inputComments').value=''; updateBalancePreview();
+        document.getElementById('recordModal').classList.add('show'); document.getElementById('overlay').classList.add('show');
+    }
+    function closeModal(){ document.getElementById('recordModal').classList.remove('show'); document.getElementById('viewCardModal').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+    document.getElementById('openModalBtn').onclick=openModal; document.getElementById('closeFormModalBtn').onclick=closeModal; document.getElementById('closeViewModalBtn').onclick=closeModal;
+    document.getElementById('cancelBtn').onclick=closeModal; document.getElementById('saveBtn').onclick=saveRecord; document.getElementById('refreshBtn').onclick=loadRecords;
+    document.getElementById('whatsappBtn').onclick=shareWhatsAppBatch; document.getElementById('smsBtn').onclick=shareSMSBatch; document.getElementById('emailBtn').onclick=emailBatch;
+    document.getElementById('overlay').onclick=closeModal; document.getElementById('cardWhatsappBtn').onclick=shareSingleCard;
+    document.getElementById('inputName').addEventListener('change', updateBalancePreview);
     loadRecords();
 </script>
 </body>
