@@ -856,7 +856,7 @@
         return parsed || "—";
     }
 
-    // Locks or unlocks UI form input fields depending on whether "Expenses" is set
+    // Handles the UI field restriction dynamically based on dropdown selection
     function handleNameChange() {
         const nameSelection = document.getElementById('inputName').value;
         const targetInput = document.getElementById('inputTarget');
@@ -868,12 +868,13 @@
             targetInput.value = "0";
             cashInInput.value = "0";
             timeInInput.value = "";
-            timeOutInput.value = "";
 
             targetInput.disabled = true;
             cashInInput.disabled = true;
             timeInInput.disabled = true;
-            timeOutInput.disabled = true;
+            
+            // Core Correction: Make sure Time Out stays ACTIVE/ENABLED for Expense logs
+            timeOutInput.disabled = false;
         } else {
             targetInput.disabled = false;
             cashInInput.disabled = false;
@@ -967,11 +968,13 @@
 
         const nameValue = document.getElementById('inputName').value;
         
-        // Enforce structural zero/null validation criteria at submission block if Expenses is picked
+        // Block submission values if Expenses is selected
         const target = nameValue === "Expenses" ? 0 : (parseFloat(document.getElementById('inputTarget').value) || 0);
         const cashIn = nameValue === "Expenses" ? 0 : (parseFloat(document.getElementById('inputCashIn').value) || 0);
         const timeIn = nameValue === "Expenses" ? "" : (document.getElementById('inputTimeIn').value || "");
-        const timeOut = nameValue === "Expenses" ? "" : (document.getElementById('inputTimeOut').value || "");
+        
+        // Time Out must pull normal user input data safely even if Expense is checked
+        const timeOut = document.getElementById('inputTimeOut').value || "";
         
         const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
         const netCash = cashIn - cashOut;
@@ -1365,7 +1368,7 @@
         document.getElementById('inputBalance').value = '';
         document.getElementById('inputComments').value = '';
         
-        // Ensure standard fields are unlocked initially
+        // Clear all restriction classes on fresh modal generation initial states
         document.getElementById('inputTarget').disabled = false;
         document.getElementById('inputCashIn').disabled = false;
         document.getElementById('inputTimeIn').disabled = false;
