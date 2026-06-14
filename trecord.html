@@ -346,6 +346,14 @@
             border-color: #38bdf8;
         }
 
+        /* Styling for disabled read-only text fields */
+        .form-group input:disabled {
+            background: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+            border-color: #334155;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -630,7 +638,7 @@
             </div>
             <div class="form-group">
                 <label><i class="fas fa-user"></i> Name *</label>
-                <select id="inputName">
+                <select id="inputName" onchange="handleNameChange()">
                     <option value="Bernald">Bernald</option>
                     <option value="Brian">Brian</option>
                     <option value="Expenses">Expenses</option>
@@ -847,6 +855,34 @@
         }
         return parsed || "—";
     }
+
+    // Locks or unlocks UI form input fields depending on whether "Expenses" is set
+    function handleNameChange() {
+        const nameSelection = document.getElementById('inputName').value;
+        const targetInput = document.getElementById('inputTarget');
+        const cashInInput = document.getElementById('inputCashIn');
+        const timeInInput = document.getElementById('inputTimeIn');
+        const timeOutInput = document.getElementById('inputTimeOut');
+
+        if (nameSelection === "Expenses") {
+            targetInput.value = "0";
+            cashInInput.value = "0";
+            timeInInput.value = "";
+            timeOutInput.value = "";
+
+            targetInput.disabled = true;
+            cashInInput.disabled = true;
+            timeInInput.disabled = true;
+            timeOutInput.disabled = true;
+        } else {
+            targetInput.disabled = false;
+            cashInInput.disabled = false;
+            timeInInput.disabled = false;
+            timeOutInput.disabled = false;
+            if (targetInput.value === "0") targetInput.value = "400";
+        }
+        updateBalancePreview();
+    }
     
     function updateBalancePreview() {
         const target = parseFloat(document.getElementById('inputTarget').value) || 0;
@@ -928,18 +964,24 @@
             showToast('A distinct validation date is required.', true);
             return;
         }
+
+        const nameValue = document.getElementById('inputName').value;
         
-        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        // Enforce structural zero/null validation criteria at submission block if Expenses is picked
+        const target = nameValue === "Expenses" ? 0 : (parseFloat(document.getElementById('inputTarget').value) || 0);
+        const cashIn = nameValue === "Expenses" ? 0 : (parseFloat(document.getElementById('inputCashIn').value) || 0);
+        const timeIn = nameValue === "Expenses" ? "" : (document.getElementById('inputTimeIn').value || "");
+        const timeOut = nameValue === "Expenses" ? "" : (document.getElementById('inputTimeOut').value || "");
+        
         const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
         const netCash = cashIn - cashOut;
         const balance = target - netCash;
         
         const record = {
             date: date,
-            name: document.getElementById('inputName').value,
-            timeIn: document.getElementById('inputTimeIn').value || "",
-            timeOut: document.getElementById('inputTimeOut').value || "",
+            name: nameValue,
+            timeIn: timeIn,
+            timeOut: timeOut,
             target: target,
             cashIn: cashIn,
             cashOut: cashOut,
@@ -1009,7 +1051,6 @@
             const cashOut = Number(record['Cash Out']) || 0;
             const nameField = record.Name || '—';
             
-            // Derive fallback dynamically if Apps Script does not pass calculated Net Cash
             const netCash = record['Net Cash'] !== undefined ? Number(record['Net Cash']) : (cashIn - cashOut);
             const transactionBalance = target - netCash;
             
@@ -1323,6 +1364,13 @@
         document.getElementById('inputNetCash').value = '';
         document.getElementById('inputBalance').value = '';
         document.getElementById('inputComments').value = '';
+        
+        // Ensure standard fields are unlocked initially
+        document.getElementById('inputTarget').disabled = false;
+        document.getElementById('inputCashIn').disabled = false;
+        document.getElementById('inputTimeIn').disabled = false;
+        document.getElementById('inputTimeOut').disabled = false;
+
         document.getElementById('recordModal').classList.add('show');
         document.getElementById('overlay').classList.add('show');
         updateBalancePreview();
