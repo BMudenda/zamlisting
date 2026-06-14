@@ -726,272 +726,503 @@
     let allRecords = [];
     let activeCardData = null;
 
-    // Helper: format date & time (existing logic simplified but robust)
-    function formatDateDisplay(raw) { if(!raw) return "—"; let str=String(raw); if(str.includes('-')){ let p=str.split('-'); if(p.length===3) return `${p[2]}/${p[1]}/${p[0]}`;} return str; }
-    function parseTime(t) { if(!t) return ""; if(typeof t==='string' && t.includes(':')) return t.substring(0,5); if(typeof t==='number'){ let hrs=Math.floor(t*24); let mins=Math.round((t*24-hrs)*60); return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;} return String(t).substring(0,5); }
+    function formatDateDisplay(raw) {
+        if (!raw) return "—";
+        let str = String(raw).trim();
+        if (str.includes('-')) {
+            let p = str.split('-');
+            if (p.length === 3) return `\( {p[2]}/ \){p[1]}/${p[0]}`;
+        }
+        return str;
+    }
+
+    function parseTime(t) {
+        if (!t) return "—";
+        if (typeof t === 'string' && t.includes(':')) return t.substring(0, 5);
+        return String(t).substring(0, 5);
+    }
 
     function updateBalancePreview() {
-        const isExpense = document.getElementById('inputName').value === 'Expenses';
+        const nameSelect = document.getElementById('inputName');
+        const isExpense = nameSelect.value === 'Expenses';
         let target = parseFloat(document.getElementById('inputTarget').value) || 0;
         let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
         let cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
-        
-        // EXPENSE MODE OVERRIDE: target=0, cashIn=0
-        if(isExpense){
+
+        if (isExpense) {
             target = 0;
             cashIn = 0;
             document.getElementById('inputTarget').value = 0;
             document.getElementById('inputCashIn').value = 0;
             document.getElementById('inputTarget').readOnly = true;
             document.getElementById('inputCashIn').readOnly = true;
-            document.getElementById('expenseHint').innerHTML = '<i class="fas fa-info-circle"></i> Expenses: Target & Cash In forced to 0. Cash Out records spending.';
+            document.getElementById('expenseHint').innerHTML = '<i class="fas fa-info-circle"></i> Expenses: Target & Cash In forced to 0. Cash Out = spending.';
         } else {
             document.getElementById('inputTarget').readOnly = false;
             document.getElementById('inputCashIn').readOnly = false;
             document.getElementById('expenseHint').innerHTML = '';
         }
-        
+
         const netCash = cashIn - cashOut;
         document.getElementById('inputNetCash').value = netCash.toFixed(2);
+
         const balance = target - netCash;
         const balField = document.getElementById('inputBalance');
         balField.value = balance.toFixed(2);
         balField.style.color = balance > 0 ? '#f87171' : (balance < 0 ? '#4ade80' : '#fbbf24');
     }
 
-    function showToast(msg, err=false) { let t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas ${err?'fa-circle-exclamation':'fa-circle-check'}"></i> ${msg}`; t.style.background=err?'#ef4444':'#10b981'; t.style.color='white'; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
-    function showLoading(show){ let l=document.getElementById('globalLoader'); if(show && !l){ l=document.createElement('div'); l.id='globalLoader'; l.className='loading'; l.innerHTML='<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Processing...</span></div>'; document.body.appendChild(l);} else if(!show && l) l.remove(); }
-
-    async function saveToSheet(record){
-        let params=new URLSearchParams();
-        params.append('Date', record.date); params.append('Name', record.name); params.append('Time In', record.timeIn); params.append('Time Out', record.timeOut);
-        params.append('Target', record.target); params.append('Cash In', record.cashIn); params.append('Cash Out', record.cashOut);
-        params.append('Net Cash', record.netCash); params.append('Balance', record.balance); params.append('Comments', record.comments);
-        try { await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:params, headers:{'Content-Type':'application/x-www-form-urlencoded'}}); return true; } catch(e){ return false; }
+    function showToast(msg, err = false) {
+        let t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = `<i class="fas ${err ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> ${msg}`;
+        t.style.background = err ? '#ef4444' : '#10b981';
+        t.style.color = 'white';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
     }
 
-    async function saveRecord(){
+    function showLoading(show) {
+        let l = document.getElementById('globalLoader');
+        if (show && !l) {
+            l = document.createElement('div');
+            l.id = 'globalLoader';
+            l.className = 'loading';
+            l.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x"></i><span>Processing...</span></div>';
+            document.body.appendChild(l);
+        } else if (!show && l) {
+            l.remove();
+        }
+    }
+
+    async function saveToSheet(record) {
+        let params = new URLSearchParams();
+        params.append('Date', record.date);
+        params.append('Name', record.name);
+        params.append('Time In', record.timeIn);
+        params.append('Time Out', record.timeOut);
+        params.append('Target', record.target);
+        params.append('Cash In', record.cashIn);
+        params.append('Cash Out', record.cashOut);
+        params.append('Net Cash', record.netCash);
+        params.append('Balance', record.balance);
+        params.append('Comments', record.comments);
+        
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: params,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async function saveRecord() {
         const date = document.getElementById('inputDate').value;
-        if(!date){ showToast('Date required', true); return; }
+        if (!date) {
+            showToast('Date is required', true);
+            return;
+        }
+        
         let name = document.getElementById('inputName').value;
         let target = parseFloat(document.getElementById('inputTarget').value) || 0;
         let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
         let cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
-        if(name === 'Expenses'){
+
+        if (name === 'Expenses') {
             target = 0;
             cashIn = 0;
         }
+
         const netCash = cashIn - cashOut;
         const balance = target - netCash;
+
         const record = {
-            date, name, timeIn: document.getElementById('inputTimeIn').value || "", timeOut: document.getElementById('inputTimeOut').value || "",
-            target, cashIn, cashOut, netCash, balance, comments: document.getElementById('inputComments').value || ""
+            date,
+            name,
+            timeIn: document.getElementById('inputTimeIn').value || "",
+            timeOut: document.getElementById('inputTimeOut').value || "",
+            target,
+            cashIn,
+            cashOut,
+            netCash,
+            balance,
+            comments: document.getElementById('inputComments').value || ""
         };
+
         showLoading(true);
-        let ok = await saveToSheet(record);
+        const ok = await saveToSheet(record);
         showLoading(false);
-        if(ok){ showToast('Saved!'); closeModal(); await loadRecords(); }
-        else showToast('Sync error', true);
+
+        if (ok) {
+            showToast('Transaction saved successfully!');
+            closeModal();
+            await loadRecords();
+        } else {
+            showToast('Failed to save. Check your connection.', true);
+        }
     }
 
-    async function loadRecords(){
-        const tbody=document.getElementById('tableBody');
-        tbody.innerHTML='<tr><td colspan="15" style="text-align:center; padding:48px;"><i class="fas fa-spinner fa-pulse"></i> Fetching...</td></tr>';
-        try{
-            let resp=await fetch(SCRIPT_URL, {method:'GET', mode:'cors'});
-            if(!resp.ok) throw new Error();
-            let data=await resp.json();
-            allRecords=(data.rows||[]).filter(r=>r && r.Date);
-            allRecords.sort((a,b)=>String(a.Date).localeCompare(String(b.Date)));
+    async function loadRecords() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:48px;"><i class="fas fa-spinner fa-pulse"></i> Fetching records...</td></tr>';
+
+        try {
+            const resp = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
+            if (!resp.ok) throw new Error('Network error');
+            
+            const data = await resp.json();
+            allRecords = (data.rows || []).filter(r => r && r.Date);
+            
+            // Sort by date
+            allRecords.sort((a, b) => {
+                const da = String(a.Date).replace(/\//g, '-');
+                const db = String(b.Date).replace(/\//g, '-');
+                return da.localeCompare(db);
+            });
+
             renderTable();
             updateStats();
-            showToast(`Loaded ${allRecords.length} entries`);
-        } catch(e){ tbody.innerHTML='<tr><td colspan="15" style="text-align:center;color:#f87171;">API connection failed</td></tr>'; showToast('Load failed', true); }
+            showToast(`Loaded ${allRecords.length} records`);
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="15" style="text-align:center;color:#f87171;">Failed to load data from Google Sheet</td></tr>';
+            showToast('Could not load records', true);
+        }
     }
 
-    function renderTable(){
-        let tbody=document.getElementById('tableBody');
-        if(allRecords.length===0){ tbody.innerHTML='<tr><td colspan="15" style="text-align:center; padding:48px;">No records</td></tr>'; document.getElementById('tableFooter').style.display='none'; return; }
-        let cumTarget=0, cumCashIn=0, cumCashOut=0, cumNet=0, cumBalance=0;
-        let html='';
-        allRecords.forEach((rec,idx)=>{
-            let name=rec.Name||'';
-            let target=Number(rec.Target)||0;
-            let cashIn=Number(rec['Cash In'])||0;
-            let cashOut=Number(rec['Cash Out'])||0;
-            // Expense correction: if name is Expenses, force target=0, cashIn=0 for cumulative consistency
-            let isExpenseRecord = (name === 'Expenses');
-            let effectiveTarget = isExpenseRecord ? 0 : target;
-            let effectiveCashIn = isExpenseRecord ? 0 : cashIn;
-            let netCash = effectiveCashIn - cashOut;
-            let txBalance = effectiveTarget - netCash;
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        if (allRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="15" style="text-align:center; padding:48px;">No records found</td></tr>';
+            document.getElementById('tableFooter').style.display = 'none';
+            return;
+        }
+
+        let cumTarget = 0, cumCashIn = 0, cumCashOut = 0, cumNet = 0, cumBalance = 0;
+        let html = '';
+
+        allRecords.forEach((rec, idx) => {
+            const name = rec.Name || '';
+            const isExpense = name === 'Expenses';
             
-            cumTarget += effectiveTarget;
-            cumCashIn += effectiveCashIn;
+            let target = Number(rec.Target) || 0;
+            let cashIn = Number(rec['Cash In']) || 0;
+            let cashOut = Number(rec['Cash Out']) || 0;
+
+            // Expense logic
+            if (isExpense) {
+                target = 0;
+                cashIn = 0;
+            }
+
+            const netCash = cashIn - cashOut;
+            const txBalance = target - netCash;
+
+            // Update cumulatives
+            cumTarget += target;
+            cumCashIn += cashIn;
             cumCashOut += cashOut;
             cumNet += netCash;
             cumBalance += txBalance;
-            
-            let balanceClass = txBalance>0?'val-negative':(txBalance<0?'val-positive':'val-neutral');
-            let cumClass = cumBalance>0?'val-negative':(cumBalance<0?'val-positive':'val-neutral');
-            let dateFmt=formatDateDisplay(rec.Date);
-            let timeIn=parseTime(rec['Time In']);
-            let timeOut=parseTime(rec['Time Out']);
-            let comments=rec.Comments||'-';
-            let shortComments=comments.length>20?comments.substring(0,20)+'...':comments;
-            
-            html+=`<tr class="interactive-row" onclick="toggleCheckbox(${idx})">
-                <td class="checkbox-col" onclick="event.stopPropagation()"><input type="checkbox" class="record-checkbox" id="cb_${idx}" data-index="${idx}"></td>
-                <td>${dateFmt}</td><td style="font-weight:600;color:#38bdf8;">${name}</td>
-                <td>${timeIn||'—'}</td><td>${timeOut||'—'}</td>
-                <td>K${effectiveTarget.toFixed(2)}</td><td>K${effectiveCashIn.toFixed(2)}</td>
-                <td style="color:#f87171;">K${cashOut.toFixed(2)}</td>
-                <td style="color:#fbbf24;">K${netCash.toFixed(2)}</td>
-                <td class="${balanceClass}">K${txBalance.toFixed(2)}</td>
-                <td>K${cumTarget.toFixed(2)}</td><td>K${cumCashIn.toFixed(2)}</td>
-                <td class="${cumClass}">K${cumBalance.toFixed(2)}</td>
-                <td title="${comments.replace(/"/g,'&quot;')}">${shortComments}</td>
-                <td class="action-cell" onclick="event.stopPropagation()"><button class="btn-view" onclick="viewCard(${idx}, ${cumTarget}, ${cumCashIn}, ${cumBalance})"><i class="fas fa-expand"></i> View</button></td>
-            </tr>`;
+
+            const balanceClass = txBalance > 0 ? 'val-negative' : (txBalance < 0 ? 'val-positive' : 'val-neutral');
+            const cumClass = cumBalance > 0 ? 'val-negative' : (cumBalance < 0 ? 'val-positive' : 'val-neutral');
+
+            const dateFmt = formatDateDisplay(rec.Date);
+            const timeIn = parseTime(rec['Time In']);
+            const timeOut = parseTime(rec['Time Out']);
+            const comments = rec.Comments || '-';
+            const shortComments = comments.length > 25 ? comments.substring(0, 25) + '...' : comments;
+
+            html += `
+                <tr class="interactive-row" onclick="toggleCheckbox(${idx})">
+                    <td class="checkbox-col" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="record-checkbox" id="cb_\( {idx}" data-index=" \){idx}">
+                    </td>
+                    <td>${dateFmt}</td>
+                    <td style="font-weight:600;color:\( {isExpense ? '#f87171' : '#38bdf8'};"> \){name}</td>
+                    <td>${timeIn}</td>
+                    <td>${timeOut}</td>
+                    <td>K${target.toFixed(2)}</td>
+                    <td>K${cashIn.toFixed(2)}</td>
+                    <td style="color:#f87171;">K${cashOut.toFixed(2)}</td>
+                    <td style="color:#fbbf24;">K${netCash.toFixed(2)}</td>
+                    <td class="\( {balanceClass}">K \){txBalance.toFixed(2)}</td>
+                    <td>K${cumTarget.toFixed(2)}</td>
+                    <td>K${cumCashIn.toFixed(2)}</td>
+                    <td class="\( {cumClass}">K \){cumBalance.toFixed(2)}</td>
+                    <td title="\( {comments.replace(/"/g, '&quot;')}"> \){shortComments}</td>
+                    <td class="action-cell" onclick="event.stopPropagation()">
+                        <button class="btn-view" onclick="viewCard(${idx})">
+                            <i class="fas fa-expand"></i> View
+                        </button>
+                    </td>
+                </tr>`;
         });
-        tbody.innerHTML=html;
-        document.getElementById('tableFooter').style.display='table-footer-group';
-        document.getElementById('footerTarget').innerHTML=`K${cumTarget.toFixed(2)}`;
-        document.getElementById('footerCashIn').innerHTML=`K${cumCashIn.toFixed(2)}`;
-        document.getElementById('footerCashOut').innerHTML=`K${cumCashOut.toFixed(2)}`;
-        document.getElementById('footerNetCash').innerHTML=`K${cumNet.toFixed(2)}`;
-        document.getElementById('footerTransBal').innerHTML=`K${(cumTarget-cumNet).toFixed(2)}`;
-        document.getElementById('footerCumulative').innerHTML=`K${cumBalance.toFixed(2)}`;
-        let footElem=document.getElementById('footerCumulative');
-        footElem.className = cumBalance>0?'val-negative':(cumBalance<0?'val-positive':'val-neutral');
+
+        tbody.innerHTML = html;
+        document.getElementById('tableFooter').style.display = 'table-footer-group';
+
+        // Footer
+        document.getElementById('footerTarget').innerHTML = `K${cumTarget.toFixed(2)}`;
+        document.getElementById('footerCashIn').innerHTML = `K${cumCashIn.toFixed(2)}`;
+        document.getElementById('footerCashOut').innerHTML = `K${cumCashOut.toFixed(2)}`;
+        document.getElementById('footerNetCash').innerHTML = `K${cumNet.toFixed(2)}`;
+        document.getElementById('footerTransBal').innerHTML = `K${(cumTarget - cumNet).toFixed(2)}`;
+        document.getElementById('footerCumulative').innerHTML = `K${cumBalance.toFixed(2)}`;
+
+        const footElem = document.getElementById('footerCumulative');
+        footElem.className = cumBalance > 0 ? 'val-negative' : (cumBalance < 0 ? 'val-positive' : 'val-neutral');
+
         attachEvents();
         updateSelectedCount();
     }
 
-    function viewCard(idx, cumT, cumCI, cumBal){
-        let rec=allRecords[idx];
-        let name=rec.Name||'';
-        let isExp = (name === 'Expenses');
-        let targetRaw=Number(rec.Target)||0;
-        let cashInRaw=Number(rec['Cash In'])||0;
-        let cashOut=Number(rec['Cash Out'])||0;
-        let target= isExp ? 0 : targetRaw;
-        let cashIn = isExp ? 0 : cashInRaw;
-        let netCash = cashIn - cashOut;
-        let txBal = target - netCash;
+    function viewCard(idx) {
+        const rec = allRecords[idx];
+        if (!rec) return;
+
+        const name = rec.Name || '';
+        const isExp = name === 'Expenses';
         
-        activeCardData = { cumTarget:cumT, cumCashIn:cumCI, cumBalance:cumBal };
-        document.getElementById('cardDateText').innerText=formatDateDisplay(rec.Date);
-        document.getElementById('cardNameText').innerText=name;
-        document.getElementById('cardTimeIn').innerText=parseTime(rec['Time In'])||'—';
-        document.getElementById('cardTimeOut').innerText=parseTime(rec['Time Out'])||'—';
-        document.getElementById('cardTarget').innerHTML=`K${target.toFixed(2)}`;
-        document.getElementById('cardCashIn').innerHTML=`K${cashIn.toFixed(2)}`;
-        document.getElementById('cardCashOut').innerHTML=`K${cashOut.toFixed(2)}`;
-        document.getElementById('cardNetCash').innerHTML=`K${netCash.toFixed(2)}`;
-        let balSpan=document.getElementById('cardBalance');
-        balSpan.innerHTML=`K${txBal.toFixed(2)}`;
-        let pill=document.getElementById('cardStatusPill');
-        if(txBal>0){ balSpan.className="card-metric-val val-negative"; pill.innerText="Shortage"; pill.className="card-status-pill pill-negative"; }
-        else if(txBal<0){ balSpan.className="card-metric-val val-positive"; pill.innerText="Surplus"; pill.className="card-status-pill pill-positive"; }
-        else { balSpan.className="card-metric-val val-neutral"; pill.innerText="Balanced"; pill.className="card-status-pill pill-neutral"; }
-        document.getElementById('cardCumTarget').innerHTML=`K${cumT.toFixed(2)}`;
-        document.getElementById('cardCumCashIn').innerHTML=`K${cumCI.toFixed(2)}`;
-        let cumBalSpan=document.getElementById('cardCumBalance');
-        cumBalSpan.innerHTML=`K${cumBal.toFixed(2)}`;
-        cumBalSpan.className = cumBal>0?'card-metric-val val-negative':(cumBal<0?'card-metric-val val-positive':'card-metric-val val-neutral');
-        document.getElementById('cardComments').innerText=rec.Comments||'No comments';
+        let target = isExp ? 0 : (Number(rec.Target) || 0);
+        let cashIn = isExp ? 0 : (Number(rec['Cash In']) || 0);
+        let cashOut = Number(rec['Cash Out']) || 0;
+        
+        const netCash = cashIn - cashOut;
+        const txBal = target - netCash;
+
+        // Calculate cumulative up to this record
+        let cumTarget = 0, cumCashIn = 0, cumBalance = 0;
+        for (let i = 0; i <= idx; i++) {
+            const r = allRecords[i];
+            const isE = r.Name === 'Expenses';
+            const t = isE ? 0 : (Number(r.Target) || 0);
+            const ci = isE ? 0 : (Number(r['Cash In']) || 0);
+            const co = Number(r['Cash Out']) || 0;
+            const net = ci - co;
+            cumTarget += t;
+            cumCashIn += ci;
+            cumBalance += (t - net);
+        }
+
+        activeCardData = { idx, cumTarget, cumCashIn, cumBalance };
+
+        document.getElementById('cardDateText').innerText = formatDateDisplay(rec.Date);
+        document.getElementById('cardNameText').innerText = name;
+        document.getElementById('cardTimeIn').innerText = parseTime(rec['Time In']) || '—';
+        document.getElementById('cardTimeOut').innerText = parseTime(rec['Time Out']) || '—';
+        
+        document.getElementById('cardTarget').innerHTML = `K${target.toFixed(2)}`;
+        document.getElementById('cardCashIn').innerHTML = `K${cashIn.toFixed(2)}`;
+        document.getElementById('cardCashOut').innerHTML = `K${cashOut.toFixed(2)}`;
+        document.getElementById('cardNetCash').innerHTML = `K${netCash.toFixed(2)}`;
+        
+        const balSpan = document.getElementById('cardBalance');
+        balSpan.innerHTML = `K${txBal.toFixed(2)}`;
+        
+        const pill = document.getElementById('cardStatusPill');
+        if (txBal > 0) {
+            balSpan.className = "card-metric-val val-negative";
+            pill.innerText = "Shortage";
+            pill.className = "card-status-pill pill-negative";
+        } else if (txBal < 0) {
+            balSpan.className = "card-metric-val val-positive";
+            pill.innerText = "Surplus";
+            pill.className = "card-status-pill pill-positive";
+        } else {
+            balSpan.className = "card-metric-val val-neutral";
+            pill.innerText = "Balanced";
+            pill.className = "card-status-pill pill-neutral";
+        }
+
+        document.getElementById('cardCumTarget').innerHTML = `K${cumTarget.toFixed(2)}`;
+        document.getElementById('cardCumCashIn').innerHTML = `K${cumCashIn.toFixed(2)}`;
+        
+        const cumBalSpan = document.getElementById('cardCumBalance');
+        cumBalSpan.innerHTML = `K${cumBalance.toFixed(2)}`;
+        cumBalSpan.className = cumBalance > 0 ? 'card-metric-val val-negative' : (cumBalance < 0 ? 'card-metric-val val-positive' : 'card-metric-val val-neutral');
+
+        document.getElementById('cardComments').innerText = rec.Comments || 'No comments';
+
         document.getElementById('viewCardModal').classList.add('show');
         document.getElementById('overlay').classList.add('show');
     }
 
-    function shareSingleCard(){
-        if(!activeCardData) return;
-        let rec=allRecords.find((_,idx)=> idx===activeCardData?.idx);
-        if(!rec) return;
-        let name=rec.Name||'';
-        let isExp=(name==='Expenses');
-        let target=isExp?0:(Number(rec.Target)||0);
-        let cashIn=isExp?0:(Number(rec['Cash In'])||0);
-        let cashOut=Number(rec['Cash Out'])||0;
-        let net=cashIn-cashOut;
-        let txBal=target-net;
-        let msg=`📊 *CASHFLOW CARD*\n📅 ${formatDateDisplay(rec.Date)}\n👤 ${name}\n⏰ ${parseTime(rec['Time In'])} → ${parseTime(rec['Time Out'])}\n🎯 Target: K${target.toFixed(2)}\n💰 Cash In: K${cashIn.toFixed(2)}\n💸 Cash Out: K${cashOut.toFixed(2)}\n⚖️ Net: K${net.toFixed(2)}\n📉 Delta: K${txBal.toFixed(2)}\n📈 Cum Target: K${activeCardData.cumTarget.toFixed(2)}\n📈 Cum Cash In: K${activeCardData.cumCashIn.toFixed(2)}\n⚖️ Cum Balance: K${activeCardData.cumBalance.toFixed(2)}\n💬 ${rec.Comments||''}`;
-        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
+    function shareSingleCard() {
+        if (!activeCardData) return;
+        const rec = allRecords[activeCardData.idx];
+        if (!rec) return;
+
+        const name = rec.Name || '';
+        const isExp = name === 'Expenses';
+        const target = isExp ? 0 : (Number(rec.Target) || 0);
+        const cashIn = isExp ? 0 : (Number(rec['Cash In']) || 0);
+        const cashOut = Number(rec['Cash Out']) || 0;
+        const net = cashIn - cashOut;
+        const txBal = target - net;
+
+        const msg = `📊 *CASHFLOW CARD*\n` +
+                   `📅 ${formatDateDisplay(rec.Date)}\n` +
+                   `👤 ${name}\n` +
+                   `⏰ ${parseTime(rec['Time In'])} → ${parseTime(rec['Time Out'])}\n` +
+                   `🎯 Target: K${target.toFixed(2)}\n` +
+                   `💰 Cash In: K${cashIn.toFixed(2)}\n` +
+                   `💸 Cash Out: K${cashOut.toFixed(2)}\n` +
+                   `⚖️ Net: K${net.toFixed(2)}\n` +
+                   `📉 Tx Balance: K${txBal.toFixed(2)}\n` +
+                   `📈 Cum Target: K${activeCardData.cumTarget.toFixed(2)}\n` +
+                   `📈 Cum Cash In: K${activeCardData.cumCashIn.toFixed(2)}\n` +
+                   `⚖️ Cum Balance: K${activeCardData.cumBalance.toFixed(2)}\n` +
+                   `💬 ${rec.Comments || ''}`;
+
+        window.open(`https://wa.me/\( {PHONE_NUMBER}?text= \){encodeURIComponent(msg)}`, '_blank');
     }
 
-    function getSelected(){ let cbs=document.querySelectorAll('.record-checkbox:checked'); return Array.from(cbs).map(cb=>allRecords[parseInt(cb.getAttribute('data-index'))]); }
-    function shareWhatsAppBatch(){
-        let sel=getSelected();
-        if(sel.length===0){ showToast('Select records first',true); return; }
-        let msg="📊 *CASHFLOW BATCH REPORT*\n━━━━━━━━━━━━\n";
-        sel.forEach((r,i)=>{
-            let isExp=(r.Name==='Expenses');
-            let target=isExp?0:(Number(r.Target)||0);
-            let cashIn=isExp?0:(Number(r['Cash In'])||0);
-            let cashOut=Number(r['Cash Out'])||0;
-            let net=cashIn-cashOut;
-            msg+=`${i+1}. ${formatDateDisplay(r.Date)} | ${r.Name} | Net: K${net.toFixed(2)}\n`;
+    function getSelected() {
+        const cbs = document.querySelectorAll('.record-checkbox:checked');
+        return Array.from(cbs).map(cb => allRecords[parseInt(cb.getAttribute('data-index'))]);
+    }
+
+    function shareWhatsAppBatch() {
+        const sel = getSelected();
+        if (sel.length === 0) {
+            showToast('Select at least one record', true);
+            return;
+        }
+        let msg = "📊 *CASHFLOW BATCH REPORT*\n━━━━━━━━━━━━\n";
+        sel.forEach((r, i) => {
+            const isExp = r.Name === 'Expenses';
+            const net = (isExp ? 0 : (Number(r['Cash In']) || 0)) - (Number(r['Cash Out']) || 0);
+            msg += `${i+1}. ${formatDateDisplay(r.Date)} | \( {r.Name} | Net: K \){net.toFixed(2)}\n`;
         });
-        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
-    }
-    function shareSMSBatch(){
-        let sel=getSelected();
-        if(sel.length===0){ showToast('Select records',true); return; }
-        let msg="CASHFLOW REPORT\n";
-        sel.forEach(r=>{ let isExp=(r.Name==='Expenses'); let net=(isExp?0:(Number(r['Cash In'])||0)) - (Number(r['Cash Out'])||0); msg+=`${formatDateDisplay(r.Date)} ${r.Name} Net:K${net.toFixed(2)}\n`; });
-        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(msg)}`,'_blank');
-    }
-    function emailBatch(){
-        let sel=getSelected();
-        if(sel.length===0){ showToast('Select records',true); return; }
-        let body="CashFlow Report\n\n";
-        sel.forEach(r=>{ let isExp=(r.Name==='Expenses'); let target=isExp?0:(Number(r.Target)||0); let cashIn=isExp?0:(Number(r['Cash In'])||0); let cashOut=Number(r['Cash Out'])||0; body+=`${formatDateDisplay(r.Date)} ${r.Name} | Target: K${target.toFixed(2)} | Net:K${(cashIn-cashOut).toFixed(2)}\n`; });
-        window.location.href=`mailto:?subject=CashFlow Report&body=${encodeURIComponent(body)}`;
+        window.open(`https://wa.me/\( {PHONE_NUMBER}?text= \){encodeURIComponent(msg)}`, '_blank');
     }
 
-    function updateStats(){
-        let totalTarget=0, totalCashIn=0, totalCashOut=0, finalBal=0;
-        allRecords.forEach(r=>{
-            let isExp=(r.Name==='Expenses');
-            let t=isExp?0:(Number(r.Target)||0);
-            let ci=isExp?0:(Number(r['Cash In'])||0);
-            let co=Number(r['Cash Out'])||0;
-            totalTarget+=t; totalCashIn+=ci; totalCashOut+=co;
+    function shareSMSBatch() {
+        const sel = getSelected();
+        if (sel.length === 0) {
+            showToast('Select records first', true);
+            return;
+        }
+        let msg = "CASHFLOW REPORT\n";
+        sel.forEach(r => {
+            const isExp = r.Name === 'Expenses';
+            const net = (isExp ? 0 : (Number(r['Cash In']) || 0)) - (Number(r['Cash Out']) || 0);
+            msg += `${formatDateDisplay(r.Date)} \( {r.Name} Net: K \){net.toFixed(2)}\n`;
         });
-        let totalNet=totalCashIn-totalCashOut;
-        finalBal=totalTarget-totalNet;
-        document.getElementById('totalCashIn').innerHTML=`K${totalCashIn.toFixed(2)}`;
-        document.getElementById('totalTarget').innerHTML=`K${totalTarget.toFixed(2)}`;
-        document.getElementById('finalCumulativeBalance').innerHTML=`K${finalBal.toFixed(2)}`;
-        document.getElementById('totalRecords').innerHTML=allRecords.length;
-        let balElem=document.getElementById('finalCumulativeBalance');
-        balElem.className = finalBal>0?'stat-value val-negative':(finalBal<0?'stat-value val-positive':'stat-value val-neutral');
+        window.open(`sms:\( {PHONE_NUMBER}?body= \){encodeURIComponent(msg)}`, '_blank');
     }
 
-    function toggleCheckbox(idx){ let cb=document.getElementById(`cb_${idx}`); if(cb) cb.checked=!cb.checked; updateSelectedCount(); }
-    function updateSelectedCount(){ document.getElementById('selectedCount').innerHTML=`${document.querySelectorAll('.record-checkbox:checked').length} selected`; }
-    function attachEvents(){
-        document.querySelectorAll('.record-checkbox').forEach(cb=>cb.onchange=()=>updateSelectedCount());
-        let masterSel=()=>{ let chk=document.getElementById('selectAllCheckbox').checked; document.querySelectorAll('.record-checkbox').forEach(c=>c.checked=chk); document.getElementById('headerMasterCheckbox').checked=chk; updateSelectedCount(); };
-        document.getElementById('selectAllCheckbox').onchange=masterSel;
-        document.getElementById('headerMasterCheckbox').onchange=masterSel;
+    function emailBatch() {
+        const sel = getSelected();
+        if (sel.length === 0) {
+            showToast('Select records first', true);
+            return;
+        }
+        let body = "CashFlow Report\n\n";
+        sel.forEach(r => {
+            const isExp = r.Name === 'Expenses';
+            const target = isExp ? 0 : (Number(r.Target) || 0);
+            const cashIn = isExp ? 0 : (Number(r['Cash In']) || 0);
+            const cashOut = Number(r['Cash Out']) || 0;
+            body += `${formatDateDisplay(r.Date)} | \( {r.Name} | Target: K \){target.toFixed(2)} | Net: K${(cashIn - cashOut).toFixed(2)}\n`;
+        });
+        window.location.href = `mailto:?subject=CashFlow Report&body=${encodeURIComponent(body)}`;
     }
-    function openModal(){ 
-        document.getElementById('inputDate').value=new Date().toISOString().slice(0,10);
-        document.getElementById('inputName').value='Bernald';
-        document.getElementById('inputTimeIn').value=''; document.getElementById('inputTimeOut').value='';
-        document.getElementById('inputTarget').value='400'; document.getElementById('inputCashIn').value=''; document.getElementById('inputCashOut').value='';
-        document.getElementById('inputComments').value=''; updateBalancePreview();
-        document.getElementById('recordModal').classList.add('show'); document.getElementById('overlay').classList.add('show');
+
+    function updateStats() {
+        let totalTarget = 0, totalCashIn = 0, totalCashOut = 0;
+        allRecords.forEach(r => {
+            const isExp = r.Name === 'Expenses';
+            const t = isExp ? 0 : (Number(r.Target) || 0);
+            const ci = isExp ? 0 : (Number(r['Cash In']) || 0);
+            const co = Number(r['Cash Out']) || 0;
+            totalTarget += t;
+            totalCashIn += ci;
+            totalCashOut += co;
+        });
+
+        const totalNet = totalCashIn - totalCashOut;
+        const finalBal = totalTarget - totalNet;
+
+        document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
+        document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
+        document.getElementById('finalCumulativeBalance').innerHTML = `K${finalBal.toFixed(2)}`;
+        document.getElementById('totalRecords').innerHTML = allRecords.length;
+
+        const balElem = document.getElementById('finalCumulativeBalance');
+        balElem.className = finalBal > 0 ? 'stat-value val-negative' : (finalBal < 0 ? 'stat-value val-positive' : 'stat-value val-neutral');
     }
-    function closeModal(){ document.getElementById('recordModal').classList.remove('show'); document.getElementById('viewCardModal').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
-    document.getElementById('openModalBtn').onclick=openModal; document.getElementById('closeFormModalBtn').onclick=closeModal; document.getElementById('closeViewModalBtn').onclick=closeModal;
-    document.getElementById('cancelBtn').onclick=closeModal; document.getElementById('saveBtn').onclick=saveRecord; document.getElementById('refreshBtn').onclick=loadRecords;
-    document.getElementById('whatsappBtn').onclick=shareWhatsAppBatch; document.getElementById('smsBtn').onclick=shareSMSBatch; document.getElementById('emailBtn').onclick=emailBatch;
-    document.getElementById('overlay').onclick=closeModal; document.getElementById('cardWhatsappBtn').onclick=shareSingleCard;
+
+    function toggleCheckbox(idx) {
+        const cb = document.getElementById(`cb_${idx}`);
+        if (cb) cb.checked = !cb.checked;
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.record-checkbox:checked').length;
+        document.getElementById('selectedCount').innerHTML = `${count} selected`;
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.record-checkbox').forEach(cb => {
+            cb.onchange = updateSelectedCount;
+        });
+
+        const masterSel = () => {
+            const chk = document.getElementById('selectAllCheckbox').checked;
+            document.querySelectorAll('.record-checkbox').forEach(c => c.checked = chk);
+            document.getElementById('headerMasterCheckbox').checked = chk;
+            updateSelectedCount();
+        };
+
+        document.getElementById('selectAllCheckbox').onchange = masterSel;
+        document.getElementById('headerMasterCheckbox').onchange = masterSel;
+    }
+
+    function openModal() {
+        document.getElementById('inputDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('inputName').value = 'Bernald';
+        document.getElementById('inputTimeIn').value = '';
+        document.getElementById('inputTimeOut').value = '';
+        document.getElementById('inputTarget').value = '400';
+        document.getElementById('inputCashIn').value = '';
+        document.getElementById('inputCashOut').value = '';
+        document.getElementById('inputComments').value = '';
+        updateBalancePreview();
+
+        document.getElementById('recordModal').classList.add('show');
+        document.getElementById('overlay').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('recordModal').classList.remove('show');
+        document.getElementById('viewCardModal').classList.remove('show');
+        document.getElementById('overlay').classList.remove('show');
+    }
+
+    // Event listeners
+    document.getElementById('openModalBtn').onclick = openModal;
+    document.getElementById('closeFormModalBtn').onclick = closeModal;
+    document.getElementById('closeViewModalBtn').onclick = closeModal;
+    document.getElementById('cancelBtn').onclick = closeModal;
+    document.getElementById('saveBtn').onclick = saveRecord;
+    document.getElementById('refreshBtn').onclick = loadRecords;
+    document.getElementById('whatsappBtn').onclick = shareWhatsAppBatch;
+    document.getElementById('smsBtn').onclick = shareSMSBatch;
+    document.getElementById('emailBtn').onclick = emailBatch;
+    document.getElementById('overlay').onclick = closeModal;
+    document.getElementById('cardWhatsappBtn').onclick = shareSingleCard;
     document.getElementById('inputName').addEventListener('change', updateBalancePreview);
-    loadRecords();
+
+    // Initial load
+    window.onload = loadRecords;
 </script>
 </body>
 </html>
