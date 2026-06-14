@@ -856,7 +856,6 @@
         return parsed || "—";
     }
 
-    // Handles the UI field restriction dynamically based on dropdown selection
     function handleNameChange() {
         const nameSelection = document.getElementById('inputName').value;
         const targetInput = document.getElementById('inputTarget');
@@ -872,8 +871,6 @@
             targetInput.disabled = true;
             cashInInput.disabled = true;
             timeInInput.disabled = true;
-            
-            // Core Correction: Make sure Time Out stays ACTIVE/ENABLED for Expense logs
             timeOutInput.disabled = false;
         } else {
             targetInput.disabled = false;
@@ -886,8 +883,11 @@
     }
     
     function updateBalancePreview() {
-        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        const nameSelection = document.getElementById('inputName').value;
+        
+        // Form mathematical overrides if Expenses option is active
+        const target = nameSelection === "Expenses" ? 0 : (parseFloat(document.getElementById('inputTarget').value) || 0);
+        const cashIn = nameSelection === "Expenses" ? 0 : (parseFloat(document.getElementById('inputCashIn').value) || 0);
         const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
         
         const netCash = cashIn - cashOut;
@@ -968,15 +968,12 @@
 
         const nameValue = document.getElementById('inputName').value;
         
-        // Block submission values if Expenses is selected
         const target = nameValue === "Expenses" ? 0 : (parseFloat(document.getElementById('inputTarget').value) || 0);
         const cashIn = nameValue === "Expenses" ? 0 : (parseFloat(document.getElementById('inputCashIn').value) || 0);
         const timeIn = nameValue === "Expenses" ? "" : (document.getElementById('inputTimeIn').value || "");
-        
-        // Time Out must pull normal user input data safely even if Expense is checked
         const timeOut = document.getElementById('inputTimeOut').value || "";
-        
         const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
+        
         const netCash = cashIn - cashOut;
         const balance = target - netCash;
         
@@ -1049,12 +1046,12 @@
         let html = '';
         
         allRecords.forEach((record, index) => {
-            const target = Number(record.Target) || 0;
-            const cashIn = Number(record['Cash In']) || 0;
-            const cashOut = Number(record['Cash Out']) || 0;
             const nameField = record.Name || '—';
+            const target = nameField === "Expenses" ? 0 : (Number(record.Target) || 0);
+            const cashIn = nameField === "Expenses" ? 0 : (Number(record['Cash In']) || 0);
+            const cashOut = Number(record['Cash Out']) || 0;
             
-            const netCash = record['Net Cash'] !== undefined ? Number(record['Net Cash']) : (cashIn - cashOut);
+            const netCash = record['Net Cash'] !== undefined && nameField !== "Expenses" ? Number(record['Net Cash']) : (cashIn - cashOut);
             const transactionBalance = target - netCash;
             
             cumulativeTarget += target;
@@ -1134,10 +1131,11 @@
     
     function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
         const record = allRecords[index];
-        const target = Number(record.Target) || 0;
-        const cashIn = Number(record['Cash In']) || 0;
+        const nameField = record.Name || '—';
+        const target = nameField === "Expenses" ? 0 : (Number(record.Target) || 0);
+        const cashIn = nameField === "Expenses" ? 0 : (Number(record['Cash In']) || 0);
         const cashOut = Number(record['Cash Out']) || 0;
-        const netCash = record['Net Cash'] !== undefined ? Number(record['Net Cash']) : (cashIn - cashOut);
+        const netCash = cashIn - cashOut;
         const transactionBalance = target - netCash;
         
         activeCardIndex = index;
@@ -1148,7 +1146,7 @@
         const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
         
         document.getElementById('cardDateText').innerText = formattedDate;
-        document.getElementById('cardNameText').innerText = record.Name || '—';
+        document.getElementById('cardNameText').innerText = nameField;
         document.getElementById('cardTimeIn').innerText = formattedTimeIn;
         document.getElementById('cardTimeOut').innerText = formattedTimeOut;
         
@@ -1193,10 +1191,11 @@
     function updateStats() {
         let totalTarget = 0, totalCashIn = 0, totalCashOut = 0, totalNetCash = 0, cumulativeBalance = 0;
         allRecords.forEach(record => {
-            const target = Number(record.Target) || 0;
-            const cashIn = Number(record['Cash In']) || 0;
+            const nameField = record.Name || '—';
+            const target = nameField === "Expenses" ? 0 : (Number(record.Target) || 0);
+            const cashIn = nameField === "Expenses" ? 0 : (Number(record['Cash In']) || 0);
             const cashOut = Number(record['Cash Out']) || 0;
-            const netCash = record['Net Cash'] !== undefined ? Number(record['Net Cash']) : (cashIn - cashOut);
+            const netCash = cashIn - cashOut;
             
             totalTarget += target;
             totalCashIn += cashIn;
@@ -1227,10 +1226,11 @@
     function shareSingleRecord() {
         if(activeCardIndex === null) return;
         const r = allRecords[activeCardIndex];
-        const target = Number(r.Target) || 0;
-        const cashIn = Number(r['Cash In']) || 0;
+        const nameField = r.Name || '—';
+        const target = nameField === "Expenses" ? 0 : (Number(r.Target) || 0);
+        const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
         const cashOut = Number(r['Cash Out']) || 0;
-        const netCash = r['Net Cash'] !== undefined ? Number(r['Net Cash']) : (cashIn - cashOut);
+        const netCash = cashIn - cashOut;
         const transactionBalance = target - netCash;
         const formattedDate = formatDateForDisplay(r.Date);
         const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
@@ -1238,7 +1238,7 @@
         
         const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
             `📅 Date: ${formattedDate}\n` +
-            `👤 Name: ${r.Name || '—'}\n` +
+            `👤 Name: ${nameField}\n` +
             `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
             `🎯 Target Point: K${target.toFixed(2)}\n` +
             `💰 Realized Cash In: K${cashIn.toFixed(2)}\n` +
@@ -1267,10 +1267,11 @@
         let message = "📊 *CASHFLOW LOG REPORT MATRIX*\n━━━━━━━━━━━━━━━━━━━━━━\n\n";
         
         selected.forEach((r, i) => {
-            const target = Number(r.Target) || 0;
-            const cashIn = Number(r['Cash In']) || 0;
+            const nameField = r.Name || '—';
+            const target = nameField === "Expenses" ? 0 : (Number(r.Target) || 0);
+            const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
             const cashOut = Number(r['Cash Out']) || 0;
-            const netCash = r['Net Cash'] !== undefined ? Number(r['Net Cash']) : (cashIn - cashOut);
+            const netCash = cashIn - cashOut;
             const transBal = target - netCash;
             
             cumulativeTarget += target;
@@ -1279,7 +1280,7 @@
             cumulativeNetCash += netCash;
             
             const formattedDate = formatDateForDisplay(r.Date);
-            message += `${i+1}. *${formattedDate}* [${r.Name || '—'}]\n`;
+            message += `${i+1}. *${formattedDate}* [${nameField}]\n`;
             message += `   Target: K${target.toFixed(2)} | In: K${cashIn.toFixed(2)} | Out: K${cashOut.toFixed(2)} | Net: K${netCash.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
             if (r.Comments) message += `   📝 ${r.Comments}\n`;
         });
@@ -1306,9 +1307,12 @@
         
         let message = "CASHFLOW LEDGER BRIEF\n\n";
         selected.forEach((r, i) => {
+            const nameField = r.Name || '—';
             const formattedDate = formatDateForDisplay(r.Date);
-            const netCash = r['Net Cash'] !== undefined ? Number(r['Net Cash']) : (Number(r['Cash In']) - Number(r['Cash Out']));
-            message += `${i+1}. ${formattedDate} (${r.Name || '—'}) | Net Cash: K${netCash.toFixed(2)}\n`;
+            const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
+            const cashOut = Number(r['Cash Out']) || 0;
+            const netCash = cashIn - cashOut;
+            message += `${i+1}. ${formattedDate} (${nameField}) | Net Cash: K${netCash.toFixed(2)}\n`;
         });
         
         window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
@@ -1323,9 +1327,13 @@
         
         let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
         selected.forEach(r => {
+            const nameField = r.Name || '—';
             const formattedDate = formatDateForDisplay(r.Date);
-            const netCash = r['Net Cash'] !== undefined ? Number(r['Net Cash']) : (Number(r['Cash In']) - Number(r['Cash Out']));
-            body += `${formattedDate} | Name: ${r.Name || '—'} | Target Base: K${Number(r.Target).toFixed(2)} | Net Cash: K${netCash.toFixed(2)}\n`;
+            const target = nameField === "Expenses" ? 0 : (Number(r.Target) || 0);
+            const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
+            const cashOut = Number(r['Cash Out']) || 0;
+            const netCash = cashIn - cashOut;
+            body += `${formattedDate} | Name: ${nameField} | Target Base: K${target.toFixed(2)} | Net Cash: K${netCash.toFixed(2)}\n`;
         });
         
         window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
@@ -1368,7 +1376,6 @@
         document.getElementById('inputBalance').value = '';
         document.getElementById('inputComments').value = '';
         
-        // Clear all restriction classes on fresh modal generation initial states
         document.getElementById('inputTarget').disabled = false;
         document.getElementById('inputCashIn').disabled = false;
         document.getElementById('inputTimeIn').disabled = false;
