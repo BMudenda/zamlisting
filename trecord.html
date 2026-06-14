@@ -2,272 +2,346 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CashFlow Pro Ledger</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CashFlow Pro | Complete Cumulative Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #38bdf8;
-            --primary-hover: #0ea5e9;
-            --val-positive: #4ade80;
-            --val-negative: #f87171;
-            --val-neutral: #fbbf24;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
             padding: 24px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
-        header {
+        /* Header */
+        .header {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        h1 i {
-            color: var(--primary);
-        }
-
-        /* Metrics Grid Dashboard */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        /* Actions Toolbar */
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            gap: 16px;
             flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid #334155;
         }
 
-        .toolbar-group {
+        .logo h1 {
+            font-size: 1.8rem;
+            color: #38bdf8;
             display: flex;
-            gap: 12px;
             align-items: center;
+            gap: 12px;
         }
 
-        button, .btn {
-            background: var(--border-color);
-            color: var(--text-main);
-            border: 1px solid transparent;
-            padding: 10px 18px;
-            border-radius: 8px;
+        .logo p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
             font-weight: 600;
             cursor: pointer;
-            display: inline-flex;
+            font-size: 0.95rem;
+            display: flex;
             align-items: center;
             gap: 8px;
             transition: all 0.2s ease;
         }
 
-        button:hover {
+        .btn-add:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: #0f172a;
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
         }
 
-        .btn-primary:hover {
-            background: var(--primary-hover);
+        .stat-card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .btn-success { background: #10b981; }
-        .btn-danger { background: #ef4444; }
-        .btn-view { padding: 6px 12px; font-size: 13px; background: #334155; }
-
-        /* Data Ledger Table Container */
-        .table-container {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
+        .stat-icon {
+            width: 56px;
+            height: 56px;
             border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-content {
+            flex-grow: 1;
+        }
+
+        .stat-card h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid #334155;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn-refresh { background: #6366f1; color: white; }
+        .btn-whatsapp { background: #22c55e; color: white; }
+        .btn-sms { background: #0ea5e9; color: white; }
+        .btn-email { background: #ef4444; color: white; }
+
+        .select-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f172a;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .select-info input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #38bdf8;
+        }
+
+        .select-info label {
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        #selectedCount {
+            background: #38bdf8;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Table Design */
+        .table-wrapper {
+            background: #1e293b;
+            border-radius: 16px;
             overflow-x: auto;
-            margin-bottom: 40px;
+            border: 1px solid #334155;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.85rem;
             text-align: left;
-            font-size: 14px;
-        }
-
-        th, td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
         }
 
         th {
-            background: #111827;
-            color: var(--text-muted);
+            background: #1e293b;
+            padding: 16px;
             font-weight: 600;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
+            color: #94a3b8;
+            border-bottom: 2px solid #334155;
+            white-space: nowrap;
         }
 
-        tfoot th, tfoot td {
-            background: #111827;
-            font-weight: 700;
-            border-top: 2px solid var(--border-color);
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #334155;
+            color: #e2e8f0;
         }
 
-        .interactive-row {
+        tr.interactive-row {
             cursor: pointer;
         }
 
-        .interactive-row:hover {
-            background: #24334d;
+        tr.interactive-row:hover {
+            background: #25334d;
         }
 
         .checkbox-col {
-            width: 40px;
+            width: 50px;
             text-align: center;
         }
 
-        input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary);
+        .checkbox-col input {
+            accent-color: #38bdf8;
             cursor: pointer;
         }
 
-        /* Color Coding Utility Classes */
-        .val-positive { color: var(--val-positive) !important; }
-        .val-negative { color: var(--val-negative) !important; }
-        .val-neutral { color: var(--val-neutral) !important; }
+        .val-positive { color: #4ade80; font-weight: 600; }
+        .val-negative { color: #f87171; font-weight: 600; }
+        .val-neutral { color: #fbbf24; font-weight: 600; }
 
-        /* Modal Overlay Sub-systems */
-        .modal-overlay {
+        .cumulative-row {
+            background: #0f172a;
+        }
+
+        .cumulative-row td {
+            border-top: 2px solid #38bdf8;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .action-cell {
+            text-align: center;
+        }
+
+        .btn-view {
+            background: #334155;
+            border: none;
+            color: #38bdf8;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .btn-view:hover { background: #475569; }
+
+        /* Modal Layout */
+        .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(4px);
-            z-index: 100;
+            z-index: 999;
             display: none;
         }
 
         .modal {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1e293b;
             border-radius: 16px;
             width: 90%;
             max-width: 550px;
-            z-index: 101;
+            z-index: 1000;
             display: none;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
+            border: 1px solid #475569;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .modal.show, .modal-overlay.show {
-            display: flex;
-        }
+        .modal.show, .overlay.show { display: block; }
 
         .modal-header {
-            background: var(--card-bg);
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 20px 24px;
+            border-bottom: 1px solid #334155;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .modal-body {
-            padding: 24px;
-            overflow-y: auto;
-            max-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.2rem;
         }
 
-        .modal-footer {
-            background: var(--card-bg);
-            padding: 16px 24px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
+        .modal-body { padding: 24px; }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #94a3b8;
+            font-size: 0.85rem;
         }
 
-        /* Form Engine Elements */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #38bdf8;
         }
 
         .form-row {
@@ -276,857 +350,962 @@
             gap: 16px;
         }
 
-        label {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
         }
 
-        input, select, textarea {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 10px 14px;
+        .btn-save {
+            flex: 1;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            width: 100%;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-        }
-
-        input[readonly] {
-            background: #111827;
-            cursor: not-allowed;
             font-weight: 600;
+            cursor: pointer;
         }
 
-        /* Toast Popup Alerts */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            padding: 14px 24px;
+        .btn-cancel {
+            flex: 1;
+            background: #334155;
+            color: #e2e8f0;
+            border: none;
+            padding: 12px;
             border-radius: 8px;
-            z-index: 1000;
-            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Card Component View */
+        .card-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #0f172a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .card-date-badge {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #38bdf8;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease forwards;
+            gap: 8px;
         }
-
-        /* View Card Unique Design rules */
-        .card-row-display {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 14px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-        }
-
-        .card-metric-lbl { font-size: 12px; color: var(--text-muted); text-transform: uppercase;}
-        .card-metric-val { font-size: 16px; font-weight: 600; margin-top: 2px;}
-
         .card-status-pill {
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
         }
-        .pill-positive { background: rgba(74, 222, 128, 0.15); color: var(--val-positive); }
-        .pill-negative { background: rgba(248, 113, 113, 0.15); color: var(--val-negative); }
-        .pill-neutral { background: rgba(251, 191, 36, 0.15); color: var(--val-neutral); }
+        .pill-positive { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+        .pill-negative { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .pill-neutral { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        
+        .card-section-title {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 16px 0 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            background: #0f172a;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        .card-metric-block {
+            text-align: center;
+        }
+        .card-metric-lbl {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .card-metric-val {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+        .card-comment-box {
+            background: #0f172a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #6366f1;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            min-height: 50px;
+        }
+        .card-share-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-card-action {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
 
-        /* Loader Overlays */
+        /* Toasts & Loaders */
+        .toast {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1100;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+
         .loading {
             position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(15,23,42,0.85);
-            display: flex; justify-content: center; align-items: center;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15,23,42,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 2000;
         }
+
         .loading-spinner {
-            display: flex; flex-direction: column; align-items: center; gap: 16px;
+            background: #1e293b;
+            padding: 24px 40px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            display: flex;
+            gap: 16px;
+            align-items: center;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .form-row { grid-template-columns: 1fr; }
+            .card-metrics-grid { grid-template-columns: 1fr; gap: 16px; }
         }
     </style>
 </head>
 <body>
+<div class="container">
+    
+    <div class="header">
+        <div class="logo">
+            <h1><i class="fas fa-wallet"></i> CashFlow Pro</h1>
+            <p>Complete Cumulative Cash Management System</p>
+        </div>
+        <button class="btn-add" id="openModalBtn"><i class="fas fa-plus"></i> Add Transaction</button>
+    </div>
 
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-wallet"></i> CashFlow Pro Operational Matrix</h1>
-            <button id="refreshBtn" class="btn"><i class="fas fa-sync-alt"></i> Force API Sync</button>
-        </header>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-label">Total Logs Pool</span>
-                <span id="totalRecords" class="stat-value">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Aggregated Bound Target</span>
-                <span id="totalTarget" class="stat-value">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Aggregated Liquid Receipts</span>
-                <span id="totalCashIn" class="stat-value val-positive">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Net Balance Pipeline Delta</span>
-                <span id="finalCumulativeBalance" class="stat-value">—</span>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #10b98120; color: #10b981;"><i class="fas fa-arrow-down"></i></div>
+            <div class="stat-content">
+                <h3>Total Cash In</h3>
+                <div class="stat-value" id="totalCashIn">K0.00</div>
+                <div class="stat-label">All-time collected</div>
             </div>
         </div>
-
-        <div class="toolbar">
-            <div class="toolbar-group">
-                <button id="openModalBtn" class="btn-primary"><i class="fas fa-plus"></i> New Row Execution</button>
-                <span id="selectedCount" style="font-size: 14px; color: var(--text-muted)">0 items checked</span>
-            </div>
-            <div class="toolbar-group">
-                <input type="checkbox" id="selectAllCheckbox" style="margin-right: 4px;"> <label for="selectAllCheckbox" style="cursor:pointer; margin-right: 12px;">Select All Elements</label>
-                <button id="whatsappBtn" class="btn-success"><i class="fab fa-whatsapp"></i> Dispatch Report</button>
-                <button id="smsBtn" class="btn"><i class="fas fa-sms"></i> SMS Text</button>
-                <button id="emailBtn" class="btn"><i class="fas fa-envelope"></i> Mail Batch</button>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #38bdf820; color: #38bdf8;"><i class="fas fa-crosshairs"></i></div>
+            <div class="stat-content">
+                <h3>Total Target</h3>
+                <div class="stat-value" id="totalTarget">K0.00</div>
+                <div class="stat-label">Expected target sum</div>
             </div>
         </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="checkbox-col"><input type="checkbox" id="headerMasterCheckbox"></th>
-                        <th>Date String</th>
-                        <th>Identity/Service</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
-                        <th>Bound Target</th>
-                        <th>Realized Cash In</th>
-                        <th>Tx Balance</th>
-                        <th>Cum. Target</th>
-                        <th>Cum. Cash In</th>
-                        <th>Cum. Net Balance</th>
-                        <th>Operational Remarks</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="13" style="text-align:center; padding:48px; color: var(--text-muted);">
-                            <i class="fas fa-spinner fa-pulse"></i> Resolving base parameters...
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot id="tableFooter" style="display: none;">
-                    <tr>
-                        <td class="checkbox-col"></td>
-                        <td colspan="4">Ledger Calculation Matrix Sum</td>
-                        <td id="footerTarget">K0.00</td>
-                        <td id="footerCashIn" class="val-positive">K0.00</td>
-                        <td id="footerTransBal">K0.00</td>
-                        <td id="footerTargetCum" style="color:var(--text-muted); font-size:12px;">Running Total</td>
-                        <td id="footerCashCum" style="color:var(--text-muted); font-size:12px;">Running Total</td>
-                        <td id="footerCumulative">K0.00</td>
-                        <td colspan="2"></td>
-                    </tr>
-                </tfoot>
-            </table>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fbbf2420; color: #fbbf24;"><i class="fas fa-scale-balanced"></i></div>
+            <div class="stat-content">
+                <h3>Cumulative Balance</h3>
+                <div class="stat-value" id="finalCumulativeBalance">K0.00</div>
+                <div class="stat-label">Net variance index</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #6366f120; color: #6366f1;"><i class="fas fa-folder-open"></i></div>
+            <div class="stat-content">
+                <h3>Total Records</h3>
+                <div class="stat-value" id="totalRecords">0</div>
+                <div class="stat-label">Logged statements</div>
+            </div>
         </div>
     </div>
 
-    <div id="overlay" class="modal-overlay"></div>
-
-    <div id="recordModal" class="modal">
-        <div class="modal-header">
-            <h3 id="modalTitle">Create Entry</h3>
-            <button id="closeFormModalBtn" style="background:transparent; font-size: 18px;"><i class="fas fa-times"></i></button>
+    <div class="action-bar">
+        <div class="btn-group">
+            <button class="btn btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="btn btn-whatsapp" id="whatsappBtn"><i class="fab fa-whatsapp"></i> Share WhatsApp</button>
+            <button class="btn btn-sms" id="smsBtn"><i class="fas fa-sms"></i> Share SMS</button>
+            <button class="btn btn-email" id="emailBtn"><i class="fas fa-envelope"></i> Email Report</button>
         </div>
-        <div class="modal-body">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Execution Date Matrix</label>
-                    <input type="date" id="inputDate">
-                </div>
-                <div class="form-group">
-                    <label>Identity / Mode Context</label>
-                    <select id="inputName">
-                        <option value="Rider 1">Rider 1</option>
-                        <option value="Rider 2">Rider 2</option>
-                        <option value="Vehicle 1">Vehicle 1</option>
-                        <option value="Expense">Expense</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Log Window In</label>
-                    <input type="time" id="inputTimeIn">
-                </div>
-                <div class="form-group">
-                    <label>Log Window Out</label>
-                    <input type="time" id="inputTimeOut">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Bound Allocation Target (K)</label>
-                    <input type="number" id="inputTarget" value="400">
-                </div>
-                <div class="form-group">
-                    <label>Realized Liquid Cash In (K)</label>
-                    <input type="number" id="inputCashIn" placeholder="0.00">
-                </div>
+        <div class="select-info">
+            <input type="checkbox" id="selectAllCheckbox"> 
+            <label for="selectAllCheckbox">Select All Rows</label>
+            <span id="selectedCount">0 selected</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th class="checkbox-col"><input type="checkbox" id="headerMasterCheckbox"></th>
+                    <th>Date</th>
+                    <th>Identity/Service</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>Target</th>
+                    <th>Cash In</th>
+                    <th>Tx Balance</th>
+                    <th>Cum. Target</th>
+                    <th>Cum. Cash In</th>
+                    <th>Cum. Net Balance</th>
+                    <th>Comments</th>
+                    <th style="text-align: center;">View Card</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;">
+                        <i class="fas fa-spinner fa-pulse"></i> Resolving data layers...
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot id="tableFooter" style="display: none;">
+                <tr class="cumulative-row">
+                    <td colspan="5" style="text-align:right; padding-right:16px;">Final Totals:</td>
+                    <td id="footerTarget">K0.00</td>
+                    <td id="footerCashIn">K0.00</td>
+                    <td id="footerTransBal">K0.00</td>
+                    <td colspan="2"></td>
+                    <td id="footerCumulative">K0.00</td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+
+<div id="recordModal" class="modal">
+    <div class="modal-header">
+        <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> New Transaction Entry</h3>
+        <button class="close-modal" id="closeFormModalBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Value Date *</label>
+                <input type="date" id="inputDate">
             </div>
             <div class="form-group">
-                <label>Calculated Row Tx Balance (Auto-compiled)</label>
-                <input type="text" id="inputBalance" readonly>
+                <label><i class="fas fa-user"></i> Identity / Mode Context *</label>
+                <select id="inputName" onchange="handleNameChange()">
+                    <option value="Rider 1">Rider 1</option>
+                    <option value="Rider 2">Rider 2</option>
+                    <option value="Vehicle 1">Vehicle 1</option>
+                    <option value="Expense">Expense</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Entry Time (In)</label>
+                <input type="time" id="inputTimeIn">
             </div>
             <div class="form-group">
-                <label>Operational String Logs / Remarks</label>
-                <textarea id="inputComments" rows="3" placeholder="Log comments regarding execution..."></textarea>
+                <label><i class="fas fa-clock"></i> Exit Time (Out)</label>
+                <input type="time" id="inputTimeOut">
             </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-crosshairs"></i> Target Frame (K)</label>
+                <input type="number" id="inputTarget" value="400" step="any" oninput="updateBalancePreview()">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-money-bill-wave"></i> Realized Cash In (K)</label>
+                <input type="number" id="inputCashIn" step="any" oninput="updateBalancePreview()">
+            </div>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-calculator"></i> Delta Target Computation Preview</label>
+            <input type="text" id="inputBalance" readonly style="font-weight:bold;">
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-comment-alt"></i> Internal Logs / Comments</label>
+            <textarea id="inputComments" rows="3" placeholder="Append transaction metadata..."></textarea>
         </div>
         <div class="modal-footer">
-            <button id="cancelBtn">Terminate</button>
-            <button id="saveBtn" class="btn-primary"><i class="fas fa-cloud-upload-alt"></i> Execute Pipeline Write</button>
+            <button class="btn-save" id="saveBtn"><i class="fas fa-check"></i> Commit Entry</button>
+            <button class="btn-cancel" id="cancelBtn">Discard</button>
         </div>
     </div>
+</div>
 
-    <div id="viewCardModal" class="modal" style="max-width: 480px;">
-        <div class="modal-header">
-            <h3><i class="fas fa-folder-open" style="color:var(--primary)"></i> Context Data Row Details</h3>
-            <button id="closeViewModalBtn" style="background:transparent; font-size:18px;"><i class="fas fa-times"></i></button>
+<div id="viewCardModal" class="modal">
+    <div class="modal-header">
+        <h3><i class="fas fa-address-card"></i> Statement Explorer</h3>
+        <button class="close-modal" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="card-view-header">
+            <div class="card-date-badge">
+                <i class="far fa-calendar-check"></i> <span id="cardDateText">--</span>
+            </div>
+            <div id="cardStatusPill" class="card-status-pill">--</div>
         </div>
-        <div class="modal-body" style="gap:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#111827; padding:12px; border-radius:8px;">
-                <div>
-                    <span class="card-metric-lbl" style="display:block;">Record Name Segment</span>
-                    <span id="cardNameText" style="font-size: 18px; font-weight:700; color:var(--primary)">—</span>
-                </div>
-                <span id="cardStatusPill" class="card-status-pill pill-neutral">—</span>
-            </div>
-            
-            <div class="card-row-display">
-                <div><span class="card-metric-lbl">Targeting Date</span><div id="cardDateText" class="card-metric-val">—</div></div>
-                <div><span class="card-metric-lbl">Active Window Range</span><div class="card-metric-val"><span id="cardTimeIn">—</span> → <span id="cardTimeOut">—</span></div></div>
-            </div>
-            <div class="card-row-display">
-                <div><span class="card-metric-lbl">Target Allocated Point</span><div id="cardTarget" class="card-metric-val">—</div></div>
-                <div><span class="card-metric-lbl">Liquid Receipts Handover</span><div id="cardCashIn" class="card-metric-val val-positive">—</div></div>
-            </div>
-            <div class="card-row-display" style="border-bottom: 2px dashed var(--border-color)">
-                <div><span class="card-metric-lbl">Local Delta Offset</span><div id="cardBalance" class="card-metric-val">—</div></div>
-                <div></div>
-            </div>
-            <div class="card-row-display">
-                <div><span class="card-metric-lbl">Cumulative Target Block</span><div id="cardCumTarget" class="card-metric-val">—</div></div>
-                <div><span class="card-metric-lbl">Cumulative Liquid Sum</span><div id="cardCumCashIn" class="card-metric-val val-positive">—</div></div>
-            </div>
-            <div class="card-row-display" style="border:none; padding:0;">
-                <div><span class="card-metric-lbl">Cumulative Net Balance Stream</span><div id="cardCumBalance" class="card-metric-val">—</div></div>
-                <div></div>
-            </div>
-            
-            <div style="background:#111827; padding:12px; border-radius:8px; margin-top:8px;">
-                <span class="card-metric-lbl" style="display:block; margin-bottom:4px;">Remarks Log Metadata String</span>
-                <p id="cardComments" style="font-size: 13px; line-height:1.5; color:var(--text-main); white-space:pre-wrap;">—</p>
+
+        <div class="card-section-title"><i class="fas fa-user"></i> Context Profile</div>
+        <div class="card-metrics-grid" style="grid-template-columns: 1fr;">
+            <div class="card-metric-block" style="text-align: left; padding-left: 8px;">
+                <div class="card-metric-lbl">Identity / Assignment Name</div>
+                <div class="card-metric-val" id="cardNameText" style="color:#38bdf8; font-size: 1.2rem;">--</div>
             </div>
         </div>
-        <div class="modal-footer" style="justify-content: space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text-muted);">CashFlow Logic Engine Pro v2.1</span>
-            <button id="cardWhatsappBtn" class="btn-success"><i class="fab fa-whatsapp"></i> Export This Card</button>
+
+        <div class="card-section-title"><i class="fas fa-clock"></i> Entry Logs Window</div>
+        <div class="card-metrics-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Time In</div>
+                <div class="card-metric-val" id="cardTimeIn" style="color:#e2e8f0;">--</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Time Out</div>
+                <div class="card-metric-val" id="cardTimeOut" style="color:#e2e8f0;">--</div>
+            </div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-coins"></i> Core Row Transaction Metrics</div>
+        <div class="card-metrics-grid">
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Target</div>
+                <div class="card-metric-val" id="cardTarget" style="color: #38bdf8;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cash In</div>
+                <div class="card-metric-val" id="cardCashIn" style="color: #10b981;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Net Balance</div>
+                <div class="card-metric-val" id="cardBalance">K0.00</div>
+            </div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-chart-line"></i> Timeline Aggregation Progress</div>
+        <div class="card-metrics-grid">
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cum. Target</div>
+                <div class="card-metric-val" id="cardCumTarget" style="color: #94a3b8;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cum. Cash In</div>
+                <div class="card-metric-val" id="cardCumCashIn" style="color: #94a3b8;">K0.00</div>
+            </div>
+            <div class="card-metric-block">
+                <div class="card-metric-lbl">Cum. Balance</div>
+                <div class="card-metric-val" id="cardCumBalance">K0.00</div>
+            </div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-comment-dots"></i> Internal Comments Log</div>
+        <div id="cardComments" class="card-comment-box">--</div>
+
+        <div class="card-share-bar">
+            <button class="btn-card-action" id="cardWhatsappBtn" style="background:#22c55e;"><i class="fab fa-whatsapp"></i> WhatsApp Node</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
-        const PHONE_NUMBER = "0978167546";
-        
-        let allRecords = [];
-        let activeCardIndex = null;
-        let activeCardCumulate = {};
-        
-        // Parse Excel serial date number safely
-        function parseExcelDate(excelDate) {
-            if (!excelDate) return null;
-            if (typeof excelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(excelDate)) {
-                return excelDate;
-            }
-            if (typeof excelDate === 'string' && excelDate.includes('T')) {
-                const dateObj = new Date(excelDate);
-                if (!isNaN(dateObj.getTime())) {
-                    const year = dateObj.getFullYear();
-                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    const day = String(dateObj.getDate()).padStart(2, '0');
-                    if (year === 1899 && month === '12' && (day === '30' || day === '31')) {
-                        return null;
-                    }
-                    return `${year}-${month}-${day}`;
-                }
-            }
-            let numDays = parseFloat(excelDate);
-            if (!isNaN(numDays) && numDays > 0) {
-                const excelEpoch = new Date(1899, 11, 30);
-                const date = new Date(excelEpoch.getTime() + numDays * 86400000);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
+    const PHONE_NUMBER = "0978167546";
+    
+    let allRecords = [];
+    let activeCardIndex = null;
+    let activeCardCumulate = {};
+    
+    function parseExcelDate(excelDate) {
+        if (!excelDate) return null;
+        if (typeof excelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(excelDate)) {
             return excelDate;
         }
-        
-        // Parse raw time data 
-        function parseTimeValue(timeValue) {
-            if (!timeValue || timeValue === "") return "";
-            if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
-                return timeValue;
-            }
-            if (typeof timeValue === 'string' && timeValue.includes('T')) {
-                const dateObj = new Date(timeValue);
-                if (!isNaN(dateObj.getTime())) {
-                    const hours = String(dateObj.getUTCHours()).padStart(2, '0');
-                    const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
-                    return `${hours}:${minutes}`;
+        if (typeof excelDate === 'string' && excelDate.includes('T')) {
+            const dateObj = new Date(excelDate);
+            if (!isNaN(dateObj.getTime())) {
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                if (year === 1899 && month === '12' && (day === '30' || day === '31')) {
+                    return null;
                 }
+                return `${year}-${month}-${day}`;
             }
-            let numDays = parseFloat(timeValue);
-            if (!isNaN(numDays) && numDays >= 0 && numDays < 1) {
-                const totalSeconds = numDays * 86400;
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-            }
-            if (typeof timeValue === 'string' && timeValue.includes(':')) {
-                const parts = timeValue.split(':');
-                if (parts.length >= 2) {
-                    return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-                }
-            }
+        }
+        let numDays = parseFloat(excelDate);
+        if (!isNaN(numDays) && numDays > 0) {
+            const excelEpoch = new Date(1899, 11, 30);
+            const date = new Date(excelEpoch.getTime() + numDays * 86400000);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        return excelDate;
+    }
+    
+    function parseTimeValue(timeValue) {
+        if (!timeValue || timeValue === "") return "";
+        if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
             return timeValue;
         }
-        
-        function formatDateForDisplay(dateValue) {
-            const parsed = parseExcelDate(dateValue);
-            if (!parsed) return "—";
-            if (parsed === dateValue && dateValue.includes('-')) {
-                const parts = dateValue.split('-');
-                if (parts.length === 3) {
-                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-                }
+        if (typeof timeValue === 'string' && timeValue.includes('T')) {
+            const dateObj = new Date(timeValue);
+            if (!isNaN(dateObj.getTime())) {
+                const hours = String(dateObj.getUTCHours()).padStart(2, '0');
+                const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
             }
-            if (parsed.includes('-')) {
-                const parts = parsed.split('-');
+        }
+        let numDays = parseFloat(timeValue);
+        if (!isNaN(numDays) && numDays >= 0 && numDays < 1) {
+            const totalSeconds = numDays * 86400;
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+        if (typeof timeValue === 'string' && timeValue.includes(':')) {
+            const parts = timeValue.split(':');
+            if (parts.length >= 2) {
+                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+            }
+        }
+        return timeValue;
+    }
+    
+    function formatDateForDisplay(dateValue) {
+        const parsed = parseExcelDate(dateValue);
+        if (!parsed) return "—";
+        if (parsed === dateValue && dateValue.includes('-')) {
+            const parts = dateValue.split('-');
+            if (parts.length === 3) {
                 return `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-            return parsed || "—";
+        }
+        if (parsed.includes('-')) {
+            const parts = parsed.split('-');
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return parsed || "—";
+    }
+
+    function handleNameChange() {
+        const selectedName = document.getElementById('inputName').value;
+        if (selectedName === "Expense") {
+            document.getElementById('inputTimeIn').value = "00:00";
+            document.getElementById('inputTarget').value = "0";
+        } else {
+            document.getElementById('inputTarget').value = "400";
+        }
+        updateBalancePreview();
+    }
+    
+    function updateBalancePreview() {
+        const selectedName = document.getElementById('inputName').value;
+        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        
+        if (selectedName === "Expense" && cashIn > 0) {
+            cashIn = -Math.abs(cashIn);
         }
 
-        // Operational Overrides: Lock Target to 0 for Expenses dynamically
-        function handleNameChange() {
-            const selectedName = document.getElementById('inputName').value;
-            if (selectedName === "Expense") {
-                document.getElementById('inputTimeIn').value = "00:00";
-                document.getElementById('inputTarget').value = "0";
-            } else {
-                document.getElementById('inputTarget').value = "400";
-            }
-            updateBalancePreview();
+        const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
+        const balanceField = document.getElementById('inputBalance');
+        balanceField.value = balance.toFixed(2);
+        
+        if (balance > 0) {
+            balanceField.style.color = "#f87171";
+            balanceField.style.background = "#0f172a";
+        } else if (balance < 0) {
+            balanceField.style.color = "#4ade80";
+            balanceField.style.background = "#0f172a";
+        } else {
+            balanceField.style.color = "#fbbf24";
+            balanceField.style.background = "#0f172a";
+        }
+    }
+    
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas ${isError ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> ${message}`;
+        toast.style.background = isError ? '#ef4444' : '#10b981';
+        toast.style.color = 'white';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function showLoading(show) {
+        let loader = document.getElementById('globalLoader');
+        if (show && !loader) {
+            loader = document.createElement('div');
+            loader.id = 'globalLoader';
+            loader.className = 'loading';
+            loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x" style="color:#38bdf8"></i><span>Running Operation Pipeline...</span></div>';
+            document.body.appendChild(loader);
+        } else if (!show && loader) {
+            loader.remove();
+        }
+    }
+    
+    async function saveToSheet(record) {
+        const params = new URLSearchParams();
+        params.append('Date', record.date);
+        params.append('Name', record.name);
+        params.append('Time In', record.timeIn);
+        params.append('Time Out', record.timeOut);
+        params.append('Target', record.target);
+        params.append('Cash In', record.cashIn);
+        params.append('Balance', record.balance);
+        params.append('Comments', record.comments);
+        
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: params.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+    
+    async function saveRecord() {
+        const date = document.getElementById('inputDate').value;
+        if (!date) {
+            showToast('A distinct validation date is required.', true);
+            return;
         }
         
-        // Live modal calculation calculations
-        function updateBalancePreview() {
-            const selectedName = document.getElementById('inputName').value;
-            const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-            let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
-            
-            if (selectedName === "Expense" && cashIn > 0) {
-                cashIn = -Math.abs(cashIn);
-            }
+        const selectedName = document.getElementById('inputName').value;
+        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        
+        if (selectedName === "Expense" && cashIn > 0) {
+            cashIn = -Math.abs(cashIn);
+        }
 
-            // Logic Core Rule: Expense lines always flag exactly a 0.00 local row variance
-            const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
-            
-            const balanceField = document.getElementById('inputBalance');
-            balanceField.value = balance.toFixed(2);
-            
-            if (balance > 0) {
-                balanceField.style.color = "#f87171";
-                balanceField.style.background = "#1e293b";
-            } else if (balance < 0) {
-                balanceField.style.color = "#4ade80";
-                balanceField.style.background = "#1e293b";
-            } else {
-                balanceField.style.color = "#fbbf24";
-                balanceField.style.background = "#1e293b";
-            }
-        }
+        const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
         
-        function showToast(message, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<i class="fas ${isError ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> ${message}`;
-            toast.style.background = isError ? '#ef4444' : '#10b981';
-            toast.style.color = 'white';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+        const record = {
+            date: date,
+            name: selectedName,
+            timeIn: document.getElementById('inputTimeIn').value || "",
+            timeOut: document.getElementById('inputTimeOut').value || "",
+            target: target,
+            cashIn: cashIn,
+            balance: balance,
+            comments: document.getElementById('inputComments').value || ""
+        };
         
-        function showLoading(show) {
-            let loader = document.getElementById('globalLoader');
-            if (show && !loader) {
-                loader = document.createElement('div');
-                loader.id = 'globalLoader';
-                loader.className = 'loading';
-                loader.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse fa-2x" style="color:#38bdf8"></i><span>Running Operation Pipeline...</span></div>';
-                document.body.appendChild(loader);
-            } else if (!show && loader) {
-                loader.remove();
-            }
-        }
+        showLoading(true);
+        const success = await saveToSheet(record);
+        showLoading(false);
         
-        async function saveToSheet(record) {
-            const params = new URLSearchParams();
-            params.append('Date', record.date);
-            params.append('Name', record.name); 
-            params.append('Time In', record.timeIn);
-            params.append('Time Out', record.timeOut);
-            params.append('Target', record.target);
-            params.append('Cash In', record.cashIn);
-            params.append('Balance', record.balance);
-            params.append('Comments', record.comments);
-            
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: params.toString(),
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                });
-                return true;
-            } catch (err) {
-                console.error(err);
-                return false;
-            }
+        if (success) {
+            showToast(`Transaction synced explicitly.`);
+            closeModal();
+            await loadRecords();
+        } else {
+            showToast('Engine encountered connection synchronization fault.', true);
         }
+    }
+    
+    async function loadRecords() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td></tr>';
         
-        async function saveRecord() {
-            const date = document.getElementById('inputDate').value;
-            if (!date) {
-                showToast('A distinct validation date is required.', true);
-                return;
-            }
+        try {
+            const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
+            if (!response.ok) throw new Error();
+            const data = await response.json();
             
-            const selectedName = document.getElementById('inputName').value;
-            const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-            let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
-            
-            if (selectedName === "Expense" && cashIn > 0) {
-                cashIn = -Math.abs(cashIn);
-            }
-
-            // Enforce K0 balance for expenses directly into data storage payloads
-            const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
-            
-            const record = {
-                date: date,
-                name: selectedName,
-                timeIn: document.getElementById('inputTimeIn').value || "",
-                timeOut: document.getElementById('inputTimeOut').value || "",
-                target: target,
-                cashIn: cashIn,
-                balance: balance,
-                comments: document.getElementById('inputComments').value || ""
-            };
-            
-            showLoading(true);
-            const success = await saveToSheet(record);
-            showLoading(false);
-            
-            if (success) {
-                showToast(`Transaction synced explicitly.`);
-                closeModal();
-                await loadRecords();
-            } else {
-                showToast('Engine encountered connection synchronization fault.', true);
-            }
-        }
-        
-        async function loadRecords() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td></tr>';
-            
-            try {
-                const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
-                if (!response.ok) throw new Error();
-                const data = await response.json();
-                
-                allRecords = (data.rows || []).filter(row => row && row.Date && row.Date !== '');
-                allRecords.sort((a, b) => {
-                    const dateA = parseExcelDate(a.Date) || '';
-                    const dateB = parseExcelDate(b.Date) || '';
-                    return dateA.localeCompare(dateB);
-                });
-                
-                displayRecordsWithAllCumulatives();
-                updateStats();
-                showToast(`Active Ledger Loaded: ${allRecords.length} Rows`);
-                
-            } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
-                showToast('Database link execution broken.', true);
-            }
-        }
-        
-        function displayRecordsWithAllCumulatives() {
-            const tbody = document.getElementById('tableBody');
-            
-            if (allRecords.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-inbox"></i> Environment Empty. Tap action buttons to write.</div></td>';
-                document.getElementById('tableFooter').style.display = 'none';
-                return;
-            }
-            
-            let cumulativeTarget = 0;
-            let cumulativeCashIn = 0;
-            let cumulativeBalance = 0;
-            let html = '';
-            
-            allRecords.forEach((record, index) => {
-                const target = Number(record.Target) || 0;
-                const cashIn = Number(record['Cash In']) || 0;
-                const nameValue = record.Name || '—';
-                
-                // Row Overrides logic: Expenses reflect 0 variance locally
-                const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
-                
-                cumulativeTarget += target;
-                cumulativeCashIn += cashIn;
-                
-                // Core Cumulative logic: Target - CashIn handles positive targets or negative expenses fluidly
-                cumulativeBalance += (target - cashIn); 
-                
-                let balanceClass = 'val-neutral';
-                if (transactionBalance > 0) balanceClass = 'val-negative';
-                else if (transactionBalance < 0) balanceClass = 'val-positive';
-                
-                let cumulativeClass = 'val-neutral';
-                if (cumulativeBalance > 0) cumulativeClass = 'val-negative';
-                else if (cumulativeBalance < 0) cumulativeClass = 'val-positive';
-                
-                const comments = record.Comments || '-';
-                const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
-                
-                const formattedDate = formatDateForDisplay(record.Date);
-                const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
-                const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
-                
-                html += `
-                    <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
-                        <td class="checkbox-col" onclick="event.stopPropagation()">
-                            <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
-                        </td>
-                        <td>${formattedDate}</td>
-                        <td style="font-weight: 600; color: #38bdf8;">${nameValue}</td>
-                        <td>${formattedTimeIn}</td>
-                        <td>${formattedTimeOut}</td>
-                        <td>K${target.toFixed(2)}</td>
-                        <td>K${cashIn.toFixed(2)}</td>
-                        <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
-                        <td>K${cumulativeTarget.toFixed(2)}</td>
-                        <td>K${cumulativeCashIn.toFixed(2)}</td>
-                        <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
-                        <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</td>
-                        <td class="action-cell" onclick="event.stopPropagation()">
-                            <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
-                               <i class="fas fa-expand"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                `;
+            allRecords = (data.rows || []).filter(row => row && row.Date && row.Date !== '');
+            allRecords.sort((a, b) => {
+                const dateA = parseExcelDate(a.Date) || '';
+                const dateB = parseExcelDate(b.Date) || '';
+                return dateA.localeCompare(dateB);
             });
             
-            tbody.innerHTML = html;
+            displayRecordsWithAllCumulatives();
+            updateStats();
+            showToast(`Active Ledger Loaded: ${allRecords.length} Rows`);
             
-            document.getElementById('tableFooter').style.display = 'table-footer-group';
-            document.getElementById('footerTarget').innerHTML = `K${cumulativeTarget.toFixed(2)}`;
-            document.getElementById('footerCashIn').innerHTML = `K${cumulativeCashIn.toFixed(2)}`;
-            document.getElementById('footerTransBal').innerHTML = `K${(cumulativeTarget - cumulativeCashIn).toFixed(2)}`;
-            document.getElementById('footerCumulative').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
-            
-            const footerElem = document.getElementById('footerCumulative');
-            if (cumulativeBalance > 0) footerElem.className = "val-negative";
-            else if (cumulativeBalance < 0) footerElem.className = "val-positive";
-            else footerElem.className = "val-neutral";
-            
-            attachCheckboxEvents();
-            updateSelectedCount();
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
+            showToast('Database link execution broken.', true);
         }
-
-        function toggleRowCheckbox(index) {
-            const checkbox = document.getElementById(`cb_row_${index}`);
-            if(checkbox) {
-                checkbox.checked = !checkbox.checked;
-                updateSelectedCount();
-            }
+    }
+    
+    function displayRecordsWithAllCumulatives() {
+        const tbody = document.getElementById('tableBody');
+        
+        if (allRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-inbox"></i> Environment Empty. Tap action buttons to write.</div></td>';
+            document.getElementById('tableFooter').style.display = 'none';
+            return;
         }
         
-        function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
-            const record = allRecords[index];
+        let cumulativeTarget = 0;
+        let cumulativeCashIn = 0;
+        let cumulativeBalance = 0;
+        let html = '';
+        
+        allRecords.forEach((record, index) => {
             const target = Number(record.Target) || 0;
             const cashIn = Number(record['Cash In']) || 0;
             const nameValue = record.Name || '—';
+            
             const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
             
-            activeCardIndex = index;
-            activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
-
+            cumulativeTarget += target;
+            cumulativeCashIn += cashIn;
+            cumulativeBalance += (target - cashIn); 
+            
+            let balanceClass = 'val-neutral';
+            if (transactionBalance > 0) balanceClass = 'val-negative';
+            else if (transactionBalance < 0) balanceClass = 'val-positive';
+            
+            let cumulativeClass = 'val-neutral';
+            if (cumulativeBalance > 0) cumulativeClass = 'val-negative';
+            else if (cumulativeBalance < 0) cumulativeClass = 'val-positive';
+            
+            const comments = record.Comments || '-';
+            const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
+            
             const formattedDate = formatDateForDisplay(record.Date);
             const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
             const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
             
-            document.getElementById('cardDateText').innerText = formattedDate;
-            document.getElementById('cardNameText').innerText = nameValue;
-            document.getElementById('cardTimeIn').innerText = formattedTimeIn;
-            document.getElementById('cardTimeOut').innerText = formattedTimeOut;
-            
-            document.getElementById('cardTarget').innerText = `K${target.toFixed(2)}`;
-            document.getElementById('cardCashIn').innerText = `K${cashIn.toFixed(2)}`;
-            
-            const balElem = document.getElementById('cardBalance');
-            balElem.innerText = `K${transactionBalance.toFixed(2)}`;
-            
-            const statusPill = document.getElementById('cardStatusPill');
-            if (nameValue === "Expense") {
-                balElem.className = "card-metric-val val-neutral";
-                statusPill.innerText = "Expense Out";
-                statusPill.className = "card-status-pill pill-neutral";
-            } else if (transactionBalance > 0) {
-                balElem.className = "card-metric-val val-negative";
-                statusPill.innerText = "Shortage";
-                statusPill.className = "card-status-pill pill-negative";
-            } else if (transactionBalance < 0) {
-                balElem.className = "card-metric-val val-positive";
-                statusPill.innerText = "Surplus";
-                statusPill.className = "card-status-pill pill-positive";
-            } else {
-                balElem.className = "card-metric-val val-neutral";
-                statusPill.innerText = "Balanced";
-                statusPill.className = "card-status-pill pill-neutral";
-            }
+            html += `
+                <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
+                    <td class="checkbox-col" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
+                    </td>
+                    <td>${formattedDate}</td>
+                    <td style="font-weight: 600; color: #38bdf8;">${nameValue}</td>
+                    <td>${formattedTimeIn}</td>
+                    <td>${formattedTimeOut}</td>
+                    <td>K${target.toFixed(2)}</td>
+                    <td>K${cashIn.toFixed(2)}</td>
+                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
+                    <td>K${cumulativeTarget.toFixed(2)}</td>
+                    <td>K${cumulativeCashIn.toFixed(2)}</td>
+                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
+                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</td>
+                    <td class="action-cell" onclick="event.stopPropagation()">
+                        <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
+                           <i class="fas fa-expand"></i> View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+        
+        document.getElementById('tableFooter').style.display = 'table-footer-group';
+        document.getElementById('footerTarget').innerHTML = `K${cumulativeTarget.toFixed(2)}`;
+        document.getElementById('footerCashIn').innerHTML = `K${cumulativeCashIn.toFixed(2)}`;
+        document.getElementById('footerTransBal').innerHTML = `K${(cumulativeTarget - cumulativeCashIn).toFixed(2)}`;
+        document.getElementById('footerCumulative').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
+        
+        const footerElem = document.getElementById('footerCumulative');
+        if (cumulativeBalance > 0) footerElem.className = "val-negative";
+        else if (cumulativeBalance < 0) footerElem.className = "val-positive";
+        else footerElem.className = "val-neutral";
+        
+        attachCheckboxEvents();
+        updateSelectedCount();
+    }
 
-            document.getElementById('cardCumTarget').innerText = `K${cumTarget.toFixed(2)}`;
-            document.getElementById('cardCumCashIn').innerText = `K${cumCashIn.toFixed(2)}`;
-            
-            const cumBalElem = document.getElementById('cardCumBalance');
-            cumBalElem.innerText = `K${cumBalance.toFixed(2)}`;
-            if (cumBalance > 0) cumBalElem.className = "card-metric-val val-negative";
-            else if (cumBalance < 0) cumBalElem.className = "card-metric-val val-positive";
-            else cumBalElem.className = "card-metric-val val-neutral";
+    function toggleRowCheckbox(index) {
+        const checkbox = document.getElementById(`cb_row_${index}`);
+        if(checkbox) {
+            checkbox.checked = !checkbox.checked;
+            updateSelectedCount();
+        }
+    }
+    
+    function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
+        const record = allRecords[index];
+        const target = Number(record.Target) || 0;
+        const cashIn = Number(record['Cash In']) || 0;
+        const nameValue = record.Name || '—';
+        const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
+        
+        activeCardIndex = index;
+        activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
 
-            document.getElementById('cardComments').innerText = record.Comments || 'No logs configured for this string record entry.';
+        const formattedDate = formatDateForDisplay(record.Date);
+        const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
+        const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
+        
+        document.getElementById('cardDateText').innerText = formattedDate;
+        document.getElementById('cardNameText').innerText = nameValue;
+        document.getElementById('cardTimeIn').innerText = formattedTimeIn;
+        document.getElementById('cardTimeOut').innerText = formattedTimeOut;
+        
+        document.getElementById('cardTarget').innerText = `K${target.toFixed(2)}`;
+        document.getElementById('cardCashIn').innerText = `K${cashIn.toFixed(2)}`;
+        
+        const balElem = document.getElementById('cardBalance');
+        balElem.innerText = `K${transactionBalance.toFixed(2)}`;
+        
+        const statusPill = document.getElementById('cardStatusPill');
+        if (nameValue === "Expense") {
+            balElem.className = "card-metric-val val-neutral";
+            statusPill.innerText = "Expense Out";
+            statusPill.className = "card-status-pill pill-neutral";
+        } else if (transactionBalance > 0) {
+            balElem.className = "card-metric-val val-negative";
+            statusPill.innerText = "Shortage";
+            statusPill.className = "card-status-pill pill-negative";
+        } else if (transactionBalance < 0) {
+            balElem.className = "card-metric-val val-positive";
+            statusPill.innerText = "Surplus";
+            statusPill.className = "card-status-pill pill-positive";
+        } else {
+            balElem.className = "card-metric-val val-neutral";
+            statusPill.innerText = "Balanced";
+            statusPill.className = "card-status-pill pill-neutral";
+        }
 
-            document.getElementById('viewCardModal').classList.add('show');
-            document.getElementById('overlay').classList.add('show');
+        document.getElementById('cardCumTarget').innerText = `K${cumTarget.toFixed(2)}`;
+        document.getElementById('cardCumCashIn').innerText = `K${cumCashIn.toFixed(2)}`;
+        
+        const cumBalElem = document.getElementById('cardCumBalance');
+        cumBalElem.innerText = `K${cumBalance.toFixed(2)}`;
+        if (cumBalance > 0) cumBalElem.className = "card-metric-val val-negative";
+        else if (cumBalance < 0) cumBalElem.className = "card-metric-val val-positive";
+        else cumBalElem.className = "card-metric-val val-neutral";
+
+        document.getElementById('cardComments').innerText = record.Comments || 'No logs configured for this string record entry.';
+
+        document.getElementById('viewCardModal').classList.add('show');
+        document.getElementById('overlay').classList.add('show');
+    }
+    
+    function updateStats() {
+        let totalTarget = 0, totalCashIn = 0, cumulativeBalance = 0;
+        allRecords.forEach(record => {
+            totalTarget += Number(record.Target) || 0;
+            totalCashIn += Number(record['Cash In']) || 0;
+        });
+        cumulativeBalance = totalTarget - totalCashIn;
+        
+        document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
+        document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
+        document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
+        document.getElementById('totalRecords').innerHTML = allRecords.length;
+        
+        const cumulativeElem = document.getElementById('finalCumulativeBalance');
+        if (cumulativeBalance > 0) cumulativeElem.className = "stat-value val-negative";
+        else if (cumulativeBalance < 0) cumulativeElem.className = "stat-value val-positive";
+        else cumulativeElem.className = "stat-value val-neutral";
+    }
+    
+    function getSelectedRecords() {
+        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
+        return Array.from(checkboxes).map(cb => {
+            const idx = cb.getAttribute('data-index');
+            return allRecords[idx];
+        });
+    }
+    
+    function shareSingleRecord() {
+        if(activeCardIndex === null) return;
+        const r = allRecords[activeCardIndex];
+        const target = Number(r.Target) || 0;
+        const cashIn = Number(r['Cash In']) || 0;
+        const nameValue = r.Name || '—';
+        const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
+        const formattedDate = formatDateForDisplay(r.Date);
+        const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
+        const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
+        
+        const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
+            `📅 Date: ${formattedDate}\n` +
+            `👤 Assignment: ${nameValue}\n` +
+            `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
+            `🎯 Target Point: K${target.toFixed(2)}\n` +
+            `💰 Realized Cash: K${cashIn.toFixed(2)}\n` +
+            `⚖️ Delta Offset: K${transactionBalance.toFixed(2)}\n` +
+            `━━━━━━━━━━━━━━━━━━\n` +
+            `📈 *RUNNING TIMELINE TOTALS*\n` +
+            `🎯 Cum. Target: K${activeCardCumulate.cumTarget.toFixed(2)}\n` +
+            `💰 Cum. Cash In: K${activeCardCumulate.cumCashIn.toFixed(2)}\n` +
+            `⚖️ Cum. Net Balance: K${activeCardCumulate.cumBalance.toFixed(2)}\n` +
+            `${r.Comments ? `\n📝 Remarks: ${r.Comments}` : ''}\n\n` +
+            `_System Dispatch: CashFlow Pro_`;
+        
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+    
+    function shareSelectedWhatsApp() {
+        const selected = getSelectedRecords();
+        if (selected.length === 0) {
+            showToast('Null selection parameter. Mark flags.', true);
+            return;
         }
         
-        function updateStats() {
-            let totalTarget = 0, totalCashIn = 0, cumulativeBalance = 0;
-            allRecords.forEach(record => {
-                totalTarget += Number(record.Target) || 0;
-                totalCashIn += Number(record['Cash In']) || 0;
-            });
-            cumulativeBalance = totalTarget - totalCashIn;
-            
-            document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
-            document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
-            document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
-            document.getElementById('totalRecords').innerHTML = allRecords.length;
-            
-            const cumulativeElem = document.getElementById('finalCumulativeBalance');
-            if (cumulativeBalance > 0) cumulativeElem.className = "stat-value val-negative";
-            else if (cumulativeBalance < 0) cumulativeElem.className = "stat-value val-positive";
-            else cumulativeElem.className = "stat-value val-neutral";
-        }
+        let cumulativeTarget = 0, cumulativeCashIn = 0, cumulativeBalance = 0;
+        let message = "📊 *CASHFLOW LOG REPORT MATRIX*\n━━━━━━━━━━━━━━━━━━━━━━\n\n";
         
-        function getSelectedRecords() {
-            const checkboxes = document.querySelectorAll('.record-checkbox:checked');
-            return Array.from(checkboxes).map(cb => {
-                const idx = cb.getAttribute('data-index');
-                return allRecords[idx];
-            });
-        }
-        
-        function shareSingleRecord() {
-            if(activeCardIndex === null) return;
-            const r = allRecords[activeCardIndex];
+        selected.forEach((r, i) => {
             const target = Number(r.Target) || 0;
             const cashIn = Number(r['Cash In']) || 0;
             const nameValue = r.Name || '—';
-            const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
+            const transBal = (nameValue === "Expense") ? 0 : (target - cashIn);
+            cumulativeTarget += target;
+            cumulativeCashIn += cashIn;
             const formattedDate = formatDateForDisplay(r.Date);
-            const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
-            const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
-            
-            const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
-                `📅 Date: ${formattedDate}\n` +
-                `👤 Name: ${nameValue}\n` +
-                `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
-                `🎯 Target Point: K${target.toFixed(2)}\n` +
-                `💰 Realized Cash: K${cashIn.toFixed(2)}\n` +
-                `⚖️ Delta Offset: K${transactionBalance.toFixed(2)}\n` +
-                `━━━━━━━━━━━━━━━━━━\n` +
-                `📈 *RUNNING TIMELINE TOTALS*\n` +
-                `🎯 Cum. Target: K${activeCardCumulate.cumTarget.toFixed(2)}\n` +
-                `💰 Cum. Cash In: K${activeCardCumulate.cumCashIn.toFixed(2)}\n` +
-                `⚖️ Cum. Net Balance: K${activeCardCumulate.cumBalance.toFixed(2)}\n` +
-                `${r.Comments ? `\n📝 Remarks: ${r.Comments}` : ''}\n\n` +
-                `_System Dispatch: CashFlow Pro_`;
-            
-            window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+            message += `${i+1}. *${formattedDate}* (${nameValue})\n`;
+            message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
+            if (r.Comments) message += `   📝 ${r.Comments}\n`;
+        });
+        
+        cumulativeBalance = cumulativeTarget - cumulativeCashIn;
+        message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+        message += `📊 *SUMMARY SEGMENT METRICS*\n`;
+        message += `🎯 Bound Target: K${cumulativeTarget.toFixed(2)}\n`;
+        message += `💰 Liquid Sum: K${cumulativeCashIn.toFixed(2)}\n`;
+        message += `⚖️ Balance Delta Portfolio: K${cumulativeBalance.toFixed(2)}\n`;
+        message += `\n_System Dispatch: CashFlow Pro_`;
+        
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+    
+    function shareSelectedSMS() {
+        const selected = getSelectedRecords();
+        if (selected.length === 0) {
+            showToast('Select target records first', true);
+            return;
         }
         
-        function shareSelectedWhatsApp() {
-            const selected = getSelectedRecords();
-            if (selected.length === 0) {
-                showToast('Null selection parameter. Mark flags.', true);
-                return;
-            }
-            
-            let cumulativeTarget = 0, cumulativeCashIn = 0, cumulativeBalance = 0;
-            let message = "📊 *CASHFLOW LOG REPORT MATRIX*\n━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            
-            selected.forEach((r, i) => {
-                const target = Number(r.Target) || 0;
-                const cashIn = Number(r['Cash In']) || 0;
-                const nameValue = r.Name || '—';
-                const transBal = (nameValue === "Expense") ? 0 : (target - cashIn);
-                cumulativeTarget += target;
-                cumulativeCashIn += cashIn;
-                const formattedDate = formatDateForDisplay(r.Date);
-                message += `${i+1}. *${formattedDate}* (${nameValue})\n`;
-                message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
-                if (r.Comments) message += `   📝 ${r.Comments}\n`;
-            });
-            
-            cumulativeBalance = cumulativeTarget - cumulativeCashIn;
-            message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
-            message += `📊 *SUMMARY SEGMENT METRICS*\n`;
-            message += `🎯 Bound Target: K${cumulativeTarget.toFixed(2)}\n`;
-            message += `💰 Liquid Sum: K${cumulativeCashIn.toFixed(2)}\n`;
-            message += `⚖️ Balance Delta Portfolio: K${cumulativeBalance.toFixed(2)}\n`;
-            message += `\n_System Dispatch: CashFlow Pro_`;
-            
-            window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        let message = "CASHFLOW LEDGER BRIEF\n\n";
+        selected.forEach((r, i) => {
+            const formattedDate = formatDateForDisplay(r.Date);
+            const nameValue = r.Name || '—';
+            message += `${i+1}. ${formattedDate} (${nameValue}) | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
+        });
+        
+        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
+    }
+    
+    function emailReport() {
+        const selected = getSelectedRecords();
+        if (selected.length === 0) {
+            showToast('Select records to route transmission', true);
+            return;
         }
         
-        function shareSelectedSMS() {
-            const selected = getSelectedRecords();
-            if (selected.length === 0) {
-                showToast('Select target records first', true);
-                return;
-            }
-            
-            let message = "CASHFLOW LEDGER BRIEF\n\n";
-            selected.forEach((r, i) => {
-                const formattedDate = formatDateForDisplay(r.Date);
-                const nameValue = r.Name || '—';
-                message += `${i+1}. ${formattedDate} (${nameValue}) | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
-            });
-            
-            window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
-        }
+        let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
+        selected.forEach(r => {
+            const formattedDate = formatDateForDisplay(r.Date);
+            const nameValue = r.Name || '—';
+            body += `${formattedDate} | Name: ${nameValue} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
+        });
         
-        function emailReport() {
-            const selected = getSelectedRecords();
-            if (selected.length === 0) {
-                showToast('Select records to route transmission', true);
-                return;
-            }
-            
-            let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
-            selected.forEach(r => {
-                const formattedDate = formatDateForDisplay(r.Date);
-                const nameValue = r.Name || '—';
-                body += `${formattedDate} | Name: ${nameValue} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
-            });
-            
-            window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
-        }
-        
-        function attachCheckboxEvents() {
-            document.querySelectorAll('.record-checkbox').forEach(cb => {
-                cb.onchange = (e) => {
-                    e.stopPropagation();
-                    updateSelectedCount();
-                };
-            });
-            
-            const masterToggle = (eState) => {
-                document.querySelectorAll('.record-checkbox').forEach(cb => cb.checked = eState);
-                document.getElementById('selectAllCheckbox').checked = eState;
-                document.getElementById('headerMasterCheckbox').checked = eState;
+        window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
+    }
+    
+    function attachCheckboxEvents() {
+        document.querySelectorAll('.record-checkbox').forEach(cb => {
+            cb.onchange = (e) => {
+                e.stopPropagation();
                 updateSelectedCount();
             };
+        });
+        
+        const masterToggle = (eState) => {
+            document.querySelectorAll('.record-checkbox').forEach(cb => cb.checked = eState);
+            document.getElementById('selectAllCheckbox').checked = eState;
+            document.getElementById('headerMasterCheckbox').checked = eState;
+            updateSelectedCount();
+        };
 
-            document.getElementById('selectAllCheckbox').onchange = (e) => masterToggle(e.target.checked);
-            document.getElementById('headerMasterCheckbox').onchange = (e) => masterToggle(e.target.checked);
-        }
-        
-        function updateSelectedCount() {
-            const count = document.querySelectorAll('.record-checkbox:checked').length;
-            document.getElementById('selectedCount').innerHTML = `${count} targeted items`;
-        }
-        
-        function openModal() {
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Create Transaction Entry';
-            document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
-            document.getElementById('inputName').selectedIndex = 0;
-            document.getElementById('inputTimeIn').value = '';
-            document.getElementById('inputTimeOut').value = '';
-            document.getElementById('inputTarget').value = '400';
-            document.getElementById('inputCashIn').value = '';
-            document.getElementById('inputBalance').value = '';
-            document.getElementById('inputComments').value = '';
-            document.getElementById('recordModal').classList.add('show');
-            document.getElementById('overlay').classList.add('show');
-            updateBalancePreview();
-        }
-        
-        function closeModal() {
-            document.getElementById('recordModal').classList.remove('show');
-            document.getElementById('viewCardModal').classList.remove('show');
-            document.getElementById('overlay').classList.remove('show');
-            activeCardIndex = null;
-        }
-        
-        document.getElementById('openModalBtn').onclick = openModal;
-        document.getElementById('closeFormModalBtn').onclick = closeModal;
-        document.getElementById('closeViewModalBtn').onclick = closeModal;
-        document.getElementById('cancelBtn').onclick = closeModal;
-        document.getElementById('saveBtn').onclick = saveRecord;
-        document.getElementById('refreshBtn').onclick = loadRecords;
-        document.getElementById('whatsappBtn').onclick = shareSelectedWhatsApp;
-        document.getElementById('smsBtn').onclick = shareSelectedSMS;
-        document.getElementById('emailBtn').onclick = emailReport;
-        document.getElementById('overlay').onclick = closeModal;
-        document.getElementById('cardWhatsappBtn').onclick = shareSingleRecord;
-        
-        document.getElementById('inputTarget').oninput = updateBalancePreview;
-        document.getElementById('inputCashIn').oninput = updateBalancePreview;
-        document.getElementById('inputName').onchange = handleNameChange;
-        
-        // Initial execution sequence loop
-        loadRecords();
-    </script>
+        document.getElementById('selectAllCheckbox').onchange = (e) => masterToggle(e.target.checked);
+        document.getElementById('headerMasterCheckbox').onchange = (e) => masterToggle(e.target.checked);
+    }
+    
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.record-checkbox:checked').length;
+        document.getElementById('selectedCount').innerHTML = `${count} selected`;
+    }
+    
+    function openModal() {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Create Transaction Entry';
+        document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('inputName').selectedIndex = 0;
+        document.getElementById('inputTimeIn').value = '';
+        document.getElementById('inputTimeOut').value = '';
+        document.getElementById('inputTarget').value = '400';
+        document.getElementById('inputCashIn').value = '';
+        document.getElementById('inputBalance').value = '';
+        document.getElementById('inputComments').value = '';
+        document.getElementById('recordModal').classList.add('show');
+        document.getElementById('overlay').classList.add('show');
+        updateBalancePreview();
+    }
+    
+    function closeModal() {
+        document.getElementById('recordModal').classList.remove('show');
+        document.getElementById('viewCardModal').classList.remove('show');
+        document.getElementById('overlay').classList.remove('show');
+        activeCardIndex = null;
+    }
+    
+    document.getElementById('openModalBtn').onclick = openModal;
+    document.getElementById('closeFormModalBtn').onclick = closeModal;
+    document.getElementById('closeViewModalBtn').onclick = closeModal;
+    document.getElementById('cancelBtn').onclick = closeModal;
+    document.getElementById('saveBtn').onclick = saveRecord;
+    document.getElementById('refreshBtn').onclick = loadRecords;
+    document.getElementById('whatsappBtn').onclick = shareSelectedWhatsApp;
+    document.getElementById('smsBtn').onclick = shareSelectedSMS;
+    document.getElementById('emailBtn').onclick = emailReport;
+    document.getElementById('overlay').onclick = closeModal;
+    document.getElementById('cardWhatsappBtn').onclick = shareSingleRecord;
+    
+    loadRecords();
+</script>
 </body>
 </html>
