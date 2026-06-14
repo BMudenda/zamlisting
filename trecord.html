@@ -346,7 +346,6 @@
             border-color: #38bdf8;
         }
 
-        /* Styling for disabled read-only text fields */
         .form-group input:disabled {
             background: #1e293b;
             color: #64748b;
@@ -676,7 +675,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label><i class="fas fa-calculator"></i> Delta Target Computation Preview (Target - Net Cash)</label>
+            <label><i class="fas fa-calculator"></i> Delta Target Computation Preview</label>
             <input type="number" id="inputBalance" readonly style="font-weight:bold;">
         </div>
         <div class="form-group">
@@ -867,7 +866,7 @@
             targetInput.value = "0";
             cashInInput.value = "0";
             timeInInput.value = "";
-
+            
             targetInput.disabled = true;
             cashInInput.disabled = true;
             timeInInput.disabled = true;
@@ -885,7 +884,6 @@
     function updateBalancePreview() {
         const nameSelection = document.getElementById('inputName').value;
         
-        // Form mathematical overrides if Expenses option is active
         const target = nameSelection === "Expenses" ? 0 : (parseFloat(document.getElementById('inputTarget').value) || 0);
         const cashIn = nameSelection === "Expenses" ? 0 : (parseFloat(document.getElementById('inputCashIn').value) || 0);
         const cashOut = parseFloat(document.getElementById('inputCashOut').value) || 0;
@@ -1047,11 +1045,11 @@
         
         allRecords.forEach((record, index) => {
             const nameField = record.Name || '—';
-            const target = nameField === "Expenses" ? 0 : (Number(record.Target) || 0);
-            const cashIn = nameField === "Expenses" ? 0 : (Number(record['Cash In']) || 0);
-            const cashOut = Number(record['Cash Out']) || 0;
             
-            const netCash = record['Net Cash'] !== undefined && nameField !== "Expenses" ? Number(record['Net Cash']) : (cashIn - cashOut);
+            const target = Number(record.Target) || 0;
+            const cashIn = Number(record['Cash In']) || 0;
+            const cashOut = Number(record['Cash Out']) || 0;
+            const netCash = cashIn - cashOut;
             const transactionBalance = target - netCash;
             
             cumulativeTarget += target;
@@ -1132,8 +1130,9 @@
     function viewRecordDetails(index, cumTarget, cumCashIn, cumBalance) {
         const record = allRecords[index];
         const nameField = record.Name || '—';
-        const target = nameField === "Expenses" ? 0 : (Number(record.Target) || 0);
-        const cashIn = nameField === "Expenses" ? 0 : (Number(record['Cash In']) || 0);
+        
+        const target = Number(record.Target) || 0;
+        const cashIn = Number(record['Cash In']) || 0;
         const cashOut = Number(record['Cash Out']) || 0;
         const netCash = cashIn - cashOut;
         const transactionBalance = target - netCash;
@@ -1191,17 +1190,15 @@
     function updateStats() {
         let totalTarget = 0, totalCashIn = 0, totalCashOut = 0, totalNetCash = 0, cumulativeBalance = 0;
         allRecords.forEach(record => {
-            const nameField = record.Name || '—';
-            const target = nameField === "Expenses" ? 0 : (Number(record.Target) || 0);
-            const cashIn = nameField === "Expenses" ? 0 : (Number(record['Cash In']) || 0);
+            const target = Number(record.Target) || 0;
+            const cashIn = Number(record['Cash In']) || 0;
             const cashOut = Number(record['Cash Out']) || 0;
-            const netCash = cashIn - cashOut;
             
             totalTarget += target;
             totalCashIn += cashIn;
             totalCashOut += cashOut;
-            totalNetCash += netCash;
         });
+        totalNetCash = totalCashIn - totalCashOut;
         cumulativeBalance = totalTarget - totalNetCash;
         
         document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
@@ -1227,8 +1224,8 @@
         if(activeCardIndex === null) return;
         const r = allRecords[activeCardIndex];
         const nameField = r.Name || '—';
-        const target = nameField === "Expenses" ? 0 : (Number(r.Target) || 0);
-        const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
+        const target = Number(r.Target) || 0;
+        const cashIn = Number(r['Cash In']) || 0;
         const cashOut = Number(r['Cash Out']) || 0;
         const netCash = cashIn - cashOut;
         const transactionBalance = target - netCash;
@@ -1268,8 +1265,8 @@
         
         selected.forEach((r, i) => {
             const nameField = r.Name || '—';
-            const target = nameField === "Expenses" ? 0 : (Number(r.Target) || 0);
-            const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
+            const target = Number(r.Target) || 0;
+            const cashIn = Number(r['Cash In']) || 0;
             const cashOut = Number(r['Cash Out']) || 0;
             const netCash = cashIn - cashOut;
             const transBal = target - netCash;
@@ -1277,7 +1274,6 @@
             cumulativeTarget += target;
             cumulativeCashIn += cashIn;
             cumulativeCashOut += cashOut;
-            cumulativeNetCash += netCash;
             
             const formattedDate = formatDateForDisplay(r.Date);
             message += `${i+1}. *${formattedDate}* [${nameField}]\n`;
@@ -1285,6 +1281,7 @@
             if (r.Comments) message += `   📝 ${r.Comments}\n`;
         });
         
+        cumulativeNetCash = cumulativeCashIn - cumulativeCashOut;
         const cumulativeBalance = cumulativeTarget - cumulativeNetCash;
         message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
         message += `📊 *SUMMARY SEGMENT METRICS*\n`;
@@ -1309,7 +1306,7 @@
         selected.forEach((r, i) => {
             const nameField = r.Name || '—';
             const formattedDate = formatDateForDisplay(r.Date);
-            const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
+            const cashIn = Number(r['Cash In']) || 0;
             const cashOut = Number(r['Cash Out']) || 0;
             const netCash = cashIn - cashOut;
             message += `${i+1}. ${formattedDate} (${nameField}) | Net Cash: K${netCash.toFixed(2)}\n`;
@@ -1329,8 +1326,8 @@
         selected.forEach(r => {
             const nameField = r.Name || '—';
             const formattedDate = formatDateForDisplay(r.Date);
-            const target = nameField === "Expenses" ? 0 : (Number(r.Target) || 0);
-            const cashIn = nameField === "Expenses" ? 0 : (Number(r['Cash In']) || 0);
+            const target = Number(r.Target) || 0;
+            const cashIn = Number(r['Cash In']) || 0;
             const cashOut = Number(r['Cash Out']) || 0;
             const netCash = cashIn - cashOut;
             body += `${formattedDate} | Name: ${nameField} | Target Base: K${target.toFixed(2)} | Net Cash: K${netCash.toFixed(2)}\n`;
