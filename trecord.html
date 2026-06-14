@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CashFlow Pro | Multi-Driver with Cash Out</title>
+    <title>CashFlow Pro | Complete Cumulative Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -68,7 +68,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 24px;
         }
@@ -184,16 +184,6 @@
         .val-negative { color: #f87171; font-weight: 600; }
         .val-neutral { color: #fbbf24; font-weight: 600; }
 
-        .cumulative-row {
-            background: #0f172a;
-        }
-
-        .cumulative-row td {
-            border-top: 2px solid #38bdf8;
-            font-weight: 700;
-        }
-
-        /* Modal Styles */
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -210,9 +200,7 @@
             background: #1e293b;
             border-radius: 16px;
             width: 90%;
-            max-width: 900px;
-            max-height: 85vh;
-            overflow-y: auto;
+            max-width: 500px;
             z-index: 1000;
             display: none;
             border: 1px solid #475569;
@@ -226,9 +214,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            background: #1e293b;
         }
 
         .close-modal {
@@ -250,7 +235,7 @@
             font-size: 0.85rem;
         }
 
-        .form-group input, .form-group textarea, .form-group select {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 10px 14px;
             background: #0f172a;
@@ -293,97 +278,6 @@
             cursor: pointer;
         }
 
-        /* Driver Section */
-        .driver-section {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid #334155;
-        }
-
-        .driver-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            color: #38bdf8;
-            font-weight: 600;
-        }
-
-        .driver-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 0.5fr;
-            gap: 12px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .driver-row select, .driver-row input {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 8px 12px;
-            color: white;
-        }
-
-        .btn-remove {
-            background: #ef4444;
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-add {
-            background: #10b981;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .cashout-section {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid #334155;
-        }
-
-        .cashout-item {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-
-        .cashout-item input {
-            flex: 1;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            padding: 8px;
-            color: white;
-        }
-
-        .summary-bar {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #334155;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-weight: 600;
-        }
-
         .toast {
             position: fixed;
             bottom: 24px; right: 24px;
@@ -394,10 +288,8 @@
         }
 
         @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .driver-row { grid-template-columns: 1fr; gap: 8px; }
+            .stats-grid { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
-            .cashout-item { flex-direction: column; }
         }
     </style>
 </head>
@@ -405,8 +297,8 @@
 <div class="container">
     <div class="header">
         <div class="logo">
-            <h1><i class="fas fa-users"></i> CashFlow Pro</h1>
-            <p>Multi-Driver Tracking with Expenses</p>
+            <h1><i class="fas fa-wallet"></i> CashFlow Pro</h1>
+            <p>Complete Cumulative Cash Management System</p>
         </div>
         <button class="btn-add" id="openModalBtn"><i class="fas fa-plus"></i> Add Transaction</button>
     </div>
@@ -420,13 +312,6 @@
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background: #ef444420; color: #ef4444;"><i class="fas fa-arrow-up"></i></div>
-            <div class="stat-content">
-                <h3>Total Cash Out</h3>
-                <div class="stat-value" id="totalCashOut">K0.00</div>
-            </div>
-        </div>
-        <div class="stat-card">
             <div class="stat-icon" style="background: #38bdf820; color: #38bdf8;"><i class="fas fa-crosshairs"></i></div>
             <div class="stat-content">
                 <h3>Total Target</h3>
@@ -436,8 +321,8 @@
         <div class="stat-card">
             <div class="stat-icon" style="background: #fbbf2420; color: #fbbf24;"><i class="fas fa-scale-balanced"></i></div>
             <div class="stat-content">
-                <h3>Net Cash</h3>
-                <div class="stat-value" id="finalNetCash">K0.00</div>
+                <h3>Cumulative Balance</h3>
+                <div class="stat-value" id="finalCumulativeBalance">K0.00</div>
             </div>
         </div>
         <div class="stat-card">
@@ -452,23 +337,20 @@
     <div class="action-bar">
         <div class="btn-group">
             <button class="btn btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
-            <button class="btn btn-whatsapp" id="whatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-            <button class="btn btn-sms" id="smsBtn"><i class="fas fa-sms"></i> SMS</button>
-            <button class="btn btn-email" id="emailBtn"><i class="fas fa-envelope"></i> Email</button>
+            <button class="btn btn-whatsapp" id="whatsappBtn"><i class="fab fa-whatsapp"></i> Share WhatsApp</button>
+            <button class="btn btn-sms" id="smsBtn"><i class="fas fa-sms"></i> Share SMS</button>
+            <button class="btn btn-email" id="emailBtn"><i class="fas fa-envelope"></i> Email Report</button>
         </div>
     </div>
 
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Target</th><th>Cash In</th><th>Cash Out</th><th>Net Cash</th><th>Balance</th><th>Drivers</th><th>Comments</th></tr>
+                <tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Target</th><th>Cash In</th><th>Balance</th><th>Comments</th></tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="10" style="text-align:center; padding:48px;">Loading...</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:48px;">Loading...</td</tr>
             </tbody>
-            <tfoot id="tableFooter" style="display: none;">
-                <tr class="cumulative-row"><td colspan="10" id="footerSummary" style="text-align:right;">Final Totals: K0.00</td></tr>
-            </tfoot>
         </table>
     </div>
 </div>
@@ -481,40 +363,40 @@
         <button class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="inputDate">
+        </div>
         <div class="form-row">
-            <div class="form-group"><label>Date</label><input type="date" id="inputDate"></div>
-            <div class="form-group"><label>Time In</label><input type="time" id="inputTimeIn"></div>
-            <div class="form-group"><label>Time Out</label><input type="time" id="inputTimeOut"></div>
-        </div>
-        
-        <div class="driver-section">
-            <div class="driver-header">
-                <span><i class="fas fa-truck"></i> Driver Collections</span>
-                <button type="button" class="btn-add" id="addDriverBtn"><i class="fas fa-plus"></i> Add Driver</button>
+            <div class="form-group">
+                <label>Time In</label>
+                <input type="time" id="inputTimeIn">
             </div>
-            <div id="driversContainer"></div>
-            <div class="summary-bar">
-                <span>Total Target: <strong id="totalTargetPreview">K0.00</strong></span>
-                <span>Total Collected: <strong id="totalCollectedPreview">K0.00</strong></span>
+            <div class="form-group">
+                <label>Time Out</label>
+                <input type="time" id="inputTimeOut">
             </div>
         </div>
-
-        <div class="cashout-section">
-            <div class="driver-header">
-                <span><i class="fas fa-receipt"></i> Expenses / Cash Out</span>
-                <button type="button" class="btn-add" id="addExpenseBtn"><i class="fas fa-plus"></i> Add Expense</button>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Target (K)</label>
+                <input type="number" id="inputTarget" value="400" step="any" oninput="updateBalancePreview()">
             </div>
-            <div id="expensesContainer"></div>
-            <div class="summary-bar">
-                <span>Total Cash Out: <strong id="totalCashOutPreview">K0.00</strong></span>
-                <span>Net Cash: <strong id="netCashPreview">K0.00</strong></span>
+            <div class="form-group">
+                <label>Cash In (K)</label>
+                <input type="number" id="inputCashIn" step="any" oninput="updateBalancePreview()">
             </div>
         </div>
-        
-        <div class="form-group"><label>Comments</label><textarea id="inputComments" rows="2"></textarea></div>
-        
+        <div class="form-group">
+            <label>Balance Preview</label>
+            <input type="number" id="inputBalance" readonly>
+        </div>
+        <div class="form-group">
+            <label>Comments</label>
+            <textarea id="inputComments" rows="3"></textarea>
+        </div>
         <div class="modal-footer">
-            <button class="btn-save" id="saveBtn">Save Transaction</button>
+            <button class="btn-save" id="saveBtn">Save</button>
             <button class="btn-cancel" id="cancelBtn">Cancel</button>
         </div>
     </div>
@@ -524,182 +406,43 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
     const PHONE_NUMBER = "0978167546";
     
-    // Predefined driver names for dropdown
-    const DRIVER_NAMES = [
-        "Select Driver",
-        "John Banda",
-        "Peter Mwale", 
-        "James Phiri",
-        "David Banda",
-        "Michael Chisale",
-        "Joseph Kumwenda",
-        "Frank Mbewe",
-        "Charles Ngoma"
-    ];
-    
     let allRecords = [];
     
-    function parseExcelDate(excelDate) {
-        if (!excelDate) return null;
-        if (typeof excelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(excelDate)) return excelDate;
-        if (typeof excelDate === 'string' && excelDate.includes('T')) {
-            const dateObj = new Date(excelDate);
-            if (!isNaN(dateObj.getTime())) {
-                const year = dateObj.getFullYear();
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                if (year === 1899) return null;
-                return `${year}-${month}-${day}`;
-            }
-        }
-        return excelDate;
-    }
-    
-    function parseTimeValue(timeValue) {
-        if (!timeValue || timeValue === "") return "—";
-        if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) return timeValue;
-        if (typeof timeValue === 'string' && timeValue.includes('T')) {
-            const dateObj = new Date(timeValue);
-            if (!isNaN(dateObj.getTime())) {
-                return `${String(dateObj.getUTCHours()).padStart(2, '0')}:${String(dateObj.getUTCMinutes()).padStart(2, '0')}`;
-            }
-        }
-        if (typeof timeValue === 'string' && timeValue.includes(':')) {
-            const parts = timeValue.split(':');
-            return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-        }
-        return timeValue;
-    }
-    
-    function formatDateDisplay(dateValue) {
-        const parsed = parseExcelDate(dateValue);
-        if (!parsed) return "—";
-        const parts = parsed.split('-');
-        if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-        return parsed;
-    }
-    
-    function updatePreviews() {
-        // Calculate driver totals
-        let totalTarget = 0, totalCollected = 0;
-        document.querySelectorAll('.driver-row').forEach(row => {
-            totalTarget += parseFloat(row.querySelector('.driver-target')?.value) || 0;
-            totalCollected += parseFloat(row.querySelector('.driver-collected')?.value) || 0;
-        });
-        document.getElementById('totalTargetPreview').innerText = `K${totalTarget.toFixed(2)}`;
-        document.getElementById('totalCollectedPreview').innerText = `K${totalCollected.toFixed(2)}`;
-        
-        // Calculate expenses
-        let totalCashOut = 0;
-        document.querySelectorAll('.expense-amount').forEach(input => {
-            totalCashOut += parseFloat(input.value) || 0;
-        });
-        document.getElementById('totalCashOutPreview').innerText = `K${totalCashOut.toFixed(2)}`;
-        
-        let netCash = totalCollected - totalCashOut;
-        let netSpan = document.getElementById('netCashPreview');
-        netSpan.innerHTML = `<span style="color:${netCash >= 0 ? '#4ade80' : '#f87171'}">K${netCash.toFixed(2)}</span>`;
-    }
-    
-    function addDriverRow(name = '', target = 100, collected = 0) {
-        let container = document.getElementById('driversContainer');
-        let row = document.createElement('div');
-        row.className = 'driver-row';
-        
-        let selectHtml = `<select class="driver-name" style="width:100%">`;
-        DRIVER_NAMES.forEach(n => {
-            selectHtml += `<option value="${n}" ${name === n ? 'selected' : ''}>${n}</option>`;
-        });
-        selectHtml += `</select>`;
-        
-        row.innerHTML = `
-            ${selectHtml}
-            <input type="number" class="driver-target" placeholder="Target (K)" value="${target}" step="any" oninput="updatePreviews()">
-            <input type="number" class="driver-collected" placeholder="Collected (K)" value="${collected}" step="any" oninput="updatePreviews()">
-            <button class="btn-remove" onclick="this.closest('.driver-row').remove(); updatePreviews();"><i class="fas fa-trash"></i></button>
-        `;
-        container.appendChild(row);
-        updatePreviews();
-    }
-    
-    function addExpenseRow(desc = '', amount = 0) {
-        let container = document.getElementById('expensesContainer');
-        let row = document.createElement('div');
-        row.className = 'cashout-item';
-        row.innerHTML = `
-            <input type="text" placeholder="Expense description (Fuel, Maintenance, etc.)" value="${desc}" style="flex:2">
-            <input type="number" class="expense-amount" placeholder="Amount (K)" value="${amount}" step="any" style="flex:1" oninput="updatePreviews()">
-            <button class="btn-remove" onclick="this.closest('.cashout-item').remove(); updatePreviews();"><i class="fas fa-trash"></i></button>
-        `;
-        container.appendChild(row);
-        updatePreviews();
-    }
-    
-    function getDriversData() {
-        let drivers = [];
-        document.querySelectorAll('.driver-row').forEach(row => {
-            let name = row.querySelector('.driver-name')?.value || 'Unknown';
-            let target = parseFloat(row.querySelector('.driver-target')?.value) || 0;
-            let collected = parseFloat(row.querySelector('.driver-collected')?.value) || 0;
-            if (name !== 'Select Driver' && (target > 0 || collected > 0)) {
-                drivers.push({ name, target, collected });
-            }
-        });
-        return drivers;
-    }
-    
-    function getExpensesData() {
-        let expenses = [];
-        document.querySelectorAll('.cashout-item').forEach(item => {
-            let desc = item.querySelector('input[type="text"]')?.value || '';
-            let amount = parseFloat(item.querySelector('.expense-amount')?.value) || 0;
-            if (amount > 0) {
-                expenses.push({ description: desc || 'Misc Expense', amount });
-            }
-        });
-        return expenses;
+    function updateBalancePreview() {
+        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        const balance = target - cashIn;
+        document.getElementById('inputBalance').value = balance.toFixed(2);
     }
     
     function showToast(message, isError = false) {
-        let toast = document.createElement('div');
+        const toast = document.createElement('div');
         toast.className = 'toast';
+        toast.innerHTML = message;
         toast.style.background = isError ? '#ef4444' : '#10b981';
-        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
     
     async function saveRecord() {
-        let date = document.getElementById('inputDate').value;
-        if (!date) { showToast('Date required', true); return; }
+        const date = document.getElementById('inputDate').value;
+        if (!date) {
+            showToast('Date required', true);
+            return;
+        }
         
-        let drivers = getDriversData();
-        if (drivers.length === 0) { showToast('Add at least one driver', true); return; }
+        const target = parseFloat(document.getElementById('inputTarget').value) || 0;
+        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        const balance = target - cashIn;
         
-        let expenses = getExpensesData();
-        let totalTarget = drivers.reduce((s, d) => s + d.target, 0);
-        let totalCashIn = drivers.reduce((s, d) => s + d.collected, 0);
-        let totalCashOut = expenses.reduce((s, e) => s + e.amount, 0);
-        let netCash = totalCashIn - totalCashOut;
-        let balance = totalTarget - totalCashIn;
-        
-        // Build comment with all details
-        let commentData = {
-            drivers: drivers,
-            expenses: expenses,
-            netCash: netCash,
-            notes: document.getElementById('inputComments').value || ''
-        };
-        let fullComment = JSON.stringify(commentData);
-        
-        let formData = new URLSearchParams();
+        const formData = new URLSearchParams();
         formData.append('Date', date);
         formData.append('Time In', document.getElementById('inputTimeIn').value || '');
         formData.append('Time Out', document.getElementById('inputTimeOut').value || '');
-        formData.append('Target', totalTarget);
-        formData.append('Cash In', totalCashIn);
+        formData.append('Target', target);
+        formData.append('Cash In', cashIn);
         formData.append('Balance', balance);
-        formData.append('Comments', fullComment);
+        formData.append('Comments', document.getElementById('inputComments').value || '');
         
         try {
             await fetch(SCRIPT_URL, {
@@ -708,7 +451,7 @@
                 body: formData,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
-            showToast('Transaction saved!');
+            showToast('Saved!');
             closeModal();
             await loadRecords();
         } catch(err) {
@@ -717,12 +460,12 @@
     }
     
     async function loadRecords() {
-        let tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:48px;">Loading...</td></tr>';
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:48px;">Loading...</td</tr>';
         
         try {
-            let response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
-            let data = await response.json();
+            const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
+            const data = await response.json();
             
             if (data.rows && Array.isArray(data.rows)) {
                 allRecords = data.rows.slice(1).map(row => ({
@@ -738,105 +481,68 @@
             
             displayRecords();
             updateStats();
-            showToast(`Loaded ${allRecords.length} records`);
         } catch(error) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:#f87171;">Failed to load data</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#f87171;">Failed to load</td</tr>';
         }
     }
     
     function displayRecords() {
-        let tbody = document.getElementById('tableBody');
+        const tbody = document.getElementById('tableBody');
         if (allRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:48px;">No records. Add your first transaction!</td></tr>';
-            document.getElementById('tableFooter').style.display = 'none';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:48px;">No records</td</tr>';
             return;
         }
         
         let html = '';
-        let cumulativeTarget = 0, cumulativeNetCash = 0;
+        let cumTarget = 0, cumCashIn = 0, cumBalance = 0;
         
-        allRecords.slice().reverse().forEach(record => {
-            let target = parseFloat(record.Target) || 0;
-            let cashIn = parseFloat(record.CashIn) || 0;
-            let balance = parseFloat(record.Balance) || (target - cashIn);
+        allRecords.forEach(record => {
+            const target = parseFloat(record.Target) || 0;
+            const cashIn = parseFloat(record.CashIn) || 0;
+            const balance = parseFloat(record.Balance) || (target - cashIn);
             
-            // Parse comment JSON to extract expenses and net cash
-            let cashOut = 0, netCash = cashIn;
-            try {
-                let commentData = JSON.parse(record.Comments);
-                if (commentData.expenses) {
-                    cashOut = commentData.expenses.reduce((s, e) => s + e.amount, 0);
-                    netCash = commentData.netCash || (cashIn - cashOut);
-                }
-                if (commentData.drivers) {
-                    var driverCount = commentData.drivers.length;
-                }
-            } catch(e) {
-                cashOut = 0;
-                netCash = cashIn;
-            }
-            
-            cumulativeTarget += target;
-            cumulativeNetCash += netCash;
-            
-            let driverDisplay = driverCount ? `${driverCount} driver${driverCount > 1 ? 's' : ''}` : '—';
-            let shortComment = record.Comments ? record.Comments.substring(0, 30) : '';
+            cumTarget += target;
+            cumCashIn += cashIn;
+            cumBalance += balance;
             
             html += `<tr>
-                <td>${formatDateDisplay(record.Date)}</td>
-                <td>${parseTimeValue(record.TimeIn)}</td>
-                <td>${parseTimeValue(record.TimeOut)}</td>
-                <td class="${balance > 0 ? 'val-negative' : 'val-positive'}">K${target.toFixed(2)}</td>
-                <td class="val-positive">K${cashIn.toFixed(2)}</td>
-                <td class="val-negative">K${cashOut.toFixed(2)}</td>
-                <td class="${netCash >= 0 ? 'val-positive' : 'val-negative'}">K${netCash.toFixed(2)}</td>
-                <td class="${balance > 0 ? 'val-negative' : 'val-positive'}">K${balance.toFixed(2)}</td>
-                <td>${driverDisplay}</td>
-                <td title="${record.Comments?.replace(/"/g, '&quot;')}">${shortComment.substring(0, 20)}</td>
+                <td>${record.Date || '—'}</div>
+                <td>${record.TimeIn || '—'}</div>
+                <td>${record.TimeOut || '—'}</div>
+                <td>K${target.toFixed(2)}</div>
+                <td>K${cashIn.toFixed(2)}</div>
+                <td class="${balance > 0 ? 'val-negative' : balance < 0 ? 'val-positive' : 'val-neutral'}">K${balance.toFixed(2)}</div>
+                <td>${(record.Comments || '').substring(0, 30)}</div>
             </tr>`;
         });
         
         tbody.innerHTML = html;
-        
-        let footer = document.getElementById('tableFooter');
-        footer.style.display = 'table-footer-group';
-        document.getElementById('footerSummary').innerHTML = `Final Totals: Target: K${cumulativeTarget.toFixed(2)} | Net Cash: K${cumulativeNetCash.toFixed(2)}`;
     }
     
     function updateStats() {
-        let totalTarget = 0, totalCashIn = 0, totalCashOut = 0;
+        let totalTarget = 0, totalCashIn = 0;
         allRecords.forEach(record => {
             totalTarget += parseFloat(record.Target) || 0;
             totalCashIn += parseFloat(record.CashIn) || 0;
-            try {
-                let commentData = JSON.parse(record.Comments);
-                if (commentData.expenses) {
-                    totalCashOut += commentData.expenses.reduce((s, e) => s + e.amount, 0);
-                }
-            } catch(e) {}
         });
+        const cumulativeBalance = totalTarget - totalCashIn;
         
         document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
-        document.getElementById('totalCashOut').innerHTML = `K${totalCashOut.toFixed(2)}`;
         document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
-        document.getElementById('finalNetCash').innerHTML = `K${(totalCashIn - totalCashOut).toFixed(2)}`;
+        document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
         document.getElementById('totalRecords').innerHTML = allRecords.length;
     }
     
     function openModal() {
-        document.getElementById('driversContainer').innerHTML = '';
-        document.getElementById('expensesContainer').innerHTML = '';
-        // Add 5 default drivers
-        for(let i = 1; i <= 5; i++) {
-            addDriverRow('', 100, 0);
-        }
         document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
         document.getElementById('inputTimeIn').value = '';
         document.getElementById('inputTimeOut').value = '';
+        document.getElementById('inputTarget').value = '400';
+        document.getElementById('inputCashIn').value = '';
+        document.getElementById('inputBalance').value = '';
         document.getElementById('inputComments').value = '';
         document.getElementById('recordModal').classList.add('show');
         document.getElementById('overlay').classList.add('show');
-        updatePreviews();
     }
     
     function closeModal() {
@@ -844,30 +550,21 @@
         document.getElementById('overlay').classList.remove('show');
     }
     
-    // Event listeners
     document.getElementById('openModalBtn').onclick = openModal;
     document.getElementById('closeModalBtn').onclick = closeModal;
     document.getElementById('cancelBtn').onclick = closeModal;
     document.getElementById('saveBtn').onclick = saveRecord;
     document.getElementById('refreshBtn').onclick = loadRecords;
     document.getElementById('overlay').onclick = closeModal;
-    document.getElementById('addDriverBtn').onclick = () => addDriverRow('', 100, 0);
-    document.getElementById('addExpenseBtn').onclick = () => addExpenseRow('', 0);
     
-    // Share functions (keep your existing ones)
     document.getElementById('whatsappBtn').onclick = () => {
-        let summary = `📊 CashFlow Report\nTotal Records: ${allRecords.length}\nTotal Cash In: ${document.getElementById('totalCashIn').innerText}\nTotal Cash Out: ${document.getElementById('totalCashOut').innerText}\nNet Cash: ${document.getElementById('finalNetCash').innerText}`;
-        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(summary)}`, '_blank');
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent('CashFlow Report')}`, '_blank');
     };
-    
     document.getElementById('smsBtn').onclick = () => {
-        let summary = `CashFlow Report - Total Cash In: ${document.getElementById('totalCashIn').innerText}, Net Cash: ${document.getElementById('finalNetCash').innerText}`;
-        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(summary)}`, '_blank');
+        window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent('CashFlow Report')}`, '_blank');
     };
-    
     document.getElementById('emailBtn').onclick = () => {
-        let body = `CashFlow Pro Report\n\nTotal Records: ${allRecords.length}\nTotal Cash In: ${document.getElementById('totalCashIn').innerText}\nTotal Cash Out: ${document.getElementById('totalCashOut').innerText}\nNet Cash: ${document.getElementById('finalNetCash').innerText}`;
-        window.location.href = `mailto:?subject=CashFlow Report&body=${encodeURIComponent(body)}`;
+        window.location.href = `mailto:?subject=CashFlow Report`;
     };
     
     loadRecords();
