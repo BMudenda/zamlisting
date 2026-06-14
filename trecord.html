@@ -377,7 +377,7 @@
             cursor: pointer;
         }
 
-        /* --- NEW REDESIGNED CARD COMPONENT VIEW--- */
+        /* Card Component View */
         .card-view-header {
             display: flex;
             justify-content: space-between;
@@ -729,33 +729,99 @@
     let activeCardIndex = null;
     let activeCardCumulate = {};
     
-    // Helper: format time from raw value (handles empty, "HH:MM", or any partial)
-    function formatTimeString(timeValue) {
-        if (!timeValue || timeValue === "") return "—";
-        // If it already looks like HH:MM (with colon) just return trimmed
-        if (typeof timeValue === "string" && timeValue.includes(":")) {
-            return timeValue;
+    // Parse Excel serial date number (days since 1899-12-30)
+    function parseExcelDate(excelDate) {
+        if (!excelDate) return null;
+        
+        // If it's already a YYYY-MM-DD string, return as is
+        if (typeof excelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(excelDate)) {
+            return excelDate;
         }
-        // If numeric or weird, attempt to parse as simple HHMM
-        let str = String(timeValue).trim();
-        if (str.length === 4 && !isNaN(parseInt(str))) {
-            return str.slice(0,2) + ":" + str.slice(2,4);
+        
+        // Handle ISO string format "1899-12-30T07:24:42.000Z"
+        if (typeof excelDate === 'string' && excelDate.includes('T')) {
+            const dateObj = new Date(excelDate);
+            if (!isNaN(dateObj.getTime())) {
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                // Check if it's the Excel epoch (1899-12-30) - this means it's a time-only value
+                if (year === 1899 && month === '12' && (day === '30' || day === '31')) {
+                    return null; // This is time-only, no date
+                }
+                return `${year}-${month}-${day}`;
+            }
         }
-        return str;
+        
+        // Try parsing as number (Excel serial)
+        let numDays = parseFloat(excelDate);
+        if (!isNaN(numDays) && numDays > 0) {
+            // Excel epoch: 1899-12-30
+            const excelEpoch = new Date(1899, 11, 30);
+            const date = new Date(excelEpoch.getTime() + numDays * 86400000);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        return excelDate;
     }
     
-    // Helper: format date from raw string (YYYY-MM-DD) to DD/MM/YYYY for readability
-    function formatDateString(dateValue) {
-        if (!dateValue) return "—";
-        let str = String(dateValue).trim();
-        // if already YYYY-MM-DD format
-        let parts = str.split("-");
-        if (parts.length === 3) {
-            // Convert to DD/MM/YYYY
+    // Parse time from various formats (Excel serial time, ISO string, HH:MM)
+    function parseTimeValue(timeValue) {
+        if (!timeValue || timeValue === "") return "";
+        
+        // If already in HH:MM format
+        if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
+            return timeValue;
+        }
+        
+        // Handle ISO string format "1899-12-30T07:24:42.000Z"
+        if (typeof timeValue === 'string' && timeValue.includes('T')) {
+            const dateObj = new Date(timeValue);
+            if (!isNaN(dateObj.getTime())) {
+                const hours = String(dateObj.getUTCHours()).padStart(2, '0');
+                const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+        }
+        
+        // Try parsing as Excel serial time (fraction of day)
+        let numDays = parseFloat(timeValue);
+        if (!isNaN(numDays) && numDays >= 0 && numDays < 1) {
+            const totalSeconds = numDays * 86400;
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+        
+        // Try parsing as string that might be "HH:MM:SS"
+        if (typeof timeValue === 'string' && timeValue.includes(':')) {
+            const parts = timeValue.split(':');
+            if (parts.length >= 2) {
+                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+            }
+        }
+        
+        return timeValue;
+    }
+    
+    // Format date for display (DD/MM/YYYY)
+    function formatDateForDisplay(dateValue) {
+        const parsed = parseExcelDate(dateValue);
+        if (!parsed) return "—";
+        if (parsed === dateValue && dateValue.includes('-')) {
+            const parts = dateValue.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+        }
+        if (parsed.includes('-')) {
+            const parts = parsed.split('-');
             return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
-        // fallback, maybe already formatted
-        return str;
+        return parsed || "—";
     }
     
     function updateBalancePreview() {
@@ -868,14 +934,18 @@
             const data = await response.json();
             
             allRecords = (data.rows || []).filter(row => row && row.Date && row.Date !== '');
-            allRecords.sort((a, b) => a.Date.localeCompare(b.Date));
+            allRecords.sort((a, b) => {
+                const dateA = parseExcelDate(a.Date) || '';
+                const dateB = parseExcelDate(b.Date) || '';
+                return dateA.localeCompare(dateB);
+            });
             
             displayRecordsWithAllCumulatives();
             updateStats();
             showToast(`Active Ledger Loaded: ${allRecords.length} Rows`);
             
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
             showToast('Database link execution broken.', true);
         }
     }
@@ -884,7 +954,7 @@
         const tbody = document.getElementById('tableBody');
         
         if (allRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-inbox"></i> Environment Empty. Tap action buttons to write.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-inbox"></i> Environment Empty. Tap action buttons to write.</div></td>';
             document.getElementById('tableFooter').style.display = 'none';
             return;
         }
@@ -914,31 +984,31 @@
             const comments = record.Comments || '-';
             const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
             
-            // FORMAT DATE and TIME IN/OUT using helpers
-            const formattedDate = formatDateString(record.Date);
-            const formattedTimeIn = formatTimeString(record['Time In']);
-            const formattedTimeOut = formatTimeString(record['Time Out']);
+            // Parse and format using the new functions
+            const formattedDate = formatDateForDisplay(record.Date);
+            const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
+            const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
             
             html += `
                 <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
                     <td class="checkbox-col" onclick="event.stopPropagation()">
                         <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
                     </td>
-                    <td>${formattedDate}</td>
-                    <td>${formattedTimeIn}</td>
-                    <td>${formattedTimeOut}</td>
-                    <td>K${target.toFixed(2)}</td>
-                    <td>K${cashIn.toFixed(2)}</td>
-                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
-                    <td>K${cumulativeTarget.toFixed(2)}</td>
-                    <td>K${cumulativeCashIn.toFixed(2)}</td>
-                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
-                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</td>
+                    <td>${formattedDate}</div>
+                    <td>${formattedTimeIn}</div>
+                    <td>${formattedTimeOut}</div>
+                    <td>K${target.toFixed(2)}</div>
+                    <td>K${cashIn.toFixed(2)}</div>
+                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</div>
+                    <td>K${cumulativeTarget.toFixed(2)}</div>
+                    <td>K${cumulativeCashIn.toFixed(2)}</div>
+                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</div>
+                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</div>
                     <td class="action-cell" onclick="event.stopPropagation()">
                         <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
                            <i class="fas fa-expand"></i> View
                         </button>
-                    </td>
+                    </div>
                 </tr>
             `;
         });
@@ -977,10 +1047,9 @@
         activeCardIndex = index;
         activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
 
-        // Apply formatting for modal as well
-        const formattedDate = formatDateString(record.Date);
-        const formattedTimeIn = formatTimeString(record['Time In']);
-        const formattedTimeOut = formatTimeString(record['Time Out']);
+        const formattedDate = formatDateForDisplay(record.Date);
+        const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
+        const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
         
         document.getElementById('cardDateText').innerText = formattedDate;
         document.getElementById('cardTimeIn').innerText = formattedTimeIn;
@@ -1055,9 +1124,9 @@
         const target = Number(r.Target) || 0;
         const cashIn = Number(r['Cash In']) || 0;
         const transactionBalance = target - cashIn;
-        const formattedDate = formatDateString(r.Date);
-        const formattedTimeIn = formatTimeString(r['Time In']);
-        const formattedTimeOut = formatTimeString(r['Time Out']);
+        const formattedDate = formatDateForDisplay(r.Date);
+        const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
+        const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
         
         const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
             `📅 Date: ${formattedDate}\n` +
@@ -1092,7 +1161,7 @@
             const transBal = target - cashIn;
             cumulativeTarget += target;
             cumulativeCashIn += cashIn;
-            const formattedDate = formatDateString(r.Date);
+            const formattedDate = formatDateForDisplay(r.Date);
             message += `${i+1}. *${formattedDate}*\n`;
             message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
             if (r.Comments) message += `   📝 ${r.Comments}\n`;
@@ -1118,7 +1187,7 @@
         
         let message = "CASHFLOW LEDGER BRIEF\n\n";
         selected.forEach((r, i) => {
-            const formattedDate = formatDateString(r.Date);
+            const formattedDate = formatDateForDisplay(r.Date);
             message += `${i+1}. ${formattedDate} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
@@ -1134,7 +1203,7 @@
         
         let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
         selected.forEach(r => {
-            const formattedDate = formatDateString(r.Date);
+            const formattedDate = formatDateForDisplay(r.Date);
             body += `${formattedDate} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
