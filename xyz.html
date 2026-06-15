@@ -266,7 +266,7 @@
     .header-controls { display: flex; gap: 12px; align-items: center; }
     .control-btn { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 170, 68, 0.5); padding: 8px 18px; border-radius: 50px; color: #ffdd99; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
     .control-btn:hover { background: #ff9900; color: #000; transform: scale(1.05); }
-    .cart-icon { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 50px; cursor: pointer; font-size: 18px; color: #ffdd99; }
+    /* Shopping basket completely removed */
     .book-btn { background: linear-gradient(135deg, #ff9900, #ff5500); border: none; padding: 10px 22px; border-radius: 40px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
     .book-btn:hover { transform: scale(1.02); }
     .menu-button { background: rgba(255,255,255,0.15); border: none; width: 42px; height: 42px; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -296,6 +296,26 @@
     .form-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 8px; }
     .close-form { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .close-form:hover { background: #f1f5f9; }
+    /* Three dots icon placed next to close X */
+    .three-dots-icon {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--gray);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .three-dots-icon:hover { background: #f1f5f9; }
+    .form-header .header-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
     .form-body { padding: 20px; }
 
     /* Form styles */
@@ -432,16 +452,13 @@
                 <h2 class="zam"><span class="z-green">Z</span><span class="z-black">a</span><span class="z-red">m</span><span>Listing Rides</span></h2>
             </div>
             <div class="header-controls">
-                
-<div class="cart-icon" onclick="window.location.href='https://www.zamlisting.com';">
-    <i class="fa fa-shopping-cart"></i>
-</div>
+                <!-- Shopping basket removed -->
                 <button class="book-btn" id="openFormBtn"><span>REQUESTING FORM</span></button>
                 <button class="menu-button" id="menu-toggle-btn"><i class="fas fa-ellipsis-v"></i></button>
             </div>
         </div>
 
-        <!-- BILLBOARD SLIDES -->
+        <!-- BILLBOARD SLIDES (unchanged) -->
         <div class="billboard-slide active"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
         <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div></div><div class="product-info"><div class="product-price">🏍️ MOTORBIKE RIDE • K15</div><div class="status-text">✅ Available!</div><button class="store-button" onclick="visitStore()">🚀 BOOK NOW</button></div></div></div>
         <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="car-billboard"><img src="car.png" alt="Car"></div></div><div class="product-info"><div class="product-price">🚗 CAR RIDE • FROM K25</div><div class="status-text">✅ Available</div><button class="store-button" onclick="visitStore()">📅 BOOK NOW</button></div></div></div>
@@ -539,11 +556,15 @@
     <div class="slide-dots" id="slideDots"></div>
 </div>
 
-<!-- FORM DROPDOWN -->
+<!-- FORM DROPDOWN - Three dots placed next to close X -->
 <div id="formDropdown" class="form-dropdown">
     <div class="form-header">
         <h3></h3>
-        <button class="close-form" id="closeFormBtn"><i class="fas fa-times"></i></button>
+        <div class="header-buttons">
+            <button class="close-form" id="closeFormBtn"><i class="fas fa-times"></i></button>
+            <!-- Three dots button directly next to close X -->
+            <button class="three-dots-icon" id="formThreeDotsBtn"><i class="fas fa-ellipsis-v"></i></button>
+        </div>
     </div>
     <div class="form-body">
         <fieldset><legend><span class="material-icons">account_circle</span>Profile</legend>
@@ -593,7 +614,7 @@
     </div>
 </div>
 
-<!-- MENU DROPDOWN -->
+<!-- MENU DROPDOWN (unchanged) -->
 <div id="menuDropdown" class="menu-dropdown">
     <div class="dropdown-content-section">
         <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
@@ -633,7 +654,7 @@
 </div>
 
 <script>
-// ========== SLIDESHOW WITH MANUAL CONTROLS ==========
+// ========== SLIDESHOW WITH MANUAL CONTROLS (unchanged) ==========
 (function() {
     const slides = document.querySelectorAll('.fullpage-billboard .billboard-header > .billboard-slide');
     if (!slides.length) return;
@@ -695,37 +716,18 @@
         }
     }
     
-    // Manual controls
     const prevBtn = document.getElementById('prevSlideBtn');
     const nextBtn = document.getElementById('nextSlideBtn');
+    if (prevBtn) prevBtn.addEventListener('click', function(e) { e.preventDefault(); prevSlide(); });
+    if (nextBtn) nextBtn.addEventListener('click', function(e) { e.preventDefault(); nextSlide(); });
     
-    if (prevBtn) {
-        prevBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            prevSlide();
-        });
-    }
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            nextSlide();
-        });
-    }
-    
-    // Touch swipe
     let touchStartX = 0;
-    document.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].clientX;
-    }, { passive: true });
-    
+    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
     document.addEventListener('touchend', function(e) {
         let diff = touchStartX - e.changedTouches[0].clientX;
         if (Math.abs(diff) > 50) {
-            if (diff > 0) {
-                nextSlide();
-            } else {
-                prevSlide();
-            }
+            if (diff > 0) nextSlide();
+            else prevSlide();
             resetAutoPlay();
         }
     }, { passive: true });
@@ -735,7 +737,7 @@
     resetAutoPlay();
 })();
 
-// ========== EYE ANIMATION FUNCTIONS ==========
+// ========== EYE ANIMATION FUNCTIONS (unchanged) ==========
 let eyeIsAsleep = false;
 let microBlinkTimeout, macroGazeTimeout;
 const eyeElements = document.querySelectorAll('.billboard-slide14 .eye-svg');
@@ -814,7 +816,7 @@ function closeForm() {
 if (openFormBtn) openFormBtn.addEventListener('click', openForm);
 if (closeFormBtn) closeFormBtn.addEventListener('click', closeForm);
 
-// Menu dropdown
+// Menu dropdown toggle function
 function toggleMenu() {
     const menu = document.getElementById('menuDropdown');
     if (menu) menu.classList.toggle('show');
@@ -823,6 +825,17 @@ function toggleMenu() {
 
 const menuToggleBtn = document.getElementById('menu-toggle-btn');
 if (menuToggleBtn) menuToggleBtn.onclick = toggleMenu;
+
+// Three dots button inside form (next to close X) toggles the menu dropdown
+const formThreeDots = document.getElementById('formThreeDotsBtn');
+if (formThreeDots) {
+    formThreeDots.addEventListener('click', (e) => {
+        e.preventDefault();
+        const mainMenu = document.getElementById('menuDropdown');
+        if (mainMenu) mainMenu.classList.toggle('show');
+        // Keep form open; menu toggles independently
+    });
+}
 
 // ========== AUTO BANNER - NATIVE INSTALL ==========
 let deferredPrompt = null;
@@ -865,7 +878,7 @@ if ("serviceWorker" in navigator) {
     });
 }
 
-// ========== COMPLETE PLACES LIST ==========
+// ========== COMPLETE PLACES LIST & DISTANCE LOGIC (rest unchanged) ==========
 const placesWithCoords = [
     { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
     { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055 },
@@ -877,13 +890,6 @@ const placesWithCoords = [
 ];
 
 const MASTER_PLACES_LIST = placesWithCoords.map(p => p.name);
-
-function getCoordinates(placeName) {
-    const found = placesWithCoords.find(p => p.name === placeName);
-    return found || { lat: -15.6213, lng: 30.4064 };
-}
-
-// ========== DISTANCE SEGMENTS ==========
 const segments = [
     { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62 },
     { from: "Luangwa Bus Station", to: "Luangwa Bridge Market", distance: 89 },
@@ -892,7 +898,6 @@ const segments = [
     { from: "Rufunsa Town", to: "Lusaka Town", distance: 192.7 },
     { from: "Lusaka Town", to: "Luanshya Town", distance: 335 }
 ];
-
 const hubs = ["Luangwa Bus Station", "Luangwa Town", "Rufunsa Town", "Lusaka Town"];
 const graph = {};
 segments.forEach(({ from, to, distance }) => {
@@ -955,7 +960,6 @@ let rideData = null;
 let currentPickup = "";
 let currentDestination = "";
 
-// DOM Elements
 const phoneInput = document.getElementById('customer-phone');
 const tripDiv = document.getElementById('trip-details');
 const summaryDiv = document.getElementById('summary-section');
@@ -965,7 +969,6 @@ const btnIcon = document.getElementById('btn-icon');
 const btnLoader = document.getElementById('btn-loader');
 const progressTextSpan = document.getElementById('progress-text');
 
-// Phone validation
 if (phoneInput) {
     phoneInput.oninput = () => {
         if (/^0[0-9]{9}$/.test(phoneInput.value)) {
@@ -977,13 +980,11 @@ if (phoneInput) {
     };
 }
 
-// Autocomplete setup
 function setupAuto(inputId, containerId, listId) {
     const input = document.getElementById(inputId);
     const container = document.getElementById(containerId);
     const list = document.getElementById(listId);
     if (!input) return;
-    
     input.oninput = () => {
         const val = input.value.toLowerCase().trim();
         if (list) list.innerHTML = '';
@@ -1164,7 +1165,6 @@ function finishRequestUI() {
     if (submitBtn) submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
 }
 
-// Location sharing
 let mapLink = "";
 function getLocation() {
     const status = document.getElementById("locationStatus");
@@ -1183,7 +1183,6 @@ function shareWhatsApp() { if (mapLink) window.open(`https://wa.me/260777737047?
 function shareSMS() { if (mapLink) window.location.href = `sms:0777737047?body=📍 ${mapLink}`; else alert("Get location first"); }
 function visitStore() { window.open("https://www.zamlisting.com/store", "_blank"); }
 
-// Countdown timer
 function updateCountdown() {
     const electionDay = new Date("August 12, 2026 06:00:00").getTime();
     const now = new Date().getTime();
@@ -1202,13 +1201,11 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// Initialize autocomplete
 setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 const modeGroup = document.getElementById('mode-group');
 if (modeGroup) modeGroup.onchange = checkReady;
 
-// Download APK
 const menuInstallBtn = document.getElementById('menu-install-btn');
 if (menuInstallBtn) {
     menuInstallBtn.addEventListener('click', () => {
