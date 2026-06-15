@@ -96,7 +96,7 @@
         z-index: 2;
     }
 
-    /* Slide content styles - all your animations preserved */
+    /* Slide content styles */
     .welcome-billboard { font-size: 45px; color: #ffd700; font-weight: bold; text-shadow: 0 0 20px rgba(255,215,0,0.7); text-align: center; padding: 20px; overflow: hidden; white-space: nowrap; animation: typing 5s steps(30, end) infinite, blink-cursor 1s step-end infinite; }
     @keyframes typing { 0% { width: 0; } 30% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
     @keyframes blink-cursor { 0%, 100% { border-right: 3px solid #ffd700; } 50% { border-right: 3px solid transparent; } }
@@ -160,52 +160,115 @@
     .z-red { color: #e74c3c; }
     .z-black { color: #ffffff; }
 
-    .header-actions { display: flex; gap: 12px; align-items: center; }
-    .book-btn { background: linear-gradient(135deg, var(--secondary), #ff5500); border: none; padding: 10px 22px; border-radius: 40px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
+    .header-actions { display: flex; gap: 12px; align-items: center; position: relative; }
+    
+    .book-btn { 
+        background: linear-gradient(135deg, var(--secondary), #ff5500); 
+        border: none; 
+        padding: 10px 22px; 
+        border-radius: 40px; 
+        color: white; 
+        font-weight: 700; 
+        font-size: 14px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        transition: transform 0.2s; 
+    }
     .book-btn:hover { transform: scale(1.02); }
-    .menu-button { background: rgba(255,255,255,0.15); border: none; width: 42px; height: 42px; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    
+    .menu-button { 
+        background: rgba(255,255,255,0.15); 
+        border: none; 
+        width: 42px; 
+        height: 42px; 
+        border-radius: 50%; 
+        color: white; 
+        font-size: 20px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
 
-    /* ========== COMPACT FORM PANEL - DOES NOT FILL SCREEN ========== */
-    .form-panel {
+    /* ========== DROPDOWN FORM PANEL - Appears like menu near 3 dots ========== */
+    .form-dropdown {
+        display: none;
         position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%) translateY(100%);
-        width: 90%;
-        max-width: 500px;
-        z-index: 200;
-        background: white;
-        border-radius: 32px 32px 0 0;
-        transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        max-height: 80vh;
+        right: 20px;
+        top: 75px;
+        width: 420px;
+        max-width: calc(100vw - 40px);
+        max-height: 85vh;
         overflow-y: auto;
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        z-index: 200;
+        animation: fadeInScale 0.2s ease-out;
     }
-
-    .form-panel.open {
-        transform: translateX(-50%) translateY(0);
+    
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
-
-    .panel-header {
+    
+    .form-dropdown.show {
+        display: block;
+    }
+    
+    .form-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 18px 22px 12px;
+        padding: 18px 20px 12px;
         border-bottom: 1px solid var(--border);
+        background: white;
+        border-radius: 24px 24px 0 0;
         position: sticky;
         top: 0;
-        background: white;
         z-index: 10;
-        border-radius: 32px 32px 0 0;
+    }
+    
+    .form-header h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .close-form {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: var(--gray);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .close-form:hover {
+        background: #f1f5f9;
+    }
+    
+    .form-body {
+        padding: 20px;
     }
 
-    .panel-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 8px; }
-    .close-panel { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .close-panel:hover { background: #f1f5f9; }
-
-    .panel-content { padding: 16px 20px 24px; }
-
-    /* Form styles - compact but functional */
+    /* Form styles - compact and clean */
     fieldset { border: 1px solid var(--border); border-radius: 18px; padding: 14px 14px; background: #fafafa; margin-bottom: 16px; }
     legend { font-weight: bold; color: var(--primary); padding: 0 10px; font-size: 0.85rem; background: white; border-radius: 30px; display: flex; align-items: center; gap: 5px; }
     .input-box { background: white; border: 1.5px solid var(--border); border-radius: 50px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; position: relative; }
@@ -245,20 +308,6 @@
     .route-info { font-size: 0.75rem; text-align: center; margin-bottom: 8px; }
     .open-maps-link { display: block; background: var(--primary); color: white; text-align: center; padding: 10px; border-radius: 12px; text-decoration: none; font-size: 0.85rem; }
 
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 150;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
-    }
-    .overlay.active { opacity: 1; visibility: visible; }
-
     @media (max-width: 600px) {
         .welcome-billboard, .request-billboard, .contact-billboard { font-size: 22px; white-space: normal; }
         .promo-billboard { font-size: 16px; padding: 10px 20px; }
@@ -268,10 +317,9 @@
         .corner-logo { width: 32px; height: 32px; }
         .book-btn span { display: none; }
         .book-btn { padding: 8px 14px; }
-        .form-panel { width: 95%; }
-        .panel-content { padding: 12px 16px 20px; }
+        .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
+        .form-body { padding: 16px; }
         fieldset { padding: 12px; margin-bottom: 12px; }
-        .input-box { padding: 8px 14px; }
     }
 </style>
 </head>
@@ -306,43 +354,13 @@
     </div>
 </div>
 
-<!-- MENU DROPDOWN -->
-<div id="header-menu-dropdown" class="menu-dropdown">
-    <div class="dropdown-content-section">
-        <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-        <p>Local passenger hailing via motorbikes and cars. Coverage: Luangwa, Luanshya, Rufunsa.</p>
-        <button id="menu-install-btn" class="store-button" style="width:100%; margin-top:8px;">⬇️ Download APK</button>
-    </div>
-    <div class="dropdown-content-section">
-        <h4><i class="fas fa-headset"></i> Quick Contact</h4>
-        <a href="tel:0777737047"><i class="fas fa-phone"></i><span>Call Us</span></a>
-        <a href="https://wa.me/260777737047" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-    </div>
-    <div class="dropdown-content-section">
-        <h4><i class="fas fa-map-marker-alt"></i> Share Location</h4>
-        <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
-        <p id="locationStatus" style="font-size:0.7rem; margin-top:5px;"></p>
-        <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
-    </div>
-    <div class="dropdown-content-section">
-        <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
-        <div class="route-container">
-            <div id="map-route-info" class="route-info">Select pickup & destination</div>
-            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 View Map</a>
-        </div>
-    </div>
-</div>
-
-<!-- OVERLAY -->
-<div id="overlay" class="overlay"></div>
-
-<!-- COMPACT FORM PANEL - CENTERED, DOESN'T FILL SCREEN -->
-<div id="formPanel" class="form-panel">
-    <div class="panel-header">
+<!-- FORM DROPDOWN - Appears right near the 3 dots button -->
+<div id="formDropdown" class="form-dropdown">
+    <div class="form-header">
         <h3><i class="fas fa-paper-plane"></i> Request a Ride</h3>
-        <button class="close-panel" id="closePanelBtn"><i class="fas fa-times"></i></button>
+        <button class="close-form" id="closeFormBtn"><i class="fas fa-times"></i></button>
     </div>
-    <div class="panel-content">
+    <div class="form-body">
         <fieldset><legend><span class="material-icons">account_circle</span> Your Info</legend>
             <div class="input-box" id="phone-box">
                 <span class="material-icons">phone</span>
@@ -385,8 +403,35 @@
     </div>
 </div>
 
+<!-- MENU DROPDOWN -->
+<div id="menuDropdown" class="menu-dropdown">
+    <div class="dropdown-content-section">
+        <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+        <p>Local passenger hailing via motorbikes and cars. Coverage: Luangwa, Luanshya, Rufunsa.</p>
+        <button id="menu-install-btn" class="store-button" style="width:100%; margin-top:8px;">⬇️ Download APK</button>
+    </div>
+    <div class="dropdown-content-section">
+        <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+        <a href="tel:0777737047"><i class="fas fa-phone"></i><span>Call Us</span></a>
+        <a href="https://wa.me/260777737047" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+    </div>
+    <div class="dropdown-content-section">
+        <h4><i class="fas fa-map-marker-alt"></i> Share Location</h4>
+        <a href="#" id="getLocationBtn"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
+        <p id="locationStatus" style="font-size:0.7rem; margin-top:5px;"></p>
+        <a href="#" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
+    </div>
+    <div class="dropdown-content-section">
+        <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
+        <div class="route-container">
+            <div id="map-route-info" class="route-info">Select pickup & destination</div>
+            <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 View Map</a>
+        </div>
+    </div>
+</div>
+
 <script>
-// ========== ALL YOUR ORIGINAL FUNCTIONALITY PRESERVED ==========
+// ========== ALL ORIGINAL FUNCTIONALITY PRESERVED ==========
 const placesList = [
     "Luangwa Bus Station", "Chitope, Luangwa", "Luangwa Bridge Market", 
     "Luangwa Town", "Rufunsa Town", "Lusaka Town", "Luanshya Town",
@@ -587,23 +632,61 @@ setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
-const formPanel = document.getElementById('formPanel');
-const overlay = document.getElementById('overlay');
+// Form dropdown controls
+const formDropdown = document.getElementById('formDropdown');
 const openFormBtn = document.getElementById('openFormBtn');
-const closePanelBtn = document.getElementById('closePanelBtn');
+const closeFormBtn = document.getElementById('closeFormBtn');
 
-function openPanel() { formPanel.classList.add('open'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-function closePanel() { formPanel.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+function openForm() {
+    formDropdown.classList.add('show');
+    // Close menu if open
+    document.getElementById('menuDropdown').classList.remove('show');
+}
 
-openFormBtn.addEventListener('click', openPanel);
-closePanelBtn.addEventListener('click', closePanel);
-overlay.addEventListener('click', closePanel);
+function closeForm() {
+    formDropdown.classList.remove('show');
+}
 
-function toggleDropdown() { document.getElementById("header-menu-dropdown").classList.toggle("show"); }
-document.getElementById('menu-toggle-btn').onclick = toggleDropdown;
-document.getElementById('menu-install-btn')?.addEventListener('click', () => { const a = document.createElement('a'); a.href = 'Luangwa_Feira_Rides.apk'; a.download = 'Luangwa_Feira_Rides.apk'; a.click(); alert("Download started!"); });
-window.onclick = (e) => { const menu = document.getElementById("header-menu-dropdown"); const btn = document.getElementById("menu-toggle-btn"); if (menu && menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) menu.classList.remove('show'); };
-window.getLocation = getLocation; window.shareWhatsApp = shareWhatsApp; window.visitStore = visitStore;
+openFormBtn.addEventListener('click', openForm);
+closeFormBtn.addEventListener('click', closeForm);
+
+// Click outside to close form
+document.addEventListener('click', (e) => {
+    const form = document.getElementById('formDropdown');
+    const formBtn = document.getElementById('openFormBtn');
+    const menu = document.getElementById('menuDropdown');
+    const menuBtn = document.getElementById('menu-toggle-btn');
+    
+    if (form.classList.contains('show') && !form.contains(e.target) && !formBtn.contains(e.target)) {
+        form.classList.remove('show');
+    }
+    if (menu.classList.contains('show') && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+        menu.classList.remove('show');
+    }
+});
+
+// Menu dropdown
+function toggleMenu() {
+    const menu = document.getElementById('menuDropdown');
+    menu.classList.toggle('show');
+    // Close form if open
+    document.getElementById('formDropdown').classList.remove('show');
+}
+
+document.getElementById('menu-toggle-btn').onclick = toggleMenu;
+document.getElementById('menu-install-btn')?.addEventListener('click', () => { 
+    const a = document.createElement('a'); 
+    a.href = 'Luangwa_Feira_Rides.apk'; 
+    a.download = 'Luangwa_Feira_Rides.apk'; 
+    a.click(); 
+    alert("Download started!"); 
+});
+document.getElementById('getLocationBtn')?.addEventListener('click', (e) => { e.preventDefault(); getLocation(); });
+document.getElementById('shareWhatsappBtn')?.addEventListener('click', (e) => { e.preventDefault(); shareWhatsApp(); });
+
+window.getLocation = getLocation;
+window.shareWhatsApp = shareWhatsApp;
+window.visitStore = visitStore;
 </script>
 </body>
 </html>
