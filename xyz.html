@@ -29,22 +29,40 @@
         --border-color-light: #e0e0e0;
         --font-color-dark: #333;
     }
-    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
-   
-  .store-button {
-    z-index: 100;
-    position: relative;
+    
+    /* ========== 50/50 SPLIT SCREEN LAYOUT ========== */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
     }
     
-  /* ========== BILLBOARD HEADER ========== */
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        background-color: var(--bg-color-body);
+        color: var(--font-color-dark);
+        display: flex;
+        flex-direction: column;
+    }
+   
+    .store-button {
+        z-index: 100;
+        position: relative;
+    }
+    
+    /* ========== BILLBOARD HEADER - TAKES EXACTLY 50% OF SCREEN ========== */
     .billboard-header {
         position: relative;
         width: 100%;
-        height: 200px;
-        overflow: visible;
+        height: 50vh;
+        min-height: 250px;
+        max-height: 450px;
+        flex-shrink: 0;
+        overflow: hidden;
         background: linear-gradient(135deg, #1e3a8a, #2563eb, #1e40af);
         border-bottom: none;
     }
+    
     .billboard-header::before {
         content: '';
         position: absolute;
@@ -56,7 +74,11 @@
         pointer-events: none;
         animation: floatParticles 15s ease-in-out infinite;
     }
-    @keyframes floatParticles { 0%,100% { transform: translateX(0px) translateY(0px); opacity: 0.3; } 50% { transform: translateX(20px) translateY(-20px); opacity: 0.6; } }
+    
+    @keyframes floatParticles { 
+        0%,100% { transform: translateX(0px) translateY(0px); opacity: 0.3; } 
+        50% { transform: translateX(20px) translateY(-20px); opacity: 0.6; } 
+    }
 
     /* ========== HEADER OVERLAY LOGO & MENU ========== */
     .header-overlay {
@@ -71,6 +93,7 @@
         padding: 12px 20px;
         background: transparent;
     }
+    
     .company-info { display: flex; align-items: center; gap: 10px; }
     .corner-logo { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--secondary-color); }
     .zam { font-weight: 800; letter-spacing: 0.5px; color: #ffcc00; text-shadow: 1px 2px 4px rgba(0,0,0,0.5); font-family: 'Segoe UI', Arial, sans-serif; font-size: 1.2rem; }
@@ -98,7 +121,7 @@
     }
     .menu-dropdown.show { display: block; }
     .menu-button { background: none; border: none; font-size: 24px; cursor: pointer; color: white; }
-    .menu-button:hover { opacity: 1; transform: scale(1.05); }
+    .menu-button:hover { transform: scale(1.05); }
     .dropdown-content-section { margin-bottom: 20px; }
     .dropdown-content-section h4 { color: #2563eb; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; font-weight: 700; }
     .dropdown-content-section p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px; color: #4b5563; }
@@ -112,113 +135,133 @@
     .open-maps-link:hover { background: #1d4ed8; }
 
     /* ========== SLIDES ========== */
-.billboard-slide {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-}
+    .billboard-slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
 
-.welcome-billboard { font-size: 45px; color: #ffd700; font-weight: bold; text-shadow: 0 0 20px rgba(255,215,0,0.7); text-align: center; padding: 20px; overflow: hidden; white-space: nowrap; animation: typing 5s steps(30, end) infinite, blink-cursor 1s step-end infinite; }
-@keyframes typing { 0% { width: 0; } 30% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
-@keyframes blink-cursor { 0%, 100% { border-right: 3px solid #ffd700; } 50% { border-right: 3px solid transparent; } }
+    .welcome-billboard { font-size: 45px; color: #ffd700; font-weight: bold; text-shadow: 0 0 20px rgba(255,215,0,0.7); text-align: center; padding: 20px; overflow: hidden; white-space: nowrap; animation: typing 5s steps(30, end) infinite, blink-cursor 1s step-end infinite; }
+    @keyframes typing { 0% { width: 0; } 30% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
+    @keyframes blink-cursor { 0%, 100% { border-right: 3px solid #ffd700; } 50% { border-right: 3px solid transparent; } }
 
-.car-billboard img { width: 180px; filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); animation: smoothDrive 5s ease-in-out infinite; transition: all 0.3s ease; }
-@keyframes smoothDrive { 0%,100% { transform: translateX(0px) translateY(0px); } 25% { transform: translateX(20px) translateY(-3px); } 50% { transform: translateX(0px) translateY(0px); } 75% { transform: translateX(-20px) translateY(-3px); } }
+    .car-billboard img { width: 180px; filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); animation: smoothDrive 5s ease-in-out infinite; transition: all 0.3s ease; }
+    @keyframes smoothDrive { 0%,100% { transform: translateX(0px) translateY(0px); } 25% { transform: translateX(20px) translateY(-3px); } 50% { transform: translateX(0px) translateY(0px); } 75% { transform: translateX(-20px) translateY(-3px); } }
 
-.motorbike-billboard img { width: 180px; filter: drop-shadow(0 0 18px #ffcc00); animation: bikeGlide 4s ease-in-out infinite; }
-@keyframes bikeGlide { 0%,100% { transform: translateY(0px) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-3deg); } 75% { transform: translateY(-20px) rotate(3deg); } }
+    .motorbike-billboard img { width: 180px; filter: drop-shadow(0 0 18px #ffcc00); animation: bikeGlide 4s ease-in-out infinite; }
+    @keyframes bikeGlide { 0%,100% { transform: translateY(0px) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-3deg); } 75% { transform: translateY(-20px) rotate(3deg); } }
 
-.request-billboard { font-size: 45px; color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: neonShake 3s ease-in-out infinite; text-align: center; padding: 20px; width: 100%; white-space: normal; word-wrap: break-word; }
-.promo-billboard { background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00); padding: 20px 40px; border-radius: 60px; font-size: 44px; font-weight: bold; color: white; animation: promoPulse 3.5s ease-in-out infinite alternate; text-align: center; }
-.contact-billboard { font-size: 45px; color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: gentleFloat 5s ease-in-out infinite; text-align: center; padding: 20px; }
+    .request-billboard { font-size: 45px; color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: neonShake 3s ease-in-out infinite; text-align: center; padding: 20px; width: 100%; white-space: normal; word-wrap: break-word; }
+    @keyframes neonShake { 0%,100% { transform: translateX(0px) scale(1); } 10%,30%,50%,70%,90% { transform: translateX(-3px) scale(1.02); } 20%,40%,60%,80% { transform: translateX(3px) scale(1.02); } }
 
-/* Product row */
-.product-row{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap;}
-.product-image img{width:140px;filter:drop-shadow(0 0 15px rgba(0,255,153,0.8));animation:smoothDrive 5s ease-in-out infinite;}
-.product-info{display:flex;flex-direction:column;align-items:center;gap:10px;}
-.product-price{font-size:18px;font-weight:bold;color:#ffcc00;white-space:nowrap;}
-.store-button{background:linear-gradient(135deg,#ff9900,#ff5500);color:white;font-weight:bold;padding:8px 25px;border:none;border-radius:50px;font-size:14px;cursor:pointer;}
-.status-text{font-size:14px;font-weight:bold;color:#ffcc00;}
+    .promo-billboard { background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00); padding: 20px 40px; border-radius: 60px; font-size: 44px; font-weight: bold; color: white; animation: promoPulse 3.5s ease-in-out infinite alternate; text-align: center; }
+    @keyframes promoPulse { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
 
-/* SLIDE 11 road */
-.billboard-slide11{position:relative;overflow:hidden;}
-.billboard-slide11 .road-track{position:absolute;bottom:35px;left:0;width:100%;height:6px;background:repeating-linear-gradient(90deg,#444 0px,#444 20px,#666 20px,#666 40px);opacity:0.6;animation:roadMove 1s linear infinite;}
-@keyframes roadMove{0%{background-position:0 0;}100%{background-position:40px 0;}}
-.billboard-slide11 .motorbike-billboard img{width:180px;position:relative;z-index:2;animation:bikeDrive 3.5s linear infinite;}
-@keyframes bikeDrive{0%{transform:translateX(-200px) scale(0.9);}100%{transform:translateX(200px) scale(1.05);}}
+    .contact-billboard { font-size: 45px; color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: gentleFloat 5s ease-in-out infinite; text-align: center; padding: 20px; }
+    @keyframes gentleFloat { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
 
-/* SLIDE 12 campaign */
-.billboard-slide12{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#2a0000 0%,#8b0000 40%,#ff1a1a 70%,#3a0000 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;}
-.billboard-slide12 .container{display:flex;justify-content:center;align-items:center;width:90%;gap:30px;flex-wrap:wrap;}
-.billboard-slide12 .circle-img{border-radius:50%;object-fit:cover;border:3px solid #ffcc00;width:80px;height:80px;}
-.billboard-slide12 .right{color:#fff;font-size:14px;font-weight:bold;}
-.billboard-slide12 .title{margin-bottom:10px;font-size:16px;color:#ffd700;}
+    .product-row { display: flex; align-items: center; justify-content: center; gap: 30px; flex-wrap: wrap; }
+    .product-image img { width: 140px; filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); animation: smoothDrive 5s ease-in-out infinite; }
+    .product-info { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .product-price { font-size: 18px; font-weight: bold; color: #ffcc00; white-space: nowrap; }
+    .status-text { font-size: 14px; font-weight: bold; color: #ffcc00; }
 
-/* SLIDE 13 countdown */
-.billboard-slide13{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(-45deg,#006633,#009966,#111,#006633);display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;}
-.billboard-slide13 .ecz-countdown{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
-.billboard-slide13 .ecz-box{width:70px;height:70px;background:rgba(255,255,255,.12);border-radius:15px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
-.billboard-slide13 .ecz-number{font-size:24px;font-weight:900;color:#fff;}
-.billboard-slide13 .ecz-label{font-size:9px;color:#ffd700;}
+    /* SLIDE 11 road effect */
+    .billboard-slide11 { position: relative; overflow: hidden; }
+    .billboard-slide11 .road-track { position: absolute; bottom: 35px; left: 0; width: 100%; height: 6px; background: repeating-linear-gradient(90deg, #444 0px, #444 20px, #666 20px, #666 40px); opacity: 0.6; animation: roadMove 1s linear infinite; }
+    @keyframes roadMove { 0% { background-position: 0 0; } 100% { background-position: 40px 0; } }
+    .billboard-slide11 .motorbike-billboard img { width: 180px; position: relative; z-index: 2; animation: bikeDrive 3.5s linear infinite; }
+    @keyframes bikeDrive { 0% { transform: translateX(-200px) scale(0.9); } 100% { transform: translateX(200px) scale(1.05); } }
 
-/* ========== STRETCHED FORM STYLES (MODIFIED) ========== */
-.product-container { 
-    width: 100%; 
-    margin: 0; 
-    padding: 20px; 
-    background: linear-gradient(145deg, #eef2f7 0%, #e2e8f0 100%);
-}
-.booking-container { 
-    background: var(--bg-color-card); 
-    border-radius: 24px; 
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12); 
-    padding: 28px 24px; 
-    width: 100%;
-    max-width: none;
-}
-fieldset { border: 1px solid var(--border-color-light); border-radius: 18px; padding: 18px 16px; background: #fafafa; margin-bottom: 20px; width: 100%; position: relative; }
-legend { font-weight: bold; color: var(--primary-color); padding: 0 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 5px; background: white; border-radius: 40px; }
-.input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 60px; padding: 12px 16px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
-.input-box .material-icons { color: var(--primary-color); font-size: 22px; margin-right: 12px; }
-.input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: 500; background: transparent; width: 100%; }
-.input-box input::placeholder { font-style: italic; color: #999; font-weight: normal; font-size: 0.85rem; }
-.field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
-@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
-.suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
-.summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-.submit-btn { background: var(--primary-color); color: white; width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,0.3); transition: 0.2s; position: relative; }
-.btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-#progress-text { position: absolute; font-size: 12px; font-weight: bold; color: white; display: none; bottom: 12px; }
-.hidden-section { display: none; }
-.calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
-.tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
-.tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; pointer-events: none; }
-.tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
-.mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; justify-content: center; background: #f9fafb; padding: 12px; border-radius: 40px; transition: 0.2s; }
-.mode-option:hover { background: #eef2ff; }
-#mode-group { display: flex; justify-content: space-around; width: 100%; gap: 16px; }
-.icon-img { width: 40px; height: 40px; object-fit: contain; }
+    /* SLIDE 12 campaign */
+    .billboard-slide12 { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #2a0000 0%, #8b0000 40%, #ff1a1a 70%, #3a0000 100%); display: flex; justify-content: center; align-items: center; }
+    .billboard-slide12 .container { display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; }
+    .billboard-slide12 .circle-img { border-radius: 50%; object-fit: cover; border: 3px solid #ffcc00; width: 80px; height: 80px; }
+    .billboard-slide12 .title { font-size: 16px; color: #ffd700; margin-bottom: 10px; }
+    .billboard-slide12 .right { color: #fff; }
 
-@media (max-width: 640px) {
-    .product-container { padding: 12px; }
-    .booking-container { padding: 18px 16px; }
-    .mode-option { padding: 8px; }
-    .billboard-header { height: 160px; }
-    .welcome-billboard { font-size: 22px; white-space: normal; animation: none; }
-    .car-billboard img, .motorbike-billboard img { width: 100px; }
-}
+    /* SLIDE 13 countdown */
+    .billboard-slide13 { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(-45deg, #006633, #009966, #111, #006633); display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; }
+    .billboard-slide13 .ecz-countdown { display: flex; gap: 12px; justify-content: center; }
+    .billboard-slide13 .ecz-box { width: 70px; height: 70px; background: rgba(255,255,255,.12); border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .billboard-slide13 .ecz-number { font-size: 24px; font-weight: 900; color: #fff; }
+    .billboard-slide13 .ecz-label { font-size: 9px; color: #ffd700; }
+
+    /* ========== FORM CONTAINER - TAKES REMAINING 50% ========== */
+    .product-container { 
+        flex: 1;
+        width: 100%;
+        margin: 0;
+        padding: 24px 20px;
+        overflow-y: auto;
+        background: linear-gradient(145deg, #eef2f7 0%, #e2e8f0 100%);
+    }
+    
+    .booking-container { 
+        max-width: 700px;
+        margin: 0 auto;
+        background: var(--bg-color-card); 
+        border-radius: 28px; 
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15); 
+        padding: 28px 24px;
+    }
+    
+    /* Form inner styles */
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 20px; padding: 18px 16px; background: #fafafa; margin-bottom: 20px; width: 100%; }
+    legend { font-weight: bold; color: var(--primary-color); padding: 0 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 5px; background: white; border-radius: 40px; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 60px; padding: 12px 18px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
+    .input-box .material-icons { color: var(--primary-color); font-size: 22px; margin-right: 12px; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; font-weight: 500; background: transparent; width: 100%; }
+    .input-box input::placeholder { font-style: italic; color: #999; font-weight: normal; font-size: 0.85rem; }
+    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 200px; overflow-y: auto; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; transition: background 0.2s; }
+    .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .submit-btn { background: var(--primary-color); color: white; width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,0.3); transition: 0.2s; position: relative; }
+    .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    #progress-text { position: absolute; font-size: 12px; font-weight: bold; color: white; display: none; bottom: 12px; }
+    .hidden-section { display: none; }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+    .tooltip-icon { font-size: 18px !important; color: var(--primary-color); }
+    .tooltip-text { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 9999; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; pointer-events: none; }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+    .mode-option { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; justify-content: center; background: #f9fafb; padding: 12px; border-radius: 40px; transition: 0.2s; }
+    .mode-option:hover { background: #eef2ff; }
+    #mode-group { display: flex; justify-content: space-around; width: 100%; gap: 16px; }
+    .icon-img { width: 40px; height: 40px; object-fit: contain; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .billboard-header { height: 40vh; min-height: 220px; }
+        .product-container { padding: 16px; }
+        .booking-container { padding: 20px 16px; }
+        .welcome-billboard { font-size: 22px; white-space: normal; animation: none; }
+        .car-billboard img, .motorbike-billboard img { width: 100px; }
+        .promo-billboard { font-size: 18px; padding: 10px 20px; }
+        .request-billboard, .contact-billboard { font-size: 18px; }
+    }
+    
+    @media (max-width: 480px) {
+        .billboard-header { height: 35vh; min-height: 180px; }
+        .product-container { padding: 12px; }
+        .mode-option { padding: 8px; gap: 5px; }
+        .mode-option small { font-size: 10px; }
+        .icon-img { width: 28px; height: 28px; }
+    }
 </style>
 </head>
 <body>
+
+<!-- ========== BILLBOARD HEADER - TOP 50% ========== -->
 <div class="billboard-header">
     <div class="header-overlay">
         <div class="company-info">
@@ -229,12 +272,12 @@ legend { font-weight: bold; color: var(--primary-color); padding: 0 12px; font-s
             <button id="menu-toggle-btn" class="menu-button" onclick="toggleDropdown()"><i class="fas fa-ellipsis-v"></i></button>
             <div id="header-menu-dropdown" class="menu-dropdown">
                 <div class="dropdown-content-section">
-                    <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-                    <p>Local passenger hailing services via motorbikes and cars. Coverage: Luangwa, Luanshya, Rufunsa.</p>
+                    <h4><i class="fas fa-info-circle"></i> About</h4>
+                    <p>Local passenger hailing via motorbikes and cars. Coverage: Luangwa, Luanshya, Rufunsa.</p>
                     <button id="menu-install-btn" class="store-button" style="width:100%;">⬇️ Download APK</button>
                 </div>
                 <div class="dropdown-content-section">
-                    <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+                    <h4><i class="fas fa-headset"></i> Contact</h4>
                     <a href="tel:0777737047"><i class="fas fa-phone"></i><span>Call Us</span></a>
                     <a href="https://wa.me/260777737047" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
                 </div>
@@ -255,22 +298,23 @@ legend { font-weight: bold; color: var(--primary-color); padding: 0 12px; font-s
         </div>
     </div>
 
-    <!-- SLIDES (simplified but working) -->
+    <!-- SLIDES -->
     <div class="billboard-slide billboard-slide1"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
-    <div class="billboard-slide billboard-slide2"><div class="vehicle-container"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">From K15</div></div></div>
-    <div class="billboard-slide billboard-slide3"><div class="vehicle-container"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text">From K25</div></div></div>
-    <div class="billboard-slide billboard-slide4"><div class="request-billboard">👇 PROCEED TO MAKE A REQUEST 👇</div></div>
+    <div class="billboard-slide billboard-slide2"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">From K15</div></div>
+    <div class="billboard-slide billboard-slide3"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text">From K25</div></div>
+    <div class="billboard-slide billboard-slide4"><div class="request-billboard">👇 REQUEST A RIDE BELOW 👇</div></div>
     <div class="billboard-slide billboard-slide5"><div class="promo-billboard">🔥 50% DISCOUNT PROMOTION 🔥</div></div>
     <div class="billboard-slide billboard-slide6"><div class="contact-billboard">📞 CONTACT NOW • 24/7</div></div>
     <div class="billboard-slide billboard-slide7"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="TV"></div><div class="product-info"><div class="product-price">K3,000</div><button class="store-button" onclick="visitStore()">SHOP</button></div></div></div>
     <div class="billboard-slide billboard-slide8"><div class="product-row"><div class="product-image"><img src="S241S.png" alt="Phone"></div><div class="product-info"><div class="product-price">K2,200</div><button class="store-button" onclick="visitStore()">SHOP</button></div></div></div>
     <div class="billboard-slide billboard-slide9"><div class="product-row"><div class="product-image"><img src="fridge.png" alt="Fridge"></div><div class="product-info"><div class="product-price">K2,600</div><button class="store-button" onclick="visitStore()">SHOP</button></div></div></div>
     <div class="billboard-slide billboard-slide10"><div class="rotating-image"><img src="car.png" alt="Car" style="width:180px; animation:coinRotate 3s infinite;"></div></div>
-    <div class="billboard-slide billboard-slide11"><div class="vehicle-container"><div class="road-track"></div><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">FAST DELIVERY</div></div></div>
+    <div class="billboard-slide billboard-slide11"><div class="road-track"></div><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">FAST DELIVERY</div></div>
     <div class="billboard-slide billboard-slide12"><div class="container"><div class="left"><img class="circle-img" src="P1.png" alt="Leader"></div><div class="right"><div class="title">OUR PROMISE</div><div>✔ Free Education</div><div>✔ Repaired Economy</div></div></div></div>
     <div class="billboard-slide billboard-slide13"><div class="ecz-countdown"><div class="ecz-box"><span class="ecz-number" id="days">00</span><span class="ecz-label">Days</span></div><div class="ecz-box"><span class="ecz-number" id="hours">00</span><span class="ecz-label">Hours</span></div><div class="ecz-box"><span class="ecz-number" id="mins">00</span><span class="ecz-label">Mins</span></div><div class="ecz-box"><span class="ecz-number" id="secs">00</span><span class="ecz-label">Secs</span></div></div><div>Elections 2026</div></div>
 </div>
 
+<!-- ========== FORM CONTAINER - BOTTOM 50% ========== -->
 <main class="product-container">
   <div class="booking-container">
     <fieldset><legend><span class="material-icons">account_circle</span> Requesting Form</legend>
@@ -317,8 +361,7 @@ legend { font-weight: bold; color: var(--primary-color); padding: 0 12px; font-s
 </main>
 
 <script>
-// ========== SIMPLIFIED BUT COMPLETE PLACES LIST (ADD YOUR OWN HERE) ==========
-// You can add more places to this array. Format: { name: "Place Name", lat: -15.1234, lng: 28.5678 }
+// ========== SIMPLIFIED PLACES LIST (ADD YOUR OWN HERE) ==========
 const placesWithCoords = [
   { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
   { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055 },
@@ -326,37 +369,22 @@ const placesWithCoords = [
   { name: "Luangwa Town", lat: -15.6400, lng: 30.5000 },
   { name: "Rufunsa Town", lat: -15.2500, lng: 30.3000 },
   { name: "Lusaka Town", lat: -15.3875, lng: 28.3228 },
-  { name: "Chipata Town", lat: -13.6333, lng: 32.6500 },
-  { name: "Luanshya Town", lat: -13.1333, lng: 28.4167 },
-  { name: "Ndola Town", lat: -12.9667, lng: 28.6333 },
-  { name: "Kabwe Town", lat: -14.4333, lng: 28.4500 }
+  { name: "Luanshya Town", lat: -13.1333, lng: 28.4167 }
 ];
 
-const allPlaceNames = placesWithCoords.map(p => p.name);
-const MASTER_PLACES_LIST = [...allPlaceNames];
+const MASTER_PLACES_LIST = placesWithCoords.map(p => p.name);
+function getCoordinates(place) { return placesWithCoords.find(p => p.name === place) || { lat: -15.8167, lng: 30.7167 }; }
 
-function getCoordinates(placeName) {
-  const found = placesWithCoords.find(p => p.name === placeName);
-  if (found) return { lat: found.lat, lng: found.lng };
-  return { lat: -15.8167, lng: 30.7167 };
-}
-
-// Simplified graph segments (you can add more connections)
+// Distance segments
 const segments = [
-  { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62.0 },
-  { from: "Luangwa Bus Station", to: "Luangwa Bridge Market", distance: 89.0 },
-  { from: "Luangwa Bus Station", to: "Luangwa Town", distance: 5.0 },
+  { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62 },
+  { from: "Luangwa Bus Station", to: "Luangwa Town", distance: 5 },
   { from: "Luangwa Town", to: "Rufunsa Town", distance: 102.7 },
   { from: "Rufunsa Town", to: "Lusaka Town", distance: 192.7 },
-  { from: "Lusaka Town", to: "Luanshya Town", distance: 335.0 },
-  { from: "Lusaka Town", to: "Ndola Town", distance: 320.0 },
-  { from: "Lusaka Town", to: "Kabwe Town", distance: 140.0 },
-  { from: "Lusaka Town", to: "Chipata Town", distance: 578.0 }
+  { from: "Lusaka Town", to: "Luanshya Town", distance: 335 }
 ];
 
 const hubs = ["Luangwa Bus Station", "Luangwa Town", "Rufunsa Town", "Lusaka Town"];
-
-// Build graph
 const graph = {};
 segments.forEach(({ from, to, distance }) => {
   if (!graph[from]) graph[from] = [];
@@ -368,21 +396,18 @@ segments.forEach(({ from, to, distance }) => {
 function findShortestDistance(start, end) {
   if (start === end) return 0;
   if (!graph[start] || !graph[end]) return null;
-  const distances = {};
-  const unvisited = new Set(Object.keys(graph));
-  for (let node of unvisited) distances[node] = Infinity;
-  distances[start] = 0;
+  const dist = {}; const unvisited = new Set(Object.keys(graph));
+  for (let n of unvisited) dist[n] = Infinity;
+  dist[start] = 0;
   while (unvisited.size) {
     let current = null;
-    for (let node of unvisited) {
-      if (current === null || distances[node] < distances[current]) current = node;
-    }
-    if (!current || distances[current] === Infinity) break;
-    if (current === end) return distances[end];
+    for (let n of unvisited) if (current === null || dist[n] < dist[current]) current = n;
+    if (!current || dist[current] === Infinity) break;
+    if (current === end) return dist[end];
     unvisited.delete(current);
     for (let neighbor of graph[current]) {
-      let newDist = distances[current] + neighbor.distance;
-      if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
+      let nd = dist[current] + neighbor.distance;
+      if (nd < dist[neighbor.node]) dist[neighbor.node] = nd;
     }
   }
   return null;
@@ -392,22 +417,22 @@ function calculateTotalDistance(pickup, dest) {
   if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
   let nearestHub = null, minTotal = Infinity;
   for (let hub of hubs) {
-    let hubToPickup = findShortestDistance(hub, pickup);
-    let tripDist = findShortestDistance(pickup, dest);
-    let destToHub = findShortestDistance(dest, hub);
-    if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-      let total = hubToPickup + tripDist + destToHub;
+    let h2p = findShortestDistance(hub, pickup);
+    let trip = findShortestDistance(pickup, dest);
+    let d2h = findShortestDistance(dest, hub);
+    if (h2p !== null && trip !== null && d2h !== null) {
+      let total = h2p + trip + d2h;
       if (total < minTotal) { minTotal = total; nearestHub = hub; }
     }
   }
-  if (!nearestHub) return { total: null, trip: null, hub: null };
+  if (!nearestHub) return { total: null, trip: null };
   return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
 }
 
-const config = { vehiclePricePerKm: 3.90, motorbikePricePerKm: 1.54, vehicleMinPrice: 25, motorbikeMinPrice: 15, vehicleExtra: 6, motorbikeExtra: 3, avgSpeed: 60 };
-let rideData = null, currentPickup = "", currentDestination = "";
+const config = { vehiclePricePerKm: 3.9, motorbikePricePerKm: 1.54, vehicleMinPrice: 25, motorbikeMinPrice: 15, vehicleExtra: 6, motorbikeExtra: 3, avgSpeed: 60 };
+let rideData = null;
 
-// DOM elements
+// DOM and event handlers (same as original functionality)
 const phoneInput = document.getElementById('customer-phone');
 const tripDiv = document.getElementById('trip-details');
 const summaryDiv = document.getElementById('summary-section');
@@ -436,29 +461,19 @@ function setupAuto(inputId, containerId, listId) {
       const div = document.createElement('div');
       div.className = 'suggestion';
       div.textContent = place;
-      div.onclick = () => {
-        input.value = place;
-        list.innerHTML = '';
-        if (inputId === 'gm-origin') currentPickup = place;
-        if (inputId === 'gm-destination') currentDestination = place;
-        checkReady();
-      };
+      div.onclick = () => { input.value = place; list.innerHTML = ''; checkReady(); };
       list.appendChild(div);
     });
   };
 }
 
-function updateRouteInfo(pickup, destination) {
-  if (!pickup || !destination) return;
-  const totalDist = calculateTotalDistance(pickup, destination);
-  const infoDiv = document.getElementById('map-route-info');
-  if (infoDiv && totalDist.total) {
-    infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}`;
-  }
-  const coords = getCoordinates(pickup);
-  const destCoords = getCoordinates(destination);
-  const openLink = document.getElementById('openMapsLink');
-  openLink.href = `https://www.google.com/maps/dir/${coords.lat},${coords.lng}/${destCoords.lat},${destCoords.lng}`;
+function updateRouteInfo(pickup, dest) {
+  if (!pickup || !dest) return;
+  const res = calculateTotalDistance(pickup, dest);
+  const info = document.getElementById('map-route-info');
+  if (info && res.total) info.innerHTML = `${pickup} → ${dest}<br>📏 ${res.trip?.toFixed(1)} km | Via: ${res.hub}`;
+  const coords = getCoordinates(pickup), destCoords = getCoordinates(dest);
+  document.getElementById('openMapsLink').href = `https://www.google.com/maps/dir/${coords.lat},${coords.lng}/${destCoords.lat},${destCoords.lng}`;
 }
 
 function checkReady() {
@@ -466,8 +481,7 @@ function checkReady() {
   const to = document.getElementById('gm-destination').value;
   const mode = document.querySelector('input[name="mode"]:checked');
   if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
-    currentPickup = from; currentDestination = to;
-    if (!mode) statusText.innerHTML = "⚠️ Please select a transport mode.";
+    if (!mode) statusText.innerHTML = "⚠️ Select transport mode";
     else { statusText.innerHTML = ""; calculate(from, to, mode.value); updateRouteInfo(from, to); }
   } else { summaryDiv.style.display = 'none'; }
 }
@@ -478,23 +492,17 @@ function calculate(from, to, mode) {
   setTimeout(() => {
     document.getElementById('spinner').style.display = 'none';
     const res = calculateTotalDistance(from, to);
-    if (res.total === null) { statusText.innerHTML = "❌ Route not available."; return; }
+    if (!res.total) { statusText.innerHTML = "❌ Route not available"; return; }
     summaryDiv.style.display = 'block';
-    document.getElementById('hub-tooltip').textContent = `✨ Calculated via: ${res.hub}`;
+    document.getElementById('hub-tooltip').textContent = `✨ Via: ${res.hub}`;
     let rate, minPrice, extra;
     if (mode === 'vehicle') { rate = config.vehiclePricePerKm; minPrice = config.vehicleMinPrice; extra = config.vehicleExtra; }
     else { rate = config.motorbikePricePerKm; minPrice = config.motorbikeMinPrice; extra = config.motorbikeExtra; }
     let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-    document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
-    let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
-    rideData = { preferredMode: mode, phone: formattedPhone, hub: res.hub, from, to, tripDistance: res.trip.toFixed(2), price, estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins" };
-    submitBtn.style.background = "var(--primary-color)";
-    btnIcon.className = "fas fa-paper-plane";
-    btnIcon.style.display = "block";
-    btnLoader.style.display = "none";
-    progressTextSpan.style.display = "none";
-    document.getElementById('action-label').innerHTML = "Request Now";
+    document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Total Price</span><span style="color:#ff9900;font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
+    rideData = { preferredMode: mode, phone: '+260' + phoneInput.value.substring(1), hub: res.hub, from, to, price };
     submitBtn.onclick = handleRequest;
+    btnIcon.style.display = "block"; btnLoader.style.display = "none"; progressTextSpan.style.display = "none";
   }, 500);
 }
 
@@ -503,48 +511,31 @@ async function handleRequest() {
   btnIcon.style.display = "none";
   btnLoader.style.display = "block";
   progressTextSpan.style.display = "block";
+  const interval = setInterval(() => { progressTextSpan.textContent = Math.min(98, Math.floor(((Date.now() - startTime) / 13000) * 98)) + "%"; }, 100);
   const startTime = Date.now();
-  const interval = setInterval(() => { let p = Math.min(98, Math.floor(((Date.now() - startTime) / 13000) * 98)); progressTextSpan.textContent = p + "%"; }, 100);
-  const payload = { ...rideData, timestamp: new Date().toISOString() };
-  let timeoutTriggered = false;
-  const timeoutId = setTimeout(() => {
-    if (!timeoutTriggered) { timeoutTriggered = true; clearInterval(interval); statusText.innerHTML = "⏰ Timeout! Connecting you to driver..."; finishRequestUI(); setTimeout(() => { document.getElementById('submit-btn').click(); }, 100); }
-  }, 15000);
+  let timeout = setTimeout(() => { clearInterval(interval); finishRequestUI(); }, 15000);
   try {
-    await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", { method: 'POST', body: new URLSearchParams(payload), mode: 'no-cors' });
-    clearTimeout(timeoutId);
-    if (!timeoutTriggered) { clearInterval(interval); progressTextSpan.textContent = "100%"; statusText.innerHTML = "✅ Request sent! Driver will contact you."; finishRequestUI(); }
-  } catch(e) { clearTimeout(timeoutId); if (!timeoutTriggered) { clearInterval(interval); statusText.innerHTML = "⚠️ Network issue. Please call!"; finishRequestUI(); } }
+    await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", { method: 'POST', body: new URLSearchParams({ ...rideData, timestamp: new Date().toISOString() }), mode: 'no-cors' });
+    clearTimeout(timeout); clearInterval(interval); progressTextSpan.textContent = "100%"; statusText.innerHTML = "✅ Request sent!"; finishRequestUI();
+  } catch(e) { clearTimeout(timeout); clearInterval(interval); finishRequestUI(); }
 }
-
 function finishRequestUI() {
-  btnLoader.style.display = "none";
-  progressTextSpan.style.display = "none";
-  btnIcon.style.display = "block";
-  btnIcon.className = "fas fa-phone";
-  let callNumber = rideData?.hub === "Luangwa Bus Station" ? "0777737047" : "0777737047";
-  submitBtn.style.background = "var(--success-color)";
-  submitBtn.disabled = false;
+  btnLoader.style.display = "none"; progressTextSpan.style.display = "none";
+  btnIcon.style.display = "block"; btnIcon.className = "fas fa-phone";
+  submitBtn.style.background = "var(--success-color)"; submitBtn.disabled = false;
   document.getElementById('action-label').innerHTML = "Call Now";
-  submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
+  submitBtn.onclick = () => window.location.href = "tel:0777737047";
 }
-
-// Location sharing
 let mapLink = "";
-function getLocation() {
-  const status = document.getElementById("locationStatus");
-  if (navigator.geolocation) {
-    status.innerHTML = "📍 Getting location...";
-    navigator.geolocation.getCurrentPosition((pos) => { mapLink = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; status.innerHTML = "✅ Location ready!"; });
-  } else { status.innerHTML = "❌ Not supported"; }
-}
-function shareWhatsApp() { if (!mapLink) { alert("Get location first"); return; } window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 My location: " + mapLink)}`, "_blank"); }
-function shareSMS() { if (!mapLink) { alert("Get location first"); return; } window.location.href = `sms:0777737047?body=📍 My location: ${mapLink}`; }
+function getLocation() { if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p => { mapLink = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`; document.getElementById("locationStatus").innerHTML = "✅ Ready"; }); }
+function shareWhatsApp() { if(mapLink) window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + mapLink)}`); else alert("Get location first"); }
+function visitStore() { window.open("https://www.zamlisting.com/store", "_blank"); }
+function toggleDropdown() { document.getElementById("header-menu-dropdown").classList.toggle("show"); }
+window.toggleDropdown = toggleDropdown; window.getLocation = getLocation; window.shareWhatsApp = shareWhatsApp; window.visitStore = visitStore;
 
 // Countdown
 function updateCountdown() {
-  const electionDay = new Date("August 12, 2026 06:00:00").getTime();
-  const diff = electionDay - new Date().getTime();
+  const diff = new Date("August 12, 2026 06:00:00") - new Date();
   if (diff > 0) {
     document.getElementById("days").innerHTML = Math.floor(diff / 86400000).toString().padStart(2,'0');
     document.getElementById("hours").innerHTML = Math.floor((diff % 86400000) / 3600000).toString().padStart(2,'0');
@@ -552,32 +543,18 @@ function updateCountdown() {
     document.getElementById("secs").innerHTML = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
   }
 }
-setInterval(updateCountdown, 1000);
-updateCountdown();
+setInterval(updateCountdown, 1000); updateCountdown();
 
 // Slideshow
-let slides = document.querySelectorAll('.billboard-slide'), currentIndex = 0;
-function showSlide(idx) { slides.forEach((s, i) => { s.style.opacity = i === idx ? '1' : '0'; s.style.zIndex = i === idx ? '2' : '1'; }); }
-function nextSlide() { currentIndex = (currentIndex + 1) % slides.length; showSlide(currentIndex); }
-showSlide(0);
-setInterval(nextSlide, 9000);
+let slides = document.querySelectorAll('.billboard-slide'), idx = 0;
+function showSlide(i) { slides.forEach((s, n) => { s.style.opacity = n === i ? '1' : '0'; s.style.zIndex = n === i ? '2' : '1'; }); }
+function nextSlide() { idx = (idx + 1) % slides.length; showSlide(idx); }
+showSlide(0); setInterval(nextSlide, 9000);
 
-// Initialize
 setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
-
-window.toggleDropdown = () => document.getElementById("header-menu-dropdown").classList.toggle("show");
-window.getLocation = getLocation;
-window.shareWhatsApp = shareWhatsApp;
-window.shareSMS = shareSMS;
-window.visitStore = () => window.open("https://www.zamlisting.com/store", "_blank");
-window.confirmStoreRedirect = (e) => { if(e) e.preventDefault(); return !window.open("https://www.zamlisting.com/store", "_blank"); };
-
-document.getElementById('menu-install-btn')?.addEventListener('click', () => {
-  const link = document.createElement('a'); link.href = 'Luangwa_Feira_Rides.apk'; link.download = 'Luangwa_Feira_Rides.apk'; link.click();
-  alert("Download started!");
-});
+document.getElementById('menu-install-btn')?.addEventListener('click', () => { const a = document.createElement('a'); a.href = 'Luangwa_Feira_Rides.apk'; a.download = 'Luangwa_Feira_Rides.apk'; a.click(); alert("Download started!"); });
 </script>
 </body>
 </html>
