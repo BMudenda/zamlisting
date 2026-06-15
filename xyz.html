@@ -400,18 +400,30 @@
   }
   openMapsBtn.onclick = () => window.open(`https://www.google.com/maps/dir/Luangwa,+Zambia/Luangwa,+Zambia`, '_blank');
 
+  // ========== SLIDESHOW ==========
   (function() {
     const slides = document.querySelectorAll('.billboard-slide');
     if (!slides.length) return;
     let currentIndex = 0, autoInterval;
+    let eyeAnimationInterval = null;
+    
     function showSlide(index) {
       slides.forEach((s, i) => { s.classList.remove('active'); s.style.opacity = '0'; });
       slides[index].classList.add('active'); slides[index].style.opacity = '1';
       currentIndex = index;
+      
+      // Stop eyes animation when leaving slide 14
+      if (eyeAnimationInterval) {
+        clearInterval(eyeAnimationInterval);
+        eyeAnimationInterval = null;
+      }
     }
+    
     function nextSlide() { showSlide((currentIndex + 1) % slides.length); }
     function startAutoPlay() { if (autoInterval) clearInterval(autoInterval); autoInterval = setInterval(nextSlide, 6000); }
+    
     showSlide(0); startAutoPlay();
+    
     let touchStartX = 0;
     document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; });
     document.addEventListener('touchend', (e) => {
@@ -489,70 +501,103 @@
     items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
 
-  // ========== SLIDE 14 - ANIMATED EYES ==========
-  const eyes = document.querySelectorAll('.billboard-slide14 .eye-svg');
-  const irisGroupsSlide14 = document.querySelectorAll('.billboard-slide14 .iris-group');
-  const pupilsSlide14 = document.querySelectorAll('.billboard-slide14 .pupil');
-  let isAsleep = false;
-  let blinkTimeoutSlide14;
-  let saccadeTimeoutSlide14;
+  // ========== SLIDE 14 - ANIMATED EYES (only runs when slide is active) ==========
+  function initEyesAnimation() {
+    const eyes = document.querySelectorAll('.billboard-slide14 .eye-svg');
+    const irisGroupsSlide14 = document.querySelectorAll('.billboard-slide14 .iris-group');
+    const pupilsSlide14 = document.querySelectorAll('.billboard-slide14 .pupil');
+    if (!eyes.length) return;
+    
+    let isAsleep = false;
+    let blinkTimeoutSlide14;
+    let saccadeTimeoutSlide14;
+    let isRunning = true;
 
-  function masterLifecycle() {
-    isAsleep = false;
-    eyes.forEach(eye => eye.classList.remove('closed'));
-    runAwakeBlinks();
-    runGazingSaccades();
-    setTimeout(() => {
-      triggerExtendedSleepState(4000);
-    }, 8000);
-  }
-
-  function triggerExtendedSleepState(duration) {
-    isAsleep = true;
-    clearTimeout(blinkTimeoutSlide14);
-    clearTimeout(saccadeTimeoutSlide14);
-    eyes.forEach(eye => eye.classList.add('closed'));
-    setTimeout(() => {
-      eyes.forEach(eye => {
-        eye.classList.remove('closed');
-        eye.classList.add('blinking');
-      });
+    function masterLifecycle() {
+      if (!isRunning) return;
+      isAsleep = false;
+      eyes.forEach(eye => eye.classList.remove('closed'));
+      runAwakeBlinks();
+      runGazingSaccades();
       setTimeout(() => {
+        if (isRunning) triggerExtendedSleepState(4000);
+      }, 8000);
+    }
+
+    function triggerExtendedSleepState(duration) {
+      if (!isRunning) return;
+      isAsleep = true;
+      clearTimeout(blinkTimeoutSlide14);
+      clearTimeout(saccadeTimeoutSlide14);
+      eyes.forEach(eye => eye.classList.add('closed'));
+      setTimeout(() => {
+        if (!isRunning) return;
+        eyes.forEach(eye => {
+          eye.classList.remove('closed');
+          eye.classList.add('blinking');
+        });
+        setTimeout(() => {
+          if (!isRunning) return;
+          eyes.forEach(eye => eye.classList.remove('blinking'));
+          masterLifecycle();
+        }, 150);
+      }, duration);
+    }
+
+    function runAwakeBlinks() {
+      if (!isRunning || isAsleep) return;
+      eyes.forEach(eye => eye.classList.add('blinking'));
+      setTimeout(() => {
+        if (!isRunning) return;
         eyes.forEach(eye => eye.classList.remove('blinking'));
-        masterLifecycle();
-      }, 150);
-    }, duration);
-  }
+      }, 120);
+      blinkTimeoutSlide14 = setTimeout(runAwakeBlinks, Math.random() * 3000 + 1500);
+    }
 
-  function runAwakeBlinks() {
-    if (isAsleep) return;
-    eyes.forEach(eye => eye.classList.add('blinking'));
-    setTimeout(() => {
-      eyes.forEach(eye => eye.classList.remove('blinking'));
-    }, 120);
-    blinkTimeoutSlide14 = setTimeout(runAwakeBlinks, Math.random() * 3000 + 1500);
-  }
+    function runGazingSaccades() {
+      if (!isRunning || isAsleep) return;
+      const maxX = 24; 
+      const maxY = 10;
+      const targetX = (Math.random() - 0.5) * maxX;
+      const targetY = (Math.random() - 0.5) * maxY;
+      irisGroupsSlide14.forEach(iris => {
+        iris.style.setProperty('--saccade-x', `${targetX}px`);
+        iris.style.setProperty('--saccade-y', `${targetY}px`);
+      });
+      const baseRadius = 15;
+      const intensity = Math.sqrt(targetX*targetX + targetY*targetY) / 26;
+      const changingRadius = baseRadius + (baseRadius * (intensity * 0.12));
+      pupilsSlide14.forEach(pupil => pupil.setAttribute('r', changingRadius));
+      saccadeTimeoutSlide14 = setTimeout(runGazingSaccades, Math.random() * 2000 + 500);
+    }
 
-  function runGazingSaccades() {
-    if (isAsleep) return;
-    const maxX = 24; 
-    const maxY = 10;
-    const targetX = (Math.random() - 0.5) * maxX;
-    const targetY = (Math.random() - 0.5) * maxY;
-    irisGroupsSlide14.forEach(iris => {
-      iris.style.setProperty('--saccade-x', `${targetX}px`);
-      iris.style.setProperty('--saccade-y', `${targetY}px`);
-    });
-    const baseRadius = 15;
-    const intensity = Math.sqrt(targetX*targetX + targetY*targetY) / 26;
-    const changingRadius = baseRadius + (baseRadius * (intensity * 0.12));
-    pupilsSlide14.forEach(pupil => pupil.setAttribute('r', changingRadius));
-    saccadeTimeoutSlide14 = setTimeout(runGazingSaccades, Math.random() * 2000 + 500);
-  }
-
-  if (document.querySelector('.billboard-slide14')) {
     masterLifecycle();
+    
+    // Return cleanup function
+    return function cleanup() {
+      isRunning = false;
+      clearTimeout(blinkTimeoutSlide14);
+      clearTimeout(saccadeTimeoutSlide14);
+    };
   }
+
+  // Start eyes animation when page loads
+  let cleanupEyes = initEyesAnimation();
+  
+  // Monitor slide changes to restart eyes animation when needed
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        const slide14 = document.querySelector('.billboard-slide14');
+        if (slide14 && slide14.classList.contains('active')) {
+          if (cleanupEyes) cleanupEyes();
+          cleanupEyes = initEyesAnimation();
+        }
+      }
+    });
+  });
+  
+  observer.observe(document.querySelector('.billboard-header'), { attributes: true, subtree: true });
 
   window.searchAndShowOnMap = searchAndShowOnMap;
 </script>
