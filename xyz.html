@@ -620,22 +620,29 @@
 </div>
 
 <script>
-// ========== MANUAL SLIDER WITH AUTO-PLAY (FIXED - WORKING) ==========
+// ========== MANUAL SLIDER WITH AUTO-PLAY (FULLY WORKING) ==========
 let slides = document.querySelectorAll('.billboard-slide');
 let currentSlide = 0;
 let autoPlayInterval;
 
 function showSlide(index) {
+    // Make sure index is within bounds
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
+    
     // Remove active class from all slides
     for (let i = 0; i < slides.length; i++) {
         slides[i].classList.remove('active');
     }
     // Add active class to current slide
-    if (slides[index]) {
-        slides[index].classList.add('active');
-    }
+    slides[index].classList.add('active');
     currentSlide = index;
     updateDots();
+    
+    // Trigger eye animation if this is the eyes slide
+    if (slides[index].classList.contains('billboard-slide14')) {
+        startEyeAnimation();
+    }
 }
 
 function nextSlide() {
@@ -686,40 +693,17 @@ function updateDots() {
     }
 }
 
-// Initialize slider when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    if (slides.length > 0) {
-        showSlide(0);
-        createDots();
-        autoPlayInterval = setInterval(nextSlide, 8000);
-    }
-});
-
-// Manual controls
-const prevBtn = document.getElementById('prevSlideBtn');
-const nextBtn = document.getElementById('nextSlideBtn');
-if (prevBtn) {
-    prevBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        prevSlide();
-    });
-}
-if (nextBtn) {
-    nextBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        nextSlide();
-    });
-}
-
-// ========== EYES ANIMATION FOR SLIDE 14 ==========
+// ========== EYE ANIMATION FUNCTIONS ==========
+let eyeIsAsleep = false;
+let microBlinkTimeout, macroGazeTimeout;
 const eyeElements = document.querySelectorAll('.billboard-slide14 .eye-svg');
 const irisGroups = document.querySelectorAll('.billboard-slide14 .iris-group');
 const pupilElements = document.querySelectorAll('.billboard-slide14 .pupil');
 
-let eyeIsAsleep = false;
-let microBlinkTimeout, macroGazeTimeout;
-
-function runEyeMasterLifecycle() {
+function startEyeAnimation() {
+    // Stop any existing animations
+    if (microBlinkTimeout) clearTimeout(microBlinkTimeout);
+    if (macroGazeTimeout) clearTimeout(macroGazeTimeout);
     eyeIsAsleep = false;
     eyeElements.forEach(eye => eye.classList.remove('closed'));
     executeMicroBlinks();
@@ -741,7 +725,7 @@ function executeCompleteSleepState(duration) {
         });
         setTimeout(() => {
             eyeElements.forEach(eye => eye.classList.remove('blinking'));
-            runEyeMasterLifecycle();
+            startEyeAnimation();
         }, 150);
     }, duration);
 }
@@ -771,26 +755,56 @@ function executeMacroGazeSaccades() {
     macroGazeTimeout = setTimeout(executeMacroGazeSaccades, Math.random() * 2000 + 500);
 }
 
-// Start eye animation when slide 14 becomes active
-function checkAndStartEyeAnimation() {
-    const activeSlide = document.querySelector('.billboard-slide.active');
-    if (activeSlide && activeSlide.classList.contains('billboard-slide14')) {
-        runEyeMasterLifecycle();
+// Initialize slider when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    if (slides.length > 0) {
+        showSlide(0);
+        createDots();
+        autoPlayInterval = setInterval(nextSlide, 8000);
     }
+});
+
+// Manual controls with direct event binding
+const prevBtn = document.getElementById('prevSlideBtn');
+const nextBtn = document.getElementById('nextSlideBtn');
+
+if (prevBtn) {
+    prevBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        prevSlide();
+        return false;
+    };
+}
+if (nextBtn) {
+    nextBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        nextSlide();
+        return false;
+    };
 }
 
-// Monitor slide changes for eye animation
-const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-        if (mutation.attributeName === 'class') {
-            checkAndStartEyeAnimation();
+// Also add touch/swipe support
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+            nextSlide();
+        } else {
+            prevSlide();
         }
-    });
-});
-slides.forEach(slide => {
-    observer.observe(slide, { attributes: true });
-});
-checkAndStartEyeAnimation();
+        resetAutoPlay();
+    }
+}, { passive: true });
 
 // ========== FORM DROPDOWN CONTROLS ==========
 const formDropdown = document.getElementById('formDropdown');
