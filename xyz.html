@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>ZamListing – Full Screen Billboard | Simple Media Player</title>
+  <title>ZamListing – Full Screen Billboard | Bounce Effects for Vehicles & Electronics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -61,12 +61,56 @@
     .product-info { background: rgba(0,0,0,0.65); backdrop-filter: blur(20px); padding: 28px 48px; border-radius: 100px; text-align: center; }
     .product-price { font-size: 32px; font-weight: bold; color: #ffdd66; }
     .status-text { font-size: 26px; color: #ffdd88; }
-    .store-button { background: linear-gradient(135deg,#ff9900,#ff4400); color: white; padding: 14px 38px; border: none; border-radius: 60px; font-size: 20px; cursor: pointer; }
+    .store-button { background: linear-gradient(135deg,#ff9900,#ff4400); color: white; padding: 14px 38px; border: none; border-radius: 60px; font-size: 20px; cursor: pointer; transition: transform 0.2s; }
+    .store-button:hover { transform: scale(1.03); }
     .welcome-billboard { font-size: clamp(32px,7vw,72px); color: #ffd966; font-weight: 800; text-align: center; white-space: nowrap; overflow: hidden; border-right: 5px solid #ffcc33; width: 0; animation: typing 5s steps(30,end) infinite, blink-cursor 0.8s step-end infinite; }
     @keyframes typing { 0%{width:0}30%{width:100%}70%{width:100%}100%{width:0} }
     @keyframes blink-cursor { 0%,100%{border-color:#ffcc33}50%{border-color:transparent} }
     .promo-billboard { background: linear-gradient(135deg,#ff4d4d,#ff8c00,#ffdd44); padding: 32px 65px; border-radius: 90px; font-size: clamp(28px,6vw,58px); font-weight: 800; color: white; }
     .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ffcc; font-weight: bold; }
+    
+    /* ========== GENTLE BOUNCE FOR VEHICLES & ELECTRONICS (Car, Motorbike, TV, Phone, Fridge) ========== */
+    /* This targets the specific product images inside slides for car, motorbike, TV, phone, fridge */
+    .billboard-slide.active .motorbike-billboard img,
+    .billboard-slide.active .car-billboard img,
+    .billboard-slide.active .product-image img {
+      animation: gentleBounce 2.2s ease-in-out infinite;
+      transform-origin: center;
+    }
+    
+    /* Gentle slow bounce keyframes - smooth and playful */
+    @keyframes gentleBounce {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+      }
+      50% {
+        transform: translateY(-14px) scale(1.02);
+      }
+    }
+    
+    /* Extra subtle hover (optional but keeps integrity) */
+    .billboard-slide.active .motorbike-billboard img:hover,
+    .billboard-slide.active .car-billboard img:hover,
+    .billboard-slide.active .product-image img:hover {
+      animation-duration: 1.6s;
+      filter: drop-shadow(0 0 45px rgba(0, 255, 200, 1));
+    }
+    
+    /* Preserve original rotating image slide from disturbance — but NOT applying bounce (keep its unique coinRotate) */
+    .billboard-slide.active .rotating-image img {
+      animation: coinRotate 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+    
+    /* Keep road effect slide independent with its own animation (no conflict) */
+    .billboard-slide11.active .motorbike-billboard img {
+      animation: bikeDrive 3.5s linear infinite, gentleBounce 2.2s ease-in-out infinite !important;
+    }
+    
+    /* Make sure other slides like promo, countdown, political are NOT affected */
+    .billboard-slide12 .circle-img, .billboard-slide13 .ecz-logo {
+      animation: float 3s ease-in-out infinite, eczFloat 3s ease-in-out infinite; /* keep original */
+    }
     
     /* ========== ADDED: ROTATING IMAGE SLIDE ========== */
     .rotating-image img { width: 350px; filter: drop-shadow(0 0 15px rgba(0,255,255,0.8)); animation: coinRotate 3s ease-in-out infinite; }
@@ -151,33 +195,41 @@
       </div>
     </div>
 
-    <!-- BILLBOARD SLIDES -->
+    <!-- BILLBOARD SLIDES (all original slides preserved) -->
     <div class="billboard-slide active"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
     
-    <!-- SLIDE 2 - MOTORBIKE with text and button -->
+    <!-- SLIDE 2 - MOTORBIKE with bounce effect added via CSS -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div></div><div class="product-info"><div class="product-price">🏍️ MOTORBIKE RIDE • K15</div><div class="status-text">✅ Available!</div><button class="store-button" onclick="window.open('https://www.zamlisting.com/luangwa','_blank');">🚀 BOOK NOW</button></div></div></div>
     
-    <!-- SLIDE 3 - CAR with text and button -->
+    <!-- SLIDE 3 - CAR with bounce effect -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="car-billboard"><img src="car.png" alt="Car"></div></div><div class="product-info"><div class="product-price">🚗 CAR RIDE • FROM K25</div><div class="status-text"> ✅Available</div><button class="store-button" onclick="window.open('https://www.zamlisting.com/luangwa','_blank');">📅 BOOK NOW</button></div></div></div>
     
+    <!-- PROMO SLIDE (no bounce, preserved) -->
     <div class="billboard-slide"><div class="promo-billboard">🔥 50% DISCOUNT PROMOTION ALL LOCAL RIDES 🔥</div></div>
     <div class="billboard-slide"><div class="contact-billboard">📞 CONTACT NOW • FAST PICKUP • 24/7 SUPPORT</div></div>
+    
+    <!-- SLIDE - TV (bounce added via .product-image img) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="TV"></div><div class="product-info"><div class="product-price">📺 Smart TV • K3,000</div><button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 SHOP</button></div></div></div>
+    
+    <!-- SLIDE - Phone (bounce added) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="S241S.png" alt="Phone"></div><div class="product-info"><div class="product-price">📱 Samsung • K1,200</div><button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 VIEW</button></div></div></div>
+    
+    <!-- SLIDE - Fridge (bounce added) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="fridge.png" alt="Fridge"></div><div class="product-info"><div class="product-price">❄️ Fridge • K2,600</div><button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 SHOP</button></div></div></div>
     
-    <!-- SLIDE 10 - ROTATING IMAGE -->
+    <!-- SLIDE 10 - ROTATING IMAGE (keeps original coinRotate, no bounce disturbance) -->
     <div class="billboard-slide"><div class="rotating-image"><img src="car.png" alt="Car"></div></div>
     
-    <!-- SLIDE 11 - ROAD EFFECT -->
+    <!-- SLIDE 11 - ROAD EFFECT (original bikeDrive + additional gentleBounce via composite) -->
     <div class="billboard-slide billboard-slide11">
       <div class="road-track"></div>
       <div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div>
     </div>
     
+    <!-- QR SCAN SLIDE (unchanged) -->
     <div class="billboard-slide"><div style="text-align:center; background:rgba(0,0,0,0.7); padding:40px; border-radius:60px;"><div style="font-size:42px; color:#ffdd77;">📱 SCAN TO BOOK</div><img src="LFR3.png" alt="QR" style="margin:20px; border-radius:20px; width:250px; height:250px;"><div style="font-size:20px; color:#aaffdd;">Scan with phone → Instant booking</div></div></div>
     
-    <!-- SLIDE 12 -->
+    <!-- SLIDE 12 (politics, untouched) -->
     <div class="billboard-slide billboard-slide12">
         <div class="top-right-group">
             <div class="tag">CAMPAIGN MESSAGE</div>
@@ -213,7 +265,7 @@
         </div>
     </div>
     
-    <!-- SLIDE 13 - ECZ ELECTION COUNTDOWN -->
+    <!-- SLIDE 13 - ECZ ELECTION COUNTDOWN (untouched) -->
     <div class="billboard-slide billboard-slide13">
         <div class="top-right-group">
             <div class="tag">ELECTION COUNTDOWN</div>
@@ -228,22 +280,10 @@
             <div class="right">
                 <div class="title">TIME REMAINING</div>
                 <div class="ecz-countdown">
-                    <div class="ecz-box">
-                        <span class="ecz-number" id="days">00</span>
-                        <span class="ecz-label">Days</span>
-                    </div>
-                    <div class="ecz-box">
-                        <span class="ecz-number" id="hours">00</span>
-                        <span class="ecz-label">Hrs</span>
-                    </div>
-                    <div class="ecz-box">
-                        <span class="ecz-number" id="mins">00</span>
-                        <span class="ecz-label">Mins</span>
-                    </div>
-                    <div class="ecz-box">
-                        <span class="ecz-number" id="secs">00</span>
-                        <span class="ecz-label">Secs</span>
-                    </div>
+                    <div class="ecz-box"><span class="ecz-number" id="days">00</span><span class="ecz-label">Days</span></div>
+                    <div class="ecz-box"><span class="ecz-number" id="hours">00</span><span class="ecz-label">Hrs</span></div>
+                    <div class="ecz-box"><span class="ecz-number" id="mins">00</span><span class="ecz-label">Mins</span></div>
+                    <div class="ecz-box"><span class="ecz-number" id="secs">00</span><span class="ecz-label">Secs</span></div>
                 </div>
                 <div class="ecz-footer">Vote Wisely • Peace First</div>
             </div>
@@ -266,7 +306,7 @@
     </div>
   </div>
 
-  <!-- SIMPLE MEDIA OVERLAY - NO COMPLEX APIS -->
+  <!-- SIMPLE MEDIA OVERLAY -->
   <div id="mediaPanel" class="overlay-panel">
     <div class="panel-header"><span><i class="fa fa-headphones"></i> Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
     <div class="panel-content">
@@ -275,7 +315,6 @@
         <button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Player</button>
       </div>
       
-      <!-- VIDEO TAB - SIMPLE -->
       <div id="videoTab" class="tab-content active">
         <div class="file-upload-area" onclick="document.getElementById('videoFileInput').click()">
           <input type="file" id="videoFileInput" accept="video/*" multiple style="display:none">
@@ -283,16 +322,11 @@
           <p>📀 Click to load VIDEOS from USB / Phone Storage</p>
           <small>MP4, AVI, MOV, MKV, WEBM</small>
         </div>
-        <div class="video-wrapper">
-          <video id="videoPlayer" controls style="width:100%; min-height:350px; background:#000;"></video>
-        </div>
-        <div class="playlist-box" id="videoPlaylistBox" style="display:none;">
-          <ul id="videoPlaylist"></ul>
-        </div>
+        <div class="video-wrapper"><video id="videoPlayer" controls style="width:100%; min-height:350px; background:#000;"></video></div>
+        <div class="playlist-box" id="videoPlaylistBox" style="display:none;"><ul id="videoPlaylist"></ul></div>
         <div class="now-playing" id="videoNowPlaying">🎬 No video loaded</div>
       </div>
       
-      <!-- AUDIO TAB - SIMPLE -->
       <div id="audioTab" class="tab-content">
         <div class="file-upload-area" onclick="document.getElementById('audioFileInput').click()">
           <input type="file" id="audioFileInput" accept="audio/*" multiple style="display:none">
@@ -300,9 +334,7 @@
           <p>🎵 Click to load MUSIC from USB / Phone Storage</p>
           <small>MP3, WAV, OGG, M4A, FLAC</small>
         </div>
-        <div class="playlist-box" id="audioPlaylistBox" style="display:none;">
-          <ul id="audioPlaylist"></ul>
-        </div>
+        <div class="playlist-box" id="audioPlaylistBox" style="display:none;"><ul id="audioPlaylist"></ul></div>
         <div class="now-playing" id="audioNowPlaying">🎧 No music loaded</div>
         <audio id="audioPlayer" controls style="width:100%; margin:15px 0; border-radius:50px;"></audio>
       </div>
@@ -311,35 +343,26 @@
 </div>
 
 <script>
-  // Countdown timer for Slide 13
+  // Countdown timer for Slide 13 (ECZ)
   function updateElectionCountdown() {
       const electionDay = new Date("August 12, 2026 06:00:00").getTime();
       const now = new Date().getTime();
       const diff = electionDay - now;
-      
       if(diff > 0) {
           const days = Math.floor(diff / (1000 * 60 * 60 * 24));
           const hours = Math.floor((diff % (86400000)) / (3600000));
           const mins = Math.floor((diff % 3600000) / 60000);
           const secs = Math.floor((diff % 60000) / 1000);
-          
-          const daysEl = document.getElementById("days");
-          const hoursEl = document.getElementById("hours");
-          const minsEl = document.getElementById("mins");
-          const secsEl = document.getElementById("secs");
-          
-          if(daysEl) daysEl.innerHTML = days.toString().padStart(2,'0');
-          if(hoursEl) hoursEl.innerHTML = hours.toString().padStart(2,'0');
-          if(minsEl) minsEl.innerHTML = mins.toString().padStart(2,'0');
-          if(secsEl) secsEl.innerHTML = secs.toString().padStart(2,'0');
+          if(document.getElementById("days")) document.getElementById("days").innerHTML = days.toString().padStart(2,'0');
+          if(document.getElementById("hours")) document.getElementById("hours").innerHTML = hours.toString().padStart(2,'0');
+          if(document.getElementById("mins")) document.getElementById("mins").innerHTML = mins.toString().padStart(2,'0');
+          if(document.getElementById("secs")) document.getElementById("secs").innerHTML = secs.toString().padStart(2,'0');
       }
   }
-  
-  // Run countdown timer
   setInterval(updateElectionCountdown, 1000);
   updateElectionCountdown();
 
-  // ========== MAP FUNCTIONS ==========
+  // MAP FUNCTIONS
   const mapIframe = document.getElementById('mapIframe');
   const openMapsBtn = document.getElementById('openMapsBtn');
   async function geocodeAddress(address) {
@@ -360,8 +383,9 @@
     } else alert('Location not found');
   }
   openMapsBtn.onclick = () => window.open(`https://www.google.com/maps/dir/Luangwa,+Zambia/Luangwa,+Zambia`, '_blank');
+  window.searchAndShowOnMap = searchAndShowOnMap;
 
-  // ========== SLIDESHOW ==========
+  // SLIDESHOW (original rotation)
   (function() {
     const slides = document.querySelectorAll('.billboard-slide');
     if (!slides.length) return;
@@ -395,13 +419,12 @@
     else { document.getElementById('audioTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:last-child').classList.add('active'); }
   }
 
-  // ========== SIMPLE VIDEO PLAYER ==========
+  // VIDEO PLAYER
   let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
   const videoPlaylist = document.getElementById('videoPlaylist');
   const videoPlaylistBox = document.getElementById('videoPlaylistBox');
   const videoNowPlaying = document.getElementById('videoNowPlaying');
-
   document.getElementById('videoFileInput').addEventListener('change', function(e) {
     videoFiles = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
     if (!videoFiles.length) { alert('No video files found!'); return; }
@@ -415,7 +438,6 @@
     videoPlaylistBox.style.display = 'block';
     loadVideo(0);
   });
-
   function loadVideo(i) {
     let url = URL.createObjectURL(videoFiles[i]);
     videoPlayer.src = url;
@@ -426,13 +448,12 @@
     items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
 
-  // ========== SIMPLE AUDIO PLAYER ==========
+  // AUDIO PLAYER
   let audioFiles = [], currentAudio = 0;
   const audioPlayer = document.getElementById('audioPlayer');
   const audioPlaylist = document.getElementById('audioPlaylist');
   const audioPlaylistBox = document.getElementById('audioPlaylistBox');
   const audioNowPlaying = document.getElementById('audioNowPlaying');
-
   document.getElementById('audioFileInput').addEventListener('change', function(e) {
     audioFiles = Array.from(e.target.files).filter(f => f.type.startsWith('audio/'));
     if (!audioFiles.length) { alert('No audio files found!'); return; }
@@ -446,7 +467,6 @@
     audioPlaylistBox.style.display = 'block';
     loadAudio(0);
   });
-
   function loadAudio(i) {
     let url = URL.createObjectURL(audioFiles[i]);
     audioPlayer.src = url;
@@ -456,9 +476,6 @@
     const items = audioPlaylist.querySelectorAll('li');
     items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
-
-  // Expose global functions
-  window.searchAndShowOnMap = searchAndShowOnMap;
 </script>
 </body>
 </html>
