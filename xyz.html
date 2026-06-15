@@ -72,6 +72,7 @@
         background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
         pointer-events: none;
         animation: floatParticles 15s ease-in-out infinite;
+        z-index: 1;
     }
 
     @keyframes floatParticles { 
@@ -137,6 +138,62 @@
     .billboard-slide13 .ecz-number{font-size:28px;font-weight:900;}
     .billboard-slide13 .ecz-label{font-size:10px;color:#ffd700;}
 
+    /* Manual slider navigation buttons */
+    .slider-nav {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        z-index: 10;
+    }
+    .nav-btn {
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(8px);
+        border: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .nav-btn:hover {
+        background: rgba(0,0,0,0.7);
+        transform: scale(1.05);
+    }
+    .slide-dots {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.4);
+        transition: all 0.2s;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+    .dot.active {
+        background: #ffcc00;
+        width: 24px;
+        border-radius: 5px;
+    }
+
     /* ========== TOP HEADER ========== */
     .top-header {
         position: fixed;
@@ -192,7 +249,7 @@
         justify-content: center; 
     }
 
-    /* ========== FORM DROPDOWN - Near 3 dots button ========== */
+    /* ========== FORM DROPDOWN - PERSISTENT, DOESN'T AUTO-CLOSE ========== */
     .form-dropdown {
         display: none;
         position: fixed;
@@ -286,6 +343,7 @@
         .book-btn { padding: 8px 14px; }
         .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
         .form-body { padding: 16px; }
+        .nav-btn { width: 36px; height: 36px; font-size: 16px; }
     }
 </style>
 </head>
@@ -293,7 +351,7 @@
 
 <!-- FULLSCREEN BILLBOARD -->
 <div class="billboard-container">
-    <div class="billboard-header">
+    <div class="billboard-header" id="billboardHeader">
         <div class="billboard-slide"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
         <div class="billboard-slide"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">For as low as K15</div></div>
         <div class="billboard-slide"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text">For as low as K25</div></div>
@@ -306,6 +364,13 @@
         <div class="billboard-slide billboard-slide12"><div><img class="circle-img" src="P1.png" alt="Leader"><div style="color:white;margin-top:10px;">Hakainde Hichilema<br>For President</div></div></div>
         <div class="billboard-slide billboard-slide13"><div class="ecz-countdown"><div class="ecz-box"><div class="ecz-number" id="days">00</div><div class="ecz-label">Days</div></div><div class="ecz-box"><div class="ecz-number" id="hours">00</div><div class="ecz-label">Hrs</div></div><div class="ecz-box"><div class="ecz-number" id="mins">00</div><div class="ecz-label">Mins</div></div><div class="ecz-box"><div class="ecz-number" id="secs">00</div><div class="ecz-label">Secs</div></div></div><div style="margin-top:10px;">General Elections 2026</div></div>
     </div>
+    
+    <!-- Manual Slider Controls -->
+    <div class="slider-nav">
+        <button class="nav-btn" id="prevSlideBtn"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-btn" id="nextSlideBtn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="slide-dots" id="slideDots"></div>
 </div>
 
 <!-- TOP HEADER -->
@@ -320,7 +385,7 @@
     </div>
 </div>
 
-<!-- FORM DROPDOWN -->
+<!-- FORM DROPDOWN - PERSISTENT (stays open until manually closed) -->
 <div id="formDropdown" class="form-dropdown">
     <div class="form-header">
         <h3><i class="fas fa-paper-plane"></i> Request a Ride</h3>
@@ -401,6 +466,67 @@
 </div>
 
 <script>
+// ========== MANUAL SLIDER WITH AUTO-PLAY ==========
+let slides = document.querySelectorAll('.billboard-slide');
+let currentSlide = 0;
+let autoPlayInterval;
+
+function showSlide(index) {
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+    });
+    currentSlide = index;
+    updateDots();
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+    resetAutoPlay();
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+    resetAutoPlay();
+}
+
+function resetAutoPlay() {
+    if (autoPlayInterval) clearInterval(autoPlayInterval);
+    autoPlayInterval = setInterval(nextSlide, 8000);
+}
+
+// Create dots
+function createDots() {
+    const dotsContainer = document.getElementById('slideDots');
+    dotsContainer.innerHTML = '';
+    slides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === currentSlide ? ' active' : '');
+        dot.addEventListener('click', () => {
+            showSlide(i);
+            resetAutoPlay();
+        });
+        dotsContainer.appendChild(dot);
+    });
+}
+
+function updateDots() {
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+    });
+}
+
+// Initialize slider
+showSlide(0);
+createDots();
+autoPlayInterval = setInterval(nextSlide, 8000);
+
+// Manual controls
+document.getElementById('prevSlideBtn').addEventListener('click', prevSlide);
+document.getElementById('nextSlideBtn').addEventListener('click', nextSlide);
+
 // ========== SERVICE WORKER REGISTRATION ==========
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
@@ -514,7 +640,7 @@ const btnIcon = document.getElementById('btn-icon');
 const btnLoader = document.getElementById('btn-loader');
 const progressTextSpan = document.getElementById('progress-text');
 
-// CRITICAL: Phone validation - shows trip details ONLY when valid 10-digit number starting with 0 is entered
+// Phone validation - shows trip details ONLY when valid 10-digit number starting with 0 is entered
 phoneInput.oninput = () => {
   if (/^0[0-9]{9}$/.test(phoneInput.value)) {
     tripDiv.style.display = 'block';
@@ -762,27 +888,12 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// Slideshow
-let slides = document.querySelectorAll('.billboard-slide');
-let currentIndex = 0;
-function showSlide(index) {
-  slides.forEach((slide, i) => {
-    slide.classList.toggle('active', i === index);
-  });
-}
-function nextSlide() {
-  currentIndex = (currentIndex + 1) % slides.length;
-  showSlide(currentIndex);
-}
-showSlide(0);
-setInterval(nextSlide, 9000);
-
 // Initialize autocomplete
 setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
-// Form dropdown controls
+// Form dropdown controls - PERSISTENT (no auto-close)
 const formDropdown = document.getElementById('formDropdown');
 const openFormBtn = document.getElementById('openFormBtn');
 const closeFormBtn = document.getElementById('closeFormBtn');
@@ -799,26 +910,10 @@ function closeForm() {
 openFormBtn.addEventListener('click', openForm);
 closeFormBtn.addEventListener('click', closeForm);
 
-// Click outside to close form
-document.addEventListener('click', (e) => {
-  const form = document.getElementById('formDropdown');
-  const formBtn = document.getElementById('openFormBtn');
-  const menu = document.getElementById('menuDropdown');
-  const menuBtn = document.getElementById('menu-toggle-btn');
-  
-  if (form.classList.contains('show') && !form.contains(e.target) && !formBtn.contains(e.target)) {
-    form.classList.remove('show');
-  }
-  if (menu.classList.contains('show') && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
-    menu.classList.remove('show');
-  }
-});
-
 // Menu dropdown
 function toggleMenu() {
   const menu = document.getElementById('menuDropdown');
   menu.classList.toggle('show');
-  document.getElementById('formDropdown').classList.remove('show');
 }
 
 document.getElementById('menu-toggle-btn').onclick = toggleMenu;
