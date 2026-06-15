@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
-<link rel="apple-touch-icon" href="lfr.jpg">
+<link rel="apple-touch-icon" content="lfr.jpg">
 
 <style>
     * {
@@ -324,11 +324,12 @@
 
     .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
     
+    /* FIXED LOADER BUTTON STYLES - ensures percentage text is visible */
     .submit-btn { 
         background: var(--primary-color); 
         color: white; 
-        width: 65px; 
-        height: 65px; 
+        width: 70px; 
+        height: 70px; 
         border-radius: 50%; 
         display: flex; 
         align-items: center; 
@@ -349,16 +350,32 @@
         border-radius: 50%; 
         animation: spin 0.8s linear infinite; 
         display: none; 
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
     #progress-text { 
         position: absolute; 
-        font-size: 11px; 
+        font-size: 12px; 
         font-weight: bold; 
         color: white; 
         display: none; 
-        bottom: 8px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        background: rgba(0,0,0,0.5);
+        padding: 2px 6px;
+        border-radius: 20px;
     }
-    #btn-icon { font-size: 24px; }
+    #btn-icon { 
+        font-size: 28px; 
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
     
     .hidden-section { display: none; }
     .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 12px auto; display: none; }
@@ -392,7 +409,7 @@
         .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
         .form-body { padding: 16px; }
         .nav-btn { width: 36px; height: 36px; font-size: 16px; }
-        .submit-btn { width: 60px; height: 60px; font-size: 22px; }
+        .submit-btn { width: 60px; height: 60px; }
         #btn-icon { font-size: 22px; }
         .menu-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
     }
@@ -536,7 +553,6 @@ let currentSlide = 0;
 let autoPlayInterval;
 
 function showSlide(index) {
-    // Ensure index wraps around correctly
     if (index < 0) index = slides.length - 1;
     if (index >= slides.length) index = 0;
     
@@ -595,12 +611,9 @@ function updateDots() {
     });
 }
 
-// Initialize slider
 showSlide(0);
 createDots();
 autoPlayInterval = setInterval(nextSlide, 8000);
-
-// Manual controls
 document.getElementById('prevSlideBtn').addEventListener('click', prevSlide);
 document.getElementById('nextSlideBtn').addEventListener('click', nextSlide);
 
@@ -994,6 +1007,14 @@ function closeForm() {
 
 openFormBtn.addEventListener('click', openForm);
 closeFormBtn.addEventListener('click', closeForm);
+
+// Click outside to close form
+document.addEventListener('click', function(e) {
+  if (formDropdown && formDropdown.classList.contains('show') && 
+      !formDropdown.contains(e.target) && e.target !== openFormBtn) {
+    formDropdown.classList.remove('show');
+  }
+});
 
 // Menu dropdown
 function toggleMenu() {
