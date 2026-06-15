@@ -29,19 +29,37 @@
         --border-color-light: #e0e0e0;
         --font-color-dark: #333;
     }
-    body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-body); color: var(--font-color-dark); }
+    
+    body { 
+        font-family: 'Roboto', Arial, sans-serif; 
+        background-color: var(--bg-color-body); 
+        color: var(--font-color-dark);
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+    }
    
-  .store-button {
-    /* existing styles */
-    z-index: 100;
-    position: relative;
+    .store-button {
+        z-index: 100;
+        position: relative;
     }
     
-  /* ========== BILLBOARD HEADER ========== */
+    /* ========== FULLSCREEN BILLBOARD CONTAINER ========== */
+    .billboard-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    /* ========== BILLBOARD HEADER ========== */
     .billboard-header {
         position: relative;
         width: 100%;
-        height: 200px;
+        height: 100%;
         overflow: visible;
         background: linear-gradient(135deg, #1e3a8a, #2563eb, #1e40af);
         border-bottom: none;
@@ -61,7 +79,7 @@
 
     /* ========== HEADER OVERLAY LOGO & MENU ========== */
     .header-overlay {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
@@ -70,7 +88,8 @@
         justify-content: space-between;
         align-items: center;
         padding: 12px 20px;
-        background: transparent;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(12px);
     }
     .company-info { display: flex; align-items: center; gap: 10px; }
     .corner-logo { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--secondary-color); }
@@ -78,6 +97,32 @@
     .z-green { color: #2ecc71; }
     .z-red { color: #e74c3c; }
     .z-black { color: #ffffff; }
+
+    /* NEW: Header actions container for buttons */
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    /* NEW: BOOK RIDE button */
+    .book-btn {
+        background: linear-gradient(135deg, var(--secondary-color), #ff5500);
+        border: none;
+        padding: 8px 18px;
+        border-radius: 40px;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.2s;
+    }
+    .book-btn:hover {
+        transform: scale(1.02);
+    }
 
     /* ========== MENU DROPDOWN - FIXED FOR LONGER CONTENT ========== */
     .menu-dropdown-container { position: relative; display: inline-block; z-index: 100000; }
@@ -112,17 +157,65 @@
     .open-maps-link { display: block; padding: 12px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-size: 0.85rem; text-align: center; transition: background 0.2s; font-weight: 500; }
     .open-maps-link:hover { background: #1d4ed8; }
 
-    /* ========== SLIDES (SLOWER TRANSITION) ========== */
-.billboard-slide {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-}
+    /* ========== FORM DROPDOWN (appears when BOOK RIDE clicked) ========== */
+    .form-dropdown {
+        display: none;
+        position: fixed;
+        right: 20px;
+        top: 75px;
+        width: 450px;
+        max-width: calc(100vw - 40px);
+        max-height: 85vh;
+        overflow-y: auto;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        z-index: 200;
+        animation: fadeInScale 0.2s ease-out;
+    }
+    
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    .form-dropdown.show { display: block; }
+    
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px 12px;
+        border-bottom: 1px solid var(--border-color-light);
+        background: white;
+        border-radius: 24px 24px 0 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .form-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--font-color-dark); display: flex; align-items: center; gap: 8px; }
+    .close-form { background: none; border: none; font-size: 22px; cursor: pointer; color: #64748b; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .close-form:hover { background: #f1f5f9; }
+    
+    .form-body { padding: 20px; }
+
+    /* ========== SLIDES ========== */
+    .billboard-slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        z-index: 2;
+    }
+    .billboard-slide.active {
+        opacity: 1;
+        z-index: 3;
+    }
 
   
 /* ========== SLIDE CONTENT ANIMATIONS ========== */
@@ -244,8 +337,8 @@
     .scroll-subtitle { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scrollSubtitle 20s linear infinite; font-size: 12px; font-weight: 700; color: #ffecb3; text-shadow: 1px 1px 0 #000; font-family: 'Segoe UI', Arial, sans-serif; }
     @keyframes scrollSubtitle { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
 
-    /* ========== BOOKING FORM STYLES ========== */
-    .product-container { max-width: 500px; margin: 15px auto; padding: 0 10px; }
+    /* ========== BOOKING FORM STYLES (for inside dropdown) ========== */
+    .product-container { max-width: 500px; margin: 0 auto; padding: 0; }
     .booking-container { background: var(--bg-color-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 15px; }
     fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
     legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
@@ -275,7 +368,7 @@
 
     /* ========== RESPONSIVE FIXES FOR SMALLER RESOLUTIONS ========== */
     @media (max-width: 768px) {
-        .billboard-header { height: 160px; }
+        .billboard-header { height: 100%; }
         .welcome-billboard { font-size: 22px; padding: 10px; white-space: normal; animation: none; }
         .request-billboard, .contact-billboard { font-size: 16px; padding: 8px; }
         .promo-billboard { font-size: 14px; padding: 6px 12px; width: auto; max-width: 95%; }
@@ -286,10 +379,11 @@
         .corner-logo { width: 28px; height: 28px; }
         .header-overlay { padding: 8px 12px; }
         .menu-dropdown { width: 320px; max-height: 80vh; right: 10px; top: 55px; }
+        .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
     }
     
     @media (max-width: 480px) {
-        .billboard-header { height: 140px; }
+        .billboard-header { height: 100%; }
         .welcome-billboard { font-size: 16px; padding: 5px; }
         .request-billboard, .contact-billboard { font-size: 12px; padding: 5px; }
         .promo-billboard { font-size: 10px; padding: 4px 8px; border-radius: 30px; }
@@ -303,10 +397,11 @@
         .dropdown-content-section h4 { font-size: 0.85rem; }
         .dropdown-content-section a { font-size: 0.75rem; padding: 8px; }
         .dropdown-content-section p { font-size: 0.75rem; }
+        .form-dropdown { width: calc(100vw - 30px); }
     }
     
     @media (max-width: 360px) {
-        .billboard-header { height: 120px; }
+        .billboard-header { height: 100%; }
         .welcome-billboard { font-size: 12px; }
         .request-billboard, .contact-billboard { font-size: 10px; }
         .promo-billboard { font-size: 8px; padding: 3px 6px; }
@@ -315,6 +410,7 @@
         .zam { font-size: 0.6rem; }
         .menu-dropdown { width: 260px; max-height: 65vh; }
     }
+ 
 </style>
       
 </head>
