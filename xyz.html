@@ -6,35 +6,20 @@
   <meta name="description" content="Find cheap taxis, motorbikes, car rides, and Yango services in Luangwa Feira, Zambia on ZamListing.">
   
   <title>Luangwa Feira Rides – Taxi Booking</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#2b6ef6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
 <link rel="apple-touch-icon" href="lfr.jpg">
-
+  
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --secondary: #ff9900;
-        --danger: #dc2626;
-        --success: #16a34a;
-        --dark: #1e293b;
-        --gray: #64748b;
-        --light: #f8fafc;
-        --border: #e2e8f0;
         --primary-color: #2563eb;
         --secondary-color: #ff9900;
         --error-color: #dc2626;
@@ -44,15 +29,14 @@
         --border-color-light: #e0e0e0;
         --font-color-dark: #333;
     }
-
-    body {
-        font-family: 'Roboto', sans-serif;
-        background: #0f172a;
+    body { 
+        font-family: 'Roboto', Arial, sans-serif; 
+        background-color: #0f172a;
         height: 100vh;
         overflow: hidden;
         position: relative;
     }
-
+   
     /* ========== FULLSCREEN BILLBOARD ========== */
     .fullpage-billboard {
         position: fixed;
@@ -62,17 +46,16 @@
         height: 100vh;
         z-index: 1;
         overflow: hidden;
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
+        background: linear-gradient(135deg, #1e3a8a, #2563eb, #1e40af);
     }
-
+    
     .billboard-header {
         position: relative;
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: linear-gradient(135deg, #1e3a8a, #2563eb, #1e40af);
     }
-
+    
     .billboard-header::before {
         content: '';
         position: absolute;
@@ -80,21 +63,35 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+        background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
         pointer-events: none;
-        animation: floatParticles 18s ease-in-out infinite;
-        z-index: 1;
+        animation: floatParticles 15s ease-in-out infinite;
     }
+    @keyframes floatParticles { 0%,100% { transform: translateX(0px) translateY(0px); opacity: 0.3; } 50% { transform: translateX(20px) translateY(-20px); opacity: 0.6; } }
 
-    @keyframes floatParticles { 
-        0%,100% { transform: translateX(0px) translateY(0px); opacity: 0.4; } 
-        50% { transform: translateX(25px) translateY(-25px); opacity: 0.7; } 
-    }
-
-    .billboard-slide {
+    /* ========== HEADER OVERLAY LOGO ========== */
+    .header-overlay {
         position: absolute;
         top: 0;
         left: 0;
+        right: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: transparent;
+    }
+    .company-info { display: flex; align-items: center; gap: 10px; }
+    .corner-logo { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--secondary-color); }
+    .zam { font-weight: 800; letter-spacing: 0.5px; color: #ffcc00; text-shadow: 1px 2px 4px rgba(0,0,0,0.5); font-family: 'Segoe UI', Arial, sans-serif; font-size: 1.2rem; }
+    .z-green { color: #2ecc71; }
+    .z-red { color: #e74c3c; }
+    .z-black { color: #ffffff; }
+
+    /* ========== SLIDES ========== */
+    .billboard-slide {
+        position: absolute;
         width: 100%;
         height: 100%;
         display: flex;
@@ -105,175 +102,70 @@
         z-index: 1;
         padding: 20px;
     }
-
     .billboard-slide.active {
         opacity: 1;
         z-index: 2;
     }
 
-    /* ========== GENTLE FLOAT BOUNCE FOR STATIC PRODUCT IMAGES ========== */
-    .billboard-slide:not(.billboard-slide11):not(.billboard-slide14).active .motorbike-billboard img,
-    .billboard-slide.active .car-billboard img,
-    .billboard-slide.active .product-image img {
-        animation: float 2.8s ease-in-out infinite;
-        transform-origin: center;
-    }
-
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
-        100% { transform: translateY(0px); }
-    }
-
-    .billboard-slide.active .car-billboard img { animation-duration: 2.6s; }
-    .billboard-slide.active .product-image img { animation-duration: 2.7s; }
-    .billboard-slide:not(.billboard-slide11):not(.billboard-slide14).active .motorbike-billboard img { animation-duration: 2.5s; }
-
-    /* Slide content styles */
-    .welcome-billboard { font-size: clamp(32px,7vw,72px); color: #ffd966; font-weight: 800; text-align: center; white-space: nowrap; overflow: hidden; border-right: 5px solid #ffcc33; width: 0; animation: typing 5s steps(30,end) infinite, blink-cursor 0.8s step-end infinite; display: inline-block; margin: 0 auto; }
+    .welcome-billboard { font-size: clamp(32px,7vw,72px); color: #ffd700; font-weight: bold; text-shadow: 0 0 20px rgba(255,215,0,0.7); text-align: center; white-space: nowrap; overflow: hidden; border-right: 5px solid #ffd700; width: 0; animation: typing 5s steps(30,end) infinite, blink-cursor 1s step-end infinite; display: inline-block; margin: 0 auto; }
     @keyframes typing { 0% { width: 0; } 30% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
-    @keyframes blink-cursor { 0%,100% { border-color: #ffcc33; } 50% { border-color: transparent; } }
+    @keyframes blink-cursor { 0%,100% { border-color: #ffd700; } 50% { border-color: transparent; } }
 
-    .car-billboard img { width: min(380px, 55vw); height: auto; max-height: 55vh; object-fit: contain; filter: drop-shadow(0 0 35px rgba(0,255,200,0.9)); }
-    .motorbike-billboard img { width: min(380px, 55vw); height: auto; max-height: 55vh; object-fit: contain; filter: drop-shadow(0 0 35px rgba(0,255,200,0.9)); }
+    .car-billboard img { width: min(280px, 55vw); filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); animation: smoothDrive 5s ease-in-out infinite; }
+    @keyframes smoothDrive { 0%,100% { transform: translateX(0px) translateY(0px); } 25% { transform: translateX(20px) translateY(-3px); } 50% { transform: translateX(0px) translateY(0px); } 75% { transform: translateX(-20px) translateY(-3px); } }
 
-    .product-row { display: flex; align-items: center; justify-content: center; gap: 50px; flex-wrap: wrap; padding: 30px; }
-    .product-image img { width: min(380px, 55vw); height: auto; max-height: 55vh; object-fit: contain; filter: drop-shadow(0 0 35px rgba(0,255,200,0.9)); }
-    .product-info { background: rgba(0,0,0,0.65); backdrop-filter: blur(20px); padding: 28px 48px; border-radius: 100px; text-align: center; }
-    .product-price { font-size: 32px; font-weight: bold; color: #ffdd66; }
-    .status-text { font-size: 26px; color: #ffdd88; margin-top: 10px; text-align: center; }
-    .store-button { background: linear-gradient(135deg, #ff9900, #ff4400); color: white; padding: 14px 38px; border: none; border-radius: 60px; font-size: 20px; cursor: pointer; transition: transform 0.2s; }
-    .store-button:hover { transform: scale(1.03); }
+    .motorbike-billboard img { width: min(280px, 55vw); filter: drop-shadow(0 0 18px #ffcc00); animation: bikeGlide 4s ease-in-out infinite; }
+    @keyframes bikeGlide { 0%,100% { transform: translateY(0px) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-3deg); } 75% { transform: translateY(-20px) rotate(3deg); } }
 
-    .promo-billboard { background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffdd44); padding: 32px 65px; border-radius: 90px; font-size: clamp(28px,6vw,58px); font-weight: 800; color: white; text-align: center; display: inline-block; margin: 0 auto; }
-    .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ffcc; font-weight: bold; text-align: center; }
+    .request-billboard { font-size: clamp(28px,6vw,58px); color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: neonShake 3s ease-in-out infinite; text-align: center; }
+    @keyframes neonShake { 0%,100% { transform: translateX(0px) scale(1); } 10%,30%,50%,70%,90% { transform: translateX(-3px) scale(1.02); } 20%,40%,60%,80% { transform: translateX(3px) scale(1.02); } 50% { transform: translateX(0px) scale(1.05); } }
 
-    .rotating-image img { width: min(380px, 55vw); filter: drop-shadow(0 0 15px rgba(0,255,255,0.8)); animation: coinRotate 3s ease-in-out infinite; display: block; margin: 0 auto; }
+    .promo-billboard { background: linear-gradient(135deg, #ff4d4d, #ff8c00, #ffcc00); padding: 20px 40px; border-radius: 60px; font-size: clamp(24px,5vw,48px); font-weight: bold; color: white; animation: promoPulse 3.5s ease-in-out infinite alternate; text-align: center; }
+    @keyframes promoPulse { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
+
+    .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ff99; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,153,0.7); animation: gentleFloat 5s ease-in-out infinite; text-align: center; }
+    @keyframes gentleFloat { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+
+    .rotating-image img { width: min(280px, 55vw); filter: drop-shadow(0 0 15px rgba(0,255,255,0.8)); animation: coinRotate 3s ease-in-out infinite; }
     @keyframes coinRotate { 0% { transform: rotateY(0deg); } 50% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
 
-    /* SLIDE 11 - ROAD EFFECT */
-    .billboard-slide11 { position: relative; overflow: hidden; }
-    .billboard-slide11 .road-track { position: absolute; bottom: 35px; left: 0; width: 100%; height: 6px; background: repeating-linear-gradient(90deg, #444 0px, #444 20px, #666 20px, #666 40px); opacity: 0.6; animation: roadMove 1s linear infinite; }
-    @keyframes roadMove { 0% { background-position: 0 0; } 100% { background-position: 40px 0; } }
-    .billboard-slide11 .motorbike-billboard img { width: min(380px, 55vw); position: relative; z-index: 2; animation: bikeDrive 3.5s linear infinite; filter: drop-shadow(0 0 15px rgba(0,255,153,0.8)); }
-    @keyframes bikeDrive { 0% { transform: translateX(-200px) scale(0.9); } 100% { transform: translateX(200px) scale(1.05); } }
+    .product-row{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap;}
+    .product-image{flex-shrink:0;}
+    .product-image img{width:180px;filter:drop-shadow(0 0 15px rgba(0,255,153,0.8));animation:smoothDrive 5s ease-in-out infinite;}
+    .product-info{display:flex;flex-direction:column;align-items:center;gap:10px;}
+    .product-price{font-size:24px;font-weight:bold;color:#ffcc00;text-shadow:0 0 10px rgba(255,204,0,0.5);}
+    .store-button{background:linear-gradient(135deg,#ff9900,#ff5500);color:white;font-weight:bold;padding:10px 30px;border:none;border-radius:50px;font-size:16px;cursor:pointer;transition:all 0.2s ease;}
+    .store-button:hover{transform:scale(1.05);}
 
-    /* SLIDE 12 - Campaign */
-    .billboard-slide12 { background: linear-gradient(135deg, #2a0000 0%, #8b0000 40%, #ff1a1a 70%, #3a0000 100%); display: flex; justify-content: center; align-items: center; }
-    .billboard-slide12 .circle-img { border-radius: 50%; width: 80px; height: 80px; border: 4px solid #ffcc00; animation: float 3s ease-in-out infinite; }
-    .billboard-slide12 .circle-small { width: 70px; height: 70px; margin-left: -10px; animation-delay: 0.5s; }
-    .billboard-slide12 .name-tag { margin-top: 12px; font-size: 14px; font-weight: bold; color: #ffd700; text-align: center; }
-    .billboard-slide12 .title { margin-bottom: 15px; font-size: 20px; color: #ffd700; }
-    .billboard-slide12 .list div { margin: 8px 0; font-size: 14px; color: white; }
-
-    /* SLIDE 13 - Countdown */
-    .billboard-slide13 { background: linear-gradient(-45deg, #006633, #009966, #111, #006633); background-size: 400% 400%; animation: eczBgMove 15s ease infinite; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    @keyframes eczBgMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .billboard-slide13 .ecz-countdown { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-    .billboard-slide13 .ecz-box { background: rgba(255,255,255,0.12); backdrop-filter: blur(6px); padding: 20px; border-radius: 20px; text-align: center; min-width: 100px; animation: eczPulse 2s infinite; }
-    @keyframes eczPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-    .billboard-slide13 .ecz-number { font-size: 38px; font-weight: 900; color: #fff; }
-    .billboard-slide13 .ecz-label { font-size: 12px; text-transform: uppercase; color: #ffd700; }
-    .billboard-slide13 .ecz-logo { width: 150px; margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.4)); animation: eczFloat 3s ease-in-out infinite; }
-    @keyframes eczFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-    /* SLIDE 14 - Eyes */
-    .billboard-slide14 { display: flex; gap: 60px; align-items: center; justify-content: center; background: #06090e; }
-    .eye-svg { width: 280px; height: 140px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
-    .eye-clip-mask { transform-origin: 140px 30px; transition: transform 0.15s cubic-bezier(0.25, 1, 0.2, 1); }
-    .blinking .eye-clip-mask { transform: scaleY(0); }
-    .closed .eye-clip-mask { transform: scaleY(0); transition: transform 0.55s cubic-bezier(0.5, 0, 0.25, 1); }
-    .iris-group { transform: translate(var(--saccade-x, 0px), var(--saccade-y, 0px)); transition: transform 0.16s cubic-bezier(0.25, 1, 0.2, 1); }
-
-    /* Manual slider navigation buttons */
-    .slider-nav {
-        position: absolute;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        z-index: 20;
-    }
-    .nav-btn {
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(8px);
-        border: none;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 20;
-    }
-    .nav-btn:hover {
-        background: rgba(0,0,0,0.8);
-        transform: scale(1.05);
-    }
-    .slide-dots {
-        position: absolute;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        z-index: 20;
-    }
-    .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.4);
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-    .dot.active {
-        background: #ffcc00;
-        width: 24px;
-        border-radius: 5px;
-    }
-
-    /* ========== TOP HEADER ========== */
-    .header-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 100;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 24px;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .company-info { display: flex; align-items: center; gap: 10px; }
-    .corner-logo { width: 42px; height: 42px; object-fit: cover; border-radius: 50%; border: 2px solid var(--secondary); box-shadow: 0 0 12px rgba(255, 170, 51, 0.6); }
-    .zam { font-weight: 800; letter-spacing: 0.5px; color: #ffdd77; text-shadow: 1px 2px 6px rgba(0,0,0,0.6); font-size: 1.3rem; }
-    .z-green { color: #2ecc71; }
-    .z-red { color: #e74c3c; }
-    .z-black { color: #ffffff; }
-
-    .header-controls { display: flex; gap: 12px; align-items: center; }
-    .book-btn { background: linear-gradient(135deg, #ff9900, #ff5500); border: none; padding: 10px 22px; border-radius: 40px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
-    .book-btn:hover { transform: scale(1.02); }
-    .menu-button { background: rgba(255,255,255,0.15); border: none; width: 42px; height: 42px; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-    /* ========== FORM DROPDOWN ========== */
-    .form-dropdown {
-        display: none;
+    /* ========== FORM DROPDOWN (TOGGLES LIKE MENU) ========== */
+    .form-dropdown-container {
         position: fixed;
         right: 20px;
         top: 75px;
+        z-index: 200;
+    }
+    .open-form-btn {
+        background: linear-gradient(135deg, #ff9900, #ff5500);
+        border: none;
+        padding: 12px 24px;
+        border-radius: 40px;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .open-form-btn:hover { transform: scale(1.02); }
+    
+    .form-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 55px;
         width: 450px;
         max-width: calc(100vw - 40px);
         max-height: 85vh;
@@ -281,7 +173,6 @@
         background: white;
         border-radius: 24px;
         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        z-index: 200;
         animation: fadeInScale 0.2s ease-out;
     }
     @keyframes fadeInScale {
@@ -289,120 +180,113 @@
         to { opacity: 1; transform: scale(1); }
     }
     .form-dropdown.show { display: block; }
-    .form-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 12px; border-bottom: 1px solid var(--border); background: white; border-radius: 24px 24px 0 0; position: sticky; top: 0; z-index: 10; }
-    .form-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 8px; }
-    .close-form { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px 12px;
+        border-bottom: 1px solid var(--border-color-light);
+        background: white;
+        border-radius: 24px 24px 0 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .form-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--font-color-dark); }
+    .form-header .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .close-form {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: #64748b;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .close-form:hover { background: #f1f5f9; }
+    /* 3-dots menu button inside form header (top right) */
+    .form-three-dots {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #64748b;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .form-three-dots:hover { background: #f1f5f9; }
+    
     .form-body { padding: 20px; }
 
     /* Form styles */
-    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
+    fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; }
     legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; background: white; border-radius: 30px; }
-    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
+    .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; }
     .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
-    .input-box input { flex: 1; border: none; outline: none; font-size: 0.9rem; font-weight: bold; background: transparent; width: 100%; }
-    .input-box input::placeholder { font-style: italic; color: #999; font-weight: normal; font-size: 0.85rem; }
-    .field-error { border: 2px solid var(--error-color) !important; background: #fff5f5 !important; animation: shake 0.4s ease-in-out; }
-    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-
-    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 160px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .suggestion { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid #eee; }
+    .input-box input { flex: 1; border: none; outline: none; font-size: 1rem; background: transparent; }
+    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .icon-img { width: 40px; height: 40px; object-fit: contain; }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; }
+    .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
     .suggestion:hover { background: #e8f0fe; color: var(--primary-color); }
-
-    .mode-option { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; justify-content: center; background: #f9fafb; padding: 8px; border-radius: 40px; transition: 0.2s; }
-    .mode-option.selected { background: #eef2ff; border: 1.5px solid var(--primary-color); }
-    #mode-group { display: flex; gap: 12px; justify-content: space-around; }
-    .icon-img { width: 36px; height: 36px; object-fit: contain; }
-
-    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-    
-    .submit-btn { 
-        background: var(--primary-color); 
-        color: white; 
-        width: 70px; 
-        height: 70px; 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 18px; 
-        font-weight: bold;
-        border: none; 
-        cursor: pointer; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-        transition: 0.3s; 
-        position: relative;
-        margin: 0 auto;
-    }
-    /* Loader ring removed - no spinner animation */
-    #progress-text { 
-        position: absolute; 
-        font-size: 14px; 
-        font-weight: bold; 
-        color: white; 
-        display: none; 
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        background: rgba(0,0,0,0.7);
-        padding: 4px 10px;
-        border-radius: 30px;
-        white-space: nowrap;
-        font-family: monospace;
-    }
-    #btn-icon { 
-        font-size: 28px; 
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    
+    .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .submit-btn { background: var(--primary-color); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; position: relative; margin: 0 auto; }
+    .btn-loader { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    #progress-text { position: absolute; font-size: 11px; font-weight: bold; color: white; display: none; }
     .hidden-section { display: none; }
-    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 12px auto; display: none; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .tooltip-container { position: relative; display: inline-flex; margin-left: 4px; cursor: pointer; }
     .tooltip-text { visibility: hidden; width: 160px; background: #333; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: 0.2s; font-size: 0.65rem; }
     .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-    /* Menu Dropdown */
-    .menu-dropdown { display: none; position: fixed; right: 20px; top: 75px; background: white; width: 360px; max-height: 80vh; overflow-y: auto; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 300; padding: 20px; }
-    .menu-dropdown.show { display: block; }
+    /* Main Menu Dropdown (separate, triggered by 3-dots in form) */
+    .main-menu-dropdown {
+        display: none;
+        position: fixed;
+        right: 20px;
+        top: 140px;
+        background: white;
+        width: 360px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 24px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        z-index: 300;
+        padding: 20px;
+    }
+    .main-menu-dropdown.show { display: block; }
     .dropdown-content-section { margin-bottom: 20px; }
-    .dropdown-content-section h4 { color: var(--primary-color); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+    .dropdown-content-section h4 { color: #2563eb; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
     .dropdown-content-section p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px; color: #4b5563; }
-    .dropdown-content-section a { display: flex; align-items: center; gap: 12px; padding: 10px; text-decoration: none; color: var(--dark); border-radius: 12px; transition: 0.2s; font-size: 0.9rem; }
-    .dropdown-content-section a:hover { background: #f1f5f9; }
+    .dropdown-content-section a { display: flex; align-items: center; gap: 12px; padding: 10px; text-decoration: none; color: #1f2937; border-radius: 12px; font-size: 0.9rem; }
+    .dropdown-content-section a:hover { background: #f3f4f6; }
     .menu-divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
     .route-container { background: #f8fafc; padding: 12px; border-radius: 16px; margin-top: 8px; }
     .route-info { font-size: 0.75rem; text-align: center; margin-bottom: 8px; }
     .open-maps-link { display: block; background: var(--primary-color); color: white; text-align: center; padding: 10px; border-radius: 12px; text-decoration: none; font-size: 0.85rem; }
 
-    @media (max-width: 700px) {
-        .product-price { font-size: 18px; }
-        .status-text { font-size: 14px; }
-        .store-button { padding: 8px 20px; font-size: 14px; }
-        .welcome-billboard { font-size: 20px; white-space: normal; border-right: none; width: auto; animation: none; }
-        .rotating-image img, .billboard-slide11 .motorbike-billboard img { width: 180px; }
-        .car-billboard img, .motorbike-billboard img, .product-image img { width: 180px; }
-        .zam { font-size: 0.9rem; }
-        .corner-logo { width: 32px; height: 32px; }
-        .book-btn span { display: none; }
-        .book-btn { padding: 8px 14px; }
-        .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
-        .form-body { padding: 16px; }
-        .nav-btn { width: 36px; height: 36px; font-size: 16px; }
-        .submit-btn { width: 60px; height: 60px; font-size: 16px; }
-        #btn-icon { font-size: 22px; }
-        .menu-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
-        .eye-svg { width: 180px; height: 90px; }
-        .billboard-slide14 { gap: 30px; }
-        .circle-img { width: 50px; height: 50px; }
-        .circle-small { width: 40px; height: 40px; }
-        .billboard-slide13 .ecz-box { min-width: 70px; padding: 12px; }
-        .billboard-slide13 .ecz-number { font-size: 24px; }
-        .billboard-slide13 .ecz-logo { width: 100px; }
+    @media (max-width: 768px) {
+        .form-dropdown { width: calc(100vw - 30px); right: -10px; }
+        .form-three-dots { width: 32px; height: 32px; font-size: 18px; }
+        .open-form-btn span { display: none; }
+        .open-form-btn { padding: 10px 16px; }
+        .main-menu-dropdown { width: calc(100vw - 30px); right: 15px; top: 130px; }
+        .product-price { font-size: 16px; }
+        .store-button { padding: 6px 18px; font-size: 12px; }
     }
 </style>
 </head>
@@ -413,173 +297,82 @@
         <div class="header-overlay">
             <div class="company-info">
                 <img src="lfr.jpg" alt="Logo" class="corner-logo">
-                <h2 class="zam"><span class="z-green">Z</span><span class="z-black">a</span><span class="z-red">m</span><span>Listing Rides</span></h2>
+                <h2 class="zam">
+                    <span class="z-green">Z</span>
+                    <span class="z-black">a</span>
+                    <span class="z-red">m</span>
+                    <span>Listing Rides</span>
+                </h2>
             </div>
-            <div class="header-controls">
-                <button class="book-btn" id="openFormBtn"><span>REQUESTING FORM</span></button>
-                <button class="menu-button" id="menu-toggle-btn"><i class="fas fa-ellipsis-v"></i></button>
-            </div>
+            <!-- Open Form Button -->
+            <button class="open-form-btn" id="openFormBtn"><span>REQUEST FORM</span> <i class="fas fa-chevron-down"></i></button>
         </div>
 
         <!-- BILLBOARD SLIDES -->
         <div class="billboard-slide active"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
-        <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div></div><div class="product-info"><div class="product-price">🏍️ MOTORBIKE RIDE • K15</div><div class="status-text">✅ Available!</div><button class="store-button" onclick="visitStore()">🚀 BOOK NOW</button></div></div></div>
-        <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="car-billboard"><img src="car.png" alt="Car"></div></div><div class="product-info"><div class="product-price">🚗 CAR RIDE • FROM K25</div><div class="status-text">✅ Available</div><button class="store-button" onclick="visitStore()">📅 BOOK NOW</button></div></div></div>
+        <div class="billboard-slide"><div class="vehicle-container"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text" style="margin-top:20px; color:#ffcc00;">For as low as K15</div></div></div>
+        <div class="billboard-slide"><div class="vehicle-container"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text" style="margin-top:20px; color:#ffcc00;">For as low as K25</div></div></div>
+        <div class="billboard-slide"><div class="request-billboard">👇 PROCEED TO MAKE A REQUEST WITH THE FORM 👇</div></div>
         <div class="billboard-slide"><div class="promo-billboard">🔥 50% DISCOUNT PROMOTION ALL LOCAL RIDES 🔥</div></div>
         <div class="billboard-slide"><div class="contact-billboard">📞 CONTACT NOW • FAST PICKUP • 24/7 SUPPORT</div></div>
-        <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="TV"></div><div class="product-info"><div class="product-price">📺 Smart TV • K3,000</div><button class="store-button" onclick="visitStore()">🛒 SHOP</button></div></div></div>
+        <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="Smart TV"></div><div class="product-info"><div class="product-price">🔥 Smart TV • K3,000</div><button class="store-button" onclick="visitStore()">🛒 SHOP</button></div></div></div>
         <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="S241S.png" alt="Phone"></div><div class="product-info"><div class="product-price">📱 Samsung • K2,200</div><button class="store-button" onclick="visitStore()">🛒 VIEW</button></div></div></div>
         <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="fridge.png" alt="Fridge"></div><div class="product-info"><div class="product-price">❄️ Fridge • K2,600</div><button class="store-button" onclick="visitStore()">🛒 SHOP</button></div></div></div>
         <div class="billboard-slide"><div class="rotating-image"><img src="car.png" alt="Car"></div></div>
-        <div class="billboard-slide billboard-slide11"><div class="road-track"></div><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div></div>
-        <div class="billboard-slide"><div style="text-align:center; background:rgba(0,0,0,0.7); padding:40px; border-radius:60px;"><div style="font-size:42px; color:#ffdd77;">📱 SCAN TO BOOK</div><img src="LFR3.png" alt="QR" style="margin:20px; border-radius:20px; width:250px; height:250px;"><div style="font-size:20px; color:#aaffdd;">Scan with phone → Instant booking</div></div></div>
-        
-        <!-- SLIDE 12 - Campaign -->
-        <div class="billboard-slide billboard-slide12">
-            <div style="display:flex; gap:30px; align-items:center; flex-wrap:wrap; justify-content:center;">
-                <div style="text-align:center;">
-                    <div style="display:flex; align-items:center; justify-content:center; position:relative;">
-                        <img class="circle-img" src="P1.png" alt="Leader">
-                        <img class="circle-img circle-small" src="P2.png" alt="Supporter">
+    </div>
+</div>
+
+<!-- FORM DROPDOWN (Toggles like menu, with 3-dots button inside header) -->
+<div class="form-dropdown-container">
+    <div id="formDropdown" class="form-dropdown">
+        <div class="form-header">
+            <h3>Request a Ride</h3>
+            <div class="header-actions">
+                <button class="form-three-dots" id="formThreeDotsBtn"><i class="fas fa-ellipsis-v"></i></button>
+                <button class="close-form" id="closeFormBtn"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="form-body">
+            <fieldset><legend><span class="material-icons">account_circle</span> Profile</legend>
+                <div class="input-box"><span class="material-icons">phone</span><input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric"></div>
+            </fieldset>
+            <div id="trip-details" class="hidden-section">
+                <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
+                    <p style="font-size:0.75rem; color:#999; text-align:center; margin-bottom:10px;">Choose your preferred transport mode</p>
+                    <div id="mode-group" style="display:flex; gap:20px; justify-content:center;">
+                        <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
+                        <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
                     </div>
-                    <div class="name-tag">Hakainde Hichilema<br>For President</div>
-                </div>
-                <div style="color:white; text-align:center;">
-                    <div class="title">OUR PROMISE</div>
-                    <div class="list"><div>✔ Free Education</div><div>✔ Repaired Economy</div><div>✔ Full Electrification</div><div>✔ Enhanced CDF</div><div>✔ More Jobs</div></div>
-                </div>
+                </fieldset>
+                <fieldset><legend>Pickup Location</legend>
+                    <div class="input-box" style="position:relative;"><span class="material-icons">my_location</span><input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off"><div id="originList" class="autocomplete-list"></div></div>
+                </fieldset>
+                <fieldset><legend>Destination</legend>
+                    <div class="input-box" style="position:relative;"><span class="material-icons">pin_drop</span><input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off"><div id="destinationList" class="autocomplete-list"></div></div>
+                </fieldset>
             </div>
-        </div>
-        
-        <!-- SLIDE 13 - Countdown -->
-        <div class="billboard-slide billboard-slide13">
-            <div style="text-align:center;">
-                <img class="ecz-logo" src="ecz-logo.png" alt="ECZ Logo">
-                <div style="font-size:28px; font-weight:700; color:white;">General Elections 2026</div>
-                <div style="font-size:18px; color:#ffd700; margin-bottom:20px;">Your Vote. Your Future.</div>
-                <div class="ecz-countdown">
-                    <div class="ecz-box"><span class="ecz-number" id="days">00</span><span class="ecz-label">Days</span></div>
-                    <div class="ecz-box"><span class="ecz-number" id="hours">00</span><span class="ecz-label">Hrs</span></div>
-                    <div class="ecz-box"><span class="ecz-number" id="mins">00</span><span class="ecz-label">Mins</span></div>
-                    <div class="ecz-box"><span class="ecz-number" id="secs">00</span><span class="ecz-label">Secs</span></div>
+            <div id="summary-section" class="hidden-section">
+                <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
+                    <div id="summary-cards"></div>
+                </fieldset>
+                <div style="display:flex; justify-content:center; margin-top:20px;">
+                    <button class="submit-btn" id="submit-btn"><i class="fas fa-paper-plane" id="btn-icon"></i><div class="btn-loader" id="btn-loader"></div><span id="progress-text">0%</span></button>
                 </div>
-                <div style="margin-top:20px; font-size:14px;">Vote Wisely • Peace First</div>
+                <p id="action-label" style="text-align:center; margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
             </div>
+            <div class="calc-loader" id="spinner"></div>
+            <p id="status" style="text-align:center; margin-top:10px; font-weight:bold;"></p>
         </div>
-        
-        <!-- SLIDE 14 - Eyes -->
-        <div class="billboard-slide billboard-slide14">
-            <svg class="eye-svg left-eye" viewBox="0 0 280 140">
-                <defs>
-                    <radialGradient id="iris-depth" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="#050505"/><stop offset="22%" stop-color="#0d0d0d"/>
-                        <stop offset="30%" stop-color="#4a3319"/><stop offset="55%" stop-color="#785329"/>
-                        <stop offset="85%" stop-color="#a67742"/><stop offset="100%" stop-color="#261607"/>
-                    </radialGradient>
-                    <radialGradient id="sclera-grad" cx="50%" cy="50%" r="50%">
-                        <stop offset="30%" stop-color="#fffbfa"/><stop offset="75%" stop-color="#eed8cc"/>
-                        <stop offset="100%" stop-color="#cda38f"/>
-                    </radialGradient>
-                    <clipPath id="left-eye-clip">
-                        <path class="eye-clip-mask" d="M 20,70 C 40,25 110,15 250,35 C 260,65 220,115 110,120 C 50,115 30,90 20,70 Z"/>
-                    </clipPath>
-                </defs>
-                <g clip-path="url(#left-eye-clip)">
-                    <path d="M 0,0 L 280,0 L 280,140 L 0,140 Z" fill="url(#sclera-grad)"/>
-                    <g class="iris-group">
-                        <circle cx="145" cy="70" r="48" fill="url(#iris-depth)"/>
-                        <circle class="pupil" cx="145" cy="70" r="15" fill="#000" />
-                        <ellipse cx="128" cy="52" rx="8" ry="5" transform="rotate(-15 128 52)" fill="#ffffff" fill-opacity="0.85"/>
-                    </g>
-                </g>
-            </svg>
-            <svg class="eye-svg right-eye" viewBox="0 0 280 140">
-                <defs>
-                    <clipPath id="right-eye-clip">
-                        <path class="eye-clip-mask" d="M 260,70 C 240,25 170,15 30,35 C 20,65 60,115 170,120 C 230,115 250,90 260,70 Z"/>
-                    </clipPath>
-                </defs>
-                <g clip-path="url(#right-eye-clip)">
-                    <path d="M 0,0 L 280,0 L 280,140 L 0,140 Z" fill="url(#sclera-grad)"/>
-                    <g class="iris-group">
-                        <circle cx="135" cy="70" r="48" fill="url(#iris-depth)"/>
-                        <circle class="pupil" cx="135" cy="70" r="15" fill="#000" />
-                        <ellipse cx="118" cy="52" rx="8" ry="5" transform="rotate(-15 118 52)" fill="#ffffff" fill-opacity="0.85"/>
-                    </g>
-                </g>
-            </svg>
-        </div>
-    </div>
-    
-    <!-- Manual Slider Controls -->
-    <div class="slider-nav">
-        <button class="nav-btn" id="prevSlideBtn"><i class="fas fa-chevron-left"></i></button>
-        <button class="nav-btn" id="nextSlideBtn"><i class="fas fa-chevron-right"></i></button>
-    </div>
-    <div class="slide-dots" id="slideDots"></div>
-</div>
-
-<!-- FORM DROPDOWN - Three dots removed from header -->
-<div id="formDropdown" class="form-dropdown">
-    <div class="form-header">
-        <h3></h3>
-        <button class="close-form" id="closeFormBtn"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="form-body">
-        <fieldset><legend><span class="material-icons">account_circle</span>Profile</legend>
-            <div class="input-box" id="phone-box">
-                <span class="material-icons">phone</span>
-                <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
-            </div>
-        </fieldset>
-        <div id="trip-details" class="hidden-section">
-            <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
-                <p style="font-size:0.75rem; color:#999; text-align:center; margin-bottom:10px;">Choose your preferred transport mode</p>
-                <div id="mode-group">
-                    <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
-                    <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
-                </div>
-            </fieldset>
-            <fieldset><legend>Pickup Location</legend>
-                <div class="input-box" id="origin-container" style="position:relative;">
-                    <span class="material-icons">my_location</span>
-                    <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
-                    <div id="originList" class="autocomplete-list"></div>
-                </div>
-            </fieldset>
-            <fieldset><legend>Destination</legend>
-                <div class="input-box" id="dest-container" style="position:relative;">
-                    <span class="material-icons">pin_drop</span>
-                    <input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off">
-                    <div id="destinationList" class="autocomplete-list"></div>
-                </div>
-            </fieldset>
-        </div>
-        <div id="summary-section" class="hidden-section">
-            <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon" style="font-size:16px;">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
-                <div id="summary-cards"></div>
-            </fieldset>
-            <div style="display:flex; justify-content:center; margin-top:12px;">
-                <button class="submit-btn" id="submit-btn">
-                    <i class="fas fa-paper-plane" id="btn-icon"></i>
-                    <span id="progress-text">0%</span>
-                </button>
-            </div>
-            <p id="action-label" style="text-align:center; margin-top:8px; font-weight:bold; color:var(--primary-color); font-size:0.85rem;">Request Now</p>
-        </div>
-        <div class="calc-loader" id="spinner"></div>
-        <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; font-size:0.8rem;"></p>
     </div>
 </div>
 
-<!-- MENU DROPDOWN -->
-<div id="menuDropdown" class="menu-dropdown">
+<!-- MAIN MENU DROPDOWN (triggered by 3-dots button inside form) -->
+<div id="mainMenuDropdown" class="main-menu-dropdown">
     <div class="dropdown-content-section">
         <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
         <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
         <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
         <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
-        <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
         <button id="menu-install-btn" class="store-button" style="width:100%; margin-top:8px;">⬇️ Download APK</button>
     </div>
     <div class="dropdown-content-section">
@@ -591,7 +384,6 @@
         <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
         <a href="https://www.facebook.com/profile.php?id=61572032020351" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
         <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
-        <a href="https://chat.whatsapp.com/F3wU0QC4uaC68WkPNEHMZF" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp Group</span></a>
     </div>
     <div class="dropdown-content-section">
         <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
@@ -612,179 +404,62 @@
 </div>
 
 <script>
-// ========== SLIDESHOW WITH MANUAL CONTROLS ==========
+// ========== SLIDESHOW ==========
 (function() {
     const slides = document.querySelectorAll('.fullpage-billboard .billboard-header > .billboard-slide');
     if (!slides.length) return;
-    let currentIndex = 0;
-    let autoInterval;
-    
+    let currentIndex = 0, autoInterval;
     function showSlide(index) {
-        slides.forEach((s, i) => {
-            s.classList.remove('active');
-            s.style.opacity = '0';
-        });
+        slides.forEach((s, i) => { s.classList.remove('active'); });
         slides[index].classList.add('active');
-        slides[index].style.opacity = '1';
         currentIndex = index;
         updateDots();
     }
-    
-    function nextSlide() {
-        showSlide((currentIndex + 1) % slides.length);
-        resetAutoPlay();
-    }
-    
-    function prevSlide() {
-        showSlide((currentIndex - 1 + slides.length) % slides.length);
-        resetAutoPlay();
-    }
-    
-    function resetAutoPlay() {
-        if (autoInterval) clearInterval(autoInterval);
-        autoInterval = setInterval(nextSlide, 10000);
-    }
-    
-    function createDots() {
-        const dotsContainer = document.getElementById('slideDots');
-        if (!dotsContainer) return;
-        dotsContainer.innerHTML = '';
-        for (let i = 0; i < slides.length; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            if (i === currentIndex) dot.classList.add('active');
-            dot.addEventListener('click', (function(index) {
-                return function() {
-                    showSlide(index);
-                    resetAutoPlay();
-                };
-            })(i));
-            dotsContainer.appendChild(dot);
-        }
-    }
-    
-    function updateDots() {
-        const dots = document.querySelectorAll('.dot');
-        for (let i = 0; i < dots.length; i++) {
-            if (i === currentIndex) {
-                dots[i].classList.add('active');
-            } else {
-                dots[i].classList.remove('active');
-            }
-        }
-    }
-    
-    const prevBtn = document.getElementById('prevSlideBtn');
-    const nextBtn = document.getElementById('nextSlideBtn');
-    if (prevBtn) prevBtn.addEventListener('click', function(e) { e.preventDefault(); prevSlide(); });
-    if (nextBtn) nextBtn.addEventListener('click', function(e) { e.preventDefault(); nextSlide(); });
-    
-    let touchStartX = 0;
-    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
-    document.addEventListener('touchend', function(e) {
-        let diff = touchStartX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0) nextSlide();
-            else prevSlide();
-            resetAutoPlay();
-        }
-    }, { passive: true });
-    
+    function nextSlide() { showSlide((currentIndex + 1) % slides.length); resetAutoPlay(); }
+    function prevSlide() { showSlide((currentIndex - 1 + slides.length) % slides.length); resetAutoPlay(); }
+    function resetAutoPlay() { if (autoInterval) clearInterval(autoInterval); autoInterval = setInterval(nextSlide, 9000); }
+    function updateDots() {}
     showSlide(0);
-    createDots();
     resetAutoPlay();
 })();
 
-// ========== EYE ANIMATION FUNCTIONS ==========
-let eyeIsAsleep = false;
-let microBlinkTimeout, macroGazeTimeout;
-const eyeElements = document.querySelectorAll('.billboard-slide14 .eye-svg');
-const irisGroups = document.querySelectorAll('.billboard-slide14 .iris-group');
-const pupilElements = document.querySelectorAll('.billboard-slide14 .pupil');
-
-function runEyeMasterLifecycle() {
-    eyeIsAsleep = false;
-    eyeElements.forEach(eye => eye.classList.remove('closed'));
-    executeMicroBlinks();
-    executeMacroGazeSaccades();
-    setTimeout(() => {
-        executeCompleteSleepState(6000);
-    }, 14000);
-}
-
-function executeCompleteSleepState(duration) {
-    eyeIsAsleep = true;
-    clearTimeout(microBlinkTimeout);
-    clearTimeout(macroGazeTimeout);
-    eyeElements.forEach(eye => eye.classList.add('closed'));
-    setTimeout(() => {
-        eyeElements.forEach(eye => {
-            eye.classList.remove('closed');
-            eye.classList.add('blinking');
-        });
-        setTimeout(() => {
-            eyeElements.forEach(eye => eye.classList.remove('blinking'));
-            runEyeMasterLifecycle();
-        }, 150);
-    }, duration);
-}
-
-function executeMicroBlinks() {
-    if (eyeIsAsleep) return;
-    eyeElements.forEach(eye => eye.classList.add('blinking'));
-    setTimeout(() => {
-        eyeElements.forEach(eye => eye.classList.remove('blinking'));
-    }, 120);
-    microBlinkTimeout = setTimeout(executeMicroBlinks, Math.random() * 3000 + 1500);
-}
-
-function executeMacroGazeSaccades() {
-    if (eyeIsAsleep) return;
-    const maxX = 24, maxY = 10;
-    const targetX = (Math.random() - 0.5) * maxX;
-    const targetY = (Math.random() - 0.5) * maxY;
-    irisGroups.forEach(iris => {
-        iris.style.setProperty('--saccade-x', `${targetX}px`);
-        iris.style.setProperty('--saccade-y', `${targetY}px`);
-    });
-    const baseRadius = 15;
-    const moveIntensity = Math.sqrt(targetX*targetX + targetY*targetY) / 26;
-    const customRadius = baseRadius + (baseRadius * (moveIntensity * 0.12));
-    pupilElements.forEach(pupil => pupil.setAttribute('r', customRadius));
-    macroGazeTimeout = setTimeout(executeMacroGazeSaccades, Math.random() * 2000 + 500);
-}
-
-runEyeMasterLifecycle();
-
-// ========== FORM DROPDOWN CONTROLS ==========
+// ========== FORM & MENU TOGGLE ==========
 const formDropdown = document.getElementById('formDropdown');
 const openFormBtn = document.getElementById('openFormBtn');
 const closeFormBtn = document.getElementById('closeFormBtn');
+const mainMenu = document.getElementById('mainMenuDropdown');
+const formThreeDots = document.getElementById('formThreeDotsBtn');
 
 function openForm() {
-    if (formDropdown) formDropdown.classList.add('show');
-    const menuDropdown = document.getElementById('menuDropdown');
-    if (menuDropdown) menuDropdown.classList.remove('show');
+    formDropdown.classList.add('show');
+    mainMenu.classList.remove('show');
 }
-
 function closeForm() {
-    if (formDropdown) formDropdown.classList.remove('show');
+    formDropdown.classList.remove('show');
+}
+function toggleMainMenu() {
+    mainMenu.classList.toggle('show');
+    // Don't close form when opening menu
 }
 
-if (openFormBtn) openFormBtn.addEventListener('click', openForm);
-if (closeFormBtn) closeFormBtn.addEventListener('click', closeForm);
+openFormBtn.addEventListener('click', openForm);
+closeFormBtn.addEventListener('click', closeForm);
+formThreeDots.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMainMenu();
+});
+// Close menus when clicking outside
+document.addEventListener('click', function(event) {
+    if (!formDropdown.contains(event.target) && !openFormBtn.contains(event.target)) {
+        formDropdown.classList.remove('show');
+    }
+    if (!mainMenu.contains(event.target) && !formThreeDots.contains(event.target)) {
+        mainMenu.classList.remove('show');
+    }
+});
 
-// Menu dropdown
-function toggleMenu() {
-    const menu = document.getElementById('menuDropdown');
-    if (menu) menu.classList.toggle('show');
-    if (formDropdown) formDropdown.classList.remove('show');
-}
-
-const menuToggleBtn = document.getElementById('menu-toggle-btn');
-if (menuToggleBtn) menuToggleBtn.onclick = toggleMenu;
-
-// ========== AUTO BANNER - NATIVE INSTALL ==========
+// ========== INSTALL LOGIC ==========
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
@@ -792,18 +467,26 @@ window.addEventListener("beforeinstallprompt", (e) => {
     if (window.innerWidth > 600) {
         const installBox = document.createElement("div");
         installBox.style.position = "fixed";
-        installBox.style.top = "15px";
-        installBox.style.right = "15px";
+        installBox.style.bottom = "20px";
+        installBox.style.left = "20px";
+        installBox.style.right = "20px";
         installBox.style.background = "#2b6ef6";
         installBox.style.color = "#fff";
-        installBox.style.borderRadius = "8px";
-        installBox.style.padding = "8px 14px";
+        installBox.style.borderRadius = "60px";
+        installBox.style.padding = "12px 20px";
         installBox.style.fontSize = "14px";
         installBox.style.cursor = "pointer";
         installBox.style.zIndex = "9999";
-        installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="margin-left:10px;cursor:pointer;">×</span>`;
+        installBox.style.display = "flex";
+        installBox.style.justifyContent = "space-between";
+        installBox.style.alignItems = "center";
+        installBox.innerHTML = `<span>📱 Install App for faster booking</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;">✕</span>`;
         document.body.appendChild(installBox);
-        document.getElementById("installText").addEventListener("click", async () => {
+        installBox.addEventListener("click", async (e) => {
+            if (e.target.id === 'closeInstall') {
+                installBox.remove();
+                return;
+            }
             installBox.remove();
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -811,41 +494,39 @@ window.addEventListener("beforeinstallprompt", (e) => {
                 deferredPrompt = null;
             }
         });
-        document.getElementById("closeInstall").addEventListener("click", () => installBox.remove());
     }
 });
-
-// ========== SERVICE WORKER REGISTRATION ==========
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function() {
-        navigator.serviceWorker.register("sw.js").then(
-            function(reg) { console.log("ServiceWorker registered"); },
-            function(err) { console.log("ServiceWorker registration failed:", err); }
-        );
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(err => console.log("SW error", err));
     });
 }
 
-// ========== COMPLETE PLACES LIST & DISTANCE LOGIC ==========
+// ========== PLACES & RIDE LOGIC (6 places) ==========
+const MASTER_PLACES_LIST = ["Luangwa Bus Station", "Luangwa Town", "Rufunsa Town", "Lusaka Town", "Luanshya Town", "Chipata Town"];
 const placesWithCoords = [
     { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
-    { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055 },
-    { name: "Luangwa Bridge Market", lat: -15.9853, lng: 30.2049 },
     { name: "Luangwa Town", lat: -15.6400, lng: 30.5000 },
     { name: "Rufunsa Town", lat: -15.2500, lng: 30.3000 },
     { name: "Lusaka Town", lat: -15.3875, lng: 28.3228 },
-    { name: "Luanshya Town", lat: -13.1333, lng: 28.4167 }
+    { name: "Luanshya Town", lat: -13.1333, lng: 28.4167 },
+    { name: "Chipata Town", lat: -13.6333, lng: 32.6500 }
 ];
-
-const MASTER_PLACES_LIST = placesWithCoords.map(p => p.name);
+function getCoordinates(placeName) {
+    const found = placesWithCoords.find(p => p.name === placeName);
+    return found || { lat: -15.6213, lng: 30.4064 };
+}
 const segments = [
-    { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62 },
-    { from: "Luangwa Bus Station", to: "Luangwa Bridge Market", distance: 89 },
     { from: "Luangwa Bus Station", to: "Luangwa Town", distance: 5 },
+    { from: "Luangwa Bus Station", to: "Rufunsa Town", distance: 105 },
+    { from: "Luangwa Bus Station", to: "Lusaka Town", distance: 320 },
     { from: "Luangwa Town", to: "Rufunsa Town", distance: 102.7 },
     { from: "Rufunsa Town", to: "Lusaka Town", distance: 192.7 },
-    { from: "Lusaka Town", to: "Luanshya Town", distance: 335 }
+    { from: "Lusaka Town", to: "Luanshya Town", distance: 335 },
+    { from: "Luanshya Town", to: "Chipata Town", distance: 243 },
+    { from: "Lusaka Town", to: "Chipata Town", distance: 578 }
 ];
-const hubs = ["Luangwa Bus Station", "Luangwa Town", "Rufunsa Town", "Lusaka Town"];
+const hubs = MASTER_PLACES_LIST;
 const graph = {};
 segments.forEach(({ from, to, distance }) => {
     if (!graph[from]) graph[from] = [];
@@ -853,323 +534,110 @@ segments.forEach(({ from, to, distance }) => {
     graph[from].push({ node: to, distance });
     graph[to].push({ node: from, distance });
 });
-
 function findShortestDistance(start, end) {
     if (start === end) return 0;
     if (!graph[start] || !graph[end]) return null;
-    const distances = {};
-    const unvisited = new Set(Object.keys(graph));
-    for (let node of unvisited) distances[node] = Infinity;
-    distances[start] = 0;
+    let dist = {}, unvisited = new Set(Object.keys(graph));
+    for (let node of unvisited) dist[node] = Infinity;
+    dist[start] = 0;
     while (unvisited.size) {
-        let current = null;
-        for (let node of unvisited) {
-            if (current === null || distances[node] < distances[current]) current = node;
-        }
-        if (!current || distances[current] === Infinity) break;
-        if (current === end) return distances[end];
-        unvisited.delete(current);
-        for (let neighbor of graph[current]) {
-            let newDist = distances[current] + neighbor.distance;
-            if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
+        let curr = null;
+        for (let node of unvisited) if (curr === null || dist[node] < dist[curr]) curr = node;
+        if (!curr || dist[curr] === Infinity) break;
+        if (curr === end) return dist[end];
+        unvisited.delete(curr);
+        for (let neighbor of graph[curr]) {
+            let newDist = dist[curr] + neighbor.distance;
+            if (newDist < dist[neighbor.node]) dist[neighbor.node] = newDist;
         }
     }
     return null;
 }
-
 function calculateTotalDistance(pickup, dest) {
     if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
-    let nearestHub = null, minTotal = Infinity;
+    let bestHub = null, bestTotal = Infinity;
     for (let hub of hubs) {
-        let hubToPickup = findShortestDistance(hub, pickup);
-        let tripDist = findShortestDistance(pickup, dest);
-        let destToHub = findShortestDistance(dest, hub);
-        if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-            let total = hubToPickup + tripDist + destToHub;
-            if (total < minTotal) { minTotal = total; nearestHub = hub; }
+        let toPick = findShortestDistance(hub, pickup), trip = findShortestDistance(pickup, dest), toHub = findShortestDistance(dest, hub);
+        if (toPick !== null && trip !== null && toHub !== null) {
+            let total = toPick + trip + toHub;
+            if (total < bestTotal) { bestTotal = total; bestHub = hub; }
         }
     }
-    if (!nearestHub) return { total: null, trip: null, hub: null };
-    return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
+    if (!bestHub) return { total: null, trip: null, hub: null };
+    return { hub: bestHub, trip: findShortestDistance(pickup, dest), total: bestTotal };
 }
-
-const config = {
-    vehiclePricePerKm: 3.90,
-    motorbikePricePerKm: 1.54,
-    vehicleMinPrice: 25,
-    motorbikeMinPrice: 15,
-    vehicleExtra: 6.00,
-    motorbikeExtra: 3.00,
-    avgSpeed: 60
-};
-
+const config = { vehiclePricePerKm: 3.90, motorbikePricePerKm: 1.54, vehicleMinPrice: 25, motorbikeMinPrice: 15, vehicleExtra: 6, motorbikeExtra: 3, avgSpeed: 60 };
 let rideData = null;
-let currentPickup = "";
-let currentDestination = "";
-
-const phoneInput = document.getElementById('customer-phone');
-const tripDiv = document.getElementById('trip-details');
-const summaryDiv = document.getElementById('summary-section');
-const statusText = document.getElementById('status');
-const submitBtn = document.getElementById('submit-btn');
-const btnIcon = document.getElementById('btn-icon');
-const progressTextSpan = document.getElementById('progress-text');
-
-// Phone validation
-if (phoneInput) {
-    phoneInput.oninput = () => {
-        if (/^0[0-9]{9}$/.test(phoneInput.value)) {
-            if (tripDiv) tripDiv.style.display = 'block';
-        } else {
-            if (tripDiv) tripDiv.style.display = 'none';
-            if (summaryDiv) summaryDiv.style.display = 'none';
-        }
-    };
-}
-
-function setupAuto(inputId, containerId, listId) {
-    const input = document.getElementById(inputId);
-    const container = document.getElementById(containerId);
-    const list = document.getElementById(listId);
-    if (!input) return;
+const phoneInput = document.getElementById('customer-phone'), tripDiv = document.getElementById('trip-details'), summaryDiv = document.getElementById('summary-section'), statusText = document.getElementById('status'), submitBtn = document.getElementById('submit-btn'), btnIcon = document.getElementById('btn-icon'), btnLoader = document.getElementById('btn-loader'), progressSpan = document.getElementById('progress-text');
+phoneInput.oninput = () => { if (/^0[0-9]{9}$/.test(phoneInput.value)) tripDiv.style.display = 'block'; else { tripDiv.style.display = 'none'; summaryDiv.style.display = 'none'; } };
+function setupAuto(inputId, listId) {
+    const input = document.getElementById(inputId), list = document.getElementById(listId);
     input.oninput = () => {
         const val = input.value.toLowerCase().trim();
-        if (list) list.innerHTML = '';
-        if (container) container.classList.remove('field-error');
+        list.innerHTML = '';
         if (!val) return;
-        const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 8);
-        if (list) {
-            matches.forEach(place => {
-                const div = document.createElement('div');
-                div.className = 'suggestion';
-                div.textContent = place;
-                div.onclick = () => {
-                    input.value = place;
-                    if (list) list.innerHTML = '';
-                    if (inputId === 'gm-origin') currentPickup = place;
-                    if (inputId === 'gm-destination') currentDestination = place;
-                    checkReady();
-                };
-                list.appendChild(div);
-            });
-        }
+        MASTER_PLACES_LIST.filter(p => p.toLowerCase().includes(val)).slice(0,6).forEach(place => {
+            const div = document.createElement('div'); div.className = 'suggestion'; div.textContent = place;
+            div.onclick = () => { input.value = place; list.innerHTML = ''; checkReady(); };
+            list.appendChild(div);
+        });
     };
 }
-
-function updateRouteInfo(pickup, destination) {
-    if (!pickup || !destination) return;
-    const totalDist = calculateTotalDistance(pickup, destination);
+function updateRouteInfo(pickup, dest) {
+    if (!pickup || !dest) return;
+    const res = calculateTotalDistance(pickup, dest);
     const infoDiv = document.getElementById('map-route-info');
-    if (infoDiv && totalDist.total) {
-        const estimatedMinutes = Math.ceil((totalDist.trip / config.avgSpeed) * 60);
-        infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1)} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estimatedMinutes} mins`;
-    }
+    if (infoDiv && res.total) infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${dest}<br>📏 ${res.trip?.toFixed(1)} km | Via: ${res.hub}<br>⏱️ Est. Time: ${Math.ceil(res.trip/60*60)} mins`;
+    const p = getCoordinates(pickup), d = getCoordinates(dest);
+    document.getElementById('openMapsLink').href = `https://www.google.com/maps/dir/${p.lat},${p.lng}/${d.lat},${d.lng}`;
 }
-
 function checkReady() {
-    const from = document.getElementById('gm-origin') ? document.getElementById('gm-origin').value : '';
-    const to = document.getElementById('gm-destination') ? document.getElementById('gm-destination').value : '';
-    const mode = document.querySelector('input[name="mode"]:checked');
-    if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
-        currentPickup = from;
-        currentDestination = to;
-        if (!mode) {
-            if (statusText) statusText.innerHTML = "⚠️ Please select a transport mode.";
-            if (summaryDiv) summaryDiv.style.display = 'none';
-        } else {
-            if (statusText) statusText.innerHTML = "";
-            calculate(from, to, mode.value);
-            updateRouteInfo(from, to);
-        }
-    }
+    const from = document.getElementById('gm-origin').value, to = document.getElementById('gm-destination').value, mode = document.querySelector('input[name="mode"]:checked');
+    if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to) && mode) calculate(from, to, mode.value);
+    else if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to) && !mode) statusText.innerHTML = "⚠️ Select a transport mode.";
 }
-
 function calculate(from, to, mode) {
-    const spinner = document.getElementById('spinner');
-    if (spinner) spinner.style.display = 'block';
-    if (summaryDiv) summaryDiv.style.display = 'none';
+    document.getElementById('spinner').style.display = 'block'; summaryDiv.style.display = 'none';
     setTimeout(() => {
-        if (spinner) spinner.style.display = 'none';
+        document.getElementById('spinner').style.display = 'none';
         const res = calculateTotalDistance(from, to);
-        if (!res.total) {
-            if (statusText) statusText.innerHTML = "❌ Route not available.";
-            return;
-        }
-        if (summaryDiv) summaryDiv.style.display = 'block';
-        const hubTooltip = document.getElementById('hub-tooltip');
-        if (hubTooltip) hubTooltip.textContent = `✨ 50% Discount! Calculated via: ${res.hub}`;
+        if (!res.total) { statusText.innerHTML = "❌ Route not available."; return; }
+        summaryDiv.style.display = 'block';
+        document.getElementById('hub-tooltip').textContent = `✨ 50% Discount! Via: ${res.hub}`;
         let rate, minPrice, extra;
-        if (mode === 'vehicle') {
-            rate = config.vehiclePricePerKm;
-            minPrice = config.vehicleMinPrice;
-            extra = config.vehicleExtra;
-        } else {
-            rate = config.motorbikePricePerKm;
-            minPrice = config.motorbikeMinPrice;
-            extra = config.motorbikeExtra;
-        }
+        if (mode === 'vehicle') { rate = config.vehiclePricePerKm; minPrice = config.vehicleMinPrice; extra = config.vehicleExtra; }
+        else { rate = config.motorbikePricePerKm; minPrice = config.motorbikeMinPrice; extra = config.motorbikeExtra; }
         let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-        const summaryCards = document.getElementById('summary-cards');
-        if (summaryCards) {
-            summaryCards.innerHTML = `<div class="summary-card"><span>Total Price</span><span style="color:#ff9900;font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
-        }
-        let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
-        rideData = {
-            preferredMode: mode,
-            phone: formattedPhone,
-            hub: res.hub,
-            from: from,
-            to: to,
-            tripDistance: res.trip.toFixed(2),
-            totalDistance: res.total.toFixed(2),
-            price: price,
-            estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
-        };
-        if (submitBtn) {
-            submitBtn.style.background = "var(--primary-color)";
-            btnIcon.className = "fas fa-paper-plane";
-            btnIcon.style.display = "block";
-            progressTextSpan.style.display = "none";
-            document.getElementById('action-label').innerHTML = "Request Now";
-            submitBtn.onclick = handleRequest;
-        }
+        document.getElementById('summary-cards').innerHTML = `<div class="summary-card"><span>Total Price</span><span style="color:#ff9900;font-weight:bold;">K${price}</span></div><div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>`;
+        rideData = { preferredMode: mode, phone: phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value, hub: res.hub, from, to, price };
+        submitBtn.style.background = "var(--primary-color)"; btnIcon.className = "fas fa-paper-plane"; btnIcon.style.display = "block"; btnLoader.style.display = "none"; progressSpan.style.display = "none"; document.getElementById('action-label').innerHTML = "Request Now";
+        submitBtn.onclick = handleRequest;
+        updateRouteInfo(from, to);
     }, 500);
 }
-
 async function handleRequest() {
-    if (submitBtn) submitBtn.disabled = true;
-    if (btnIcon) btnIcon.style.display = "none";
-    if (progressTextSpan) progressTextSpan.style.display = "block";
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-        let p = Math.min(98, Math.floor(((Date.now() - startTime) / 13000) * 98));
-        if (progressTextSpan) progressTextSpan.textContent = p + "%";
-    }, 100);
-    const payload = { ...rideData, timestamp: new Date().toISOString() };
-    let timeoutTriggered = false;
-    const timeoutId = setTimeout(() => {
-        if (!timeoutTriggered) {
-            timeoutTriggered = true;
-            clearInterval(interval);
-            if (statusText) {
-                statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
-                statusText.style.color = "orange";
-            }
-            finishRequestUI();
-            setTimeout(() => { if (submitBtn) submitBtn.click(); }, 100);
-        }
-    }, 15000);
+    submitBtn.disabled = true; btnIcon.style.display = "none"; btnLoader.style.display = "block"; progressSpan.style.display = "block";
+    const start = Date.now(), interval = setInterval(() => { let p = Math.min(98, Math.floor(((Date.now() - start) / 13000) * 98)); progressSpan.textContent = p + "%"; }, 100);
+    let triggered = false;
+    const tid = setTimeout(() => { if (!triggered) { triggered = true; clearInterval(interval); statusText.innerHTML = "⏰ Timeout! Connecting..."; finishRequest(); setTimeout(() => submitBtn.click(), 100); } }, 15000);
     try {
-        await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-            method: 'POST',
-            body: new URLSearchParams(payload),
-            mode: 'no-cors'
-        });
-        clearTimeout(timeoutId);
-        if (!timeoutTriggered) {
-            clearInterval(interval);
-            if (progressTextSpan) progressTextSpan.textContent = "100%";
-            if (statusText) {
-                statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
-                statusText.style.color = "green";
-            }
-            finishRequestUI();
-        }
-    } catch(e) {
-        clearTimeout(timeoutId);
-        if (!timeoutTriggered) {
-            clearInterval(interval);
-            if (statusText) {
-                statusText.innerHTML = "⚠️ Network issue. Please call!";
-                statusText.style.color = "red";
-            }
-            finishRequestUI();
-        }
-    }
+        await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", { method: 'POST', body: new URLSearchParams({ ...rideData, timestamp: new Date().toISOString() }), mode: 'no-cors' });
+        clearTimeout(tid); if (!triggered) { clearInterval(interval); progressSpan.textContent = "100%"; statusText.innerHTML = "✅ Request sent! Driver will contact you."; finishRequest(); }
+    } catch(e) { clearTimeout(tid); if (!triggered) { clearInterval(interval); statusText.innerHTML = "⚠️ Network issue. Please call!"; finishRequest(); } }
 }
-
-function finishRequestUI() {
-    if (progressTextSpan) progressTextSpan.style.display = "none";
-    if (btnIcon) {
-        btnIcon.style.display = "block";
-        btnIcon.className = "fas fa-phone";
-    }
-    let callNumber = "0777737047";
-    if (rideData && rideData.hub) {
-        const hubNumbers = {
-            "Luangwa Bus Station": "0777737047",
-            "Chitope, Luangwa": "0777737047",
-            "Luangwa Bridge Market": "0777737047"
-        };
-        if (hubNumbers[rideData.hub]) callNumber = hubNumbers[rideData.hub];
-    }
-    if (submitBtn) submitBtn.style.background = "var(--success-color)";
-    if (submitBtn) submitBtn.disabled = false;
-    document.getElementById('action-label').innerHTML = "Call Now";
-    if (submitBtn) submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
+function finishRequest() {
+    btnLoader.style.display = "none"; progressSpan.style.display = "none"; btnIcon.style.display = "block"; btnIcon.className = "fas fa-phone";
+    submitBtn.style.background = "var(--success-color)"; submitBtn.disabled = false; document.getElementById('action-label').innerHTML = "Call Now";
+    submitBtn.onclick = () => window.location.href = "tel:0777737047";
 }
-
-let mapLink = "";
-function getLocation() {
-    const status = document.getElementById("locationStatus");
-    if (navigator.geolocation) {
-        if (status) status.innerHTML = "📍 Getting location...";
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                if (status) status.innerHTML = "🌐 ✅ Location ready!";
-            },
-            () => { if (status) status.innerHTML = "❌ Failed!"; }
-        );
-    }
-}
-function shareWhatsApp() { if (mapLink) window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + mapLink)}`); else alert("Get location first"); }
-function shareSMS() { if (mapLink) window.location.href = `sms:0777737047?body=📍 ${mapLink}`; else alert("Get location first"); }
-function visitStore() { window.open("https://www.zamlisting.com/store", "_blank"); }
-
-function updateCountdown() {
-    const electionDay = new Date("August 12, 2026 06:00:00").getTime();
-    const now = new Date().getTime();
-    const diff = electionDay - now;
-    if (diff > 0) {
-        const daysEl = document.getElementById("days");
-        const hoursEl = document.getElementById("hours");
-        const minsEl = document.getElementById("mins");
-        const secsEl = document.getElementById("secs");
-        if (daysEl) daysEl.innerHTML = Math.floor(diff / 86400000).toString().padStart(2, '0');
-        if (hoursEl) hoursEl.innerHTML = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-        if (minsEl) minsEl.innerHTML = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-        if (secsEl) secsEl.innerHTML = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-    }
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
-
-setupAuto('gm-origin', 'origin-container', 'originList');
-setupAuto('gm-destination', 'dest-container', 'destinationList');
-const modeGroup = document.getElementById('mode-group');
-if (modeGroup) modeGroup.onchange = checkReady;
-
-const menuInstallBtn = document.getElementById('menu-install-btn');
-if (menuInstallBtn) {
-    menuInstallBtn.addEventListener('click', () => {
-        const a = document.createElement('a');
-        a.href = 'Luangwa_Feira_Rides.apk';
-        a.download = 'Luangwa_Feira_Rides.apk';
-        a.click();
-        alert("📱 Download started!\n\nOpen the APK file to install the app.");
-    });
-}
-const getLocationBtn = document.getElementById('getLocationBtn');
-if (getLocationBtn) getLocationBtn.addEventListener('click', (e) => { e.preventDefault(); getLocation(); });
-const shareWhatsappBtn = document.getElementById('shareWhatsappBtn');
-if (shareWhatsappBtn) shareWhatsappBtn.addEventListener('click', (e) => { e.preventDefault(); shareWhatsApp(); });
-const shareSMSBtn = document.getElementById('shareSMSBtn');
-if (shareSMSBtn) shareSMSBtn.addEventListener('click', (e) => { e.preventDefault(); shareSMS(); });
-
-window.getLocation = getLocation;
-window.shareWhatsApp = shareWhatsApp;
-window.visitStore = visitStore;
+setupAuto('gm-origin', 'originList'); setupAuto('gm-destination', 'destinationList');
+document.getElementById('mode-group').onchange = checkReady;
+document.getElementById('menu-install-btn').addEventListener('click', () => { const a = document.createElement('a'); a.href = 'Luangwa_Feira_Rides.apk'; a.download = 'Luangwa_Feira_Rides.apk'; a.click(); alert("📱 Download started!"); });
+let userMap = "";
+document.getElementById('getLocationBtn').addEventListener('click', (e) => { e.preventDefault(); if (navigator.geolocation) { document.getElementById('locationStatus').innerHTML = "📍 Getting..."; navigator.geolocation.getCurrentPosition(pos => { userMap = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; document.getElementById('locationStatus').innerHTML = "✅ Ready!"; }, () => document.getElementById('locationStatus').innerHTML = "❌ Failed"); } });
+document.getElementById('shareWhatsappBtn').addEventListener('click', (e) => { e.preventDefault(); if (userMap) window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + userMap)}`); else alert("Get location first"); });
+document.getElementById('shareSMSBtn').addEventListener('click', (e) => { e.preventDefault(); if (userMap) window.location.href = `sms:0777737047?body=📍 ${userMap}`; else alert("Get location first"); });
+window.visitStore = () => window.open("https://www.zamlisting.com/store", "_blank");
 </script>
 </body>
 </html>
