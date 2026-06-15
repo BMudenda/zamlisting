@@ -63,26 +63,22 @@
     .contact-billboard { font-size: clamp(28px,6vw,58px); color: #00ffcc; font-weight: bold; }
     
     /* ========== GENTLE FLOAT BOUNCE FOR STATIC PRODUCT IMAGES (same as P1/P2) ========== */
-    /* Applied to: Car, Motorbike (static slide), TV, Phone, Fridge */
-    /* IMPORTANT: Excludes the moving motorbike slide (billboard-slide11) */
-    .billboard-slide:not(.billboard-slide11).active .motorbike-billboard img,
+    .billboard-slide:not(.billboard-slide11):not(.billboard-slide14).active .motorbike-billboard img,
     .billboard-slide.active .car-billboard img,
     .billboard-slide.active .product-image img {
       animation: float 2.8s ease-in-out infinite;
       transform-origin: center;
     }
     
-    /* Gentle floating keyframe (identical to P1/P2) */
     @keyframes float {
       0% { transform: translateY(0px); }
       50% { transform: translateY(-8px); }
       100% { transform: translateY(0px); }
     }
     
-    /* Slight timing variations for natural feel */
     .billboard-slide.active .car-billboard img { animation-duration: 2.6s; }
     .billboard-slide.active .product-image img { animation-duration: 2.7s; }
-    .billboard-slide:not(.billboard-slide11).active .motorbike-billboard img { animation-duration: 2.5s; }
+    .billboard-slide:not(.billboard-slide11):not(.billboard-slide14).active .motorbike-billboard img { animation-duration: 2.5s; }
     
     /* ========== ORIGINAL ROTATING IMAGE SLIDE (UNTOUCHED) ========== */
     .rotating-image img { width: 350px; filter: drop-shadow(0 0 15px rgba(0,255,255,0.8)); animation: coinRotate 3s ease-in-out infinite; }
@@ -164,6 +160,15 @@
     .billboard-slide13 .ecz-label { font-size: 12px; text-transform: uppercase; color: #ffd700; }
     .billboard-slide13 .ecz-footer { margin-top: 20px; font-size: 14px; opacity: 0.9; }
     @media (max-width: 768px) { .billboard-slide13 .ecz-logo { width: 120px; } .billboard-slide13 .ecz-box { width: 70px; height: 70px; } .billboard-slide13 .ecz-number { font-size: 24px; } .billboard-slide13 .ecz-title { font-size: 20px; } .billboard-slide13 .container { gap: 25px; } }
+
+    /* ==================== SLIDE 14 - ISOLATED EYE GEOMETRY OVERHAUL ==================== */
+    .billboard-slide14 { display: flex; gap: 60px; align-items: center; justify-content: center; width: 100%; height: 100%; background: #06090e; }
+    .eye-svg { width: 280px; height: 140px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+    .eye-clip-mask { transform-origin: 140px 30px; transition: transform 0.15s cubic-bezier(0.25, 1, 0.2, 1); }
+    .blinking .eye-clip-mask { transform: scaleY(0); }
+    .closed .eye-clip-mask { transform: scaleY(0); transition: transform 0.55s cubic-bezier(0.5, 0, 0.25, 1); }
+    .iris-group { transform: translate(var(--saccade-x, 0px), var(--saccade-y, 0px)); transition: transform 0.16s cubic-bezier(0.25, 1, 0.2, 1); }
+    .pupil { transition: r 0.35s ease-out; }
   </style>
 </head>
 <body>
@@ -182,31 +187,23 @@
       </div>
     </div>
 
-    <!-- BILLBOARD SLIDES -->
     <div class="billboard-slide active"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
     
-    <!-- SLIDE 2 - MOTORBIKE (static, with gentle float bounce) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div></div><div class="product-info"><div class="product-price">🏍️ MOTORBIKE RIDE • K15</div><div class="status-text">✅ Available!</div><button class="store-button" onclick="window.open('https://www.zamlisting.com/luangwa','_blank');">🚀 BOOK NOW</button></div></div></div>
     
-    <!-- SLIDE 3 - CAR (with gentle float bounce) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><div class="car-billboard"><img src="car.png" alt="Car"></div></div><div class="product-info"><div class="product-price">🚗 CAR RIDE • FROM K25</div><div class="status-text"> ✅Available</div><button class="store-button" onclick="window.open('https://www.zamlisting.com/luangwa','_blank');">📅 BOOK NOW</button></div></div></div>
     
     <div class="billboard-slide"><div class="promo-billboard">🔥 50% DISCOUNT PROMOTION ALL LOCAL RIDES 🔥</div></div>
     <div class="billboard-slide"><div class="contact-billboard">📞 CONTACT NOW • FAST PICKUP • 24/7 SUPPORT</div></div>
     
-    <!-- SLIDE - TV (with gentle float bounce) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="TV"></div><div class="product-info"><div class="product-price">📺 Smart TV • K3,000</div><button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 SHOP</button></div></div></div>
     
-    <!-- SLIDE - Phone (with gentle float bounce) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="S241S.png" alt="Phone"></div><div class="product-info"><div class="product-price">📱 Samsung • K1,200</div><button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 VIEW</button></div></div></div>
     
-    <!-- SLIDE - Fridge (with gentle float bounce) -->
     <div class="billboard-slide"><div class="product-row"><div class="product-image"><img src="fridge.png" alt="Fridge"></div><div class="product-info"><div class="product-price">❄️ Fridge • K2,600</div><button class="store-button" onclick="window.open('https://www.zamlisting.com','_blank');">🛒 SHOP</button></div></div></div>
     
-    <!-- SLIDE 10 - ROTATING IMAGE (unique rotation, no float) -->
     <div class="billboard-slide"><div class="rotating-image"><img src="car.png" alt="Car"></div></div>
     
-    <!-- SLIDE 11 - ROAD EFFECT (FULLY RESTORED: moving motorbike left to right) -->
     <div class="billboard-slide billboard-slide11">
       <div class="road-track"></div>
       <div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div>
@@ -214,7 +211,6 @@
     
     <div class="billboard-slide"><div style="text-align:center; background:rgba(0,0,0,0.7); padding:40px; border-radius:60px;"><div style="font-size:42px; color:#ffdd77;">📱 SCAN TO BOOK</div><img src="LFR3.png" alt="QR" style="margin:20px; border-radius:20px; width:250px; height:250px;"><div style="font-size:20px; color:#aaffdd;">Scan with phone → Instant booking</div></div></div>
     
-    <!-- SLIDE 12 - Political with P1/P2 float -->
     <div class="billboard-slide billboard-slide12">
         <div class="top-right-group">
             <div class="tag">CAMPAIGN MESSAGE</div>
@@ -226,10 +222,7 @@
                     <img class="circle-img circle-big" src="P1.png" alt="Politician">
                     <img class="circle-img circle-small" src="P2.png" alt="Supporter">
                 </div>
-                <div class="name-tag">
-                    Hakainde Hichilema<br>
-                    For President 
-                </div>
+                <div class="name-tag"> Hakainde Hichilema<br> For President </div>
                 <div class="square-group">
                     <img class="square-img" src="upnd.png" alt="Campaign">
                     <div class="square-x">
@@ -250,7 +243,6 @@
         </div>
     </div>
     
-    <!-- SLIDE 13 - ECZ ELECTION COUNTDOWN -->
     <div class="billboard-slide billboard-slide13">
         <div class="top-right-group">
             <div class="tag">ELECTION COUNTDOWN</div>
@@ -274,10 +266,56 @@
             </div>
         </div>
     </div>
+
+    <div class="billboard-slide billboard-slide14">
+        <svg class="eye-svg left-eye" viewBox="0 0 280 140">
+            <defs>
+                <radialGradient id="iris-depth" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#050505"/><stop offset="22%" stop-color="#0d0d0d"/>
+                    <stop offset="30%" stop-color="#4a3319"/><stop offset="55%" stop-color="#785329"/>
+                    <stop offset="85%" stop-color="#a67742"/><stop offset="100%" stop-color="#261607"/>
+                </radialGradient>
+                <radialGradient id="sclera-grad" cx="50%" cy="50%" r="50%">
+                    <stop offset="30%" stop-color="#fffbfa"/><stop offset="75%" stop-color="#eed8cc"/>
+                    <stop offset="100%" stop-color="#cda38f"/>
+                </radialGradient>
+                <clipPath id="left-eye-clip">
+                    <path class="eye-clip-mask" d="M 20,70 C 40,25 110,15 250,35 C 260,65 220,115 110,120 C 50,115 30,90 20,70 Z"/>
+                </clipPath>
+            </defs>
+            <g clip-path="url(#left-eye-clip)">
+                <path d="M 0,0 L 280,0 L 280,140 L 0,140 Z" fill="url(#sclera-grad)"/>
+                <path d="M 18,70 C 23,60 38,62 42,72 C 38,80 24,78 18,70 Z" fill="#e0a396" opacity="0.85"/>
+                <g class="iris-group">
+                    <circle cx="145" cy="70" r="48" fill="url(#iris-depth)"/>
+                    <circle class="pupil" cx="145" cy="70" r="15" fill="#000" />
+                    <ellipse cx="128" cy="52" rx="8" ry="5" transform="rotate(-15 128 52)" fill="#ffffff" fill-opacity="0.85"/>
+                    <circle cx="158" cy="88" r="3" fill="#ffffff" fill-opacity="0.3"/>
+                </g>
+            </g>
+        </svg>
+
+        <svg class="eye-svg right-eye" viewBox="0 0 280 140">
+            <defs>
+                <clipPath id="right-eye-clip">
+                    <path class="eye-clip-mask" d="M 260,70 C 240,25 170,15 30,35 C 20,65 60,115 170,120 C 230,115 250,90 260,70 Z"/>
+                </clipPath>
+            </defs>
+            <g clip-path="url(#right-eye-clip)">
+                <path d="M 0,0 L 280,0 L 280,140 L 0,140 Z" fill="url(#sclera-grad)"/>
+                <path d="M 262,70 C 257,60 242,62 238,72 C 242,80 256,78 262,70 Z" fill="#e0a396" opacity="0.85"/>
+                <g class="iris-group">
+                    <circle cx="135" cy="70" r="48" fill="url(#iris-depth)"/>
+                    <circle class="pupil" cx="135" cy="70" r="15" fill="#000" />
+                    <ellipse cx="118" cy="52" rx="8" ry="5" transform="rotate(-15 118 52)" fill="#ffffff" fill-opacity="0.85"/>
+                    <circle cx="148" cy="88" r="3" fill="#ffffff" fill-opacity="0.3"/>
+                </g>
+            </g>
+        </svg>
+    </div>
     
-  <!-- MAP OVERLAY -->
   <div id="mapPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-map-marker"></i> Find Your Way</span><button class="close-btn" onclick="closePanel('mapPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-map-marker"></i> Find Your Way</span><button class="close-btn" onclick="closePanel('mapPanel')">×</button></div>
     <div class="panel-content">
       <div class="map-container">
         <iframe class="map-iframe" id="mapIframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30671.63491544881!2d29.607876373142864!3d-15.616184020765396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x193f5570e1e207f5%3A0x7b8e8b8b8b8b8b8b!2sLuangwa%2C%20Zambia!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" loading="lazy" allowfullscreen></iframe>
@@ -291,9 +329,8 @@
     </div>
   </div>
 
-  <!-- SIMPLE MEDIA OVERLAY -->
   <div id="mediaPanel" class="overlay-panel">
-    <div class="panel-header"><span><i class="fa fa-headphones"></i> Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">&times;</button></div>
+    <div class="panel-header"><span><i class="fa fa-headphones"></i> Media Player</span><button class="close-btn" onclick="closePanel('mediaPanel')">×</button></div>
     <div class="panel-content">
       <div class="media-tabs">
         <button class="tab-btn active" onclick="switchTab('video')">🎬 Video Player</button>
@@ -370,9 +407,9 @@
   openMapsBtn.onclick = () => window.open(`https://www.google.com/maps/dir/Luangwa,+Zambia/Luangwa,+Zambia`, '_blank');
   window.searchAndShowOnMap = searchAndShowOnMap;
 
-  // SLIDESHOW
+  // SLIDESHOW WITH SEAMLESS WRAPPING FOR ALL 14 SLIDES
   (function() {
-    const slides = document.querySelectorAll('.billboard-slide');
+    const slides = document.querySelectorAll('.fullpage-billboard .billboard-header > .billboard-slide');
     if (!slides.length) return;
     let currentIndex = 0, autoInterval;
     function showSlide(index) {
@@ -404,7 +441,7 @@
     else { document.getElementById('audioTab').classList.add('active'); document.querySelector('.media-tabs .tab-btn:last-child').classList.add('active'); }
   }
 
-  // VIDEO PLAYER
+  // VIDEO PLAYER INTERFACES
   let videoFiles = [], currentVideo = 0;
   const videoPlayer = document.getElementById('videoPlayer');
   const videoPlaylist = document.getElementById('videoPlaylist');
@@ -427,13 +464,13 @@
     let url = URL.createObjectURL(videoFiles[i]);
     videoPlayer.src = url;
     videoPlayer.load();
-    videoPlayer.play().catch(e => console.log('Click play to start'));
+    videoPlayer.play().catch(e => console.log('Playback error handled'));
     videoNowPlaying.innerHTML = `🎬 Now Playing: ${videoFiles[i].name}`;
     const items = videoPlaylist.querySelectorAll('li');
     items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
 
-  // AUDIO PLAYER
+  // AUDIO PLAYER INTERFACES
   let audioFiles = [], currentAudio = 0;
   const audioPlayer = document.getElementById('audioPlayer');
   const audioPlaylist = document.getElementById('audioPlaylist');
@@ -456,11 +493,83 @@
     let url = URL.createObjectURL(audioFiles[i]);
     audioPlayer.src = url;
     audioPlayer.load();
-    audioPlayer.play().catch(e => console.log('Click play to start'));
+    audioPlayer.play().catch(e => console.log('Playback error handled'));
     audioNowPlaying.innerHTML = `🎵 Now Playing: ${audioFiles[i].name}`;
     const items = audioPlaylist.querySelectorAll('li');
     items.forEach((item, idx) => { if (idx === i) item.classList.add('active'); else item.classList.remove('active'); });
   }
+
+  // ==================== SLIDE 14 - TIMED WAKE & TOTAL CLOSE LOOP ENGINE ====================
+  const eyeElements = document.querySelectorAll('.billboard-slide14 .eye-svg');
+  const irisGroups = document.querySelectorAll('.billboard-slide14 .iris-group');
+  const pupilElements = document.querySelectorAll('.billboard-slide14 .pupil');
+  
+  let eyeIsAsleep = false;
+  let microBlinkTimeout, macroGazeTimeout;
+
+  function runEyeMasterLifecycle() {
+      eyeIsAsleep = false;
+      eyeElements.forEach(eye => eye.classList.remove('closed'));
+      
+      executeMicroBlinks();
+      executeMacroGazeSaccades();
+
+      // Cycle configurations: 8 seconds active, then 4 seconds completely blacked out
+      setTimeout(() => {
+          executeCompleteSleepState(4000);
+      }, 8000);
+  }
+
+  function executeCompleteSleepState(duration) {
+      eyeIsAsleep = true;
+      clearTimeout(microBlinkTimeout);
+      clearTimeout(macroGazeTimeout);
+      
+      eyeElements.forEach(eye => eye.classList.add('closed'));
+
+      setTimeout(() => {
+          eyeElements.forEach(eye => {
+              eye.classList.remove('closed');
+              eye.classList.add('blinking');
+          });
+          
+          setTimeout(() => {
+              eyeElements.forEach(eye => eye.classList.remove('blinking'));
+              runEyeMasterLifecycle();
+          }, 150);
+      }, duration);
+  }
+
+  function executeMicroBlinks() {
+      if (eyeIsAsleep) return;
+      eyeElements.forEach(eye => eye.classList.add('blinking'));
+      setTimeout(() => {
+          eyeElements.forEach(eye => eye.classList.remove('blinking'));
+      }, 120);
+      microBlinkTimeout = setTimeout(executeMicroBlinks, Math.random() * 3000 + 1500);
+  }
+
+  function executeMacroGazeSaccades() {
+      if (eyeIsAsleep) return;
+      const maxX = 24, maxY = 10;
+      const targetX = (Math.random() - 0.5) * maxX;
+      const targetY = (Math.random() - 0.5) * maxY;
+      
+      irisGroups.forEach(iris => {
+          iris.style.setProperty('--saccade-x', `${targetX}px`);
+          iris.style.setProperty('--saccade-y', `${targetY}px`);
+      });
+
+      const baseRadius = 15;
+      const moveIntensity = Math.sqrt(targetX*targetX + targetY*targetY) / 26;
+      const customRadius = baseRadius + (baseRadius * (moveIntensity * 0.12));
+      pupilElements.forEach(pupil => pupil.setAttribute('r', customRadius));
+
+      macroGazeTimeout = setTimeout(executeMacroGazeSaccades, Math.random() * 2000 + 500);
+  }
+
+  // Initializing eye lifecycle
+  runEyeMasterLifecycle();
 </script>
 </body>
 </html>
