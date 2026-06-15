@@ -132,7 +132,7 @@
     .product-container.show { display: block; }
     .booking-container { background: var(--bg-color-card); padding: 16px; border-radius: 16px; position: relative; }
     
-    /* Dedicated Form Header Layout for Actions */
+    /* Form Header Layout for Actions */
     .form-header-bar {
         display: flex;
         justify-content: space-between;
@@ -323,18 +323,18 @@
   <main class="product-container" id="booking-form-popup">
     <div class="booking-container">
       
-      <!-- New Dedicated Form Header Bar containing Title, 3 Dots & Close X -->
+      <!-- Top Action Bar for Title, 3 Dots & Close X -->
       <div class="form-header-bar">
           <div class="form-title-text">
               <i class="fas fa-file-alt" style="color: var(--primary-color);"></i> Requesting Form
           </div>
           <div class="form-actions-cluster">
               <!-- Three Dots Button -->
-              <button id="menu-toggle-btn" class="form-menu-btn" onclick="toggleDropdown()" title="Open Options Menu">
+              <button id="menu-toggle-btn" class="form-menu-btn" onclick="toggleDropdown(event)" title="Open Options Menu">
                   <i class="fas fa-ellipsis-v"></i>
               </button>
               <!-- Close Form X Button -->
-              <button class="form-close-btn" onclick="toggleForm()" title="Close Form">
+              <button class="form-close-btn" onclick="toggleForm(event)" title="Close Form">
                   <i class="fas fa-times"></i>
               </button>
           </div>
@@ -617,7 +617,8 @@ function setupAuto(inputId, containerId, listId) {
       const div = document.createElement('div');
       div.className = 'suggestion';
       div.textContent = place;
-      div.onclick = () => {
+      div.onclick = (e) => {
+        e.stopPropagation(); // Prevents autocomplete clicks from closing the container
         input.value = place;
         list.innerHTML = '';
         checkReady();
@@ -641,7 +642,8 @@ function updateRouteInfo(pickup, destination) {
   openLink.href = `https://www.google.com/maps/dir/${pickupCoord.lat},${pickupCoord.lng}/${destCoord.lat},${destCoord.lng}`;
 }
 
-function toggleForm() {
+function toggleForm(event) {
+  if (event) event.stopPropagation(); // Prevents button action from conflicting with click rules
   const formPopup = document.getElementById("booking-form-popup");
   const menu = document.getElementById("header-menu-dropdown");
   if (menu && menu.classList.contains("show")) {
@@ -838,22 +840,27 @@ setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
-function toggleDropdown() {
+function toggleDropdown(event) {
+  if (event) event.stopPropagation(); // Prevents conflict closures
   const menu = document.getElementById("header-menu-dropdown");
   menu.classList.toggle("show");
 }
 
-// Fixed window click controller to guarantee the form never auto-closes while being typed inside
+// Fixed Window Controller: Prevents the form from ever closing on its own while interacting with fields/options
 window.onclick = (event) => {
   const menu = document.getElementById("header-menu-dropdown");
   const formPopup = document.getElementById("booking-form-popup");
   const companyInfo = document.querySelector(".company-info");
   const toggleActionBtn = document.querySelector(".form-toggle-action-btn");
   
-  // Clean structure check: Only run close logic if the clicked element is completely outside the popup layout block
+  // If the user clicks completely inside the form card layout or autocomplete elements, enforce a hard return (keep form open)
+  if (formPopup && formPopup.contains(event.target)) {
+      return; 
+  }
+  
+  // Close only if clicking completely outside the layout structure on the blank slide billboard areas
   if (formPopup && formPopup.classList.contains('show')) {
-      if (!formPopup.contains(event.target) && 
-          !companyInfo.contains(event.target) && 
+      if (!companyInfo.contains(event.target) && 
           !toggleActionBtn.contains(event.target) && 
           !menu.contains(event.target) &&
           !event.target.closest('.request-billboard')) {
