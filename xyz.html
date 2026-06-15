@@ -190,7 +190,6 @@
         justify-content: center;
         gap: 10px;
         z-index: 10;
-        pointer-events: none;
     }
     .dot {
         width: 10px;
@@ -198,7 +197,6 @@
         border-radius: 50%;
         background: rgba(255,255,255,0.4);
         transition: all 0.2s;
-        pointer-events: auto;
         cursor: pointer;
     }
     .dot.active {
@@ -492,7 +490,7 @@
     </div>
 </div>
 
-<!-- MENU DROPDOWN - YOUR ORIGINAL CONTENT -->
+<!-- MENU DROPDOWN -->
 <div id="menuDropdown" class="menu-dropdown">
     <div class="dropdown-content-section">
         <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
@@ -538,22 +536,29 @@ let currentSlide = 0;
 let autoPlayInterval;
 
 function showSlide(index) {
+    // Ensure index wraps around correctly
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
+    
     slides.forEach((slide, i) => {
-        slide.classList.toggle('active', i === index);
+        slide.classList.remove('active');
     });
+    slides[index].classList.add('active');
     currentSlide = index;
     updateDots();
 }
 
 function nextSlide() {
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
+    let newIndex = currentSlide + 1;
+    if (newIndex >= slides.length) newIndex = 0;
+    showSlide(newIndex);
     resetAutoPlay();
 }
 
 function prevSlide() {
-    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-    showSlide(currentSlide);
+    let newIndex = currentSlide - 1;
+    if (newIndex < 0) newIndex = slides.length - 1;
+    showSlide(newIndex);
     resetAutoPlay();
 }
 
@@ -567,11 +572,14 @@ function createDots() {
     dotsContainer.innerHTML = '';
     slides.forEach((_, i) => {
         const dot = document.createElement('div');
-        dot.className = 'dot' + (i === currentSlide ? ' active' : '');
-        dot.addEventListener('click', () => {
-            showSlide(i);
-            resetAutoPlay();
-        });
+        dot.className = 'dot';
+        if (i === currentSlide) dot.classList.add('active');
+        dot.addEventListener('click', (function(index) {
+            return function() {
+                showSlide(index);
+                resetAutoPlay();
+            };
+        })(i));
         dotsContainer.appendChild(dot);
     });
 }
@@ -579,13 +587,20 @@ function createDots() {
 function updateDots() {
     const dots = document.querySelectorAll('.dot');
     dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === currentSlide);
+        if (i === currentSlide) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
     });
 }
 
+// Initialize slider
 showSlide(0);
 createDots();
 autoPlayInterval = setInterval(nextSlide, 8000);
+
+// Manual controls
 document.getElementById('prevSlideBtn').addEventListener('click', prevSlide);
 document.getElementById('nextSlideBtn').addEventListener('click', nextSlide);
 
@@ -599,7 +614,7 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// ========== SIMPLIFIED PLACES LIST (ADD YOUR PLACES HERE) ==========
+// ========== SIMPLIFIED PLACES LIST ==========
 const placesWithCoords = [
   { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
   { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055 },
@@ -607,10 +622,7 @@ const placesWithCoords = [
   { name: "Luangwa Town", lat: -15.6400, lng: 30.5000 },
   { name: "Rufunsa Town", lat: -15.2500, lng: 30.3000 },
   { name: "Lusaka Town", lat: -15.3875, lng: 28.3228 },
-  { name: "Luanshya Town", lat: -13.1333, lng: 28.4167 },
-  { name: "Chipata Town", lat: -13.6333, lng: 32.6500 },
-  { name: "Petauke Town", lat: -14.2400, lng: 31.3200 },
-  { name: "Nyimba Town", lat: -14.5560, lng: 30.8170 }
+  { name: "Luanshya Town", lat: -13.1333, lng: 28.4167 }
 ];
 
 const MASTER_PLACES_LIST = placesWithCoords.map(p => p.name);
@@ -620,17 +632,14 @@ function getCoordinates(placeName) {
   return found || { lat: -15.6213, lng: 30.4064 };
 }
 
-// ========== SIMPLIFIED DISTANCE SEGMENTS (ADD YOUR CONNECTIONS HERE) ==========
+// ========== DISTANCE SEGMENTS ==========
 const segments = [
   { from: "Luangwa Bus Station", to: "Chitope, Luangwa", distance: 62 },
   { from: "Luangwa Bus Station", to: "Luangwa Bridge Market", distance: 89 },
   { from: "Luangwa Bus Station", to: "Luangwa Town", distance: 5 },
   { from: "Luangwa Town", to: "Rufunsa Town", distance: 102.7 },
   { from: "Rufunsa Town", to: "Lusaka Town", distance: 192.7 },
-  { from: "Lusaka Town", to: "Luanshya Town", distance: 335 },
-  { from: "Lusaka Town", to: "Chipata Town", distance: 578 },
-  { from: "Lusaka Town", to: "Petauke Town", distance: 350 },
-  { from: "Lusaka Town", to: "Nyimba Town", distance: 288 }
+  { from: "Lusaka Town", to: "Luanshya Town", distance: 335 }
 ];
 
 const hubs = ["Luangwa Bus Station", "Luangwa Town", "Rufunsa Town", "Lusaka Town"];
@@ -706,7 +715,7 @@ const btnIcon = document.getElementById('btn-icon');
 const btnLoader = document.getElementById('btn-loader');
 const progressTextSpan = document.getElementById('progress-text');
 
-// Phone validation - shows trip details ONLY when valid 10-digit number starting with 0 is entered
+// Phone validation
 phoneInput.oninput = () => {
   if (/^0[0-9]{9}$/.test(phoneInput.value)) {
     tripDiv.style.display = 'block';
@@ -838,6 +847,7 @@ function calculate(from, to, mode) {
     btnIcon.style.display = "block";
     btnLoader.style.display = "none";
     progressTextSpan.style.display = "none";
+    progressTextSpan.textContent = "0%";
     document.getElementById('action-label').innerHTML = "Request Now";
     submitBtn.onclick = handleRequest;
   }, 500);
@@ -851,7 +861,8 @@ async function handleRequest() {
   const startTime = Date.now();
   const duration = 13000;
   const interval = setInterval(() => {
-    let p = Math.min(98, Math.floor(((Date.now() - startTime) / duration) * 98));
+    let elapsed = Date.now() - startTime;
+    let p = Math.min(98, Math.floor((elapsed / duration) * 98));
     progressTextSpan.textContent = p + "%";
   }, 100);
   const payload = { ...rideData, timestamp: new Date().toISOString() };
@@ -967,7 +978,7 @@ setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
-// Form dropdown controls - PERSISTENT (no auto-close)
+// Form dropdown controls
 const formDropdown = document.getElementById('formDropdown');
 const openFormBtn = document.getElementById('openFormBtn');
 const closeFormBtn = document.getElementById('closeFormBtn');
