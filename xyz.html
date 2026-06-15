@@ -110,7 +110,7 @@
     .app-interface-wrapper {
         position: fixed;
         right: 20px;
-        top: 75px; /* Shifted down slightly to stay perfectly aligned under header actions */
+        top: 75px; 
         z-index: 100000;
         display: flex;
         flex-direction: column;
@@ -130,13 +130,49 @@
         padding: 0;
     }
     .product-container.show { display: block; }
-    .booking-container { background: var(--bg-color-card); padding: 16px; border-radius: 16px; }
+    .booking-container { background: var(--bg-color-card); padding: 16px; border-radius: 16px; position: relative; }
+    
+    /* Dedicated Form Header Layout for Actions */
+    .form-header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-color-light);
+    }
+    .form-title-text {
+        font-weight: bold;
+        font-size: 1rem;
+        color: var(--font-color-dark);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .form-actions-cluster {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    /* Action Buttons in Form Header */
+    .form-menu-btn, .form-close-btn { 
+        background: none; 
+        border: none; 
+        font-size: 18px; 
+        color: #777; 
+        cursor: pointer; 
+        padding: 4px; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    .form-menu-btn:hover { color: var(--primary-color); transform: scale(1.1); }
+    .form-close-btn:hover { color: var(--error-color); transform: scale(1.1); }
+
     fieldset { border: 1px solid var(--border-color-light); border-radius: 10px; padding: 12px; background: #fafafa; margin-bottom: 15px; width: 100%; position: relative; }
     legend { font-weight: bold; color: var(--primary-color); padding: 0 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-    
-    /* Three Dots relocated to Form Top Right Corner */
-    .form-menu-btn { position: absolute; top: 0; right: 5px; background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 4px; }
-    .form-menu-btn:hover { opacity: 0.8; transform: scale(1.05); }
 
     .input-box { background: white; border: 1.5px solid var(--border-color-light); border-radius: 8px; padding: 10px; display: flex; align-items: center; width: 100%; position: relative; transition: all 0.3s ease; }
     .input-box .material-icons { color: var(--primary-color); font-size: 20px; margin-right: 10px; }
@@ -248,7 +284,8 @@
       
 </head>
 <body>
-  <div class="billboard-header">
+  <!-- ========== BILLBOARD HEADER (FULL PAGE) ========== -->
+<div class="billboard-header">
     <div class="header-overlay">
         <div class="company-info" onclick="toggleForm()" title="Request Ride Form">
             <img src="lfr.jpg" alt="Logo" class="corner-logo">
@@ -264,6 +301,7 @@
         </button>
     </div>
 
+<!-- SLIDES -->
 <div class="billboard-slide billboard-slide1"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
 <div class="billboard-slide billboard-slide2"><div class="vehicle-container"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">For as low as K15</div></div></div>
 <div class="billboard-slide billboard-slide3"><div class="vehicle-container"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text">For as low as K25</div></div></div>
@@ -279,19 +317,37 @@
 <div class="billboard-slide billboard-slide13"><div class="contact-billboard">⭐ RATED 4.9/5 BY HAPPY CUSTOMERS ⭐</div></div>
 </div>
 
+<!-- ========== APP INTERFACE ON TOP RIGHT ========== -->
 <div class="app-interface-wrapper">
+  
   <main class="product-container" id="booking-form-popup">
     <div class="booking-container">
+      
+      <!-- New Dedicated Form Header Bar containing Title, 3 Dots & Close X -->
+      <div class="form-header-bar">
+          <div class="form-title-text">
+              <i class="fas fa-file-alt" style="color: var(--primary-color);"></i> Requesting Form
+          </div>
+          <div class="form-actions-cluster">
+              <!-- Three Dots Button -->
+              <button id="menu-toggle-btn" class="form-menu-btn" onclick="toggleDropdown()" title="Open Options Menu">
+                  <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <!-- Close Form X Button -->
+              <button class="form-close-btn" onclick="toggleForm()" title="Close Form">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+      </div>
+
       <fieldset>
-        <legend><span class="material-icons">account_circle</span> Requesting Form</legend>
-        <button id="menu-toggle-btn" class="form-menu-btn" onclick="toggleDropdown()" title="Menu">
-          <i class="fas fa-ellipsis-v"></i>
-        </button>
+        <legend><span class="material-icons">account_circle</span> Identity Check</legend>
         <div class="input-box" id="phone-box">
           <span class="material-icons">phone</span>
           <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
         </div>
       </fieldset>
+      
       <div id="trip-details" class="hidden-section">
         <fieldset><legend><span class="material-icons">commute</span> Transport Mode</legend>
             <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">Choose your preferred transport mode</p>
@@ -315,6 +371,7 @@
           </div>
         </fieldset>
       </div>
+      
       <div id="summary-section" class="hidden-section">
         <fieldset><legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
           <div id="summary-cards"></div>
@@ -441,7 +498,6 @@ const MASTER_PLACES_LIST = [
   "Chipata Town"
 ];
 
-// Coordinates for the 6 places
 const placesWithCoords = [
   { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
   { name: "Luangwa Town", lat: -15.6400, lng: 30.5000 },
@@ -456,7 +512,6 @@ function getCoordinates(placeName) {
   return found || { lat: -15.6213, lng: 30.4064 };
 }
 
-// Distance segments between the 6 places
 const segments = [
   { from: "Luangwa Bus Station", to: "Luangwa Town", distance: 5 },
   { from: "Luangwa Bus Station", to: "Rufunsa Town", distance: 105 },
@@ -468,10 +523,8 @@ const segments = [
   { from: "Lusaka Town", to: "Chipata Town", distance: 578 }
 ];
 
-// Hubs for routing
 const hubs = MASTER_PLACES_LIST;
 
-// Build graph
 const graph = {};
 segments.forEach(({ from, to, distance }) => {
   if (!graph[from]) graph[from] = [];
@@ -588,7 +641,6 @@ function updateRouteInfo(pickup, destination) {
   openLink.href = `https://www.google.com/maps/dir/${pickupCoord.lat},${pickupCoord.lng}/${destCoord.lat},${destCoord.lng}`;
 }
 
-// Form visibility controller (behaves like a dropdown toggle menu)
 function toggleForm() {
   const formPopup = document.getElementById("booking-form-popup");
   const menu = document.getElementById("header-menu-dropdown");
@@ -752,7 +804,6 @@ function finishRequestUI() {
   submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
 }
 
-// Location sharing functions
 let mapLink = "";
 
 function getLocation() {
@@ -783,32 +834,32 @@ function visitStore() {
   window.open("https://www.zamlisting.com/store", "_blank");
 }
 
-// Initialize autocomplete
 setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
-// Menu toggle handler (opens option details underneath form popup)
 function toggleDropdown() {
   const menu = document.getElementById("header-menu-dropdown");
   menu.classList.toggle("show");
 }
 
+// Fixed window click controller to guarantee the form never auto-closes while being typed inside
 window.onclick = (event) => {
   const menu = document.getElementById("header-menu-dropdown");
   const formPopup = document.getElementById("booking-form-popup");
   const companyInfo = document.querySelector(".company-info");
   const toggleActionBtn = document.querySelector(".form-toggle-action-btn");
   
-  // Close everything if clicking totally off the top-right app layout block
-  if (formPopup && formPopup.classList.contains('show') && 
-      !formPopup.contains(event.target) && 
-      !companyInfo.contains(event.target) && 
-      !toggleActionBtn.contains(event.target) && 
-      !menu.contains(event.target) &&
-      !event.target.closest('.request-billboard')) {
-      formPopup.classList.remove('show');
-      menu.classList.remove('show');
+  // Clean structure check: Only run close logic if the clicked element is completely outside the popup layout block
+  if (formPopup && formPopup.classList.contains('show')) {
+      if (!formPopup.contains(event.target) && 
+          !companyInfo.contains(event.target) && 
+          !toggleActionBtn.contains(event.target) && 
+          !menu.contains(event.target) &&
+          !event.target.closest('.request-billboard')) {
+          formPopup.classList.remove('show');
+          menu.classList.remove('show');
+      }
   }
 };
 
