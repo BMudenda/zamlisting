@@ -160,10 +160,10 @@
         display: flex;
         justify-content: center;
         gap: 15px;
-        z-index: 10;
+        z-index: 20;
     }
     .nav-btn {
-        background: rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.6);
         backdrop-filter: blur(8px);
         border: none;
         width: 44px;
@@ -176,9 +176,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 20;
     }
     .nav-btn:hover {
-        background: rgba(0,0,0,0.7);
+        background: rgba(0,0,0,0.8);
         transform: scale(1.05);
     }
     .slide-dots {
@@ -189,7 +190,7 @@
         display: flex;
         justify-content: center;
         gap: 10px;
-        z-index: 10;
+        z-index: 20;
     }
     .dot {
         width: 10px;
@@ -324,7 +325,7 @@
 
     .summary-card { background: white; border: 1px solid var(--border-color-light); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
     
-    /* FIXED LOADER BUTTON */
+    /* FIXED LOADER BUTTON - ONLY PERCENTAGE TEXT, NO RING */
     .submit-btn { 
         background: var(--primary-color); 
         color: white; 
@@ -334,7 +335,8 @@
         display: flex; 
         align-items: center; 
         justify-content: center; 
-        font-size: 24px; 
+        font-size: 18px; 
+        font-weight: bold;
         border: none; 
         cursor: pointer; 
         box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
@@ -342,22 +344,9 @@
         position: relative;
         margin: 0 auto;
     }
-    .btn-loader { 
-        width: 45px; 
-        height: 45px; 
-        border: 4px solid rgba(255,255,255,0.3); 
-        border-top: 4px solid #fff; 
-        border-radius: 50%; 
-        animation: spin 0.8s linear infinite; 
-        display: none; 
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
     #progress-text { 
         position: absolute; 
-        font-size: 12px; 
+        font-size: 16px; 
         font-weight: bold; 
         color: white; 
         display: none; 
@@ -365,9 +354,9 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 10;
-        background: rgba(0,0,0,0.7);
-        padding: 2px 6px;
-        border-radius: 20px;
+        background: rgba(0,0,0,0.5);
+        padding: 4px 8px;
+        border-radius: 30px;
         white-space: nowrap;
     }
     #btn-icon { 
@@ -376,6 +365,9 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+    .btn-loader { 
+        display: none;
     }
     
     .hidden-section { display: none; }
@@ -410,7 +402,7 @@
         .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
         .form-body { padding: 16px; }
         .nav-btn { width: 36px; height: 36px; font-size: 16px; }
-        .submit-btn { width: 60px; height: 60px; }
+        .submit-btn { width: 60px; height: 60px; font-size: 16px; }
         #btn-icon { font-size: 22px; }
         .menu-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
     }
@@ -497,7 +489,6 @@
             <div style="display:flex; justify-content:center; margin-top:12px;">
                 <button class="submit-btn" id="submit-btn">
                     <i class="fas fa-paper-plane" id="btn-icon"></i>
-                    <div class="btn-loader" id="btn-loader"></div>
                     <span id="progress-text">0%</span>
                 </button>
             </div>
@@ -548,22 +539,20 @@
 </div>
 
 <script>
-// ========== MANUAL SLIDER WITH AUTO-PLAY (FIXED) ==========
+// ========== MANUAL SLIDER WITH AUTO-PLAY (FIXED - WORKING) ==========
 let slides = document.querySelectorAll('.billboard-slide');
 let currentSlide = 0;
 let autoPlayInterval;
 
 function showSlide(index) {
-    if (index < 0) index = slides.length - 1;
-    if (index >= slides.length) index = 0;
-    
-    slides.forEach((slide, i) => {
-        if (i === index) {
-            slide.classList.add('active');
-        } else {
-            slide.classList.remove('active');
-        }
+    // Remove active class from all slides
+    slides.forEach(slide => {
+        slide.classList.remove('active');
     });
+    // Add active class to current slide
+    if (slides[index]) {
+        slides[index].classList.add('active');
+    }
     currentSlide = index;
     updateDots();
 }
@@ -589,6 +578,7 @@ function resetAutoPlay() {
 
 function createDots() {
     const dotsContainer = document.getElementById('slideDots');
+    if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
     slides.forEach((_, i) => {
         const dot = document.createElement('div');
@@ -615,12 +605,20 @@ function updateDots() {
     });
 }
 
-// Initialize slider
-showSlide(0);
-createDots();
-autoPlayInterval = setInterval(nextSlide, 8000);
-document.getElementById('prevSlideBtn').addEventListener('click', prevSlide);
-document.getElementById('nextSlideBtn').addEventListener('click', nextSlide);
+// Initialize slider after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    if (slides.length > 0) {
+        showSlide(0);
+        createDots();
+        autoPlayInterval = setInterval(nextSlide, 8000);
+    }
+});
+
+// Manual controls
+const prevBtn = document.getElementById('prevSlideBtn');
+const nextBtn = document.getElementById('nextSlideBtn');
+if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+if (nextBtn) nextBtn.addEventListener('click', nextSlide);
 
 // ========== FORM DROPDOWN CONTROLS ==========
 const formDropdown = document.getElementById('formDropdown');
@@ -628,25 +626,27 @@ const openFormBtn = document.getElementById('openFormBtn');
 const closeFormBtn = document.getElementById('closeFormBtn');
 
 function openForm() {
-    formDropdown.classList.add('show');
-    document.getElementById('menuDropdown').classList.remove('show');
+    if (formDropdown) formDropdown.classList.add('show');
+    const menuDropdown = document.getElementById('menuDropdown');
+    if (menuDropdown) menuDropdown.classList.remove('show');
 }
 
 function closeForm() {
-    formDropdown.classList.remove('show');
+    if (formDropdown) formDropdown.classList.remove('show');
 }
 
-openFormBtn.addEventListener('click', openForm);
-closeFormBtn.addEventListener('click', closeForm);
+if (openFormBtn) openFormBtn.addEventListener('click', openForm);
+if (closeFormBtn) closeFormBtn.addEventListener('click', closeForm);
 
 // Menu dropdown
 function toggleMenu() {
     const menu = document.getElementById('menuDropdown');
-    menu.classList.toggle('show');
-    formDropdown.classList.remove('show');
+    if (menu) menu.classList.toggle('show');
+    if (formDropdown) formDropdown.classList.remove('show');
 }
 
-document.getElementById('menu-toggle-btn').onclick = toggleMenu;
+const menuToggleBtn = document.getElementById('menu-toggle-btn');
+if (menuToggleBtn) menuToggleBtn.onclick = toggleMenu;
 
 // ========== SERVICE WORKER REGISTRATION ==========
 if ("serviceWorker" in navigator) {
@@ -658,7 +658,7 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// ========== SIMPLIFIED PLACES LIST ==========
+// ========== SIMPLIFIED PLACES LIST (ADD YOUR PLACES HERE) ==========
 const placesWithCoords = [
   { name: "Luangwa Bus Station", lat: -15.6213, lng: 30.4064 },
   { name: "Chitope, Luangwa", lat: -15.1902, lng: 30.2055 },
@@ -756,29 +756,31 @@ const summaryDiv = document.getElementById('summary-section');
 const statusText = document.getElementById('status');
 const submitBtn = document.getElementById('submit-btn');
 const btnIcon = document.getElementById('btn-icon');
-const btnLoader = document.getElementById('btn-loader');
 const progressTextSpan = document.getElementById('progress-text');
 
 // Phone validation
-phoneInput.oninput = () => {
-  if (/^0[0-9]{9}$/.test(phoneInput.value)) {
-    tripDiv.style.display = 'block';
-  } else {
-    tripDiv.style.display = 'none';
-    summaryDiv.style.display = 'none';
-  }
-};
+if (phoneInput) {
+    phoneInput.oninput = () => {
+        if (/^0[0-9]{9}$/.test(phoneInput.value)) {
+            if (tripDiv) tripDiv.style.display = 'block';
+        } else {
+            if (tripDiv) tripDiv.style.display = 'none';
+            if (summaryDiv) summaryDiv.style.display = 'none';
+        }
+    };
+}
 
 // Autocomplete setup
 function setupAuto(inputId, containerId, listId) {
   const input = document.getElementById(inputId);
   const container = document.getElementById(containerId);
   const list = document.getElementById(listId);
+  if (!input || !container || !list) return;
   
   input.oninput = () => {
     const val = input.value.toLowerCase().trim();
     list.innerHTML = '';
-    container.classList.remove('field-error');
+    if (container) container.classList.remove('field-error');
     if (!val || val.length < 1) return;
     const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 8);
     matches.forEach(place => {
@@ -798,11 +800,11 @@ function setupAuto(inputId, containerId, listId) {
   input.onblur = () => {
     setTimeout(() => {
       if (input.value && !MASTER_PLACES_LIST.includes(input.value)) {
-        container.classList.add('field-error');
-        statusText.innerHTML = "⚠️ Invalid location! Please select from the list.";
-        summaryDiv.style.display = 'none';
+        if (container) container.classList.add('field-error');
+        if (statusText) statusText.innerHTML = "⚠️ Invalid location! Please select from the list.";
+        if (summaryDiv) summaryDiv.style.display = 'none';
       } else if (input.value && MASTER_PLACES_LIST.includes(input.value)) {
-        container.classList.remove('field-error');
+        if (container) container.classList.remove('field-error');
       }
     }, 200);
   };
@@ -822,43 +824,47 @@ function updateRouteInfo(pickup, destination) {
     infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1) || '?'} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estTimeStr}`;
   }
   const openLink = document.getElementById('openMapsLink');
-  openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
+  if (openLink) {
+    openLink.href = `https://www.google.com/maps/dir/${pickupCoords.lat},${pickupCoords.lng}/${destCoords.lat},${destCoords.lng}`;
+  }
 }
 
 function checkReady() {
-  const from = document.getElementById('gm-origin').value;
-  const to = document.getElementById('gm-destination').value;
+  const from = document.getElementById('gm-origin') ? document.getElementById('gm-origin').value : '';
+  const to = document.getElementById('gm-destination') ? document.getElementById('gm-destination').value : '';
   const mode = document.querySelector('input[name="mode"]:checked');
   
   if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
     currentPickup = from;
     currentDestination = to;
     if (!mode) {
-      statusText.innerHTML = "⚠️ Please select a transport mode.";
-      summaryDiv.style.display = 'none';
+      if (statusText) statusText.innerHTML = "⚠️ Please select a transport mode.";
+      if (summaryDiv) summaryDiv.style.display = 'none';
     } else {
-      statusText.innerHTML = "";
+      if (statusText) statusText.innerHTML = "";
       calculate(from, to, mode.value);
       updateRouteInfo(from, to);
     }
   } else {
-    statusText.innerHTML = "";
-    summaryDiv.style.display = 'none';
+    if (statusText) statusText.innerHTML = "";
+    if (summaryDiv) summaryDiv.style.display = 'none';
   }
 }
 
 function calculate(from, to, mode) {
-  document.getElementById('spinner').style.display = 'block';
-  summaryDiv.style.display = 'none';
+  const spinner = document.getElementById('spinner');
+  if (spinner) spinner.style.display = 'block';
+  if (summaryDiv) summaryDiv.style.display = 'none';
   setTimeout(() => {
-    document.getElementById('spinner').style.display = 'none';
+    if (spinner) spinner.style.display = 'none';
     const res = calculateTotalDistance(from, to);
     if (res.total === null) {
-      statusText.innerHTML = "❌ Route not available. Please try different locations.";
+      if (statusText) statusText.innerHTML = "❌ Route not available. Please try different locations.";
       return;
     }
-    summaryDiv.style.display = 'block';
-    document.getElementById('hub-tooltip').textContent = `✨ 50% Discount! Calculated via: ${res.hub}`;
+    if (summaryDiv) summaryDiv.style.display = 'block';
+    const hubTooltip = document.getElementById('hub-tooltip');
+    if (hubTooltip) hubTooltip.textContent = `✨ 50% Discount! Calculated via: ${res.hub}`;
     let rate, minPrice, extra;
     if (mode === 'vehicle') {
       rate = config.vehiclePricePerKm;
@@ -870,10 +876,13 @@ function calculate(from, to, mode) {
       extra = config.motorbikeExtra;
     }
     let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-    document.getElementById('summary-cards').innerHTML = `
-      <div class="summary-card"><span>Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
-      <div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
-    `;
+    const summaryCards = document.getElementById('summary-cards');
+    if (summaryCards) {
+      summaryCards.innerHTML = `
+        <div class="summary-card"><span>Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
+        <div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
+      `;
+    }
     let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
     rideData = {
       preferredMode: mode,
@@ -886,28 +895,34 @@ function calculate(from, to, mode) {
       price: price,
       estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
     };
-    submitBtn.style.background = "var(--primary-color)";
-    btnIcon.className = "fas fa-paper-plane";
-    btnIcon.style.display = "block";
-    btnLoader.style.display = "none";
-    progressTextSpan.style.display = "none";
-    progressTextSpan.textContent = "0%";
-    document.getElementById('action-label').innerHTML = "Request Now";
-    submitBtn.onclick = handleRequest;
+    if (submitBtn) submitBtn.style.background = "var(--primary-color)";
+    if (btnIcon) {
+        btnIcon.className = "fas fa-paper-plane";
+        btnIcon.style.display = "block";
+    }
+    if (progressTextSpan) {
+        progressTextSpan.style.display = "none";
+        progressTextSpan.textContent = "0%";
+    }
+    const actionLabel = document.getElementById('action-label');
+    if (actionLabel) actionLabel.innerHTML = "Request Now";
+    if (submitBtn) submitBtn.onclick = handleRequest;
   }, 500);
 }
 
 async function handleRequest() {
-  submitBtn.disabled = true;
-  btnIcon.style.display = "none";
-  btnLoader.style.display = "block";
-  progressTextSpan.style.display = "block";
+  if (submitBtn) submitBtn.disabled = true;
+  if (btnIcon) btnIcon.style.display = "none";
+  if (progressTextSpan) {
+      progressTextSpan.style.display = "block";
+      progressTextSpan.textContent = "0%";
+  }
   const startTime = Date.now();
   const duration = 13000;
   const interval = setInterval(() => {
     let elapsed = Date.now() - startTime;
     let p = Math.min(98, Math.floor((elapsed / duration) * 98));
-    progressTextSpan.textContent = p + "%";
+    if (progressTextSpan) progressTextSpan.textContent = p + "%";
   }, 100);
   const payload = { ...rideData, timestamp: new Date().toISOString() };
   let timeoutTriggered = false;
@@ -915,10 +930,12 @@ async function handleRequest() {
     if (!timeoutTriggered) {
       timeoutTriggered = true;
       clearInterval(interval);
-      statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
-      statusText.style.color = "orange";
+      if (statusText) {
+          statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
+          statusText.style.color = "orange";
+      }
       finishRequestUI();
-      setTimeout(() => { document.getElementById('submit-btn').click(); }, 100);
+      setTimeout(() => { if (submitBtn) submitBtn.click(); }, 100);
     }
   }, 15000);
   try {
@@ -930,27 +947,32 @@ async function handleRequest() {
     clearTimeout(timeoutId);
     if (!timeoutTriggered) {
       clearInterval(interval);
-      progressTextSpan.textContent = "100%";
-      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
-      statusText.style.color = "green";
+      if (progressTextSpan) progressTextSpan.textContent = "100%";
+      if (statusText) {
+          statusText.innerHTML = "✅ Request sent! Driver will contact you shortly or Call.";
+          statusText.style.color = "green";
+      }
       finishRequestUI();
     }
   } catch(e) {
     clearTimeout(timeoutId);
     if (!timeoutTriggered) {
       clearInterval(interval);
-      statusText.innerHTML = "⚠️ Network issue. Please call!";
-      statusText.style.color = "red";
+      if (statusText) {
+          statusText.innerHTML = "⚠️ Network issue. Please call!";
+          statusText.style.color = "red";
+      }
       finishRequestUI();
     }
   }
 }
 
 function finishRequestUI() {
-  btnLoader.style.display = "none";
-  progressTextSpan.style.display = "none";
-  btnIcon.style.display = "block";
-  btnIcon.className = "fas fa-phone";
+  if (progressTextSpan) progressTextSpan.style.display = "none";
+  if (btnIcon) {
+      btnIcon.style.display = "block";
+      btnIcon.className = "fas fa-phone";
+  }
   let callNumber = "0777737047";
   if (rideData && rideData.hub) {
     const hubNumbers = {
@@ -960,10 +982,11 @@ function finishRequestUI() {
     };
     if (hubNumbers[rideData.hub]) callNumber = hubNumbers[rideData.hub];
   }
-  submitBtn.style.background = "var(--success-color)";
-  submitBtn.disabled = false;
-  document.getElementById('action-label').innerHTML = "Call Now";
-  submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
+  if (submitBtn) submitBtn.style.background = "var(--success-color)";
+  if (submitBtn) submitBtn.disabled = false;
+  const actionLabel = document.getElementById('action-label');
+  if (actionLabel) actionLabel.innerHTML = "Call Now";
+  if (submitBtn) submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
 }
 
 // Location sharing
@@ -971,16 +994,16 @@ let mapLink = "";
 function getLocation() {
   const status = document.getElementById("locationStatus");
   if (navigator.geolocation) {
-    status.innerHTML = "📍 Getting location...";
+    if (status) status.innerHTML = "📍 Getting location...";
     navigator.geolocation.getCurrentPosition(
       (position) => {
         mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-        status.innerHTML = "🌐 ✅ Location ready!";
+        if (status) status.innerHTML = "🌐 ✅ Location ready!";
       },
-      () => status.innerHTML = "❌ Failed to get location!"
+      () => { if (status) status.innerHTML = "❌ Failed to get location!"; }
     );
   } else {
-    status.innerHTML = "❌ Geolocation not supported!";
+    if (status) status.innerHTML = "❌ Geolocation not supported!";
   }
 }
 
@@ -1008,10 +1031,14 @@ function updateCountdown() {
   const now = new Date().getTime();
   const diff = electionDay - now;
   if (diff > 0) {
-    document.getElementById("days").innerHTML = Math.floor(diff / 86400000).toString().padStart(2, '0');
-    document.getElementById("hours").innerHTML = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-    document.getElementById("mins").innerHTML = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-    document.getElementById("secs").innerHTML = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+    const daysEl = document.getElementById("days");
+    const hoursEl = document.getElementById("hours");
+    const minsEl = document.getElementById("mins");
+    const secsEl = document.getElementById("secs");
+    if (daysEl) daysEl.innerHTML = Math.floor(diff / 86400000).toString().padStart(2, '0');
+    if (hoursEl) hoursEl.innerHTML = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+    if (minsEl) minsEl.innerHTML = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+    if (secsEl) secsEl.innerHTML = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
   }
 }
 setInterval(updateCountdown, 1000);
@@ -1020,19 +1047,26 @@ updateCountdown();
 // Initialize autocomplete
 setupAuto('gm-origin', 'origin-container', 'originList');
 setupAuto('gm-destination', 'dest-container', 'destinationList');
-document.getElementById('mode-group').onchange = checkReady;
+const modeGroup = document.getElementById('mode-group');
+if (modeGroup) modeGroup.onchange = checkReady;
 
 // Download APK
-document.getElementById('menu-install-btn')?.addEventListener('click', () => {
-  const a = document.createElement('a');
-  a.href = 'Luangwa_Feira_Rides.apk';
-  a.download = 'Luangwa_Feira_Rides.apk';
-  a.click();
-  alert("📱 Download started!\n\nOpen the APK file to install the app.");
-});
-document.getElementById('getLocationBtn')?.addEventListener('click', (e) => { e.preventDefault(); getLocation(); });
-document.getElementById('shareWhatsappBtn')?.addEventListener('click', (e) => { e.preventDefault(); shareWhatsApp(); });
-document.getElementById('shareSMSBtn')?.addEventListener('click', (e) => { e.preventDefault(); shareSMS(); });
+const menuInstallBtn = document.getElementById('menu-install-btn');
+if (menuInstallBtn) {
+    menuInstallBtn.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = 'Luangwa_Feira_Rides.apk';
+        a.download = 'Luangwa_Feira_Rides.apk';
+        a.click();
+        alert("📱 Download started!\n\nOpen the APK file to install the app.");
+    });
+}
+const getLocationBtn = document.getElementById('getLocationBtn');
+if (getLocationBtn) getLocationBtn.addEventListener('click', (e) => { e.preventDefault(); getLocation(); });
+const shareWhatsappBtn = document.getElementById('shareWhatsappBtn');
+if (shareWhatsappBtn) shareWhatsappBtn.addEventListener('click', (e) => { e.preventDefault(); shareWhatsApp(); });
+const shareSMSBtn = document.getElementById('shareSMSBtn');
+if (shareSMSBtn) shareSMSBtn.addEventListener('click', (e) => { e.preventDefault(); shareSMS(); });
 
 window.getLocation = getLocation;
 window.shareWhatsApp = shareWhatsApp;
