@@ -100,13 +100,12 @@
         opacity: 0;
         transition: opacity 1s ease-in-out;
         padding: 20px;
-        pointer-events: none;
+        z-index: 1;
     }
 
     .billboard-slide.active {
         opacity: 1;
         z-index: 2;
-        pointer-events: auto;
     }
 
     /* Slide content styles */
@@ -210,7 +209,6 @@
         align-items: center;
         justify-content: center;
         z-index: 20;
-        pointer-events: auto;
     }
     .nav-btn:hover {
         background: rgba(0,0,0,0.8);
@@ -225,7 +223,6 @@
         justify-content: center;
         gap: 10px;
         z-index: 20;
-        pointer-events: auto;
     }
     .dot {
         width: 10px;
@@ -620,78 +617,125 @@
 </div>
 
 <script>
-// ========== MANUAL SLIDER WITH AUTO-PLAY (FULLY WORKING) ==========
-let slides = document.querySelectorAll('.billboard-slide');
-let currentSlide = 0;
-let autoPlayInterval;
+// ========== SLIDESHOW (USING YOUR WORKING METHOD) ==========
+document.addEventListener('DOMContentLoaded', function () {
 
-function showSlide(index) {
-    // Make sure index is within bounds
-    if (index < 0) index = slides.length - 1;
-    if (index >= slides.length) index = 0;
-    
-    // Remove active class from all slides
-    for (let i = 0; i < slides.length; i++) {
-        slides[i].classList.remove('active');
-    }
-    // Add active class to current slide
-    slides[index].classList.add('active');
-    currentSlide = index;
-    updateDots();
-    
-    // Trigger eye animation if this is the eyes slide
-    if (slides[index].classList.contains('billboard-slide14')) {
-        startEyeAnimation();
-    }
-}
+    let slides = document.querySelectorAll('.billboard-slide');
+    let currentIndex = 0;
+    let intervalTime = 9000;
 
-function nextSlide() {
-    let newIndex = currentSlide + 1;
-    if (newIndex >= slides.length) newIndex = 0;
-    showSlide(newIndex);
-    resetAutoPlay();
-}
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.style.opacity = '0';
+            slide.style.zIndex = '1';
+        });
 
-function prevSlide() {
-    let newIndex = currentSlide - 1;
-    if (newIndex < 0) newIndex = slides.length - 1;
-    showSlide(newIndex);
-    resetAutoPlay();
-}
-
-function resetAutoPlay() {
-    if (autoPlayInterval) clearInterval(autoPlayInterval);
-    autoPlayInterval = setInterval(nextSlide, 8000);
-}
-
-function createDots() {
-    const dotsContainer = document.getElementById('slideDots');
-    if (!dotsContainer) return;
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < slides.length; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'dot';
-        if (i === currentSlide) dot.classList.add('active');
-        dot.addEventListener('click', (function(index) {
-            return function() {
-                showSlide(index);
-                resetAutoPlay();
-            };
-        })(i));
-        dotsContainer.appendChild(dot);
-    }
-}
-
-function updateDots() {
-    const dots = document.querySelectorAll('.dot');
-    for (let i = 0; i < dots.length; i++) {
-        if (i === currentSlide) {
-            dots[i].classList.add('active');
-        } else {
-            dots[i].classList.remove('active');
+        slides[index].style.opacity = '1';
+        slides[index].style.zIndex = '2';
+        
+        // Trigger eye animation if this is the eyes slide
+        if (slides[index].classList.contains('billboard-slide14')) {
+            startEyeAnimation();
         }
     }
-}
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % slides.length;
+        showSlide(currentIndex);
+        updateDots();
+    }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        showSlide(currentIndex);
+        updateDots();
+    }
+
+    // Create dots
+    function createDots() {
+        const dotsContainer = document.getElementById('slideDots');
+        if (!dotsContainer) return;
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < slides.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            if (i === currentIndex) dot.classList.add('active');
+            dot.addEventListener('click', (function(index) {
+                return function() {
+                    currentIndex = index;
+                    showSlide(currentIndex);
+                    updateDots();
+                    resetTimer();
+                };
+            })(i));
+            dotsContainer.appendChild(dot);
+        }
+    }
+
+    function updateDots() {
+        const dots = document.querySelectorAll('.dot');
+        for (let i = 0; i < dots.length; i++) {
+            if (i === currentIndex) {
+                dots[i].classList.add('active');
+            } else {
+                dots[i].classList.remove('active');
+            }
+        }
+    }
+
+    // Manual button controls
+    const prevBtn = document.getElementById('prevSlideBtn');
+    const nextBtn = document.getElementById('nextSlideBtn');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            prevSlide();
+            resetTimer();
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            nextSlide();
+            resetTimer();
+        });
+    }
+
+    // show first slide immediately
+    showSlide(currentIndex);
+    createDots();
+
+    // autoplay
+    let autoPlay = setInterval(nextSlide, intervalTime);
+
+    function resetTimer() {
+        clearInterval(autoPlay);
+        autoPlay = setInterval(nextSlide, intervalTime);
+    }
+
+    // swipe
+    let startX = 0;
+
+    document.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function (e) {
+        let endX = e.changedTouches[0].clientX;
+        let diff = startX - endX;
+
+        if (Math.abs(diff) < 60) return;
+
+        if (diff > 0) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+
+        resetTimer();
+    }, { passive: true });
+});
 
 // ========== EYE ANIMATION FUNCTIONS ==========
 let eyeIsAsleep = false;
@@ -754,57 +798,6 @@ function executeMacroGazeSaccades() {
     pupilElements.forEach(pupil => pupil.setAttribute('r', customRadius));
     macroGazeTimeout = setTimeout(executeMacroGazeSaccades, Math.random() * 2000 + 500);
 }
-
-// Initialize slider when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    if (slides.length > 0) {
-        showSlide(0);
-        createDots();
-        autoPlayInterval = setInterval(nextSlide, 8000);
-    }
-});
-
-// Manual controls with direct event binding
-const prevBtn = document.getElementById('prevSlideBtn');
-const nextBtn = document.getElementById('nextSlideBtn');
-
-if (prevBtn) {
-    prevBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        prevSlide();
-        return false;
-    };
-}
-if (nextBtn) {
-    nextBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        nextSlide();
-        return false;
-    };
-}
-
-// Also add touch/swipe support
-let touchStartX = 0;
-let touchEndX = 0;
-
-document.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-}, { passive: true });
-
-document.addEventListener('touchend', function(e) {
-    touchEndX = e.changedTouches[0].screenX;
-    const diff = touchStartX - touchEndX;
-    if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-            nextSlide();
-        } else {
-            prevSlide();
-        }
-        resetAutoPlay();
-    }
-}, { passive: true });
 
 // ========== FORM DROPDOWN CONTROLS ==========
 const formDropdown = document.getElementById('formDropdown');
