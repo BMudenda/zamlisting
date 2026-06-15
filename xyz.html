@@ -81,11 +81,36 @@
     .z-red { color: #e74c3c; }
     .z-black { color: #ffffff; }
 
+    /* Dedicated Booking Form Toggle Button */
+    .form-toggle-action-btn {
+        background: linear-gradient(135deg, #ff9900, #ff5500);
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 50px;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255,153,0,0.4);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: inherit;
+    }
+    .form-toggle-action-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(255,153,0,0.6);
+    }
+    .form-toggle-action-btn i {
+        font-size: 16px;
+    }
+
     /* ========== TOP RIGHT APP INTERFACE STRUCTURE ========== */
     .app-interface-wrapper {
         position: fixed;
         right: 20px;
-        top: 20px;
+        top: 75px; /* Shifted down slightly to stay perfectly aligned under header actions */
         z-index: 100000;
         display: flex;
         flex-direction: column;
@@ -97,7 +122,7 @@
     .product-container { 
         display: none; 
         width: 380px; 
-        max-height: 85vh; 
+        max-height: 80vh; 
         overflow-y: auto; 
         box-shadow: 0px 8px 24px rgba(0,0,0,0.3); 
         border-radius: 16px; 
@@ -137,7 +162,7 @@
         display: none; 
         background-color: white; 
         width: 380px; 
-        max-height: 75vh; 
+        max-height: 70vh; 
         overflow-y: auto; 
         box-shadow: 0px 8px 24px rgba(0,0,0,0.3); 
         border-radius: 16px; 
@@ -208,8 +233,9 @@
         .promo-billboard { font-size: 14px; padding: 6px 12px; }
         .zam { font-size: 0.9rem; }
         .corner-logo { width: 28px; height: 28px; }
-        .app-interface-wrapper { right: 10px; top: 10px; }
+        .app-interface-wrapper { right: 10px; top: 70px; }
         .menu-dropdown, .product-container { width: 320px; }
+        .form-toggle-action-btn { padding: 6px 14px; font-size: 12px; }
     }
     
     @media (max-width: 480px) {
@@ -222,8 +248,7 @@
       
 </head>
 <body>
-  <!-- ========== BILLBOARD HEADER (FULL PAGE) ========== -->
-<div class="billboard-header">
+  <div class="billboard-header">
     <div class="header-overlay">
         <div class="company-info" onclick="toggleForm()" title="Request Ride Form">
             <img src="lfr.jpg" alt="Logo" class="corner-logo">
@@ -234,13 +259,15 @@
                 <span>Listing Rides</span>
             </h2>
         </div>
+        <button class="form-toggle-action-btn" onclick="toggleForm()">
+            <i class="fas fa-taxi"></i> Book a Ride
+        </button>
     </div>
 
-<!-- SLIDES -->
 <div class="billboard-slide billboard-slide1"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
 <div class="billboard-slide billboard-slide2"><div class="vehicle-container"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">For as low as K15</div></div></div>
 <div class="billboard-slide billboard-slide3"><div class="vehicle-container"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text">For as low as K25</div></div></div>
-<div class="billboard-slide billboard-slide4"><div class="request-billboard" style="cursor: pointer;" onclick="toggleForm()">👇 CLICK LOGO TO OPEN RIDE REQUEST FORM 👇</div></div>
+<div class="billboard-slide billboard-slide4"><div class="request-billboard" style="cursor: pointer;" onclick="toggleForm()">👇 CLICK BOOK A RIDE TO OPEN REQUEST FORM 👇</div></div>
 <div class="billboard-slide billboard-slide5"><div class="promo-billboard">🔥 50% DISCOUNT PROMOTION ALL LOCAL RIDES 🔥</div></div>
 <div class="billboard-slide billboard-slide6"><div class="contact-billboard">📞 CONTACT NOW • FAST PICKUP • AVAILABLE 24/7</div></div>
 <div class="billboard-slide billboard-slide7"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="Smart TV"></div><div class="product-info"><div class="product-price">🔥 Smart TV • K3,000</div><button class="store-button" onclick="visitStore(); return false;">🛒 SHOP</button></div></div></div>
@@ -252,14 +279,11 @@
 <div class="billboard-slide billboard-slide13"><div class="contact-billboard">⭐ RATED 4.9/5 BY HAPPY CUSTOMERS ⭐</div></div>
 </div>
 
-<!-- ========== APP INTERFACE ON TOP RIGHT ========== -->
 <div class="app-interface-wrapper">
-  <!-- Booking form replaces the 3 dots menu directly -->
   <main class="product-container" id="booking-form-popup">
     <div class="booking-container">
       <fieldset>
         <legend><span class="material-icons">account_circle</span> Requesting Form</legend>
-        <!-- The three dots menu button transferred to top right corner of form -->
         <button id="menu-toggle-btn" class="form-menu-btn" onclick="toggleDropdown()" title="Menu">
           <i class="fas fa-ellipsis-v"></i>
         </button>
@@ -305,7 +329,6 @@
     </div>
   </main>
 
-  <!-- Dropdown sections appear cleanly underneath the active booking form alignment -->
   <div id="header-menu-dropdown" class="menu-dropdown">
       <div class="dropdown-content-section">
           <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
@@ -775,12 +798,13 @@ window.onclick = (event) => {
   const menu = document.getElementById("header-menu-dropdown");
   const formPopup = document.getElementById("booking-form-popup");
   const companyInfo = document.querySelector(".company-info");
-  const menuBtn = document.getElementById("menu-toggle-btn");
+  const toggleActionBtn = document.querySelector(".form-toggle-action-btn");
   
   // Close everything if clicking totally off the top-right app layout block
   if (formPopup && formPopup.classList.contains('show') && 
       !formPopup.contains(event.target) && 
       !companyInfo.contains(event.target) && 
+      !toggleActionBtn.contains(event.target) && 
       !menu.contains(event.target) &&
       !event.target.closest('.request-billboard')) {
       formPopup.classList.remove('show');
