@@ -249,7 +249,7 @@
         justify-content: center; 
     }
 
-    /* ========== FORM DROPDOWN - PERSISTENT, DOESN'T AUTO-CLOSE ========== */
+    /* ========== FORM DROPDOWN - PERSISTENT ========== */
     .form-dropdown {
         display: none;
         position: fixed;
@@ -312,8 +312,46 @@
     .icon-img { width: 28px; height: 28px; object-fit: contain; }
 
     .summary-card { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 0.9rem; }
-    .submit-btn { background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: none; cursor: pointer; margin: 0 auto; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-    .btn-loader { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    
+    /* ORIGINAL LOADER BUTTON STYLES */
+    .submit-btn { 
+        background: var(--primary); 
+        color: white; 
+        width: 70px; 
+        height: 70px; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 26px; 
+        border: none; 
+        cursor: pointer; 
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3); 
+        transition: 0.2s; 
+        position: relative;
+        margin: 0 auto;
+    }
+    .btn-loader { 
+        width: 45px; 
+        height: 45px; 
+        border: 4px solid rgba(255,255,255,0.3); 
+        border-top: 4px solid #fff; 
+        border-radius: 50%; 
+        animation: spin 0.8s linear infinite; 
+        display: none; 
+    }
+    #progress-text { 
+        position: absolute; 
+        font-size: 12px; 
+        font-weight: bold; 
+        color: white; 
+        display: none; 
+        bottom: 12px;
+    }
+    #btn-icon {
+        font-size: 28px;
+    }
+    
     .hidden-section { display: none; }
     .calc-loader { width: 28px; height: 28px; border: 3px solid #f3f3f3; border-top: 3px solid var(--secondary); border-radius: 50%; animation: spin 1s linear infinite; margin: 12px auto; display: none; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -344,6 +382,8 @@
         .form-dropdown { width: calc(100vw - 30px); right: 15px; top: 65px; }
         .form-body { padding: 16px; }
         .nav-btn { width: 36px; height: 36px; font-size: 16px; }
+        .submit-btn { width: 60px; height: 60px; font-size: 22px; }
+        #btn-icon { font-size: 24px; }
     }
 </style>
 </head>
@@ -385,7 +425,7 @@
     </div>
 </div>
 
-<!-- FORM DROPDOWN - PERSISTENT (stays open until manually closed) -->
+<!-- FORM DROPDOWN -->
 <div id="formDropdown" class="form-dropdown">
     <div class="form-header">
         <h3><i class="fas fa-paper-plane"></i> Request a Ride</h3>
@@ -426,7 +466,11 @@
                 <div id="summary-cards"></div>
             </fieldset>
             <div style="display:flex; justify-content:center; margin-top:12px;">
-                <button class="submit-btn" id="submit-btn"><i class="fas fa-paper-plane" id="btn-icon"></i><div class="btn-loader" id="btn-loader"></div><span id="progress-text">0%</span></button>
+                <button class="submit-btn" id="submit-btn">
+                    <i class="fas fa-paper-plane" id="btn-icon"></i>
+                    <div class="btn-loader" id="btn-loader"></div>
+                    <span id="progress-text">0%</span>
+                </button>
             </div>
             <p id="action-label" style="text-align:center; margin-top:8px; font-weight:bold; color:var(--primary); font-size:0.85rem;">Request Now</p>
         </div>
@@ -496,7 +540,6 @@ function resetAutoPlay() {
     autoPlayInterval = setInterval(nextSlide, 8000);
 }
 
-// Create dots
 function createDots() {
     const dotsContainer = document.getElementById('slideDots');
     dotsContainer.innerHTML = '';
@@ -518,12 +561,9 @@ function updateDots() {
     });
 }
 
-// Initialize slider
 showSlide(0);
 createDots();
 autoPlayInterval = setInterval(nextSlide, 8000);
-
-// Manual controls
 document.getElementById('prevSlideBtn').addEventListener('click', prevSlide);
 document.getElementById('nextSlideBtn').addEventListener('click', nextSlide);
 
@@ -767,6 +807,7 @@ function calculate(from, to, mode) {
       price: price,
       estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
     };
+    // Reset button to original state
     submitBtn.style.background = "var(--primary)";
     btnIcon.className = "fas fa-paper-plane";
     btnIcon.style.display = "block";
