@@ -128,6 +128,7 @@
         border-radius: 16px; 
         margin: 0; 
         padding: 0;
+        position: relative;
     }
     .product-container.show { display: block; }
     .booking-container { background: var(--bg-color-card); padding: 16px; border-radius: 16px; position: relative; }
@@ -140,6 +141,7 @@
         margin-bottom: 12px;
         padding-bottom: 8px;
         border-bottom: 1px solid var(--border-color-light);
+        position: relative;
     }
     .form-title-text {
         font-weight: bold;
@@ -153,6 +155,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        position: relative;
     }
     
     /* Action Buttons in Form Header */
@@ -199,18 +202,22 @@
     .tooltip-text { display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; z-index: 9999; font-size: 0.75rem; font-weight: normal; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     .tooltip-container:hover .tooltip-text { display: block; }
 
-    /* ========== MENU DROPDOWN (UNDER FORM) ========== */
+    /* ========== 3 DOTS MENU DROPDOWN (OVERLAYS FORM SEAMLESSLY) ========== */
     .menu-dropdown { 
         display: none; 
         background-color: white; 
-        width: 380px; 
-        max-height: 70vh; 
+        width: 100%; 
+        max-height: 75vh; 
         overflow-y: auto; 
-        box-shadow: 0px 8px 24px rgba(0,0,0,0.3); 
-        border-radius: 16px; 
+        box-shadow: 0px 8px 24px rgba(0,0,0,0.2); 
+        border-radius: 12px; 
         color: #333; 
         padding: 16px; 
         border: 1px solid #e0e0e0;
+        position: absolute;
+        top: 50px;
+        right: 0;
+        z-index: 200000;
     }
     .menu-dropdown.show { display: block; }
     .dropdown-content-section { margin-bottom: 20px; }
@@ -276,7 +283,7 @@
         .zam { font-size: 0.9rem; }
         .corner-logo { width: 28px; height: 28px; }
         .app-interface-wrapper { right: 10px; top: 70px; }
-        .menu-dropdown, .product-container { width: 320px; }
+        .product-container { width: 320px; }
         .form-toggle-action-btn { padding: 6px 14px; font-size: 12px; }
     }
     
@@ -284,7 +291,7 @@
         .welcome-billboard { font-size: 16px; }
         .car-billboard img, .motorbike-billboard img { width: 70px; }
         .promo-billboard { font-size: 10px; padding: 4px 8px; }
-        .menu-dropdown, .product-container { width: 280px; }
+        .product-container { width: 280px; }
     }
 </style>
       
@@ -338,6 +345,44 @@
                   <i class="fas fa-times"></i>
               </button>
           </div>
+
+          <div id="header-menu-dropdown" class="menu-dropdown">
+              <div class="dropdown-content-section">
+                  <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
+                  <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
+                  <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
+                  <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
+                  <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
+                  <button id="menu-install-btn" class="store-button" style="width: 100%; background: linear-gradient(135deg, #ff9900, #ff5500); padding: 10px; font-size: 14px; margin-top: 5px;">⬇️ Download APK</button>
+              </div>
+              <div class="dropdown-content-section">
+                  <h4><i class="fas fa-headset"></i> Quick Contact</h4>
+                  <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
+                  <a href="tel:0777737047"><i class="fas fa-phone"></i><span>Call Us</span></a>
+                  <a href="https://wa.me/260777737047" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+                  <div class="menu-divider"></div>
+                  <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
+                  <a href="https://www.facebook.com/profile.php?id=61572032020351" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
+                  <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
+              </div>
+              <div class="menu-divider"></div>
+              <div class="dropdown-content-section">
+                  <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
+                  <p style="font-size: 0.85rem;">Pickup/drop-off within 1 km: no extra charges.</p>
+                  <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
+                  <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
+                  <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
+                  <a href="#" onclick="shareSMS()"><i class="fas fa-sms"></i><span>Share via SMS</span></a>
+              </div>
+              <div class="dropdown-content-section">
+                  <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
+                  <div class="route-container">
+                      <div id="map-route-info" class="route-info"><i class="fas fa-route"></i> Select pickup & destination</div>
+                      <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 Click to View Map</a>
+                  </div>
+              </div>
+              <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">© 2025 Luangwa Feira Rides</p>
+          </div>
       </div>
 
       <fieldset>
@@ -385,44 +430,6 @@
       <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height: 40px;"></p>
     </div>
   </main>
-
-  <div id="header-menu-dropdown" class="menu-dropdown">
-      <div class="dropdown-content-section">
-          <h4><i class="fas fa-info-circle"></i> About Our Service</h4>
-          <p>A local company that provides passenger hailing services through motorbikes and cars using a custom-made app/site that can function even offline.</p>
-          <p><strong>Coverage:</strong> Luangwa, Luanshya and Rufunsa Districts and beyond.</p>
-          <p><strong>Pricing:</strong> Affordable fixed rates with a 50% Discount Promo.</p>
-          <p><strong>Reliable:</strong> Safe and convenient transport by Motorbike or Car.</p>
-          <button id="menu-install-btn" class="store-button" style="width: 100%; background: linear-gradient(135deg, #ff9900, #ff5500); padding: 10px; font-size: 14px; margin-top: 5px;">⬇️ Download APK</button>
-      </div>
-      <div class="dropdown-content-section">
-          <h4><i class="fas fa-headset"></i> Quick Contact</h4>
-          <a href="mailto:zamlisting@gmail.com"><i class="fas fa-envelope"></i><span>Email Us</span></a>
-          <a href="tel:0777737047"><i class="fas fa-phone"></i><span>Call Us</span></a>
-          <a href="https://wa.me/260777737047" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-          <div class="menu-divider"></div>
-          <h4><i class="fas fa-share-alt"></i> Follow Us</h4>
-          <a href="https://www.facebook.com/profile.php?id=61572032020351" target="_blank"><i class="fab fa-facebook"></i><span>Facebook Page</span></a>
-          <a href="https://www.tiktok.com/@luagwa_feira_rides" target="_blank"><i class="fab fa-tiktok"></i><span>TikTok</span></a>
-      </div>
-      <div class="menu-divider"></div>
-      <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
-          <p style="font-size: 0.85rem;">Pickup/drop-off within 1 km: no extra charges.</p>
-          <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My Location</span></a>
-          <p id="locationStatus" style="font-size: 0.75rem; margin-top:8px; color:#aaa;"></p>
-          <a href="#" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i><span>Share via WhatsApp</span></a>
-          <a href="#" onclick="shareSMS()"><i class="fas fa-sms"></i><span>Share via SMS</span></a>
-      </div>
-      <div class="dropdown-content-section">
-          <h4><i class="fas fa-map-marked-alt"></i> View Map</h4>
-          <div class="route-container">
-              <div id="map-route-info" class="route-info"><i class="fas fa-route"></i> Select pickup & destination</div>
-              <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 Click to View Map</a>
-          </div>
-      </div>
-      <p style="margin-top: 15px; text-align: center; font-size: 0.7rem; color: #aaa;">© 2025 Luangwa Feira Rides</p>
-  </div>
 </div>
 
 <script>
@@ -618,7 +625,7 @@ function setupAuto(inputId, containerId, listId) {
       div.className = 'suggestion';
       div.textContent = place;
       div.onclick = (e) => {
-        e.stopPropagation(); // Stops the event from shutting down the layout wrapper
+        e.stopPropagation(); 
         input.value = place;
         list.innerHTML = '';
         checkReady();
@@ -846,13 +853,14 @@ function toggleDropdown(event) {
   menu.classList.toggle("show");
 }
 
-// Absolute Event Safeguard: Prevents auto-closing completely inside form content
+// Global window event interceptor
 window.onclick = (event) => {
   const menu = document.getElementById("header-menu-dropdown");
   const formPopup = document.getElementById("booking-form-popup");
   const companyInfo = document.querySelector(".company-info");
   const toggleActionBtn = document.querySelector(".form-toggle-action-btn");
   
+  // If user hits inside form space or fields, hold form execution state
   if (formPopup && formPopup.contains(event.target)) {
       return; 
   }
