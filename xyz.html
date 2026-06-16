@@ -193,6 +193,12 @@
     .calc-loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 15px auto; display: none; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+    /* Tooltip styling rules preserved carefully */
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: help; margin-left: 4px; vertical-align: middle; }
+    .tooltip-icon { font-size: 16px !important; color: #999; }
+    .tooltip-text { display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; z-index: 9999; font-size: 0.75rem; font-weight: normal; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .tooltip-container:hover .tooltip-text { display: block; }
+
     /* ========== MENU DROPDOWN (UNDER FORM) ========== */
     .menu-dropdown { 
         display: none; 
@@ -284,10 +290,9 @@
       
 </head>
 <body>
-  <!-- ========== BILLBOARD HEADER (FULL PAGE) ========== -->
-<div class="billboard-header">
+  <div class="billboard-header">
     <div class="header-overlay">
-        <div class="company-info" onclick="toggleForm()" title="Request Ride Form">
+        <div class="company-info" onclick="toggleForm(event)" title="Request Ride Form">
             <img src="lfr.jpg" alt="Logo" class="corner-logo">
             <h2 class="zam">
                 <span class="z-green">Z</span>
@@ -296,16 +301,15 @@
                 <span>Listing Rides</span>
             </h2>
         </div>
-        <button class="form-toggle-action-btn" onclick="toggleForm()">
+        <button class="form-toggle-action-btn" onclick="toggleForm(event)">
             <i class="fas fa-taxi"></i> Book a Ride
         </button>
     </div>
 
-<!-- SLIDES -->
 <div class="billboard-slide billboard-slide1"><div class="welcome-billboard">WELCOME TO LUANGWA FEIRA RIDES</div></div>
 <div class="billboard-slide billboard-slide2"><div class="vehicle-container"><div class="motorbike-billboard"><img src="motorbike.png" alt="Motorbike"></div><div class="status-text">For as low as K15</div></div></div>
 <div class="billboard-slide billboard-slide3"><div class="vehicle-container"><div class="car-billboard"><img src="car.png" alt="Car"></div><div class="status-text">For as low as K25</div></div></div>
-<div class="billboard-slide billboard-slide4"><div class="request-billboard" style="cursor: pointer;" onclick="toggleForm()">👇 CLICK BOOK A RIDE TO OPEN REQUEST FORM 👇</div></div>
+<div class="billboard-slide billboard-slide4"><div class="request-billboard" style="cursor: pointer;" onclick="toggleForm(event)">👇 CLICK BOOK A RIDE TO OPEN REQUEST FORM 👇</div></div>
 <div class="billboard-slide billboard-slide5"><div class="promo-billboard">🔥 50% DISCOUNT PROMOTION ALL LOCAL RIDES 🔥</div></div>
 <div class="billboard-slide billboard-slide6"><div class="contact-billboard">📞 CONTACT NOW • FAST PICKUP • AVAILABLE 24/7</div></div>
 <div class="billboard-slide billboard-slide7"><div class="product-row"><div class="product-image"><img src="TV3.png" alt="Smart TV"></div><div class="product-info"><div class="product-price">🔥 Smart TV • K3,000</div><button class="store-button" onclick="visitStore(); return false;">🛒 SHOP</button></div></div></div>
@@ -317,23 +321,19 @@
 <div class="billboard-slide billboard-slide13"><div class="contact-billboard">⭐ RATED 4.9/5 BY HAPPY CUSTOMERS ⭐</div></div>
 </div>
 
-<!-- ========== APP INTERFACE ON TOP RIGHT ========== -->
 <div class="app-interface-wrapper">
   
   <main class="product-container" id="booking-form-popup">
     <div class="booking-container">
       
-      <!-- Top Action Bar for Title, 3 Dots & Close X -->
       <div class="form-header-bar">
           <div class="form-title-text">
               <i class="fas fa-file-alt" style="color: var(--primary-color);"></i> Requesting Form
           </div>
           <div class="form-actions-cluster">
-              <!-- Three Dots Button -->
               <button id="menu-toggle-btn" class="form-menu-btn" onclick="toggleDropdown(event)" title="Open Options Menu">
                   <i class="fas fa-ellipsis-v"></i>
               </button>
-              <!-- Close Form X Button -->
               <button class="form-close-btn" onclick="toggleForm(event)" title="Close Form">
                   <i class="fas fa-times"></i>
               </button>
@@ -341,7 +341,7 @@
       </div>
 
       <fieldset>
-        <legend><span class="material-icons">account_circle</span> Identity Check</legend>
+        <legend><span class="material-icons">account_circle</span> Profile</legend>
         <div class="input-box" id="phone-box">
           <span class="material-icons">phone</span>
           <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
@@ -618,7 +618,7 @@ function setupAuto(inputId, containerId, listId) {
       div.className = 'suggestion';
       div.textContent = place;
       div.onclick = (e) => {
-        e.stopPropagation(); // Prevents autocomplete clicks from closing the container
+        e.stopPropagation(); // Stops the event from shutting down the layout wrapper
         input.value = place;
         list.innerHTML = '';
         checkReady();
@@ -643,7 +643,7 @@ function updateRouteInfo(pickup, destination) {
 }
 
 function toggleForm(event) {
-  if (event) event.stopPropagation(); // Prevents button action from conflicting with click rules
+  if (event) event.stopPropagation(); 
   const formPopup = document.getElementById("booking-form-popup");
   const menu = document.getElementById("header-menu-dropdown");
   if (menu && menu.classList.contains("show")) {
@@ -841,24 +841,22 @@ setupAuto('gm-destination', 'dest-container', 'destinationList');
 document.getElementById('mode-group').onchange = checkReady;
 
 function toggleDropdown(event) {
-  if (event) event.stopPropagation(); // Prevents conflict closures
+  if (event) event.stopPropagation(); 
   const menu = document.getElementById("header-menu-dropdown");
   menu.classList.toggle("show");
 }
 
-// Fixed Window Controller: Prevents the form from ever closing on its own while interacting with fields/options
+// Absolute Event Safeguard: Prevents auto-closing completely inside form content
 window.onclick = (event) => {
   const menu = document.getElementById("header-menu-dropdown");
   const formPopup = document.getElementById("booking-form-popup");
   const companyInfo = document.querySelector(".company-info");
   const toggleActionBtn = document.querySelector(".form-toggle-action-btn");
   
-  // If the user clicks completely inside the form card layout or autocomplete elements, enforce a hard return (keep form open)
   if (formPopup && formPopup.contains(event.target)) {
       return; 
   }
   
-  // Close only if clicking completely outside the layout structure on the blank slide billboard areas
   if (formPopup && formPopup.classList.contains('show')) {
       if (!companyInfo.contains(event.target) && 
           !toggleActionBtn.contains(event.target) && 
