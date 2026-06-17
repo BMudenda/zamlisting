@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Video Editor - Fixed</title>
-
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+<title>Video Editor - Tablet Optimized</title>
 
 <style>
 * {
@@ -93,6 +91,8 @@ h2 {
     margin: 16px 0;
     background: #000;
     display: none;
+    max-height: 400px;
+    object-fit: contain;
 }
 
 #video.show {
@@ -111,9 +111,8 @@ h2 {
 }
 
 .video-info.show {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
 }
 
@@ -132,6 +131,10 @@ h2 {
     .controls-grid {
         grid-template-columns: 1fr;
         gap: 10px;
+    }
+    
+    .video-info.show {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -308,6 +311,13 @@ h2 {
     color: #2196f3;
 }
 
+.status-message.warning {
+    display: block;
+    background: #ffa72610;
+    border: 1px solid #ffa726;
+    color: #ffa726;
+}
+
 .spinner {
     display: inline-block;
     width: 20px;
@@ -324,6 +334,25 @@ h2 {
     to { transform: rotate(360deg); }
 }
 
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.badge-success {
+    background: #00c853;
+    color: #000;
+}
+
+.badge-warning {
+    background: #ffa726;
+    color: #000;
+}
+
 @media (max-width: 480px) {
     .container {
         padding: 16px;
@@ -336,7 +365,6 @@ h2 {
     }
 }
 
-/* Touch optimizations */
 @media (hover: none) and (pointer: coarse) {
     .upload-area:hover {
         border-color: #2a2a2a;
@@ -357,13 +385,13 @@ h2 {
 <body>
 
 <div class="container">
-    <h2>🎬 Video Editor</h2>
+    <h2>🎬 Video Editor <span class="badge badge-success">BETA</span></h2>
     
     <div class="upload-area" id="uploadArea">
         <div class="upload-icon">📤</div>
         <div class="upload-text">
             Tap to upload video
-            <small>Supports MP4, MOV, WebM</small>
+            <small>MP4, MOV, WebM • Max 500MB for best results</small>
         </div>
         <input type="file" id="videoInput" accept="video/*">
     </div>
@@ -374,6 +402,7 @@ h2 {
         <span>📹 <span id="videoName">-</span></span>
         <span>⏱️ <span id="videoDuration">-</span></span>
         <span>📦 <span id="videoSize">-</span></span>
+        <span>🎯 <span id="videoStatus">Ready</span></span>
     </div>
 
     <div id="statusMessage" class="status-message"></div>
@@ -431,13 +460,10 @@ h2 {
 </div>
 
 <script>
-// Fix: Use a more compatible FFmpeg configuration
-const { FFmpeg } = FFmpegWASM;
-const ffmpeg = new FFmpeg();
-
+// Using a simpler approach without FFmpeg for better compatibility
 let uploadedFile = null;
 let isProcessing = false;
-let progressInterval = null;
+let videoUrl = null;
 
 // DOM elements
 const uploadArea = document.getElementById('uploadArea');
@@ -447,6 +473,7 @@ const videoInfo = document.getElementById('videoInfo');
 const videoName = document.getElementById('videoName');
 const videoDuration = document.getElementById('videoDuration');
 const videoSize = document.getElementById('videoSize');
+const videoStatus = document.getElementById('videoStatus');
 
 // Upload handlers
 uploadArea.addEventListener('click', (e) => {
@@ -492,16 +519,28 @@ function handleFile(file) {
         return;
     }
 
+    // Check file size (recommend under 500MB for tablet)
+    if (file.size > 500 * 1024 * 1024) {
+        showStatus('⚠️ Large file detected. Processing may be slow or fail on tablets.', 'warning');
+    }
+
     uploadedFile = file;
     
     // Show video info
     videoName.textContent = file.name;
     videoSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    videoStatus.textContent = '✅ Loaded';
+    videoStatus.style.color = '#00c853';
     videoInfo.classList.add('show');
 
+    // Revoke old URL if exists
+    if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+    }
+    
     // Load video
-    const url = URL.createObjectURL(file);
-    video.src = url;
+    videoUrl = URL.createObjectURL(file);
+    video.src = videoUrl;
     video.classList.add('show');
     
     // Get duration
@@ -509,13 +548,13 @@ function handleFile(file) {
         const duration = Math.floor(video.duration);
         videoDuration.textContent = formatDuration(duration);
         document.getElementById('end').value = duration;
-        showStatus(`✅ Video loaded: ${file.name}`, 'success');
+        showStatus(`✅ Video loaded successfully!`, 'success');
     });
 
     // Handle loading errors
     video.addEventListener('error', (e) => {
         console.error('Video loading error:', e);
-        showStatus('⚠️ Could not load video preview, but processing may still work.', 'info');
+        showStatus('⚠️ Video preview unavailable, but processing may still work.', 'warning');
     });
 }
 
@@ -549,111 +588,170 @@ async function processVideo() {
         return;
     }
 
+    // Check if browser supports required APIs
+    if (!window.MediaRecorder) {
+        showStatus('❌ Your browser doesn\'t support video processing. Please use Chrome or Edge.', 'error');
+        return;
+    }
+
     const processBtn = document.getElementById('processBtn');
     isProcessing = true;
     processBtn.disabled = true;
     processBtn.innerHTML = '<span class="spinner"></span> Processing...';
 
     try {
-        showStatus('⏳ Loading FFmpeg... (may take a moment)', 'info');
-        updateProgress(0, 'Loading FFmpeg...');
-        
-        // Load FFmpeg with progress
-        await ffmpeg.load();
-        
-        updateProgress(10, 'FFmpeg loaded, preparing...');
-        
         const start = parseFloat(document.getElementById('start').value) || 0;
         const end = parseFloat(document.getElementById('end').value) || 10;
-        const size = document.getElementById('resolution').value;
-        const quality = document.getElementById('quality').value;
         
         if (start < 0 || end <= start) {
             showStatus('Please enter valid time values!', 'error');
             throw new Error('Invalid time range');
         }
 
-        updateProgress(20, 'Reading video file...');
+        showStatus('⏳ Processing video... This may take a moment.', 'info');
+        updateProgress(10, 'Loading video...');
+
+        // Create video element for processing
+        const videoElement = document.createElement('video');
+        videoElement.src = videoUrl;
+        videoElement.muted = true;
+        videoElement.preload = 'auto';
         
-        // Read file as ArrayBuffer
-        const arrayBuffer = await uploadedFile.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
+        await new Promise((resolve, reject) => {
+            videoElement.onloadedmetadata = resolve;
+            videoElement.onerror = reject;
+            videoElement.load();
+        });
+
+        updateProgress(20, 'Preparing canvas...');
+
+        // Set up canvas for processing
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
         
-        updateProgress(30, 'Writing to FFmpeg...');
+        // Get target resolution
+        const resolution = document.getElementById('resolution').value.split(':');
+        const targetWidth = parseInt(resolution[0]);
+        const targetHeight = parseInt(resolution[1]);
         
-        // Write file to FFmpeg
-        await ffmpeg.writeFile('input.mp4', uint8Array);
+        // Calculate aspect ratio
+        const aspectRatio = videoElement.videoWidth / videoElement.videoHeight;
+        let outputWidth = targetWidth;
+        let outputHeight = targetHeight;
         
-        updateProgress(40, 'Processing video...');
+        if (targetWidth / targetHeight > aspectRatio) {
+            outputWidth = targetHeight * aspectRatio;
+        } else {
+            outputHeight = targetWidth / aspectRatio;
+        }
         
-        // Simulate progress for better UX
-        let progress = 40;
-        clearInterval(progressInterval);
-        progressInterval = setInterval(() => {
-            progress += Math.random() * 2;
-            if (progress < 80) {
-                updateProgress(progress, 'Processing video...');
+        canvas.width = Math.floor(outputWidth);
+        canvas.height = Math.floor(outputHeight);
+
+        updateProgress(30, 'Setting up recording...');
+
+        // Set up stream
+        const stream = canvas.captureStream(30);
+        const recorder = new MediaRecorder(stream, {
+            mimeType: 'video/webm;codecs=vp9',
+            videoBitsPerSecond: 5000000
+        });
+
+        const chunks = [];
+        recorder.ondataavailable = (e) => {
+            if (e.data.size > 0) {
+                chunks.push(e.data);
             }
-        }, 300);
+        };
+
+        // Calculate time range
+        const startTime = Math.min(start, videoElement.duration - 0.5);
+        const endTime = Math.min(end, videoElement.duration);
+        const duration = endTime - startTime;
         
-        // Execute FFmpeg command
-        const commands = [
-            '-i', 'input.mp4',
-            '-ss', start.toString(),
-            '-to', end.toString(),
-            '-vf', `scale=${size}`,
-            '-c:v', 'libx264',
-            '-crf', quality,
-            '-preset', 'veryfast', // Faster for mobile
-            '-movflags', '+faststart',
-            '-c:a', 'aac',
-            '-b:a', '128k',
-            '-y', // Overwrite output
-            'output.mp4'
-        ];
-        
-        await ffmpeg.exec(commands);
-        
-        clearInterval(progressInterval);
-        updateProgress(85, 'Reading output...');
-        
-        // Read output file
-        const data = await ffmpeg.readFile('output.mp4');
-        
+        if (duration <= 0) {
+            throw new Error('Invalid time range');
+        }
+
+        updateProgress(40, `Processing ${formatDuration(duration)}...`);
+
+        // Start recording
+        recorder.start();
+        videoElement.currentTime = startTime;
+        videoElement.play();
+
+        // Process frames
+        let lastTime = -1;
+        const frameRate = 30;
+        const totalFrames = Math.floor(duration * frameRate);
+        let processedFrames = 0;
+
+        await new Promise((resolve) => {
+            const processFrame = () => {
+                if (videoElement.currentTime >= endTime || videoElement.ended) {
+                    resolve();
+                    return;
+                }
+
+                // Draw frame
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                
+                processedFrames++;
+                const progress = 40 + (processedFrames / totalFrames) * 50;
+                updateProgress(progress, `Processing frame ${processedFrames}/${totalFrames}`);
+
+                // Request next frame
+                requestAnimationFrame(processFrame);
+            };
+
+            // Start processing frames
+            requestAnimationFrame(processFrame);
+        });
+
+        updateProgress(90, 'Finalizing...');
+
+        // Stop recording
+        recorder.stop();
+        videoElement.pause();
+
+        await new Promise((resolve) => {
+            recorder.onstop = resolve;
+        });
+
         updateProgress(95, 'Creating download...');
+
+        // Create blob from chunks
+        const blob = new Blob(chunks, { type: 'video/webm' });
         
-        // Create blob and download link
-        const blob = new Blob([data.buffer], { type: 'video/mp4' });
-        const url = URL.createObjectURL(blob);
+        // Convert to MP4 if possible (download as webm for compatibility)
+        const downloadUrl = URL.createObjectURL(blob);
         
         const link = document.getElementById('downloadLink');
-        link.href = url;
-        link.download = `edited-${uploadedFile.name}`;
+        link.href = downloadUrl;
+        link.download = `edited-${uploadedFile.name.replace(/\.[^/.]+$/, '')}.webm`;
         link.classList.add('show');
         
         updateProgress(100, '✅ Done!');
         showStatus('✅ Video processed successfully! Tap download to save.', 'success');
         
-        // Update video preview
-        video.src = url;
+        // Update preview
+        video.src = downloadUrl;
         video.load();
         video.classList.add('show');
-        
-        // Update duration info
-        video.addEventListener('loadedmetadata', () => {
-            videoDuration.textContent = formatDuration(video.duration);
-        });
+        videoStatus.textContent = '✅ Processed';
+        videoStatus.style.color = '#00c853';
         
     } catch (error) {
-        clearInterval(progressInterval);
         console.error('Processing error:', error);
         showStatus(`❌ Error: ${error.message || 'Unknown error'}`, 'error');
+        videoStatus.textContent = '❌ Failed';
+        videoStatus.style.color = '#ff1744';
     } finally {
         isProcessing = false;
         processBtn.disabled = false;
         processBtn.innerHTML = '🎯 Process';
         
-        // Hide progress after delay
         setTimeout(() => {
             document.getElementById('progressContainer').style.display = 'none';
         }, 5000);
@@ -661,12 +759,15 @@ async function processVideo() {
 }
 
 function resetAll() {
-    clearInterval(progressInterval);
-    
     document.getElementById('start').value = 0;
     document.getElementById('end').value = 10;
     document.getElementById('resolution').value = '1280:720';
     document.getElementById('quality').value = '28';
+    
+    if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+        videoUrl = null;
+    }
     
     video.src = '';
     video.classList.remove('show');
@@ -684,7 +785,7 @@ function resetAll() {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter' || e.key === ' ') && (e.ctrlKey || e.metaKey)) {
+    if ((e.key === 'Enter') && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         processVideo();
     }
@@ -694,8 +795,9 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-console.log('🎬 Video Editor loaded');
+console.log('🎬 Video Editor loaded - Using Canvas/MediaRecorder API');
 console.log('📱 Optimized for tablets and mobile devices');
+console.log('💡 This version uses built-in browser APIs instead of FFmpeg');
 </script>
 </body>
 </html>
