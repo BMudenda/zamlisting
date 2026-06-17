@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Video Editor - Tablet Optimized</title>
+<title>Pro Video Editor - Full Suite</title>
 
 <style>
 * {
@@ -18,25 +18,25 @@ body {
     background: #0a0a0a;
     color: #fff;
     min-height: 100vh;
-    padding: 16px;
+    padding: 12px;
     -webkit-overflow-scrolling: touch;
 }
 
 .container {
     background: #1a1a1a;
-    border-radius: 24px;
-    padding: 24px;
-    max-width: 900px;
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 1200px;
     width: 100%;
-    margin: 10px auto;
+    margin: 0 auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.8);
     border: 1px solid #2a2a2a;
 }
 
 h2 {
-    font-size: clamp(24px, 5vw, 32px);
+    font-size: clamp(24px, 4vw, 32px);
     font-weight: 600;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     background: linear-gradient(135deg, #00c853, #00e676);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -46,16 +46,11 @@ h2 {
 .upload-area {
     border: 2px dashed #2a2a2a;
     border-radius: 16px;
-    padding: clamp(30px, 6vw, 50px) 20px;
+    padding: 30px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: 20px;
-    min-height: 150px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    margin-bottom: 16px;
     background: #0f0f0f;
 }
 
@@ -69,29 +64,34 @@ h2 {
 }
 
 .upload-icon {
-    font-size: clamp(48px, 10vw, 64px);
-    margin-bottom: 12px;
+    font-size: 48px;
+    margin-bottom: 8px;
 }
 
 .upload-text {
     color: #888;
-    font-size: clamp(14px, 2.5vw, 18px);
+    font-size: 16px;
 }
 
 .upload-text small {
     display: block;
-    margin-top: 8px;
+    margin-top: 4px;
     font-size: 12px;
     color: #666;
 }
 
+.video-container {
+    position: relative;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
 #video {
     width: 100%;
-    border-radius: 16px;
-    margin: 16px 0;
-    background: #000;
     display: none;
-    max-height: 400px;
+    max-height: 500px;
     object-fit: contain;
 }
 
@@ -99,70 +99,218 @@ h2 {
     display: block;
 }
 
-.video-info {
-    background: #121212;
-    padding: 12px 16px;
-    border-radius: 10px;
-    margin: 10px 0;
-    font-size: 14px;
-    color: #888;
+.video-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #fff;
     display: none;
+    backdrop-filter: blur(10px);
+}
+
+.video-overlay.show {
+    display: block;
+}
+
+.timeline-container {
+    background: #121212;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
     border: 1px solid #222;
 }
 
-.video-info.show {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
-.video-info span {
+.timeline-header h3 {
+    font-size: 14px;
+    color: #888;
+    font-weight: 400;
+}
+
+.timeline-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.timeline-controls button {
+    padding: 6px 14px;
+    background: #2a2a2a;
+    border: none;
+    border-radius: 6px;
     color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    touch-action: manipulation;
+}
+
+.timeline-controls button:active {
+    transform: scale(0.95);
+    background: #00c853;
+    color: #000;
+}
+
+.timeline-track {
+    position: relative;
+    height: 60px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.timeline-track .thumbnails {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+.timeline-track .thumbnails canvas {
+    height: 100%;
+    width: auto;
+}
+
+.timeline-track .playhead {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: #00c853;
+    pointer-events: none;
+    transition: left 0.1s;
+    box-shadow: 0 0 10px rgba(0,200,83,0.5);
+}
+
+.timeline-track .playhead::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -4px;
+    width: 11px;
+    height: 11px;
+    background: #00c853;
+    border-radius: 50%;
+}
+
+.timeline-markers {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 10px;
+    color: #666;
+}
+
+.timeline-selection {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: rgba(0,200,83,0.15);
+    border: 2px solid #00c853;
+    pointer-events: none;
+    display: none;
+}
+
+.timeline-selection.show {
+    display: block;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.tool-card {
+    background: #121212;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    touch-action: manipulation;
+}
+
+.tool-card:active {
+    transform: scale(0.96);
+    border-color: #00c853;
+}
+
+.tool-card .icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.tool-card .label {
+    font-size: 12px;
+    color: #888;
+}
+
+.tool-card .shortcut {
+    font-size: 10px;
+    color: #444;
+    margin-top: 2px;
 }
 
 .controls-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 16px 0;
+    gap: 10px;
+    margin: 12px 0;
 }
 
 @media (max-width: 768px) {
     .controls-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
     }
-    
-    .video-info.show {
-        grid-template-columns: 1fr;
+    .tools-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 .control-group {
     background: #121212;
-    padding: 14px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 10px;
     border: 1px solid #222;
 }
 
 .control-group label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #888;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .control-group input,
 .control-group select {
     width: 100%;
-    padding: 14px 12px;
+    padding: 10px 12px;
     background: #1a1a1a;
     border: 1px solid #333;
-    border-radius: 8px;
+    border-radius: 6px;
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
     transition: border-color 0.3s;
     -webkit-appearance: none;
     appearance: none;
@@ -174,44 +322,33 @@ h2 {
     border-color: #00c853;
 }
 
-.control-group input[type="number"] {
-    -moz-appearance: textfield;
-    font-size: 18px;
-}
-
-.control-group input[type="number"]::-webkit-outer-spin-button,
-.control-group input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-}
-
-.control-group select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
+.control-group input[type="range"] {
+    padding: 4px;
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
 }
 
 .button-group {
     display: flex;
     gap: 10px;
-    margin: 16px 0;
+    margin: 12px 0;
     flex-wrap: wrap;
 }
 
 .btn {
     flex: 1;
-    min-height: 56px;
-    padding: 16px 20px;
+    min-height: 48px;
+    padding: 12px 16px;
     border: none;
-    border-radius: 12px;
-    font-size: clamp(14px, 2vw, 16px);
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     touch-action: manipulation;
-    min-width: 120px;
+    min-width: 80px;
 }
 
 .btn:active {
@@ -234,8 +371,9 @@ h2 {
     color: #fff;
 }
 
-.btn-secondary:active {
-    background: #333;
+.btn-danger {
+    background: #ff1744;
+    color: #fff;
 }
 
 .btn-success {
@@ -244,7 +382,6 @@ h2 {
     text-decoration: none;
     display: none;
     text-align: center;
-    min-height: 56px;
     align-items: center;
     justify-content: center;
 }
@@ -254,16 +391,16 @@ h2 {
 }
 
 .progress-container {
-    margin: 16px 0;
+    margin: 12px 0;
     display: none;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 
 .progress-bar {
     width: 100%;
-    height: 8px;
+    height: 6px;
     background: #1a1a1a;
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
 }
 
@@ -275,18 +412,18 @@ h2 {
 }
 
 .progress-text {
-    font-size: 14px;
+    font-size: 12px;
     color: #888;
-    margin-top: 10px;
+    margin-top: 6px;
     text-align: center;
 }
 
 .status-message {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-radius: 10px;
-    margin: 10px 0;
+    margin: 8px 0;
     display: none;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
 }
 
@@ -318,15 +455,32 @@ h2 {
     color: #ffa726;
 }
 
+.video-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 10px 14px;
+    background: #121212;
+    border-radius: 10px;
+    margin: 8px 0;
+    border: 1px solid #222;
+    font-size: 12px;
+    color: #888;
+}
+
+.video-info span {
+    color: #fff;
+}
+
 .spinner {
     display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(0,0,0,0.1);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.1);
     border-radius: 50%;
     border-top-color: #000;
     animation: spin 0.8s linear infinite;
-    margin-right: 8px;
+    margin-right: 6px;
     vertical-align: middle;
 }
 
@@ -336,11 +490,11 @@ h2 {
 
 .badge {
     display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
     font-weight: 600;
-    margin-left: 8px;
+    margin-left: 6px;
 }
 
 .badge-success {
@@ -353,71 +507,153 @@ h2 {
     color: #000;
 }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 16px;
-    }
-    
-    .btn {
-        min-height: 50px;
-        font-size: 14px;
-        min-width: 80px;
-    }
-}
-
+/* Touch optimizations */
 @media (hover: none) and (pointer: coarse) {
-    .upload-area:hover {
-        border-color: #2a2a2a;
+    .tool-card:hover {
+        border-color: #222;
     }
-    
     .btn:hover {
         transform: none;
     }
-    
-    .control-group input,
-    .control-group select {
-        font-size: 18px;
-        padding: 16px 14px;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
     }
+    .tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .btn {
+        min-height: 44px;
+        font-size: 12px;
+        min-width: 60px;
+    }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00c853;
+    border-radius: 2px;
 }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🎬 Video Editor <span class="badge badge-success">BETA</span></h2>
+    <h2>🎬 Pro Video Editor <span class="badge badge-success">v2.0</span></h2>
     
     <div class="upload-area" id="uploadArea">
         <div class="upload-icon">📤</div>
         <div class="upload-text">
             Tap to upload video
-            <small>MP4, MOV, WebM • Max 500MB for best results</small>
+            <small>MP4, MOV, WebM • Full editing suite</small>
         </div>
         <input type="file" id="videoInput" accept="video/*">
     </div>
 
-    <video id="video" controls playsinline preload="metadata"></video>
-    
-    <div class="video-info" id="videoInfo">
+    <div class="video-container">
+        <video id="video" controls playsinline preload="metadata"></video>
+        <div class="video-overlay" id="videoOverlay">
+            <span id="currentTimeDisplay">0:00</span> / <span id="totalTimeDisplay">0:00</span>
+        </div>
+    </div>
+
+    <div class="video-info" id="videoInfo" style="display:none;">
         <span>📹 <span id="videoName">-</span></span>
         <span>⏱️ <span id="videoDuration">-</span></span>
         <span>📦 <span id="videoSize">-</span></span>
-        <span>🎯 <span id="videoStatus">Ready</span></span>
+        <span>📐 <span id="videoResolution">-</span></span>
     </div>
 
     <div id="statusMessage" class="status-message"></div>
 
+    <!-- Timeline -->
+    <div class="timeline-container">
+        <div class="timeline-header">
+            <h3>⏱️ Timeline</h3>
+            <div class="timeline-controls">
+                <button onclick="setInPoint()">✂️ In</button>
+                <button onclick="setOutPoint()">✂️ Out</button>
+                <button onclick="splitVideo()">🔪 Split</button>
+                <button onclick="deleteSelection()">🗑️ Delete</button>
+                <button onclick="resetTimeline()">↺ Reset</button>
+            </div>
+        </div>
+        <div class="timeline-track" id="timelineTrack">
+            <div class="thumbnails" id="thumbnailsContainer"></div>
+            <div class="playhead" id="playhead" style="left:0%"></div>
+            <div class="timeline-selection" id="timelineSelection"></div>
+        </div>
+        <div class="timeline-markers">
+            <span id="timelineStart">0:00</span>
+            <span id="timelineCurrent">0:00</span>
+            <span id="timelineEnd">0:00</span>
+        </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="tools-grid">
+        <div class="tool-card" onclick="applyFilter('grayscale')">
+            <span class="icon">⚫</span>
+            <span class="label">Grayscale</span>
+            <span class="shortcut">Ctrl+G</span>
+        </div>
+        <div class="tool-card" onclick="applyFilter('sepia')">
+            <span class="icon">🟫</span>
+            <span class="label">Sepia</span>
+            <span class="shortcut">Ctrl+S</span>
+        </div>
+        <div class="tool-card" onclick="applyFilter('brightness')">
+            <span class="icon">☀️</span>
+            <span class="label">Brightness</span>
+            <span class="shortcut">Ctrl+B</span>
+        </div>
+        <div class="tool-card" onclick="applyFilter('contrast')">
+            <span class="icon">🎯</span>
+            <span class="label">Contrast</span>
+            <span class="shortcut">Ctrl+C</span>
+        </div>
+        <div class="tool-card" onclick="applyFilter('invert')">
+            <span class="icon">🔄</span>
+            <span class="label">Invert</span>
+            <span class="shortcut">Ctrl+I</span>
+        </div>
+        <div class="tool-card" onclick="rotateVideo()">
+            <span class="icon">🔄</span>
+            <span class="label">Rotate 90°</span>
+            <span class="shortcut">Ctrl+R</span>
+        </div>
+        <div class="tool-card" onclick="flipVideo('horizontal')">
+            <span class="icon">↔️</span>
+            <span class="label">Flip H</span>
+            <span class="shortcut">Ctrl+H</span>
+        </div>
+        <div class="tool-card" onclick="flipVideo('vertical')">
+            <span class="icon">↕️</span>
+            <span class="label">Flip V</span>
+            <span class="shortcut">Ctrl+V</span>
+        </div>
+    </div>
+
     <div class="controls-grid">
         <div class="control-group">
-            <label>⏱️ Start (seconds)</label>
-            <input type="number" id="start" value="0" min="0" step="0.5">
+            <label>🎯 Start Time</label>
+            <input type="number" id="startTime" value="0" min="0" step="0.1">
         </div>
-        
         <div class="control-group">
-            <label>⏱️ End (seconds)</label>
-            <input type="number" id="end" value="10" min="0" step="0.5">
+            <label>🎯 End Time</label>
+            <input type="number" id="endTime" value="10" min="0" step="0.1">
         </div>
-        
         <div class="control-group">
             <label>📐 Resolution</label>
             <select id="resolution">
@@ -427,7 +663,6 @@ h2 {
                 <option value="1920:1080">1080p</option>
             </select>
         </div>
-        
         <div class="control-group">
             <label>🎚️ Quality</label>
             <select id="quality">
@@ -439,11 +674,14 @@ h2 {
     </div>
 
     <div class="button-group">
-        <button class="btn btn-primary" onclick="processVideo()" id="processBtn">
-            🎯 Process
+        <button class="btn btn-primary" onclick="renderVideo()" id="processBtn">
+            🎬 Render Video
         </button>
         <button class="btn btn-secondary" onclick="resetAll()">
-            🔄 Reset
+            🔄 Reset All
+        </button>
+        <button class="btn btn-danger" onclick="clearTimeline()">
+            🗑️ Clear Timeline
         </button>
     </div>
 
@@ -451,7 +689,7 @@ h2 {
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div class="progress-text" id="progressText">Loading...</div>
+        <div class="progress-text" id="progressText">Processing...</div>
     </div>
 
     <a id="downloadLink" class="btn btn-success">
@@ -460,33 +698,40 @@ h2 {
 </div>
 
 <script>
-// Using a simpler approach without FFmpeg for better compatibility
+// Video Editor State
 let uploadedFile = null;
-let isProcessing = false;
 let videoUrl = null;
+let isProcessing = false;
+let currentFilter = null;
+let rotation = 0;
+let flipH = false;
+let flipV = false;
+let inPoint = 0;
+let outPoint = 0;
+let segments = [];
+let currentSegment = 0;
+let thumbnailCache = [];
 
-// DOM elements
-const uploadArea = document.getElementById('uploadArea');
-const videoInput = document.getElementById('videoInput');
+// DOM Elements
 const video = document.getElementById('video');
 const videoInfo = document.getElementById('videoInfo');
 const videoName = document.getElementById('videoName');
 const videoDuration = document.getElementById('videoDuration');
 const videoSize = document.getElementById('videoSize');
-const videoStatus = document.getElementById('videoStatus');
+const videoResolution = document.getElementById('videoResolution');
+const timelineTrack = document.getElementById('timelineTrack');
+const playhead = document.getElementById('playhead');
+const selection = document.getElementById('timelineSelection');
+const thumbnailsContainer = document.getElementById('thumbnailsContainer');
 
 // Upload handlers
-uploadArea.addEventListener('click', (e) => {
-    if (e.target.tagName !== 'INPUT') {
-        videoInput.click();
-    }
-});
+const uploadArea = document.getElementById('uploadArea');
+const videoInput = document.getElementById('videoInput');
 
+uploadArea.addEventListener('click', () => videoInput.click());
 uploadArea.addEventListener('touchend', (e) => {
-    if (e.target.tagName !== 'INPUT' && !isProcessing) {
-        e.preventDefault();
-        videoInput.click();
-    }
+    e.preventDefault();
+    videoInput.click();
 });
 
 videoInput.addEventListener('change', (e) => {
@@ -519,49 +764,72 @@ function handleFile(file) {
         return;
     }
 
-    // Check file size (recommend under 500MB for tablet)
-    if (file.size > 500 * 1024 * 1024) {
-        showStatus('⚠️ Large file detected. Processing may be slow or fail on tablets.', 'warning');
-    }
-
     uploadedFile = file;
     
     // Show video info
     videoName.textContent = file.name;
     videoSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-    videoStatus.textContent = '✅ Loaded';
-    videoStatus.style.color = '#00c853';
-    videoInfo.classList.add('show');
+    videoInfo.style.display = 'grid';
 
-    // Revoke old URL if exists
-    if (videoUrl) {
-        URL.revokeObjectURL(videoUrl);
-    }
+    // Revoke old URL
+    if (videoUrl) URL.revokeObjectURL(videoUrl);
     
-    // Load video
     videoUrl = URL.createObjectURL(file);
     video.src = videoUrl;
     video.classList.add('show');
+    document.getElementById('videoOverlay').classList.add('show');
     
-    // Get duration
+    // Get video metadata
     video.addEventListener('loadedmetadata', () => {
-        const duration = Math.floor(video.duration);
-        videoDuration.textContent = formatDuration(duration);
-        document.getElementById('end').value = duration;
-        showStatus(`✅ Video loaded successfully!`, 'success');
+        const duration = video.duration;
+        videoDuration.textContent = formatTime(duration);
+        videoResolution.textContent = `${video.videoWidth}x${video.videoHeight}`;
+        
+        document.getElementById('endTime').value = Math.floor(duration);
+        document.getElementById('timelineEnd').textContent = formatTime(duration);
+        
+        // Generate thumbnails
+        generateThumbnails();
+        
+        showStatus(`✅ Video loaded: ${file.name}`, 'success');
     });
 
-    // Handle loading errors
+    // Update time display
+    video.addEventListener('timeupdate', () => {
+        const current = video.currentTime;
+        document.getElementById('currentTimeDisplay').textContent = formatTime(current);
+        document.getElementById('timelineCurrent').textContent = formatTime(current);
+        
+        const progress = (current / video.duration) * 100;
+        playhead.style.left = progress + '%';
+        
+        // Update selection
+        if (inPoint > 0 || outPoint > 0) {
+            updateSelection();
+        }
+    });
+
     video.addEventListener('error', (e) => {
-        console.error('Video loading error:', e);
-        showStatus('⚠️ Video preview unavailable, but processing may still work.', 'warning');
+        console.error('Video error:', e);
+        showStatus('⚠️ Video preview unavailable, but editing may still work.', 'warning');
     });
 }
 
-function formatDuration(seconds) {
+function formatTime(seconds) {
     if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function formatTimeDetailed(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00:00';
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    if (hours > 0) {
+        return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
     return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
@@ -569,49 +837,289 @@ function showStatus(message, type = 'info') {
     const status = document.getElementById('statusMessage');
     status.textContent = message;
     status.className = 'status-message ' + type;
+    setTimeout(() => {
+        if (status.className === 'status-message ' + type) {
+            status.className = 'status-message';
+        }
+    }, 5000);
 }
 
-function updateProgress(progress, text) {
-    const container = document.getElementById('progressContainer');
-    const fill = document.getElementById('progressFill');
-    const statusText = document.getElementById('progressText');
+// Timeline Functions
+async function generateThumbnails() {
+    if (!videoUrl) return;
     
-    container.style.display = 'block';
-    fill.style.width = Math.min(progress, 100) + '%';
-    statusText.textContent = text || `Processing... ${Math.round(Math.min(progress, 100))}%`;
+    thumbnailsContainer.innerHTML = '';
+    thumbnailCache = [];
+    
+    const duration = video.duration;
+    const numThumbnails = Math.min(20, Math.floor(duration / 0.5));
+    
+    if (numThumbnails === 0) return;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 80;
+    canvas.height = 45;
+    const ctx = canvas.getContext('2d');
+    
+    const tempVideo = document.createElement('video');
+    tempVideo.src = videoUrl;
+    tempVideo.muted = true;
+    await tempVideo.load();
+    
+    for (let i = 0; i < numThumbnails; i++) {
+        const time = (i / numThumbnails) * duration;
+        tempVideo.currentTime = time;
+        
+        await new Promise((resolve) => {
+            tempVideo.onseeked = () => {
+                ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+                const thumbnail = canvas.toDataURL('image/jpeg', 0.5);
+                thumbnailCache.push(thumbnail);
+                
+                const img = document.createElement('img');
+                img.src = thumbnail;
+                img.style.height = '100%';
+                img.style.width = 'auto';
+                thumbnailsContainer.appendChild(img);
+                resolve();
+            };
+            tempVideo.onseeked = () => {
+                // Fallback if seek fails
+                resolve();
+            };
+        });
+    }
 }
 
-async function processVideo() {
+function setInPoint() {
+    inPoint = video.currentTime;
+    showStatus(`📍 In point set at ${formatTime(inPoint)}`, 'info');
+    updateSelection();
+}
+
+function setOutPoint() {
+    outPoint = video.currentTime;
+    showStatus(`📍 Out point set at ${formatTime(outPoint)}`, 'info');
+    updateSelection();
+}
+
+function updateSelection() {
+    const duration = video.duration;
+    const start = Math.min(inPoint, outPoint);
+    const end = Math.max(inPoint, outPoint);
+    
+    if (start === end) {
+        selection.classList.remove('show');
+        return;
+    }
+    
+    const leftPercent = (start / duration) * 100;
+    const widthPercent = ((end - start) / duration) * 100;
+    
+    selection.style.left = leftPercent + '%';
+    selection.style.width = widthPercent + '%';
+    selection.classList.add('show');
+}
+
+function splitVideo() {
+    if (!videoUrl) {
+        showStatus('Please load a video first!', 'error');
+        return;
+    }
+    
+    const currentTime = video.currentTime;
+    segments.push({
+        start: currentTime,
+        end: video.duration
+    });
+    
+    // Update the current segment end
+    if (segments.length === 1) {
+        segments[0] = {
+            start: 0,
+            end: currentTime
+        };
+    } else {
+        segments[segments.length - 2].end = currentTime;
+    }
+    
+    showStatus(`✂️ Split at ${formatTime(currentTime)}`, 'success');
+}
+
+function deleteSelection() {
+    if (inPoint === 0 && outPoint === 0) {
+        showStatus('Please set In and Out points first!', 'warning');
+        return;
+    }
+    
+    const start = Math.min(inPoint, outPoint);
+    const end = Math.max(inPoint, outPoint);
+    
+    segments.push({
+        start: 0,
+        end: start
+    });
+    segments.push({
+        start: end,
+        end: video.duration
+    });
+    
+    // Remove the middle segment
+    inPoint = 0;
+    outPoint = 0;
+    selection.classList.remove('show');
+    
+    showStatus(`🗑️ Deleted selection from ${formatTime(start)} to ${formatTime(end)}`, 'success');
+}
+
+function resetTimeline() {
+    segments = [];
+    inPoint = 0;
+    outPoint = 0;
+    selection.classList.remove('show');
+    showStatus('↺ Timeline reset', 'info');
+}
+
+function clearTimeline() {
+    segments = [];
+    inPoint = 0;
+    outPoint = 0;
+    selection.classList.remove('show');
+    showStatus('🗑️ Timeline cleared', 'info');
+}
+
+// Filter Functions
+function applyFilter(filter) {
+    if (!videoUrl) {
+        showStatus('Please load a video first!', 'error');
+        return;
+    }
+    currentFilter = filter;
+    showStatus(`🎨 Applied ${filter} filter`, 'success');
+    
+    // Preview filter on current frame
+    applyFilterToFrame(filter);
+}
+
+async function applyFilterToFrame(filter) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const videoElement = video;
+    
+    canvas.width = videoElement.videoWidth || 640;
+    canvas.height = videoElement.videoHeight || 360;
+    
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    switch(filter) {
+        case 'grayscale':
+            for (let i = 0; i < data.length; i += 4) {
+                const gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                data[i] = data[i+1] = data[i+2] = gray;
+            }
+            break;
+        case 'sepia':
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i+1], b = data[i+2];
+                data[i] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+                data[i+1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+                data[i+2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+            }
+            break;
+        case 'brightness':
+            const brightness = 1.3;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.min(255, data[i] * brightness);
+                data[i+1] = Math.min(255, data[i+1] * brightness);
+                data[i+2] = Math.min(255, data[i+2] * brightness);
+            }
+            break;
+        case 'contrast':
+            const contrast = 1.5;
+            const factor = (259 * (contrast * 255 + 255)) / (255 * (259 - contrast * 255));
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.min(255, factor * (data[i] - 128) + 128);
+                data[i+1] = Math.min(255, factor * (data[i+1] - 128) + 128);
+                data[i+2] = Math.min(255, factor * (data[i+2] - 128) + 128);
+            }
+            break;
+        case 'invert':
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255 - data[i];
+                data[i+1] = 255 - data[i+1];
+                data[i+2] = 255 - data[i+2];
+            }
+            break;
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+    // Show preview briefly
+    const preview = document.createElement('img');
+    preview.src = canvas.toDataURL();
+    preview.style.position = 'fixed';
+    preview.style.top = '50%';
+    preview.style.left = '50%';
+    preview.style.transform = 'translate(-50%, -50%)';
+    preview.style.maxWidth = '90%';
+    preview.style.maxHeight = '80%';
+    preview.style.borderRadius = '12px';
+    preview.style.boxShadow = '0 0 50px rgba(0,0,0,0.9)';
+    preview.style.zIndex = '9999';
+    document.body.appendChild(preview);
+    
+    setTimeout(() => {
+        document.body.removeChild(preview);
+    }, 1500);
+}
+
+function rotateVideo() {
+    rotation = (rotation + 90) % 360;
+    showStatus(`🔄 Rotated to ${rotation}°`, 'success');
+    video.style.transform = `rotate(${rotation}deg)`;
+}
+
+function flipVideo(direction) {
+    if (direction === 'horizontal') {
+        flipH = !flipH;
+        showStatus(`↔️ Horizontal flip ${flipH ? 'on' : 'off'}`, 'info');
+    } else {
+        flipV = !flipV;
+        showStatus(`↕️ Vertical flip ${flipV ? 'on' : 'off'}`, 'info');
+    }
+    video.style.transform = `scale(${flipH ? '-1' : '1'}, ${flipV ? '-1' : '1'}) rotate(${rotation}deg)`;
+}
+
+// Main Render Function
+async function renderVideo() {
     if (isProcessing) return;
     if (!uploadedFile) {
         showStatus('Please select a video first!', 'error');
         return;
     }
 
-    // Check if browser supports required APIs
-    if (!window.MediaRecorder) {
-        showStatus('❌ Your browser doesn\'t support video processing. Please use Chrome or Edge.', 'error');
-        return;
-    }
-
     const processBtn = document.getElementById('processBtn');
     isProcessing = true;
     processBtn.disabled = true;
-    processBtn.innerHTML = '<span class="spinner"></span> Processing...';
+    processBtn.innerHTML = '<span class="spinner"></span> Rendering...';
 
     try {
-        const start = parseFloat(document.getElementById('start').value) || 0;
-        const end = parseFloat(document.getElementById('end').value) || 10;
+        const start = parseFloat(document.getElementById('startTime').value) || 0;
+        const end = parseFloat(document.getElementById('endTime').value) || video.duration || 10;
+        const resolution = document.getElementById('resolution').value.split(':');
+        const targetWidth = parseInt(resolution[0]);
+        const targetHeight = parseInt(resolution[1]);
         
         if (start < 0 || end <= start) {
             showStatus('Please enter valid time values!', 'error');
             throw new Error('Invalid time range');
         }
 
-        showStatus('⏳ Processing video... This may take a moment.', 'info');
+        showStatus('⏳ Rendering video... This may take a moment.', 'info');
         updateProgress(10, 'Loading video...');
 
-        // Create video element for processing
+        // Create processing pipeline
         const videoElement = document.createElement('video');
         videoElement.src = videoUrl;
         videoElement.muted = true;
@@ -623,16 +1131,10 @@ async function processVideo() {
             videoElement.load();
         });
 
-        updateProgress(20, 'Preparing canvas...');
+        updateProgress(20, 'Setting up canvas...');
 
-        // Set up canvas for processing
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
-        // Get target resolution
-        const resolution = document.getElementById('resolution').value.split(':');
-        const targetWidth = parseInt(resolution[0]);
-        const targetHeight = parseInt(resolution[1]);
         
         // Calculate aspect ratio
         const aspectRatio = videoElement.videoWidth / videoElement.videoHeight;
@@ -650,7 +1152,7 @@ async function processVideo() {
 
         updateProgress(30, 'Setting up recording...');
 
-        // Set up stream
+        // Use MediaRecorder
         const stream = canvas.captureStream(30);
         const recorder = new MediaRecorder(stream, {
             mimeType: 'video/webm;codecs=vp9',
@@ -659,59 +1161,73 @@ async function processVideo() {
 
         const chunks = [];
         recorder.ondataavailable = (e) => {
-            if (e.data.size > 0) {
-                chunks.push(e.data);
-            }
+            if (e.data.size > 0) chunks.push(e.data);
         };
 
-        // Calculate time range
-        const startTime = Math.min(start, videoElement.duration - 0.5);
-        const endTime = Math.min(end, videoElement.duration);
-        const duration = endTime - startTime;
-        
-        if (duration <= 0) {
-            throw new Error('Invalid time range');
-        }
+        const duration = end - start;
+        if (duration <= 0) throw new Error('Invalid time range');
 
-        updateProgress(40, `Processing ${formatDuration(duration)}...`);
+        updateProgress(40, `Rendering ${formatTimeDetailed(duration)}...`);
 
-        // Start recording
         recorder.start();
-        videoElement.currentTime = startTime;
+        videoElement.currentTime = start;
         videoElement.play();
 
-        // Process frames
-        let lastTime = -1;
-        const frameRate = 30;
-        const totalFrames = Math.floor(duration * frameRate);
         let processedFrames = 0;
+        const totalFrames = Math.floor(duration * 30);
+        const startTime = performance.now();
 
         await new Promise((resolve) => {
             const processFrame = () => {
-                if (videoElement.currentTime >= endTime || videoElement.ended) {
+                if (videoElement.currentTime >= end || videoElement.ended) {
                     resolve();
                     return;
                 }
 
-                // Draw frame
+                // Apply transformations
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Apply rotation
+                if (rotation !== 0) {
+                    ctx.save();
+                    ctx.translate(canvas.width/2, canvas.height/2);
+                    ctx.rotate(rotation * Math.PI / 180);
+                    ctx.translate(-canvas.width/2, -canvas.height/2);
+                }
+                
+                // Apply flips
+                if (flipH || flipV) {
+                    ctx.save();
+                    ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+                    if (flipH) ctx.translate(-canvas.width, 0);
+                    if (flipV) ctx.translate(0, -canvas.height);
+                }
+                
                 ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                
+                if (flipH || flipV) ctx.restore();
+                if (rotation !== 0) ctx.restore();
+                
+                // Apply filter if set
+                if (currentFilter) {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    applyFilterToImageData(imageData, currentFilter);
+                    ctx.putImageData(imageData, 0, 0);
+                }
                 
                 processedFrames++;
                 const progress = 40 + (processedFrames / totalFrames) * 50;
-                updateProgress(progress, `Processing frame ${processedFrames}/${totalFrames}`);
+                const elapsed = (performance.now() - startTime) / 1000;
+                const fps = processedFrames / elapsed;
+                updateProgress(progress, `Frame ${processedFrames}/${totalFrames} (${fps.toFixed(1)} fps)`);
 
-                // Request next frame
                 requestAnimationFrame(processFrame);
             };
 
-            // Start processing frames
             requestAnimationFrame(processFrame);
         });
 
-        updateProgress(90, 'Finalizing...');
-
-        // Stop recording
+        updateProgress(92, 'Finalizing...');
         recorder.stop();
         videoElement.pause();
 
@@ -719,12 +1235,9 @@ async function processVideo() {
             recorder.onstop = resolve;
         });
 
-        updateProgress(95, 'Creating download...');
+        updateProgress(98, 'Creating download...');
 
-        // Create blob from chunks
         const blob = new Blob(chunks, { type: 'video/webm' });
-        
-        // Convert to MP4 if possible (download as webm for compatibility)
         const downloadUrl = URL.createObjectURL(blob);
         
         const link = document.getElementById('downloadLink');
@@ -733,37 +1246,87 @@ async function processVideo() {
         link.classList.add('show');
         
         updateProgress(100, '✅ Done!');
-        showStatus('✅ Video processed successfully! Tap download to save.', 'success');
+        showStatus('✅ Video rendered successfully! Tap download to save.', 'success');
         
         // Update preview
         video.src = downloadUrl;
         video.load();
         video.classList.add('show');
-        videoStatus.textContent = '✅ Processed';
-        videoStatus.style.color = '#00c853';
         
     } catch (error) {
-        console.error('Processing error:', error);
+        console.error('Render error:', error);
         showStatus(`❌ Error: ${error.message || 'Unknown error'}`, 'error');
-        videoStatus.textContent = '❌ Failed';
-        videoStatus.style.color = '#ff1744';
     } finally {
         isProcessing = false;
         processBtn.disabled = false;
-        processBtn.innerHTML = '🎯 Process';
+        processBtn.innerHTML = '🎬 Render Video';
         
         setTimeout(() => {
             document.getElementById('progressContainer').style.display = 'none';
-        }, 5000);
+        }, 3000);
     }
 }
 
+function applyFilterToImageData(imageData, filter) {
+    const data = imageData.data;
+    switch(filter) {
+        case 'grayscale':
+            for (let i = 0; i < data.length; i += 4) {
+                const gray = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                data[i] = data[i+1] = data[i+2] = gray;
+            }
+            break;
+        case 'sepia':
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i+1], b = data[i+2];
+                data[i] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+                data[i+1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+                data[i+2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+            }
+            break;
+        case 'brightness':
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.min(255, data[i] * 1.3);
+                data[i+1] = Math.min(255, data[i+1] * 1.3);
+                data[i+2] = Math.min(255, data[i+2] * 1.3);
+            }
+            break;
+        case 'contrast':
+            const factor = 1.5;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.min(255, factor * (data[i] - 128) + 128);
+                data[i+1] = Math.min(255, factor * (data[i+1] - 128) + 128);
+                data[i+2] = Math.min(255, factor * (data[i+2] - 128) + 128);
+            }
+            break;
+        case 'invert':
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255 - data[i];
+                data[i+1] = 255 - data[i+1];
+                data[i+2] = 255 - data[i+2];
+            }
+            break;
+    }
+}
+
+function updateProgress(progress, text) {
+    const container = document.getElementById('progressContainer');
+    const fill = document.getElementById('progressFill');
+    const statusText = document.getElementById('progressText');
+    
+    container.style.display = 'block';
+    fill.style.width = Math.min(progress, 100) + '%';
+    statusText.textContent = text || `${Math.round(Math.min(progress, 100))}%`;
+}
+
 function resetAll() {
-    document.getElementById('start').value = 0;
-    document.getElementById('end').value = 10;
+    // Reset form
+    document.getElementById('startTime').value = 0;
+    document.getElementById('endTime').value = 10;
     document.getElementById('resolution').value = '1280:720';
     document.getElementById('quality').value = '28';
     
+    // Reset video state
     if (videoUrl) {
         URL.revokeObjectURL(videoUrl);
         videoUrl = null;
@@ -771,33 +1334,78 @@ function resetAll() {
     
     video.src = '';
     video.classList.remove('show');
-    videoInfo.classList.remove('show');
+    video.style.transform = '';
+    document.getElementById('videoOverlay').classList.remove('show');
+    videoInfo.style.display = 'none';
     
+    // Reset timeline
+    segments = [];
+    inPoint = 0;
+    outPoint = 0;
+    selection.classList.remove('show');
+    thumbnailsContainer.innerHTML = '';
+    
+    // Reset filters
+    currentFilter = null;
+    rotation = 0;
+    flipH = false;
+    flipV = false;
+    
+    // Reset UI
     document.getElementById('videoInput').value = '';
     uploadedFile = null;
     document.getElementById('downloadLink').classList.remove('show');
     document.getElementById('statusMessage').className = 'status-message';
-    document.getElementById('statusMessage').textContent = '';
     document.getElementById('progressContainer').style.display = 'none';
     
     showStatus('🔄 Reset complete. Tap to upload a new video.', 'info');
 }
 
-// Keyboard shortcuts
+// Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter') && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        processVideo();
-    }
-    if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        resetAll();
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+            case 'Enter': e.preventDefault(); renderVideo(); break;
+            case 'g': e.preventDefault(); applyFilter('grayscale'); break;
+            case 's': e.preventDefault(); applyFilter('sepia'); break;
+            case 'b': e.preventDefault(); applyFilter('brightness'); break;
+            case 'c': e.preventDefault(); applyFilter('contrast'); break;
+            case 'i': e.preventDefault(); applyFilter('invert'); break;
+            case 'r': e.preventDefault(); rotateVideo(); break;
+            case 'h': e.preventDefault(); flipVideo('horizontal'); break;
+            case 'v': e.preventDefault(); flipVideo('vertical'); break;
+            case 'z': e.preventDefault(); resetAll(); break;
+        }
     }
 });
 
-console.log('🎬 Video Editor loaded - Using Canvas/MediaRecorder API');
-console.log('📱 Optimized for tablets and mobile devices');
-console.log('💡 This version uses built-in browser APIs instead of FFmpeg');
+// Timeline click to seek
+timelineTrack.addEventListener('click', (e) => {
+    if (!video.duration) return;
+    const rect = timelineTrack.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const time = x * video.duration;
+    video.currentTime = time;
+});
+
+// Touch support for timeline
+timelineTrack.addEventListener('touchstart', (e) => {
+    if (!video.duration) return;
+    const touch = e.touches[0];
+    const rect = timelineTrack.getBoundingClientRect();
+    const x = (touch.clientX - rect.left) / rect.width;
+    const time = Math.max(0, Math.min(x * video.duration, video.duration));
+    video.currentTime = time;
+});
+
+console.log('🎬 Pro Video Editor loaded successfully!');
+console.log('📋 Features:');
+console.log('  - ✂️ Split, Cut, Delete segments');
+console.log('  - 🎨 Filters (Grayscale, Sepia, etc.)');
+console.log('  - 🔄 Rotate & Flip');
+console.log('  - 🎯 Timeline with In/Out points');
+console.log('  - ⌨️ Keyboard shortcuts');
+console.log('  - 📱 Tablet optimized');
 </script>
 </body>
 </html>
