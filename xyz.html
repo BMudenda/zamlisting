@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pro Video Editor - Tablet Ready</title>
+<title>Video Editor - Fixed</title>
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
 
@@ -20,9 +20,6 @@ body {
     background: #0a0a0a;
     color: #fff;
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
     padding: 16px;
     -webkit-overflow-scrolling: touch;
 }
@@ -33,9 +30,9 @@ body {
     padding: 24px;
     max-width: 900px;
     width: 100%;
+    margin: 10px auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.8);
     border: 1px solid #2a2a2a;
-    margin: 10px auto;
 }
 
 h2 {
@@ -56,12 +53,12 @@ h2 {
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 20px;
-    -webkit-touch-callout: none;
     min-height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background: #0f0f0f;
 }
 
 .upload-area:active {
@@ -76,13 +73,11 @@ h2 {
 .upload-icon {
     font-size: clamp(48px, 10vw, 64px);
     margin-bottom: 12px;
-    pointer-events: none;
 }
 
 .upload-text {
     color: #888;
     font-size: clamp(14px, 2.5vw, 18px);
-    pointer-events: none;
 }
 
 .upload-text small {
@@ -98,11 +93,32 @@ h2 {
     margin: 16px 0;
     background: #000;
     display: none;
-    touch-action: none;
 }
 
 #video.show {
     display: block;
+}
+
+.video-info {
+    background: #121212;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #888;
+    display: none;
+    border: 1px solid #222;
+}
+
+.video-info.show {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.video-info span {
+    color: #fff;
 }
 
 .controls-grid {
@@ -147,7 +163,6 @@ h2 {
     transition: border-color 0.3s;
     -webkit-appearance: none;
     appearance: none;
-    touch-action: manipulation;
 }
 
 .control-group input:focus,
@@ -166,7 +181,6 @@ h2 {
     -webkit-appearance: none;
 }
 
-/* Custom select arrow for touch devices */
 .control-group select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -194,7 +208,6 @@ h2 {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     touch-action: manipulation;
-    -webkit-touch-callout: none;
     min-width: 120px;
 }
 
@@ -205,10 +218,6 @@ h2 {
 .btn-primary {
     background: linear-gradient(135deg, #00c853, #00e676);
     color: #000;
-}
-
-.btn-primary:active {
-    box-shadow: 0 4px 20px rgba(0, 200, 83, 0.4);
 }
 
 .btn-primary:disabled {
@@ -235,11 +244,6 @@ h2 {
     min-height: 56px;
     align-items: center;
     justify-content: center;
-}
-
-.btn-success:active {
-    transform: scale(0.96);
-    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
 }
 
 .btn-success.show {
@@ -304,69 +308,6 @@ h2 {
     color: #2196f3;
 }
 
-/* Tablet-specific optimizations */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .container {
-        padding: 32px;
-    }
-    
-    .controls-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
-    
-    .btn {
-        min-height: 64px;
-        font-size: 18px;
-    }
-}
-
-@media (max-width: 480px) {
-    body {
-        padding: 10px;
-    }
-    
-    .container {
-        padding: 16px;
-        border-radius: 16px;
-    }
-    
-    .control-group {
-        padding: 12px;
-    }
-    
-    .btn {
-        min-height: 50px;
-        font-size: 14px;
-        min-width: 80px;
-    }
-}
-
-/* Touch device optimizations */
-@media (hover: none) and (pointer: coarse) {
-    .upload-area:hover {
-        border-color: #2a2a2a;
-    }
-    
-    .btn:hover {
-        transform: none;
-    }
-    
-    .control-group input,
-    .control-group select {
-        font-size: 18px; /* Larger for touch */
-        padding: 16px 14px;
-    }
-}
-
-/* iPad Pro and large tablets */
-@media (min-width: 1024px) and (max-width: 1366px) {
-    .container {
-        max-width: 1000px;
-        padding: 40px;
-    }
-}
-
-/* Loading animation */
 .spinner {
     display: inline-block;
     width: 20px;
@@ -383,38 +324,58 @@ h2 {
     to { transform: rotate(360deg); }
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+@media (max-width: 480px) {
+    .container {
+        padding: 16px;
+    }
+    
+    .btn {
+        min-height: 50px;
+        font-size: 14px;
+        min-width: 80px;
+    }
 }
 
-::-webkit-scrollbar-track {
-    background: #1a1a1a;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #00c853;
-    border-radius: 3px;
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .upload-area:hover {
+        border-color: #2a2a2a;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .control-group input,
+    .control-group select {
+        font-size: 18px;
+        padding: 16px 14px;
+    }
 }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🎬 Pro Video Editor</h2>
+    <h2>🎬 Video Editor</h2>
     
     <div class="upload-area" id="uploadArea">
         <div class="upload-icon">📤</div>
         <div class="upload-text">
             Tap to upload video
-            <small>Supports MP4, MOV, AVI, and more</small>
+            <small>Supports MP4, MOV, WebM</small>
         </div>
         <input type="file" id="videoInput" accept="video/*">
     </div>
 
-    <video id="video" controls playsinline></video>
+    <video id="video" controls playsinline preload="metadata"></video>
     
+    <div class="video-info" id="videoInfo">
+        <span>📹 <span id="videoName">-</span></span>
+        <span>⏱️ <span id="videoDuration">-</span></span>
+        <span>📦 <span id="videoSize">-</span></span>
+    </div>
+
     <div id="statusMessage" class="status-message"></div>
 
     <div class="controls-grid">
@@ -435,17 +396,15 @@ h2 {
                 <option value="854:480">480p</option>
                 <option value="1280:720" selected>720p</option>
                 <option value="1920:1080">1080p</option>
-                <option value="2560:1440">1440p</option>
-                <option value="3840:2160">4K</option>
             </select>
         </div>
         
         <div class="control-group">
             <label>🎚️ Quality</label>
             <select id="quality">
-                <option value="23">High Quality</option>
-                <option value="28" selected>Medium Quality</option>
-                <option value="35">Low Quality</option>
+                <option value="23">High</option>
+                <option value="28" selected>Medium</option>
+                <option value="35">Low</option>
             </select>
         </div>
     </div>
@@ -463,7 +422,7 @@ h2 {
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div class="progress-text" id="progressText">Processing...</div>
+        <div class="progress-text" id="progressText">Loading...</div>
     </div>
 
     <a id="downloadLink" class="btn btn-success">
@@ -472,35 +431,44 @@ h2 {
 </div>
 
 <script>
+// Fix: Use a more compatible FFmpeg configuration
 const { FFmpeg } = FFmpegWASM;
 const ffmpeg = new FFmpeg();
+
 let uploadedFile = null;
 let isProcessing = false;
 let progressInterval = null;
 
-// File upload handler with touch support
+// DOM elements
 const uploadArea = document.getElementById('uploadArea');
 const videoInput = document.getElementById('videoInput');
+const video = document.getElementById('video');
+const videoInfo = document.getElementById('videoInfo');
+const videoName = document.getElementById('videoName');
+const videoDuration = document.getElementById('videoDuration');
+const videoSize = document.getElementById('videoSize');
 
-// Touch and click events for upload
+// Upload handlers
 uploadArea.addEventListener('click', (e) => {
     if (e.target.tagName !== 'INPUT') {
         videoInput.click();
     }
 });
 
-uploadArea.addEventListener('touchstart', (e) => {
-    // Prevent double-tap zoom on iOS
-    e.preventDefault();
-});
-
 uploadArea.addEventListener('touchend', (e) => {
     if (e.target.tagName !== 'INPUT' && !isProcessing) {
+        e.preventDefault();
         videoInput.click();
     }
 });
 
-// Drag and drop (works with touch too via files API)
+videoInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+    }
+});
+
+// Drag and drop
 uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadArea.style.borderColor = '#00c853';
@@ -513,46 +481,48 @@ uploadArea.addEventListener('dragleave', () => {
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadArea.style.borderColor = '#2a2a2a';
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFile(files[0]);
+    if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
     }
 });
 
-document.getElementById('videoInput').addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        handleFile(e.target.files[0]);
-    }
-});
-
-// Handle file selection
 function handleFile(file) {
-    // Check if it's a video file
     if (!file.type.startsWith('video/')) {
-        showStatus('Please select a valid video file!', 'error');
+        showStatus('Please select a video file!', 'error');
         return;
     }
-    
+
     uploadedFile = file;
+    
+    // Show video info
+    videoName.textContent = file.name;
+    videoSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    videoInfo.classList.add('show');
+
+    // Load video
     const url = URL.createObjectURL(file);
-    const video = document.getElementById('video');
     video.src = url;
     video.classList.add('show');
     
-    // Auto-detect duration
+    // Get duration
     video.addEventListener('loadedmetadata', () => {
         const duration = Math.floor(video.duration);
+        videoDuration.textContent = formatDuration(duration);
         document.getElementById('end').value = duration;
-        showStatus(`Video loaded: ${formatDuration(duration)}`, 'success');
+        showStatus(`✅ Video loaded: ${file.name}`, 'success');
     });
-    
-    // Reset download link
-    document.getElementById('downloadLink').classList.remove('show');
+
+    // Handle loading errors
+    video.addEventListener('error', (e) => {
+        console.error('Video loading error:', e);
+        showStatus('⚠️ Could not load video preview, but processing may still work.', 'info');
+    });
 }
 
 function formatDuration(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
@@ -562,14 +532,14 @@ function showStatus(message, type = 'info') {
     status.className = 'status-message ' + type;
 }
 
-function updateProgress(progress) {
+function updateProgress(progress, text) {
     const container = document.getElementById('progressContainer');
     const fill = document.getElementById('progressFill');
-    const text = document.getElementById('progressText');
+    const statusText = document.getElementById('progressText');
     
     container.style.display = 'block';
     fill.style.width = Math.min(progress, 100) + '%';
-    text.textContent = `Processing... ${Math.round(Math.min(progress, 100))}%`;
+    statusText.textContent = text || `Processing... ${Math.round(Math.min(progress, 100))}%`;
 }
 
 async function processVideo() {
@@ -585,86 +555,99 @@ async function processVideo() {
     processBtn.innerHTML = '<span class="spinner"></span> Processing...';
 
     try {
+        showStatus('⏳ Loading FFmpeg... (may take a moment)', 'info');
+        updateProgress(0, 'Loading FFmpeg...');
+        
+        // Load FFmpeg with progress
         await ffmpeg.load();
         
-        const start = parseFloat(document.getElementById('start').value);
-        const end = parseFloat(document.getElementById('end').value);
+        updateProgress(10, 'FFmpeg loaded, preparing...');
+        
+        const start = parseFloat(document.getElementById('start').value) || 0;
+        const end = parseFloat(document.getElementById('end').value) || 10;
         const size = document.getElementById('resolution').value;
         const quality = document.getElementById('quality').value;
         
-        // Validate inputs
-        if (isNaN(start) || isNaN(end) || start < 0 || end <= start) {
+        if (start < 0 || end <= start) {
             showStatus('Please enter valid time values!', 'error');
             throw new Error('Invalid time range');
         }
 
-        updateProgress(5);
+        updateProgress(20, 'Reading video file...');
         
-        // Write input file
-        await ffmpeg.writeFile(
-            "input.mp4",
-            new Uint8Array(await uploadedFile.arrayBuffer())
-        );
+        // Read file as ArrayBuffer
+        const arrayBuffer = await uploadedFile.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
         
-        updateProgress(20);
+        updateProgress(30, 'Writing to FFmpeg...');
         
-        // Build command with optimizations for mobile
-        const commands = [
-            "-i", "input.mp4",
-            "-ss", start.toString(),
-            "-to", end.toString(),
-            "-vf", `scale=${size}`,
-            "-c:v", "libx264",
-            "-crf", quality,
-            "-preset", "medium",
-            "-movflags", "+faststart",
-            "-c:a", "aac",
-            "-b:a", "128k",
-            "output.mp4"
-        ];
+        // Write file to FFmpeg
+        await ffmpeg.writeFile('input.mp4', uint8Array);
+        
+        updateProgress(40, 'Processing video...');
         
         // Simulate progress for better UX
-        let progress = 20;
+        let progress = 40;
+        clearInterval(progressInterval);
         progressInterval = setInterval(() => {
-            progress += Math.random() * 3;
+            progress += Math.random() * 2;
             if (progress < 80) {
-                updateProgress(progress);
+                updateProgress(progress, 'Processing video...');
             }
-        }, 500);
+        }, 300);
+        
+        // Execute FFmpeg command
+        const commands = [
+            '-i', 'input.mp4',
+            '-ss', start.toString(),
+            '-to', end.toString(),
+            '-vf', `scale=${size}`,
+            '-c:v', 'libx264',
+            '-crf', quality,
+            '-preset', 'veryfast', // Faster for mobile
+            '-movflags', '+faststart',
+            '-c:a', 'aac',
+            '-b:a', '128k',
+            '-y', // Overwrite output
+            'output.mp4'
+        ];
         
         await ffmpeg.exec(commands);
         
         clearInterval(progressInterval);
-        updateProgress(85);
+        updateProgress(85, 'Reading output...');
         
-        const data = await ffmpeg.readFile("output.mp4");
+        // Read output file
+        const data = await ffmpeg.readFile('output.mp4');
         
-        updateProgress(95);
+        updateProgress(95, 'Creating download...');
         
-        const blob = new Blob(
-            [data.buffer],
-            { type: "video/mp4" }
-        );
-        
+        // Create blob and download link
+        const blob = new Blob([data.buffer], { type: 'video/mp4' });
         const url = URL.createObjectURL(blob);
+        
         const link = document.getElementById('downloadLink');
         link.href = url;
-        link.download = `video-${Date.now()}.mp4`;
+        link.download = `edited-${uploadedFile.name}`;
         link.classList.add('show');
         
-        updateProgress(100);
-        showStatus('✅ Video processed! Tap download to save.', 'success');
+        updateProgress(100, '✅ Done!');
+        showStatus('✅ Video processed successfully! Tap download to save.', 'success');
         
-        // Preview edited video
-        const video = document.getElementById('video');
+        // Update video preview
         video.src = url;
         video.load();
         video.classList.add('show');
         
+        // Update duration info
+        video.addEventListener('loadedmetadata', () => {
+            videoDuration.textContent = formatDuration(video.duration);
+        });
+        
     } catch (error) {
         clearInterval(progressInterval);
         console.error('Processing error:', error);
-        showStatus('❌ Error: ' + (error.message || 'Unknown error'), 'error');
+        showStatus(`❌ Error: ${error.message || 'Unknown error'}`, 'error');
     } finally {
         isProcessing = false;
         processBtn.disabled = false;
@@ -673,35 +656,25 @@ async function processVideo() {
         // Hide progress after delay
         setTimeout(() => {
             document.getElementById('progressContainer').style.display = 'none';
-        }, 4000);
+        }, 5000);
     }
 }
 
 function resetAll() {
-    // Clear any processing
-    if (progressInterval) {
-        clearInterval(progressInterval);
-    }
+    clearInterval(progressInterval);
     
-    // Reset form
     document.getElementById('start').value = 0;
     document.getElementById('end').value = 10;
     document.getElementById('resolution').value = '1280:720';
     document.getElementById('quality').value = '28';
     
-    // Clear video
-    const video = document.getElementById('video');
     video.src = '';
     video.classList.remove('show');
+    videoInfo.classList.remove('show');
     
-    // Clear file
     document.getElementById('videoInput').value = '';
     uploadedFile = null;
-    
-    // Hide download
     document.getElementById('downloadLink').classList.remove('show');
-    
-    // Clear status and progress
     document.getElementById('statusMessage').className = 'status-message';
     document.getElementById('statusMessage').textContent = '';
     document.getElementById('progressContainer').style.display = 'none';
@@ -709,32 +682,20 @@ function resetAll() {
     showStatus('🔄 Reset complete. Tap to upload a new video.', 'info');
 }
 
-// Keyboard shortcuts (for iPad with keyboard)
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.ctrlKey) {
+    if ((e.key === 'Enter' || e.key === ' ') && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         processVideo();
     }
-    if (e.key === 'r' && e.ctrlKey) {
+    if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         resetAll();
     }
 });
 
-// Prevent zoom on double tap for iOS
-let lastTouchEnd = 0;
-document.addEventListener('touchend', (e) => {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-    }
-    lastTouchEnd = now;
-}, false);
-
-console.log('🎬 Pro Video Editor loaded on tablet!');
-console.log('💡 Tap upload area to select video');
-console.log('⌨️ Ctrl+Enter to process, Ctrl+R to reset');
+console.log('🎬 Video Editor loaded');
+console.log('📱 Optimized for tablets and mobile devices');
 </script>
-
 </body>
 </html>
