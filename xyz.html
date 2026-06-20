@@ -16,10 +16,6 @@ body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;backgr
 .billboard-nav:hover{background:rgba(0,0,0,0.8);transform:translateY(-50%) scale(1.1)}
 .billboard-nav-prev{left:15px}
 .billboard-nav-next{right:15px}
-.billboard-dots{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);z-index:1002;display:flex;gap:8px}
-.billboard-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.4);border:none;cursor:pointer;transition:all .3s ease;padding:0}
-.billboard-dot.active{background:#ffd700;transform:scale(1.2)}
-.billboard-dot:hover{background:rgba(255,255,255,0.8)}
 
 /* ===== BILLBOARD HEADER ===== */
 .billboard-header{position:sticky;top:0;width:100%;height:200px;overflow:hidden;background:linear-gradient(135deg,#1e3a8a,#2563eb,#1e40af);z-index:1000;}
@@ -248,10 +244,9 @@ main{flex:1;padding:18px;max-width:1100px;margin:0 auto;width:100%;}
     </div>
   </div>
   
-  <!-- Billboard Navigation Controls -->
+  <!-- Billboard Navigation Arrows Only -->
   <button class="billboard-nav billboard-nav-prev" onclick="prevBillboard()">&#10094;</button>
   <button class="billboard-nav billboard-nav-next" onclick="nextBillboard()">&#10095;</button>
-  <div class="billboard-dots" id="billboard-dots"></div>
 </div>
 
 <div class="filters-search">
@@ -289,25 +284,15 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// Billboard Navigation Script
+// Billboard Navigation Script (Arrows Only)
 let billboardSlides = document.querySelectorAll('.billboard-slide');
 if (billboardSlides.length) {
     let current = 0, total = billboardSlides.length, autoPlay;
-    const dotsContainer = document.getElementById('billboard-dots');
-    if (dotsContainer) {
-        for (let i = 0; i < total; i++) {
-            const dot = document.createElement('button');
-            dot.className = 'billboard-dot' + (i === 0 ? ' active' : '');
-            dot.onclick = function() { goToBillboard(parseInt(this.dataset.index)); };
-            dot.dataset.index = i;
-            dotsContainer.appendChild(dot);
-        }
-    }
+    
     function showBillboard(index) {
         billboardSlides.forEach((slide, i) => { slide.style.opacity = '0'; slide.style.zIndex = '1'; });
         billboardSlides[index].style.opacity = '1';
         billboardSlides[index].style.zIndex = '2';
-        document.querySelectorAll('.billboard-dot').forEach((dot, i) => { dot.classList.toggle('active', i === index); });
     }
     function goToBillboard(index) { if (index < 0) index = total - 1; if (index >= total) index = 0; current = index; showBillboard(current); resetAutoPlay(); }
     window.prevBillboard = function() { goToBillboard(current - 1); };
