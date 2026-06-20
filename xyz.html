@@ -247,6 +247,11 @@ main{flex:1;padding:18px;max-width:1100px;margin:0 auto;width:100%;}
       </div>
     </div>
   </div>
+  
+  <!-- Billboard Navigation Controls -->
+  <button class="billboard-nav billboard-nav-prev" onclick="prevBillboard()">&#10094;</button>
+  <button class="billboard-nav billboard-nav-next" onclick="nextBillboard()">&#10095;</button>
+  <div class="billboard-dots" id="billboard-dots"></div>
 </div>
 
 <div class="filters-search">
@@ -283,6 +288,40 @@ function updateCountdown() {
 }
 setInterval(updateCountdown, 1000);
 updateCountdown();
+
+// Billboard Navigation Script
+let billboardSlides = document.querySelectorAll('.billboard-slide');
+if (billboardSlides.length) {
+    let current = 0, total = billboardSlides.length, autoPlay;
+    const dotsContainer = document.getElementById('billboard-dots');
+    if (dotsContainer) {
+        for (let i = 0; i < total; i++) {
+            const dot = document.createElement('button');
+            dot.className = 'billboard-dot' + (i === 0 ? ' active' : '');
+            dot.onclick = function() { goToBillboard(parseInt(this.dataset.index)); };
+            dot.dataset.index = i;
+            dotsContainer.appendChild(dot);
+        }
+    }
+    function showBillboard(index) {
+        billboardSlides.forEach((slide, i) => { slide.style.opacity = '0'; slide.style.zIndex = '1'; });
+        billboardSlides[index].style.opacity = '1';
+        billboardSlides[index].style.zIndex = '2';
+        document.querySelectorAll('.billboard-dot').forEach((dot, i) => { dot.classList.toggle('active', i === index); });
+    }
+    function goToBillboard(index) { if (index < 0) index = total - 1; if (index >= total) index = 0; current = index; showBillboard(current); resetAutoPlay(); }
+    window.prevBillboard = function() { goToBillboard(current - 1); };
+    window.nextBillboard = function() { goToBillboard(current + 1); };
+    function resetAutoPlay() { if (autoPlay) clearInterval(autoPlay); autoPlay = setInterval(window.nextBillboard, 5000); }
+    showBillboard(current);
+    resetAutoPlay();
+    let startX = 0;
+    document.querySelector('.billboard-header').addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+    document.querySelector('.billboard-header').addEventListener('touchend', function(e) {
+        let diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) { if (diff > 0) window.nextBillboard(); else window.prevBillboard(); }
+    }, { passive: true });
+}
 </script>
 <main>
 <div class="products" id="product-list">
