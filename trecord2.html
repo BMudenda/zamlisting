@@ -1082,12 +1082,44 @@
         }
     }
     
+    // Extract unique names from records for dynamic filter population
+    function populateNameFilter() {
+        const nameSet = new Set();
+        allRecords.forEach(record => {
+            if (record.Name) {
+                nameSet.add(record.Name);
+            }
+        });
+        
+        const filterSelect = document.getElementById('filterName');
+        // Keep the "All Names" option
+        const currentValue = filterSelect.value;
+        filterSelect.innerHTML = '<option value="">All Names</option>';
+        
+        // Add unique names sorted alphabetically
+        const sortedNames = Array.from(nameSet).sort();
+        sortedNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            filterSelect.appendChild(option);
+        });
+        
+        // Restore selected value if it still exists
+        if (currentValue && sortedNames.includes(currentValue)) {
+            filterSelect.value = currentValue;
+        }
+    }
+    
     function applyFilters() {
         const dateFilter = document.getElementById('filterDate').value;
         const nameFilter = document.getElementById('filterName').value;
         
         currentFilters.date = dateFilter;
         currentFilters.name = nameFilter;
+        
+        console.log('Applying filters:', currentFilters);
+        console.log('Total records:', allRecords.length);
         
         filteredRecords = allRecords.filter(record => {
             let matches = true;
@@ -1098,12 +1130,17 @@
             }
             
             if (nameFilter) {
-                const recordName = record.Name || '';
-                if (recordName !== nameFilter) matches = false;
+                const recordName = (record.Name || '').trim();
+                // Case-insensitive exact match
+                if (recordName.toLowerCase() !== nameFilter.toLowerCase()) {
+                    matches = false;
+                }
             }
             
             return matches;
         });
+        
+        console.log('Filtered records:', filteredRecords.length);
         
         // Build filter status message
         let statusParts = [];
@@ -1496,6 +1533,15 @@
     document.getElementById('filterName').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') applyFilters();
     });
+    
+    // Override loadRecords to populate name filter after loading
+    const originalLoadRecords = loadRecords;
+    loadRecords = async function() {
+        await originalLoadRecords.call(this);
+        populateNameFilter();
+        // Re-apply filters after populating
+        applyFilters();
+    };
     
     loadRecords();
 </script>
