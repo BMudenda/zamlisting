@@ -128,6 +128,87 @@
             color: #64748b;
         }
 
+        /* Filter Bar */
+        .filter-bar {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid #334155;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 8px 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
+
+        .btn-filter {
+            background: #6366f1;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-filter:hover { opacity: 0.9; }
+        .btn-filter-clear { background: #475569; }
+
+        .filter-badge {
+            background: #6366f1;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .filter-status {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-status strong {
+            color: #f8fafc;
+        }
+
         /* Action Bar */
         .action-bar {
             background: #1e293b;
@@ -329,7 +410,7 @@
             font-size: 0.85rem;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 10px 14px;
             background: #0f172a;
@@ -339,7 +420,7 @@
             font-size: 0.9rem;
         }
 
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
             border-color: #38bdf8;
         }
@@ -503,6 +584,8 @@
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
             .action-bar { flex-direction: column; align-items: stretch; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .filter-group { flex-direction: column; align-items: stretch; }
             .form-row { grid-template-columns: 1fr; }
             .card-metrics-grid { grid-template-columns: 1fr; gap: 16px; }
         }
@@ -519,13 +602,14 @@
         <button class="btn-add" id="openModalBtn"><i class="fas fa-plus"></i> Add Transaction</button>
     </div>
 
+    <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon" style="background: #10b98120; color: #10b981;"><i class="fas fa-arrow-down"></i></div>
             <div class="stat-content">
                 <h3>Total Cash In</h3>
                 <div class="stat-value" id="totalCashIn">K0.00</div>
-                <div class="stat-label">All-time collected</div>
+                <div class="stat-label" id="cashInLabel">All-time collected</div>
             </div>
         </div>
         <div class="stat-card">
@@ -533,7 +617,7 @@
             <div class="stat-content">
                 <h3>Total Target</h3>
                 <div class="stat-value" id="totalTarget">K0.00</div>
-                <div class="stat-label">Expected target sum</div>
+                <div class="stat-label" id="targetLabel">Expected target sum</div>
             </div>
         </div>
         <div class="stat-card">
@@ -541,7 +625,7 @@
             <div class="stat-content">
                 <h3>Cumulative Balance</h3>
                 <div class="stat-value" id="finalCumulativeBalance">K0.00</div>
-                <div class="stat-label">Net variance index</div>
+                <div class="stat-label" id="balanceLabel">Net variance index</div>
             </div>
         </div>
         <div class="stat-card">
@@ -549,8 +633,32 @@
             <div class="stat-content">
                 <h3>Total Records</h3>
                 <div class="stat-value" id="totalRecords">0</div>
-                <div class="stat-label">Logged statements</div>
+                <div class="stat-label" id="recordsLabel">Logged statements</div>
             </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-alt"></i> Date:</label>
+            <input type="date" id="filterDate">
+            
+            <label><i class="fas fa-user"></i> Name:</label>
+            <select id="filterName">
+                <option value="">All Names</option>
+                <option value="Rider 1">Rider 1</option>
+                <option value="Rider 2">Rider 2</option>
+                <option value="Bernard">Bernard</option>
+                <option value="Expense">Expense</option>
+            </select>
+            
+            <button class="btn-filter" id="applyFilterBtn"><i class="fas fa-check"></i> Apply</button>
+            <button class="btn-filter btn-filter-clear" id="clearFilterBtn"><i class="fas fa-times"></i> Clear</button>
+        </div>
+        <div class="filter-status">
+            <i class="fas fa-info-circle"></i>
+            <span id="filterStatus">Showing all records</span>
         </div>
     </div>
 
@@ -574,6 +682,7 @@
                 <tr>
                     <th class="checkbox-col"><input type="checkbox" id="headerMasterCheckbox"></th>
                     <th>Date</th>
+                    <th>Identity/Service</th>
                     <th>Time In</th>
                     <th>Time Out</th>
                     <th>Target</th>
@@ -588,14 +697,14 @@
             </thead>
             <tbody id="tableBody">
                 <tr>
-                    <td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;">
+                    <td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;">
                         <i class="fas fa-spinner fa-pulse"></i> Resolving data layers...
                     </td>
                 </tr>
             </tbody>
             <tfoot id="tableFooter" style="display: none;">
                 <tr class="cumulative-row">
-                    <td colspan="4" style="text-align:right; padding-right:16px;">Final Totals:</td>
+                    <td colspan="5" style="text-align:right; padding-right:16px;">Final Totals:</td>
                     <td id="footerTarget">K0.00</td>
                     <td id="footerCashIn">K0.00</td>
                     <td id="footerTransBal">K0.00</td>
@@ -616,9 +725,20 @@
         <button class="close-modal" id="closeFormModalBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-        <div class="form-group">
-            <label><i class="fas fa-calendar-alt"></i> Value Date *</label>
-            <input type="date" id="inputDate">
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Value Date *</label>
+                <input type="date" id="inputDate">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Identity / Mode Context *</label>
+                <select id="inputName" onchange="handleNameChange()">
+                    <option value="Rider 1">Rider 1</option>
+                    <option value="Rider 2">Rider 2</option>
+                    <option value="Bernard">Bernard</option>
+                    <option value="Expense">Expense</option>
+                </select>
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group">
@@ -642,7 +762,7 @@
         </div>
         <div class="form-group">
             <label><i class="fas fa-calculator"></i> Delta Target Computation Preview</label>
-            <input type="number" id="inputBalance" readonly style="font-weight:bold;">
+            <input type="text" id="inputBalance" readonly style="font-weight:bold;">
         </div>
         <div class="form-group">
             <label><i class="fas fa-comment-alt"></i> Internal Logs / Comments</label>
@@ -666,6 +786,14 @@
                 <i class="far fa-calendar-check"></i> <span id="cardDateText">--</span>
             </div>
             <div id="cardStatusPill" class="card-status-pill">--</div>
+        </div>
+
+        <div class="card-section-title"><i class="fas fa-user"></i> Context Profile</div>
+        <div class="card-metrics-grid" style="grid-template-columns: 1fr;">
+            <div class="card-metric-block" style="text-align: left; padding-left: 8px;">
+                <div class="card-metric-lbl">Identity / Assignment Name</div>
+                <div class="card-metric-val" id="cardNameText" style="color:#38bdf8; font-size: 1.2rem;">--</div>
+            </div>
         </div>
 
         <div class="card-section-title"><i class="fas fa-clock"></i> Entry Logs Window</div>
@@ -726,37 +854,30 @@
     const PHONE_NUMBER = "0978167546";
     
     let allRecords = [];
+    let filteredRecords = [];
     let activeCardIndex = null;
     let activeCardCumulate = {};
+    let currentFilters = { date: '', name: '' };
     
-    // Parse Excel serial date number (days since 1899-12-30)
     function parseExcelDate(excelDate) {
         if (!excelDate) return null;
-        
-        // If it's already a YYYY-MM-DD string, return as is
         if (typeof excelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(excelDate)) {
             return excelDate;
         }
-        
-        // Handle ISO string format "1899-12-30T07:24:42.000Z"
         if (typeof excelDate === 'string' && excelDate.includes('T')) {
             const dateObj = new Date(excelDate);
             if (!isNaN(dateObj.getTime())) {
                 const year = dateObj.getFullYear();
                 const month = String(dateObj.getMonth() + 1).padStart(2, '0');
                 const day = String(dateObj.getDate()).padStart(2, '0');
-                // Check if it's the Excel epoch (1899-12-30) - this means it's a time-only value
                 if (year === 1899 && month === '12' && (day === '30' || day === '31')) {
-                    return null; // This is time-only, no date
+                    return null;
                 }
                 return `${year}-${month}-${day}`;
             }
         }
-        
-        // Try parsing as number (Excel serial)
         let numDays = parseFloat(excelDate);
         if (!isNaN(numDays) && numDays > 0) {
-            // Excel epoch: 1899-12-30
             const excelEpoch = new Date(1899, 11, 30);
             const date = new Date(excelEpoch.getTime() + numDays * 86400000);
             const year = date.getFullYear();
@@ -764,20 +885,14 @@
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
-        
         return excelDate;
     }
     
-    // Parse time from various formats (Excel serial time, ISO string, HH:MM)
     function parseTimeValue(timeValue) {
         if (!timeValue || timeValue === "") return "";
-        
-        // If already in HH:MM format
         if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
             return timeValue;
         }
-        
-        // Handle ISO string format "1899-12-30T07:24:42.000Z"
         if (typeof timeValue === 'string' && timeValue.includes('T')) {
             const dateObj = new Date(timeValue);
             if (!isNaN(dateObj.getTime())) {
@@ -786,8 +901,6 @@
                 return `${hours}:${minutes}`;
             }
         }
-        
-        // Try parsing as Excel serial time (fraction of day)
         let numDays = parseFloat(timeValue);
         if (!isNaN(numDays) && numDays >= 0 && numDays < 1) {
             const totalSeconds = numDays * 86400;
@@ -795,19 +908,15 @@
             const minutes = Math.floor((totalSeconds % 3600) / 60);
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
         }
-        
-        // Try parsing as string that might be "HH:MM:SS"
         if (typeof timeValue === 'string' && timeValue.includes(':')) {
             const parts = timeValue.split(':');
             if (parts.length >= 2) {
                 return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
             }
         }
-        
         return timeValue;
     }
     
-    // Format date for display (DD/MM/YYYY)
     function formatDateForDisplay(dateValue) {
         const parsed = parseExcelDate(dateValue);
         if (!parsed) return "—";
@@ -823,23 +932,40 @@
         }
         return parsed || "—";
     }
+
+    function handleNameChange() {
+        const selectedName = document.getElementById('inputName').value;
+        if (selectedName === "Expense") {
+            document.getElementById('inputTimeIn').value = "00:00";
+            document.getElementById('inputTarget').value = "0";
+        } else {
+            document.getElementById('inputTarget').value = "400";
+        }
+        updateBalancePreview();
+    }
     
     function updateBalancePreview() {
+        const selectedName = document.getElementById('inputName').value;
         const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
-        const balance = target - cashIn;
+        let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        
+        if (selectedName === "Expense" && cashIn > 0) {
+            cashIn = -Math.abs(cashIn);
+        }
+
+        const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
         const balanceField = document.getElementById('inputBalance');
         balanceField.value = balance.toFixed(2);
         
         if (balance > 0) {
             balanceField.style.color = "#f87171";
-            balanceField.style.background = "#1e293b";
+            balanceField.style.background = "#0f172a";
         } else if (balance < 0) {
             balanceField.style.color = "#4ade80";
-            balanceField.style.background = "#1e293b";
+            balanceField.style.background = "#0f172a";
         } else {
             balanceField.style.color = "#fbbf24";
-            balanceField.style.background = "#1e293b";
+            balanceField.style.background = "#0f172a";
         }
     }
     
@@ -869,6 +995,7 @@
     async function saveToSheet(record) {
         const params = new URLSearchParams();
         params.append('Date', record.date);
+        params.append('Name', record.name);
         params.append('Time In', record.timeIn);
         params.append('Time Out', record.timeOut);
         params.append('Target', record.target);
@@ -897,12 +1024,19 @@
             return;
         }
         
+        const selectedName = document.getElementById('inputName').value;
         const target = parseFloat(document.getElementById('inputTarget').value) || 0;
-        const cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
-        const balance = target - cashIn;
+        let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
+        
+        if (selectedName === "Expense" && cashIn > 0) {
+            cashIn = -Math.abs(cashIn);
+        }
+
+        const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
         
         const record = {
             date: date,
+            name: selectedName,
             timeIn: document.getElementById('inputTimeIn').value || "",
             timeOut: document.getElementById('inputTimeOut').value || "",
             target: target,
@@ -926,7 +1060,7 @@
     
     async function loadRecords() {
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Re-fetching active context layers...</td></tr>';
         
         try {
             const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors' });
@@ -940,21 +1074,72 @@
                 return dateA.localeCompare(dateB);
             });
             
-            displayRecordsWithAllCumulatives();
-            updateStats();
-            showToast(`Active Ledger Loaded: ${allRecords.length} Rows`);
+            applyFilters();
             
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
+            tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td</tr>';
             showToast('Database link execution broken.', true);
         }
     }
     
-    function displayRecordsWithAllCumulatives() {
+    function applyFilters() {
+        const dateFilter = document.getElementById('filterDate').value;
+        const nameFilter = document.getElementById('filterName').value;
+        
+        currentFilters.date = dateFilter;
+        currentFilters.name = nameFilter;
+        
+        filteredRecords = allRecords.filter(record => {
+            let matches = true;
+            
+            if (dateFilter) {
+                const recordDate = parseExcelDate(record.Date);
+                if (recordDate !== dateFilter) matches = false;
+            }
+            
+            if (nameFilter) {
+                const recordName = record.Name || '';
+                if (recordName !== nameFilter) matches = false;
+            }
+            
+            return matches;
+        });
+        
+        // Build filter status message
+        let statusParts = [];
+        if (dateFilter) statusParts.push(`Date: ${formatDateForDisplay(dateFilter)}`);
+        if (nameFilter) statusParts.push(`Name: ${nameFilter}`);
+        
+        if (statusParts.length === 0) {
+            document.getElementById('filterStatus').innerHTML = 'Showing all records';
+        } else {
+            document.getElementById('filterStatus').innerHTML = 
+                `Filtered by: ${statusParts.join(' | ')} <span class="filter-badge">${filteredRecords.length}</span>`;
+        }
+        
+        displayFilteredRecords();
+        updateStatsWithFilter();
+    }
+    
+    function clearFilters() {
+        document.getElementById('filterDate').value = '';
+        document.getElementById('filterName').value = '';
+        currentFilters = { date: '', name: '' };
+        filteredRecords = [...allRecords];
+        document.getElementById('filterStatus').innerHTML = 'Showing all records';
+        displayFilteredRecords();
+        updateStatsWithFilter();
+    }
+    
+    function displayFilteredRecords() {
         const tbody = document.getElementById('tableBody');
         
-        if (allRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:48px; color: #94a3b8;"><i class="fas fa-inbox"></i> Environment Empty. Tap action buttons to write.</div></td>';
+        if (filteredRecords.length === 0) {
+            let message = '<i class="fas fa-inbox"></i> No records match the current filters.';
+            if (currentFilters.date || currentFilters.name) {
+                message = '<i class="fas fa-filter"></i> No records found matching your filters. Try clearing them.';
+            }
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:48px; color: #94a3b8;">${message}</td></tr>`;
             document.getElementById('tableFooter').style.display = 'none';
             return;
         }
@@ -964,14 +1149,20 @@
         let cumulativeBalance = 0;
         let html = '';
         
-        allRecords.forEach((record, index) => {
+        // Get the actual indices in allRecords for filtered items
+        const filteredIndices = filteredRecords.map(record => allRecords.indexOf(record));
+        
+        filteredRecords.forEach((record, displayIndex) => {
+            const actualIndex = filteredIndices[displayIndex];
             const target = Number(record.Target) || 0;
             const cashIn = Number(record['Cash In']) || 0;
-            const transactionBalance = target - cashIn;
+            const nameValue = record.Name || '—';
+            
+            const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
             
             cumulativeTarget += target;
             cumulativeCashIn += cashIn;
-            cumulativeBalance += transactionBalance;
+            cumulativeBalance += (target - cashIn);
             
             let balanceClass = 'val-neutral';
             if (transactionBalance > 0) balanceClass = 'val-negative';
@@ -984,31 +1175,31 @@
             const comments = record.Comments || '-';
             const shortComments = comments.length > 20 ? comments.substring(0,20) + '...' : comments;
             
-            // Parse and format using the new functions
             const formattedDate = formatDateForDisplay(record.Date);
             const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
             const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
             
             html += `
-                <tr class="interactive-row" onclick="toggleRowCheckbox(${index})">
+                <tr class="interactive-row" onclick="toggleRowCheckbox(${actualIndex})">
                     <td class="checkbox-col" onclick="event.stopPropagation()">
-                        <input type="checkbox" class="record-checkbox" id="cb_row_${index}" data-id="${record.Date}" data-index="${index}">
+                        <input type="checkbox" class="record-checkbox" id="cb_row_${actualIndex}" data-id="${record.Date}" data-index="${actualIndex}">
                     </td>
-                    <td>${formattedDate}</div>
-                    <td>${formattedTimeIn}</div>
-                    <td>${formattedTimeOut}</div>
-                    <td>K${target.toFixed(2)}</div>
-                    <td>K${cashIn.toFixed(2)}</div>
-                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</div>
-                    <td>K${cumulativeTarget.toFixed(2)}</div>
-                    <td>K${cumulativeCashIn.toFixed(2)}</div>
-                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</div>
-                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</div>
+                    <td>${formattedDate}</td>
+                    <td style="font-weight: 600; color: #38bdf8;">${nameValue}</td>
+                    <td>${formattedTimeIn}</td>
+                    <td>${formattedTimeOut}</td>
+                    <td>K${target.toFixed(2)}</td>
+                    <td>K${cashIn.toFixed(2)}</td>
+                    <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
+                    <td>K${cumulativeTarget.toFixed(2)}</td>
+                    <td>K${cumulativeCashIn.toFixed(2)}</td>
+                    <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
+                    <td title="${comments.replace(/"/g, '&quot;')}">${shortComments}</td>
                     <td class="action-cell" onclick="event.stopPropagation()">
-                        <button class="btn-view" onclick="viewRecordDetails(${index}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
+                        <button class="btn-view" onclick="viewRecordDetails(${actualIndex}, ${cumulativeTarget}, ${cumulativeCashIn}, ${cumulativeBalance})">
                            <i class="fas fa-expand"></i> View
                         </button>
-                    </div>
+                    </td>
                 </tr>
             `;
         });
@@ -1029,6 +1220,41 @@
         attachCheckboxEvents();
         updateSelectedCount();
     }
+    
+    function updateStatsWithFilter() {
+        let totalTarget = 0, totalCashIn = 0, cumulativeBalance = 0;
+        const displayRecords = filteredRecords.length > 0 ? filteredRecords : allRecords;
+        
+        displayRecords.forEach(record => {
+            totalTarget += Number(record.Target) || 0;
+            totalCashIn += Number(record['Cash In']) || 0;
+        });
+        cumulativeBalance = totalTarget - totalCashIn;
+        
+        document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
+        document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
+        document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
+        document.getElementById('totalRecords').innerHTML = displayRecords.length;
+        
+        const cumulativeElem = document.getElementById('finalCumulativeBalance');
+        if (cumulativeBalance > 0) cumulativeElem.className = "stat-value val-negative";
+        else if (cumulativeBalance < 0) cumulativeElem.className = "stat-value val-positive";
+        else cumulativeElem.className = "stat-value val-neutral";
+        
+        // Update labels to show filter context
+        let filterLabel = 'All-time';
+        if (currentFilters.date && currentFilters.name) {
+            filterLabel = `${formatDateForDisplay(currentFilters.date)} (${currentFilters.name})`;
+        } else if (currentFilters.date) {
+            filterLabel = formatDateForDisplay(currentFilters.date);
+        } else if (currentFilters.name) {
+            filterLabel = currentFilters.name;
+        }
+        document.getElementById('cashInLabel').textContent = `${filterLabel} collected`;
+        document.getElementById('targetLabel').textContent = `${filterLabel} expected sum`;
+        document.getElementById('balanceLabel').textContent = `${filterLabel} net variance`;
+        document.getElementById('recordsLabel').textContent = `${filterLabel} statements`;
+    }
 
     function toggleRowCheckbox(index) {
         const checkbox = document.getElementById(`cb_row_${index}`);
@@ -1042,7 +1268,8 @@
         const record = allRecords[index];
         const target = Number(record.Target) || 0;
         const cashIn = Number(record['Cash In']) || 0;
-        const transactionBalance = target - cashIn;
+        const nameValue = record.Name || '—';
+        const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
         
         activeCardIndex = index;
         activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
@@ -1052,6 +1279,7 @@
         const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
         
         document.getElementById('cardDateText').innerText = formattedDate;
+        document.getElementById('cardNameText').innerText = nameValue;
         document.getElementById('cardTimeIn').innerText = formattedTimeIn;
         document.getElementById('cardTimeOut').innerText = formattedTimeOut;
         
@@ -1062,7 +1290,11 @@
         balElem.innerText = `K${transactionBalance.toFixed(2)}`;
         
         const statusPill = document.getElementById('cardStatusPill');
-        if (transactionBalance > 0) {
+        if (nameValue === "Expense") {
+            balElem.className = "card-metric-val val-neutral";
+            statusPill.innerText = "Expense Out";
+            statusPill.className = "card-status-pill pill-neutral";
+        } else if (transactionBalance > 0) {
             balElem.className = "card-metric-val val-negative";
             statusPill.innerText = "Shortage";
             statusPill.className = "card-status-pill pill-negative";
@@ -1091,25 +1323,6 @@
         document.getElementById('overlay').classList.add('show');
     }
     
-    function updateStats() {
-        let totalTarget = 0, totalCashIn = 0, cumulativeBalance = 0;
-        allRecords.forEach(record => {
-            totalTarget += Number(record.Target) || 0;
-            totalCashIn += Number(record['Cash In']) || 0;
-        });
-        cumulativeBalance = totalTarget - totalCashIn;
-        
-        document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
-        document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
-        document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
-        document.getElementById('totalRecords').innerHTML = allRecords.length;
-        
-        const cumulativeElem = document.getElementById('finalCumulativeBalance');
-        if (cumulativeBalance > 0) cumulativeElem.className = "stat-value val-negative";
-        else if (cumulativeBalance < 0) cumulativeElem.className = "stat-value val-positive";
-        else cumulativeElem.className = "stat-value val-neutral";
-    }
-    
     function getSelectedRecords() {
         const checkboxes = document.querySelectorAll('.record-checkbox:checked');
         return Array.from(checkboxes).map(cb => {
@@ -1123,13 +1336,15 @@
         const r = allRecords[activeCardIndex];
         const target = Number(r.Target) || 0;
         const cashIn = Number(r['Cash In']) || 0;
-        const transactionBalance = target - cashIn;
+        const nameValue = r.Name || '—';
+        const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
         const formattedDate = formatDateForDisplay(r.Date);
         const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
         const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
         
         const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
             `📅 Date: ${formattedDate}\n` +
+            `👤 Assignment: ${nameValue}\n` +
             `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
             `🎯 Target Point: K${target.toFixed(2)}\n` +
             `💰 Realized Cash: K${cashIn.toFixed(2)}\n` +
@@ -1158,11 +1373,12 @@
         selected.forEach((r, i) => {
             const target = Number(r.Target) || 0;
             const cashIn = Number(r['Cash In']) || 0;
-            const transBal = target - cashIn;
+            const nameValue = r.Name || '—';
+            const transBal = (nameValue === "Expense") ? 0 : (target - cashIn);
             cumulativeTarget += target;
             cumulativeCashIn += cashIn;
             const formattedDate = formatDateForDisplay(r.Date);
-            message += `${i+1}. *${formattedDate}*\n`;
+            message += `${i+1}. *${formattedDate}* (${nameValue})\n`;
             message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
             if (r.Comments) message += `   📝 ${r.Comments}\n`;
         });
@@ -1188,7 +1404,8 @@
         let message = "CASHFLOW LEDGER BRIEF\n\n";
         selected.forEach((r, i) => {
             const formattedDate = formatDateForDisplay(r.Date);
-            message += `${i+1}. ${formattedDate} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
+            const nameValue = r.Name || '—';
+            message += `${i+1}. ${formattedDate} (${nameValue}) | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
         window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
@@ -1204,7 +1421,8 @@
         let body = "CASHFLOW BATCH REPORT ARCHIVE\n\n";
         selected.forEach(r => {
             const formattedDate = formatDateForDisplay(r.Date);
-            body += `${formattedDate} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
+            const nameValue = r.Name || '—';
+            body += `${formattedDate} | Name: ${nameValue} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
         });
         
         window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
@@ -1231,12 +1449,13 @@
     
     function updateSelectedCount() {
         const count = document.querySelectorAll('.record-checkbox:checked').length;
-        document.getElementById('selectedCount').innerHTML = `${count} targeted items`;
+        document.getElementById('selectedCount').innerHTML = `${count} selected`;
     }
     
     function openModal() {
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Create Transaction Entry';
         document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('inputName').selectedIndex = 0;
         document.getElementById('inputTimeIn').value = '';
         document.getElementById('inputTimeOut').value = '';
         document.getElementById('inputTarget').value = '400';
@@ -1255,6 +1474,7 @@
         activeCardIndex = null;
     }
     
+    // Event Listeners
     document.getElementById('openModalBtn').onclick = openModal;
     document.getElementById('closeFormModalBtn').onclick = closeModal;
     document.getElementById('closeViewModalBtn').onclick = closeModal;
@@ -1266,6 +1486,16 @@
     document.getElementById('emailBtn').onclick = emailReport;
     document.getElementById('overlay').onclick = closeModal;
     document.getElementById('cardWhatsappBtn').onclick = shareSingleRecord;
+    document.getElementById('applyFilterBtn').onclick = applyFilters;
+    document.getElementById('clearFilterBtn').onclick = clearFilters;
+    
+    // Allow Enter key on filter inputs
+    document.getElementById('filterDate').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') applyFilters();
+    });
+    document.getElementById('filterName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') applyFilters();
+    });
     
     loadRecords();
 </script>
