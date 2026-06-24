@@ -143,8 +143,8 @@
             color: #fbbf24;
         }
 
-        /* Simple Service Settings Panel */
-        .service-settings {
+        /* Service Info Display - SIMPLE */
+        .service-panel {
             background: #1e293b;
             border-radius: 16px;
             padding: 20px 24px;
@@ -152,68 +152,85 @@
             border: 1px solid #334155;
         }
 
-        .service-settings h3 {
+        .service-panel h3 {
             color: #f59e0b;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .service-settings .setting-row {
+        .service-panel .service-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
+            grid-template-columns: 1fr 1fr;
             gap: 16px;
-            align-items: center;
-            padding: 12px 16px;
+        }
+
+        .service-panel .service-item {
             background: #0f172a;
             border-radius: 8px;
-            margin-bottom: 10px;
+            padding: 16px;
+            border-left: 3px solid #f59e0b;
         }
 
-        .service-settings .setting-row .vehicle-name {
+        .service-panel .service-item .vehicle {
             font-weight: 600;
             color: #38bdf8;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
         }
 
-        .service-settings .setting-row input {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            padding: 6px 12px;
-            color: white;
-            width: 120px;
-        }
-
-        .service-settings .setting-row input:focus {
-            outline: none;
-            border-color: #38bdf8;
-        }
-
-        .service-settings .setting-row .status {
-            font-weight: 600;
+        .service-panel .service-item .detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
             font-size: 0.9rem;
         }
 
-        .btn-save-service {
-            background: #10b981;
-            border: none;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
+        .service-panel .service-item .detail .label {
+            color: #94a3b8;
+        }
+
+        .service-panel .service-item .detail .value {
             font-weight: 600;
-            transition: opacity 0.2s;
         }
 
-        .btn-save-service:hover {
-            opacity: 0.9;
+        .service-panel .service-item .status-text {
+            margin-top: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
         }
 
-        .service-settings .help-text {
+        .service-panel .service-item .status-text.good {
+            background: #10b98120;
+            color: #4ade80;
+        }
+
+        .service-panel .service-item .status-text.warning {
+            background: #fbbf2420;
+            color: #fbbf24;
+        }
+
+        .service-panel .service-item .status-text.danger {
+            background: #f8717120;
+            color: #f87171;
+        }
+
+        .service-panel .service-item .status-text.muted {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .service-panel .note {
             color: #94a3b8;
             font-size: 0.8rem;
-            margin-top: 8px;
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: #0f172a;
+            border-radius: 6px;
         }
 
         .filter-bar {
@@ -756,9 +773,8 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .service-settings .setting-row {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
+            .service-panel .service-grid {
+                grid-template-columns: 1fr;
             }
         }
         @media (max-width: 768px) {
@@ -784,9 +800,8 @@
                 grid-template-columns: 1fr;
                 gap: 16px;
             }
-            .service-settings .setting-row {
+            .service-panel .service-grid {
                 grid-template-columns: 1fr;
-                gap: 8px;
             }
         }
     </style>
@@ -847,17 +862,15 @@
             </div>
         </div>
 
-        <!-- Simple Service Settings -->
-        <div class="service-settings">
-            <h3><i class="fas fa-sliders-h"></i> Service Settings (Manual)</h3>
-            <div id="serviceSettingsContainer">
+        <!-- Simple Service Display Panel -->
+        <div class="service-panel" id="servicePanel">
+            <h3><i class="fas fa-info-circle"></i> Service Status</h3>
+            <div class="service-grid" id="serviceGrid">
                 <!-- Populated dynamically -->
             </div>
-            <div class="help-text">
-                <i class="fas fa-info-circle"></i> 
-                <strong>How it works:</strong> Set the "Last Service Mileage" for each vehicle. 
-                The system will calculate how many km until the next service based on the current mileage.
-                When you service a vehicle, simply update the "Last Service Mileage" to the current reading.
+            <div class="note">
+                <i class="fas fa-edit"></i> 
+                <strong>To update service mileage:</strong> Edit the values at the top of the JavaScript code (lines starting with <code>// SERVICE MILEAGE - EDIT THESE VALUES</code>), or use your browser's developer tools.
             </div>
         </div>
 
@@ -1119,6 +1132,17 @@
     </div>
 
     <script>
+        // ============================================================
+        // SERVICE MILEAGE - EDIT THESE VALUES WHEN VEHICLES ARE SERVICED
+        // ============================================================
+        // Toyota IST BAH1996 last service: 120,000 km
+        // Motorbike Honda 1751 last service: 500 km
+        // ============================================================
+        const SERVICE_MILEAGE = {
+            'Toyota IST BAH1996': 120000,
+            'Motorbike Honda 1751': 500
+        };
+
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrsA2UYPyzbRUITAykJa-OntyYI68JXHQuvRPe6QmTxqFYf-OHtAY2d66xG3t-UYY/exec";
         const PHONE_NUMBER = "0978167546";
 
@@ -1127,17 +1151,48 @@
             'Motorbike Honda 1751': 1000
         };
 
-        // Simple service mileage storage - these values are manually set by the user
-        let serviceMileage = {
-            'Toyota IST BAH1996': 120000,  // Last service at 120,000 km
-            'Motorbike Honda 1751': 500     // Last service at 500 km
-        };
+        // Copy for display (will be updated from localStorage if available)
+        let serviceMileage = { ...SERVICE_MILEAGE };
 
         let allRecords = [];
         let filteredRecords = [];
         let activeCardIndex = null;
         let activeCardCumulate = {};
         let currentFilters = { dateFrom: '', dateTo: '', name: '', vehicle: '' };
+
+        // Load saved service mileage from localStorage
+        function loadServiceSettings() {
+            const saved = localStorage.getItem('serviceMileage');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    Object.keys(parsed).forEach(key => {
+                        if (serviceMileage.hasOwnProperty(key)) {
+                            serviceMileage[key] = parsed[key];
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error loading service settings:', e);
+                }
+            }
+        }
+
+        // Save service mileage to localStorage
+        function saveServiceMileage() {
+            localStorage.setItem('serviceMileage', JSON.stringify(serviceMileage));
+        }
+
+        // Update service mileage when a service record is detected
+        function updateServiceMileage(vehicle, mileage) {
+            if (serviceMileage.hasOwnProperty(vehicle) && mileage > serviceMileage[vehicle]) {
+                serviceMileage[vehicle] = mileage;
+                saveServiceMileage();
+                renderServicePanel();
+                updateServiceDue();
+                return true;
+            }
+            return false;
+        }
 
         function parseExcelDate(excelDate) {
             if (!excelDate) return null;
@@ -1345,110 +1400,6 @@
             }
         }
 
-        // Save service settings to local storage
-        function saveServiceSettings() {
-            const vehicles = ['Toyota IST BAH1996', 'Motorbike Honda 1751'];
-            vehicles.forEach(vehicle => {
-                const input = document.getElementById(`service_${vehicle.replace(/ /g, '_')}`);
-                if (input) {
-                    const value = parseFloat(input.value);
-                    if (!isNaN(value) && value >= 0) {
-                        serviceMileage[vehicle] = value;
-                    }
-                }
-            });
-            localStorage.setItem('serviceMileage', JSON.stringify(serviceMileage));
-            showToast('Service settings saved!');
-            updateServiceDue();
-            renderServiceSettings();
-        }
-
-        // Load service settings from local storage
-        function loadServiceSettings() {
-            const saved = localStorage.getItem('serviceMileage');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    Object.keys(parsed).forEach(key => {
-                        if (serviceMileage.hasOwnProperty(key)) {
-                            serviceMileage[key] = parsed[key];
-                        }
-                    });
-                } catch (e) {
-                    console.error('Error loading service settings:', e);
-                }
-            }
-        }
-
-        // Render the service settings panel
-        function renderServiceSettings() {
-            const container = document.getElementById('serviceSettingsContainer');
-            let html = '';
-
-            ['Toyota IST BAH1996', 'Motorbike Honda 1751'].forEach(vehicle => {
-                const interval = SERVICE_INTERVALS[vehicle] || 5000;
-                const lastService = serviceMileage[vehicle] || 0;
-                const vehicleIcon = vehicle.includes('Motorbike') ? 'fa-motorcycle' : 'fa-car';
-                
-                // Find current max mileage
-                let currentMileage = 0;
-                allRecords.forEach(r => {
-                    if ((r.Vehicle || '').trim() === vehicle) {
-                        const m = Number(r.Mileage) || 0;
-                        if (m > currentMileage) currentMileage = m;
-                    }
-                });
-
-                const distanceSince = lastService > 0 && currentMileage > 0 ? currentMileage - lastService : 0;
-                const dueKm = lastService > 0 && currentMileage > 0 ? Math.max(0, interval - distanceSince) : 0;
-                
-                let statusText = 'Not set';
-                let statusColor = '#94a3b8';
-                if (lastService > 0 && currentMileage > 0) {
-                    if (dueKm <= 0) {
-                        statusText = '⚠️ OVERDUE!';
-                        statusColor = '#f87171';
-                    } else if (dueKm < interval * 0.2) {
-                        statusText = `${dueKm.toFixed(0)} km remaining`;
-                        statusColor = '#fbbf24';
-                    } else {
-                        statusText = `${dueKm.toFixed(0)} km remaining`;
-                        statusColor = '#4ade80';
-                    }
-                } else if (lastService > 0 && currentMileage === 0) {
-                    statusText = 'No mileage records yet';
-                    statusColor = '#94a3b8';
-                }
-
-                html += `
-                    <div class="setting-row">
-                        <div class="vehicle-name">
-                            <i class="fas ${vehicleIcon}"></i> ${vehicle}
-                        </div>
-                        <div>
-                            <label style="color: #94a3b8; font-size: 0.8rem;">Last Service (km):</label>
-                            <input type="number" id="service_${vehicle.replace(/ /g, '_')}" 
-                                   value="${lastService}" min="0" step="1"
-                                   placeholder="Enter km">
-                        </div>
-                        <div>
-                            <span style="color: #94a3b8; font-size: 0.8rem;">Current: </span>
-                            <span style="color: #f8fafc;">${currentMileage > 0 ? currentMileage.toFixed(0) + ' km' : '--'}</span>
-                            <span style="color: #94a3b8; font-size: 0.8rem; margin-left: 8px;">| Distance: ${distanceSince > 0 ? distanceSince.toFixed(0) + ' km' : '0 km'}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span class="status" style="color: ${statusColor};">${statusText}</span>
-                            <button class="btn-save-service" onclick="saveServiceSettings()">
-                                <i class="fas fa-save"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
         async function loadRecords() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML =
@@ -1466,6 +1417,9 @@
                     return dateA.localeCompare(dateB);
                 });
 
+                // Auto-detect service records and update mileage
+                detectServiceRecords();
+
                 applyFilters();
 
             } catch (error) {
@@ -1473,6 +1427,25 @@
                     '<tr><td colspan="16" style="text-align:center; color:#f87171; padding:48px;">Failed to load data.</td></tr>';
                 showToast('Failed to load data.', true);
             }
+        }
+
+        // Auto-detect service records from comments
+        function detectServiceRecords() {
+            const serviceKeywords = ['service', 'serviced', 'servicing', 'maintenance', 'oil change'];
+            
+            allRecords.forEach(record => {
+                const comments = (record.Comments || '').toLowerCase();
+                const vehicle = record.Vehicle || '';
+                const mileage = Number(record.Mileage) || 0;
+                
+                if (mileage > 0 && serviceKeywords.some(keyword => comments.includes(keyword))) {
+                    // This is a service record - update the service mileage
+                    if (serviceMileage.hasOwnProperty(vehicle) && mileage > serviceMileage[vehicle]) {
+                        serviceMileage[vehicle] = mileage;
+                        saveServiceMileage();
+                    }
+                }
+            });
         }
 
         function populateFilters() {
@@ -1560,7 +1533,7 @@
             displayFilteredRecords();
             updateStatsWithFilter();
             updateServiceDue();
-            renderServiceSettings();
+            renderServicePanel();
         }
 
         function clearFilters() {
@@ -1574,7 +1547,7 @@
             displayFilteredRecords();
             updateStatsWithFilter();
             updateServiceDue();
-            renderServiceSettings();
+            renderServicePanel();
         }
 
         function getServiceDueForVehicle(vehicle, currentMileage) {
@@ -1663,6 +1636,78 @@
             }
         }
 
+        // Render the service panel
+        function renderServicePanel() {
+            const grid = document.getElementById('serviceGrid');
+            let html = '';
+
+            ['Toyota IST BAH1996', 'Motorbike Honda 1751'].forEach(vehicle => {
+                const interval = SERVICE_INTERVALS[vehicle] || 5000;
+                const lastService = serviceMileage[vehicle] || 0;
+                const vehicleIcon = vehicle.includes('Motorbike') ? 'fa-motorcycle' : 'fa-car';
+                
+                // Find current max mileage
+                let currentMileage = 0;
+                allRecords.forEach(r => {
+                    if ((r.Vehicle || '').trim() === vehicle) {
+                        const m = Number(r.Mileage) || 0;
+                        if (m > currentMileage) currentMileage = m;
+                    }
+                });
+
+                const distanceSince = lastService > 0 && currentMileage > 0 ? currentMileage - lastService : 0;
+                const dueKm = lastService > 0 && currentMileage > 0 ? Math.max(0, interval - distanceSince) : 0;
+                
+                let statusText = 'Not set';
+                let statusClass = 'muted';
+                if (lastService > 0 && currentMileage > 0) {
+                    if (dueKm <= 0) {
+                        statusText = '⚠️ OVERDUE!';
+                        statusClass = 'danger';
+                    } else if (dueKm < interval * 0.2) {
+                        statusText = `${dueKm.toFixed(0)} km remaining (Service soon!)`;
+                        statusClass = 'warning';
+                    } else {
+                        statusText = `${dueKm.toFixed(0)} km remaining`;
+                        statusClass = 'good';
+                    }
+                } else if (lastService > 0 && currentMileage === 0) {
+                    statusText = 'No mileage records yet';
+                    statusClass = 'muted';
+                } else {
+                    statusText = `${lastService > 0 ? lastService.toFixed(0) + ' km set' : 'Not set'}`;
+                    statusClass = 'muted';
+                }
+
+                html += `
+                    <div class="service-item">
+                        <div class="vehicle">
+                            <i class="fas ${vehicleIcon}"></i> ${vehicle}
+                        </div>
+                        <div class="detail">
+                            <span class="label">Last Service:</span>
+                            <span class="value" style="color: #f59e0b;">${lastService > 0 ? lastService.toFixed(0) + ' km' : 'Not set'}</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label">Current Mileage:</span>
+                            <span class="value">${currentMileage > 0 ? currentMileage.toFixed(0) + ' km' : '--'}</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label">Distance Since:</span>
+                            <span class="value" style="color: #94a3b8;">${distanceSince > 0 ? distanceSince.toFixed(0) + ' km' : '0 km'}</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label">Service Interval:</span>
+                            <span class="value" style="color: #94a3b8;">${interval.toLocaleString()} km</span>
+                        </div>
+                        <div class="status-text ${statusClass}">${statusText}</div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
         function displayFilteredRecords() {
             const tbody = document.getElementById('tableBody');
 
@@ -1731,7 +1776,9 @@
                     serviceDueColor = '#94a3b8';
                 }
 
-                const isServiceRecord = comments.toUpperCase().includes('SERVICE');
+                const isServiceRecord = comments.toLowerCase().includes('service') || 
+                                       comments.toLowerCase().includes('serviced') ||
+                                       comments.toLowerCase().includes('maintenance');
 
                 html += `
                         <tr class="interactive-row" onclick="toggleRowCheckbox(${actualIndex})">
@@ -2110,7 +2157,7 @@
             if (e.key === 'Enter') applyFilters();
         });
 
-        // Load saved settings and data
+        // Load settings and data
         loadServiceSettings();
 
         const originalLoadRecords = loadRecords;
@@ -2119,7 +2166,7 @@
             populateFilters();
             applyFilters();
             updateServiceDue();
-            renderServiceSettings();
+            renderServicePanel();
         };
 
         loadRecords();
