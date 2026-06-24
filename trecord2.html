@@ -72,7 +72,6 @@
             transform: translateY(-1px);
         }
 
-        /* Stats Grid - 5 cards now */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -691,7 +690,7 @@
             text-transform: uppercase;
         }
 
-        /* Service Info Bar - Clean and simple */
+        /* Service Bar - Clean and consistent */
         .service-bar {
             background: #1e293b;
             border-radius: 16px;
@@ -709,27 +708,31 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 4px 12px;
+            padding: 6px 16px;
             border-radius: 8px;
             background: #0f172a;
+            flex: 1;
+            min-width: 200px;
         }
 
         .service-bar .service-item .icon {
-            font-size: 1rem;
+            font-size: 1.2rem;
             color: #f59e0b;
         }
 
-        .service-bar .service-item .info {
+        .service-bar .service-item .info-group {
             display: flex;
             flex-direction: column;
+            flex: 1;
         }
 
-        .service-bar .service-item .info .name {
+        .service-bar .service-item .info-group .name {
             font-size: 0.7rem;
             color: #94a3b8;
+            font-weight: 600;
         }
 
-        .service-bar .service-item .info .value {
+        .service-bar .service-item .info-group .value {
             font-size: 0.9rem;
             font-weight: 600;
             color: #f8fafc;
@@ -738,8 +741,9 @@
         .service-bar .service-item .status {
             font-size: 0.75rem;
             font-weight: 700;
-            padding: 2px 10px;
+            padding: 4px 12px;
             border-radius: 12px;
+            white-space: nowrap;
         }
 
         .service-bar .service-item .status.good {
@@ -800,7 +804,7 @@
                 align-items: stretch;
             }
             .service-bar .service-item {
-                justify-content: space-between;
+                min-width: unset;
             }
         }
     </style>
@@ -850,7 +854,7 @@
                     <div class="stat-label" id="recordsLabel">Logged statements</div>
                 </div>
             </div>
-            <!-- Service Due Card - Shows filtered vehicle service due -->
+            <!-- Service Due Card -->
             <div class="stat-card service-due" id="serviceDueCard">
                 <div class="stat-icon" style="background: #f59e0b20; color: #f59e0b;"><i class="fas fa-oil-can"></i></div>
                 <div class="stat-content">
@@ -861,7 +865,7 @@
             </div>
         </div>
 
-        <!-- Service Bar - Shows all vehicles at a glance -->
+        <!-- Service Bar -->
         <div class="service-bar" id="serviceBar">
             <!-- Populated dynamically -->
         </div>
@@ -1126,9 +1130,6 @@
     <script>
         // ============================================================
         // SERVICE MILEAGE - EDIT THESE VALUES WHEN VEHICLES ARE SERVICED
-        // ============================================================
-        // Toyota IST BAH1996 last service: 120,000 km
-        // Motorbike Honda 1751 last service: 500 km
         // ============================================================
         const SERVICE_MILEAGE = {
             'Toyota IST BAH1996': 120000,
@@ -1522,18 +1523,53 @@
             renderServiceBar();
         }
 
-        function getServiceDueForVehicle(vehicle, currentMileage) {
+        // ============================================================
+        // CORE SERVICE CALCULATION - SAME FUNCTION USED EVERYWHERE
+        // ============================================================
+        function calculateServiceDue(vehicle, currentMileage) {
             if (!vehicle || !currentMileage || currentMileage <= 0) {
-                return { distanceSinceService: 0, dueKm: 0, lastServiceMileage: 0 };
+                return { 
+                    distanceSinceService: 0, 
+                    dueKm: 0, 
+                    lastServiceMileage: 0, 
+                    interval: SERVICE_INTERVALS[vehicle] || 5000,
+                    isSet: false 
+                };
             }
 
             const interval = SERVICE_INTERVALS[vehicle] || 5000;
             const lastServiceMileage = serviceMileage[vehicle] || 0;
 
-            const distanceSinceService = lastServiceMileage > 0 ? currentMileage - lastServiceMileage : 0;
-            const dueKm = lastServiceMileage > 0 ? Math.max(0, interval - distanceSinceService) : 0;
+            if (lastServiceMileage === 0) {
+                return { 
+                    distanceSinceService: 0, 
+                    dueKm: 0, 
+                    lastServiceMileage: 0, 
+                    interval: interval,
+                    isSet: false 
+                };
+            }
 
-            return { distanceSinceService, dueKm, lastServiceMileage, interval };
+            const distanceSinceService = currentMileage - lastServiceMileage;
+            const dueKm = Math.max(0, interval - distanceSinceService);
+
+            return { 
+                distanceSinceService, 
+                dueKm, 
+                lastServiceMileage, 
+                interval,
+                isSet: true 
+            };
+        }
+
+        function getVehicleCurrentMileage(vehicle) {
+            let maxMileage = 0;
+            const relevantRecords = allRecords.filter(r => (r.Vehicle || '').trim() === vehicle);
+            relevantRecords.forEach(record => {
+                const mileage = Number(record.Mileage) || 0;
+                if (mileage > maxMileage) maxMileage = mileage;
+            });
+            return maxMileage;
         }
 
         function updateServiceDue() {
@@ -1543,56 +1579,59 @@
 
             const vehicleFilter = currentFilters.vehicle || '';
 
-            let relevantRecords = allRecords;
-            if (vehicleFilter) {
-                relevantRecords = allRecords.filter(r => (r.Vehicle || '').trim().toLowerCase() === vehicleFilter.toLowerCase());
-            }
-
-            if (relevantRecords.length === 0) {
-                serviceValue.innerHTML = '-- km';
-                serviceLabel.textContent = vehicleFilter ? `No data for ${vehicleFilter}` : 'Select a vehicle';
-                serviceCard.className = 'stat-card service-due';
-                return;
-            }
-
-            let maxMileage = 0;
-            relevantRecords.forEach(record => {
-                const mileage = Number(record.Mileage) || 0;
-                if (mileage > maxMileage) maxMileage = mileage;
-            });
-
-            if (maxMileage <= 0) {
-                serviceValue.innerHTML = '-- km';
-                serviceLabel.textContent = 'No mileage data';
-                serviceCard.className = 'stat-card service-due';
-                return;
-            }
-
-            let vehicle = vehicleFilter;
-            if (!vehicle) {
-                const vehicles = new Set(relevantRecords.map(r => r.Vehicle));
-                if (vehicles.size === 1) {
-                    vehicle = vehicles.values().next().value;
-                } else {
-                    serviceValue.innerHTML = '⚠️ Mixed';
-                    serviceLabel.textContent = 'Filter by a single vehicle';
+            if (!vehicleFilter) {
+                // Show combined status for all vehicles
+                const allVehicles = ['Toyota IST BAH1996', 'Motorbike Honda 1751'];
+                let combinedText = '';
+                let hasData = false;
+                
+                allVehicles.forEach(vehicle => {
+                    const currentMileage = getVehicleCurrentMileage(vehicle);
+                    const serviceInfo = calculateServiceDue(vehicle, currentMileage);
+                    
+                    if (serviceInfo.isSet && currentMileage > 0) {
+                        hasData = true;
+                        const shortName = vehicle.includes('Motorbike') ? 'Bike' : 'Car';
+                        const status = serviceInfo.dueKm <= 0 ? '⚠️' : 
+                                      serviceInfo.dueKm < SERVICE_INTERVALS[vehicle] * 0.2 ? '⚠️' : '';
+                        combinedText += `${shortName}: ${serviceInfo.dueKm <= 0 ? 'OVERDUE' : serviceInfo.dueKm.toFixed(0) + 'km'} ${status} | `;
+                    }
+                });
+                
+                if (hasData) {
+                    serviceValue.innerHTML = combinedText.slice(0, -3);
+                    serviceLabel.textContent = 'All vehicles status';
                     serviceCard.className = 'stat-card service-due';
-                    return;
+                } else {
+                    serviceValue.innerHTML = '-- km';
+                    serviceLabel.textContent = 'Select a vehicle to track';
+                    serviceCard.className = 'stat-card service-due';
                 }
+                return;
             }
 
-            const serviceInfo = getServiceDueForVehicle(vehicle, maxMileage);
+            // Single vehicle view
+            const currentMileage = getVehicleCurrentMileage(vehicleFilter);
+            
+            if (currentMileage <= 0) {
+                serviceValue.innerHTML = '-- km';
+                serviceLabel.textContent = `No mileage data for ${vehicleFilter}`;
+                serviceCard.className = 'stat-card service-due';
+                return;
+            }
 
-            if (serviceInfo.lastServiceMileage === 0) {
+            const serviceInfo = calculateServiceDue(vehicleFilter, currentMileage);
+
+            if (!serviceInfo.isSet) {
                 serviceValue.innerHTML = 'Set service';
-                serviceLabel.textContent = `Set last service mileage for ${vehicle}`;
+                serviceLabel.textContent = `Set last service mileage for ${vehicleFilter}`;
                 serviceCard.className = 'stat-card service-due';
             } else if (serviceInfo.dueKm <= 0) {
                 serviceValue.innerHTML = `⚠️ OVERDUE!`;
                 serviceValue.className = 'stat-value overdue-text';
                 serviceCard.className = 'stat-card service-due overdue';
                 serviceLabel.textContent = `Overdue by ${Math.abs(serviceInfo.dueKm).toFixed(0)} km`;
-            } else if (serviceInfo.dueKm < SERVICE_INTERVALS[vehicle] * 0.2) {
+            } else if (serviceInfo.dueKm < SERVICE_INTERVALS[vehicleFilter] * 0.2) {
                 serviceValue.innerHTML = `${serviceInfo.dueKm.toFixed(0)} km`;
                 serviceValue.className = 'stat-value due-soon-text';
                 serviceCard.className = 'stat-card service-due due-soon';
@@ -1610,35 +1649,25 @@
             let html = '';
 
             ['Toyota IST BAH1996', 'Motorbike Honda 1751'].forEach(vehicle => {
-                const interval = SERVICE_INTERVALS[vehicle] || 5000;
-                const lastService = serviceMileage[vehicle] || 0;
                 const vehicleIcon = vehicle.includes('Motorbike') ? 'fa-motorcycle' : 'fa-car';
-                
-                let currentMileage = 0;
-                allRecords.forEach(r => {
-                    if ((r.Vehicle || '').trim() === vehicle) {
-                        const m = Number(r.Mileage) || 0;
-                        if (m > currentMileage) currentMileage = m;
-                    }
-                });
-
-                const distanceSince = lastService > 0 && currentMileage > 0 ? currentMileage - lastService : 0;
-                const dueKm = lastService > 0 && currentMileage > 0 ? Math.max(0, interval - distanceSince) : 0;
+                const currentMileage = getVehicleCurrentMileage(vehicle);
+                const serviceInfo = calculateServiceDue(vehicle, currentMileage);
                 
                 let statusText = 'Not set';
                 let statusClass = 'muted';
-                if (lastService > 0 && currentMileage > 0) {
-                    if (dueKm <= 0) {
-                        statusText = '⚠️ OVERDUE';
+                
+                if (serviceInfo.isSet && currentMileage > 0) {
+                    if (serviceInfo.dueKm <= 0) {
+                        statusText = `⚠️ OVERDUE`;
                         statusClass = 'danger';
-                    } else if (dueKm < interval * 0.2) {
-                        statusText = `${dueKm.toFixed(0)} km left`;
+                    } else if (serviceInfo.dueKm < SERVICE_INTERVALS[vehicle] * 0.2) {
+                        statusText = `${serviceInfo.dueKm.toFixed(0)} km left`;
                         statusClass = 'warning';
                     } else {
-                        statusText = `${dueKm.toFixed(0)} km left`;
+                        statusText = `${serviceInfo.dueKm.toFixed(0)} km left`;
                         statusClass = 'good';
                     }
-                } else if (lastService > 0 && currentMileage === 0) {
+                } else if (serviceInfo.isSet && currentMileage === 0) {
                     statusText = 'No mileage';
                     statusClass = 'muted';
                 }
@@ -1646,17 +1675,17 @@
                 html += `
                     <div class="service-item">
                         <div class="icon"><i class="fas ${vehicleIcon}"></i></div>
-                        <div class="info">
+                        <div class="info-group">
                             <span class="name">${vehicle}</span>
-                            <span class="value">${lastService > 0 ? lastService.toFixed(0) + ' km' : 'Not set'}</span>
+                            <span class="value">Last: ${serviceInfo.isSet ? serviceInfo.lastServiceMileage.toFixed(0) + ' km' : 'Not set'}</span>
                         </div>
-                        <div class="info" style="text-align: center;">
+                        <div class="info-group" style="text-align: center;">
                             <span class="name">Current</span>
                             <span class="value">${currentMileage > 0 ? currentMileage.toFixed(0) + ' km' : '--'}</span>
                         </div>
-                        <div class="info" style="text-align: center;">
+                        <div class="info-group" style="text-align: center;">
                             <span class="name">Distance</span>
-                            <span class="value">${distanceSince > 0 ? distanceSince.toFixed(0) + ' km' : '0 km'}</span>
+                            <span class="value">${serviceInfo.isSet && currentMileage > 0 ? serviceInfo.distanceSinceService.toFixed(0) + ' km' : '0 km'}</span>
                         </div>
                         <span class="status ${statusClass}">${statusText}</span>
                     </div>
@@ -1714,11 +1743,12 @@
 
                 const vehicleClass = vehicleValue.includes('Motorbike') ? 'bike' : 'car';
 
-                const serviceInfo = getServiceDueForVehicle(vehicleValue, mileage);
+                // Calculate service due for this specific record
+                const serviceInfo = calculateServiceDue(vehicleValue, mileage);
                 let serviceDueDisplay = '—';
                 let serviceDueColor = '#94a3b8';
 
-                if (mileage > 0 && serviceInfo.lastServiceMileage > 0) {
+                if (mileage > 0 && serviceInfo.isSet) {
                     if (serviceInfo.dueKm <= 0) {
                         serviceDueDisplay = '⚠️ DUE';
                         serviceDueColor = '#f87171';
@@ -1729,7 +1759,7 @@
                         serviceDueDisplay = `${serviceInfo.dueKm.toFixed(0)} km`;
                         serviceDueColor = '#4ade80';
                     }
-                } else if (mileage > 0 && serviceInfo.lastServiceMileage === 0) {
+                } else if (mileage > 0 && !serviceInfo.isSet) {
                     serviceDueDisplay = 'Set service';
                     serviceDueColor = '#94a3b8';
                 }
@@ -1897,13 +1927,13 @@
             document.getElementById('cardServiceInterval').textContent = interval.toLocaleString();
             document.getElementById('cardMileage').innerText = mileage > 0 ? `${mileage.toFixed(0)} km` : '—';
 
-            const serviceInfo = getServiceDueForVehicle(vehicleValue, mileage);
+            const serviceInfo = calculateServiceDue(vehicleValue, mileage);
             
-            if (mileage > 0 && serviceInfo.lastServiceMileage > 0) {
+            if (mileage > 0 && serviceInfo.isSet) {
                 document.getElementById('cardSinceService').innerText = `${serviceInfo.distanceSinceService.toFixed(0)} km`;
                 document.getElementById('cardServiceDue').innerText = serviceInfo.dueKm <= 0 ? '⚠️ OVERDUE' : `${serviceInfo.dueKm.toFixed(0)} km`;
                 document.getElementById('cardServiceDue').style.color = serviceInfo.dueKm <= 0 ? '#f87171' : '#f59e0b';
-            } else if (mileage > 0 && serviceInfo.lastServiceMileage === 0) {
+            } else if (mileage > 0 && !serviceInfo.isSet) {
                 document.getElementById('cardSinceService').innerText = 'No service record';
                 document.getElementById('cardServiceDue').innerText = 'Set service';
                 document.getElementById('cardServiceDue').style.color = '#94a3b8';
@@ -1939,7 +1969,7 @@
             const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
             const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
 
-            const serviceInfo = getServiceDueForVehicle(vehicleValue, mileage);
+            const serviceInfo = calculateServiceDue(vehicleValue, mileage);
 
             const message =
                 `📊 *CASH TRANSACTION*\n\n` +
@@ -1951,7 +1981,7 @@
                 `💰 Cash: K${cashIn.toFixed(2)}\n` +
                 `⚖️ Balance: K${transactionBalance.toFixed(2)}\n` +
                 `📏 Mileage: ${mileage > 0 ? mileage.toFixed(0) + ' km' : '—'}\n` +
-                `🔧 Service: ${mileage > 0 ? (serviceInfo.dueKm <= 0 ? '⚠️ OVERDUE' : serviceInfo.dueKm.toFixed(0) + ' km') : '—'}\n` +
+                `🔧 Service: ${mileage > 0 && serviceInfo.isSet ? (serviceInfo.dueKm <= 0 ? '⚠️ OVERDUE' : serviceInfo.dueKm.toFixed(0) + ' km') : 'Not set'}\n` +
                 `${r.Comments ? `\n📝 ${r.Comments}` : ''}`;
 
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
@@ -1979,11 +2009,11 @@
                 cumulativeTarget += target;
                 cumulativeCashIn += cashIn;
                 const formattedDate = formatDateForDisplay(r.Date);
-                const serviceInfo = getServiceDueForVehicle(vehicleValue, mileage);
+                const serviceInfo = calculateServiceDue(vehicleValue, mileage);
                 message += `${i+1}. ${formattedDate} - ${nameValue} [${vehicleValue}]\n`;
                 message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Δ: K${transBal.toFixed(2)}`;
-                if (mileage > 0) {
-                    message += ` | Mileage: ${mileage.toFixed(0)} km | Service: ${serviceInfo.dueKm <= 0 ? '⚠️DUE' : serviceInfo.dueKm.toFixed(0)+'km'}`;
+                if (mileage > 0 && serviceInfo.isSet) {
+                    message += ` | Service: ${serviceInfo.dueKm <= 0 ? '⚠️DUE' : serviceInfo.dueKm.toFixed(0)+'km'}`;
                 }
                 message += `\n`;
             });
