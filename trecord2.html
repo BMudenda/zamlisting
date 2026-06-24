@@ -683,9 +683,9 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            background: #0f172a;
+            background: #10b98110;
             border-radius: 8px;
-            border: 1px solid #334155;
+            border: 2px solid #10b981;
             margin-bottom: 16px;
         }
 
@@ -698,9 +698,10 @@
         }
 
         .service-checkbox-group label {
-            color: #e2e8f0;
+            color: #4ade80;
             font-weight: 600;
             cursor: pointer;
+            font-size: 0.95rem;
         }
 
         .service-checkbox-group .service-info {
@@ -735,9 +736,99 @@
             color: #f87171;
         }
 
+        .service-info-box {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 8px;
+            border-left: 3px solid #f59e0b;
+        }
+
+        .service-info-box .label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .service-info-box .value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        /* Service Management Panel */
+        .service-management {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            border: 1px solid #334155;
+        }
+
+        .service-management h3 {
+            color: #f59e0b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-management .service-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: center;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .service-management .service-row .vehicle-name {
+            font-weight: 600;
+            color: #38bdf8;
+        }
+
+        .service-management .service-row .service-mileage {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .service-management .service-row .service-interval {
+            color: #94a3b8;
+        }
+
+        .service-management .btn-reset-service {
+            background: #10b981;
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: opacity 0.2s;
+        }
+
+        .service-management .btn-reset-service:hover {
+            opacity: 0.9;
+        }
+
+        .service-management .service-note {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
         @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .service-management .service-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
         }
         @media (max-width: 768px) {
@@ -769,6 +860,10 @@
             .service-checkbox-group .service-info {
                 margin-left: 0;
                 width: 100%;
+            }
+            .service-management .service-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
             }
         }
     </style>
@@ -826,6 +921,17 @@
                     <div class="stat-value" id="serviceDueValue">-- km</div>
                     <div class="stat-label" id="serviceDueLabel">Based on last recorded mileage</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Service Management Panel -->
+        <div class="service-management">
+            <h3><i class="fas fa-tools"></i> Service Management</h3>
+            <div id="serviceManagementContainer">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="service-note">
+                <i class="fas fa-info-circle"></i> Click "Reset Service" when a vehicle is serviced. The tracking will start fresh from the current mileage.
             </div>
         </div>
 
@@ -918,7 +1024,7 @@
 
     <div id="overlay" class="overlay"></div>
 
-    <!-- Transaction Modal with Service Checkbox -->
+    <!-- Transaction Modal -->
     <div id="recordModal" class="modal">
         <div class="modal-header">
             <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> New Transaction Entry</h3>
@@ -948,11 +1054,10 @@
                 </select>
             </div>
 
-            <!-- Service Performed Checkbox -->
             <div class="service-checkbox-group">
                 <input type="checkbox" id="inputServicePerformed" onchange="handleServiceCheckbox()">
                 <label for="inputServicePerformed">
-                    <i class="fas fa-wrench"></i> Service Performed
+                    <i class="fas fa-wrench"></i> ✅ This transaction records a SERVICE
                 </label>
                 <span class="service-info">
                     <i class="fas fa-info-circle"></i> 
@@ -983,12 +1088,25 @@
             <div class="form-group">
                 <label><i class="fas fa-tachometer-alt"></i> Current Mileage (km) *</label>
                 <input type="number" id="inputMileage" step="1" min="0" placeholder="Enter current odometer reading" required oninput="updateMileageInfo()">
-                <div id="mileageInfo" class="service-mileage-info">
-                    <i class="fas fa-info-circle"></i> 
-                    Last service mileage: <span id="lastServiceMileage">--</span> | 
-                    Distance since service: <span id="distanceSinceService">--</span> km
-                    <br>
-                    <span id="serviceStatusText"></span>
+                
+                <div class="service-info-box" id="serviceInfoBox">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                        <div>
+                            <div class="label">Last Service</div>
+                            <div class="value" id="lastServiceMileage">-- km</div>
+                        </div>
+                        <div>
+                            <div class="label">Distance Since</div>
+                            <div class="value" id="distanceSinceService">-- km</div>
+                        </div>
+                        <div>
+                            <div class="label">Service Due In</div>
+                            <div class="value" id="serviceDuePreview">-- km</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #334155;">
+                        <span id="serviceStatusText" style="font-size: 0.85rem;"></span>
+                    </div>
                 </div>
                 <small style="color: #64748b; display: block; margin-top: 4px;" id="serviceIntervalInfo">Service interval: 5,000 km for this vehicle</small>
             </div>
@@ -1094,7 +1212,6 @@
             </div>
             <div style="margin-top: 8px; padding: 8px 12px; background: #0f172a; border-radius: 6px; border-left: 3px solid #f59e0b; font-size: 0.8rem; color: #94a3b8;">
                 <i class="fas fa-info-circle"></i> Service interval: <span id="cardServiceInterval">5,000</span> km
-                <span id="cardServiceDate" style="display: block; margin-top: 4px; color: #10b981;"></span>
             </div>
 
             <div class="card-section-title"><i class="fas fa-comment-dots"></i> Internal Comments Log</div>
@@ -1113,6 +1230,12 @@
         const SERVICE_INTERVALS = {
             'Toyota IST BAH1996': 5000,
             'Motorbike Honda 1751': 1000
+        };
+
+        // Store service mileage per vehicle (in-memory cache)
+        let serviceMileageCache = {
+            'Toyota IST BAH1996': 0,
+            'Motorbike Honda 1751': 0
         };
 
         let allRecords = [];
@@ -1223,17 +1346,65 @@
             if (isService && mileage > 0) {
                 const interval = SERVICE_INTERVALS[vehicle] || 5000;
                 statusText.innerHTML = `
-                    ✅ <strong>Service recorded at ${mileage.toFixed(0)} km</strong> 
+                    ✅ <strong style="color: #4ade80;">SERVICE RECORDED</strong> 
+                    <span style="color: #94a3b8;">at ${mileage.toFixed(0)} km</span>
                     <span style="color: #94a3b8; font-size: 0.8rem;">
                         (Next service due at ${(mileage + interval).toFixed(0)} km)
                     </span>
                 `;
                 statusText.className = 'service-status-success';
+                document.getElementById('serviceDuePreview').textContent = interval.toFixed(0) + ' km';
+                document.getElementById('distanceSinceService').textContent = '0 km';
+                document.getElementById('lastServiceMileage').textContent = mileage.toFixed(0) + ' km';
+                document.getElementById('currentLastService').textContent = mileage.toFixed(0) + ' km';
             } else {
                 statusText.textContent = '';
                 statusText.className = '';
                 updateMileageInfo();
             }
+        }
+
+        function getLastServiceMileage(vehicle) {
+            // Check cache first
+            if (serviceMileageCache[vehicle] > 0) {
+                return serviceMileageCache[vehicle];
+            }
+
+            const vehicleRecords = allRecords.filter(r => (r.Vehicle || '').trim() === vehicle);
+
+            if (vehicleRecords.length === 0) return 0;
+
+            // Look for service records
+            let serviceRecords = vehicleRecords.filter(r => {
+                const comments = (r.Comments || '').toUpperCase();
+                return comments.includes('SERVICE') || comments.includes('SERVICED') || 
+                       comments.includes('MAINTENANCE') || comments.includes('SERVICING');
+            });
+
+            if (serviceRecords.length > 0) {
+                let latestServiceMileage = 0;
+                serviceRecords.forEach(r => {
+                    const m = Number(r.Mileage) || 0;
+                    if (m > latestServiceMileage) {
+                        latestServiceMileage = m;
+                    }
+                });
+                serviceMileageCache[vehicle] = latestServiceMileage;
+                return latestServiceMileage;
+            }
+
+            // If no service record, find the minimum mileage as baseline
+            let minMileage = Infinity;
+            vehicleRecords.forEach(r => {
+                const m = Number(r.Mileage) || 0;
+                if (m > 0 && m < minMileage) {
+                    minMileage = m;
+                }
+            });
+
+            const baseline = minMileage < Infinity ? minMileage : 0;
+            serviceMileageCache[vehicle] = baseline;
+            return baseline;
         }
 
         function updateMileageInfo() {
@@ -1243,91 +1414,67 @@
             const statusText = document.getElementById('serviceStatusText');
 
             if (!vehicle || isNaN(currentMileage) || currentMileage <= 0) {
-                document.getElementById('lastServiceMileage').textContent = '--';
-                document.getElementById('distanceSinceService').textContent = '--';
-                document.getElementById('currentLastService').textContent = '--';
-                statusText.textContent = '';
+                document.getElementById('lastServiceMileage').textContent = '-- km';
+                document.getElementById('distanceSinceService').textContent = '-- km';
+                document.getElementById('serviceDuePreview').textContent = '-- km';
+                document.getElementById('currentLastService').textContent = '-- km';
+                statusText.textContent = 'Enter mileage to see service status';
                 statusText.className = '';
                 return;
             }
 
-            // Get the last service mileage for this vehicle
             let lastServiceMileage = getLastServiceMileage(vehicle);
 
-            // If service is being performed now, use current mileage as new service point
-            if (isService && currentMileage > 0) {
+            if (isService) {
                 lastServiceMileage = currentMileage;
                 const interval = SERVICE_INTERVALS[vehicle] || 5000;
                 statusText.innerHTML = `
-                    ✅ <strong>Service recorded at ${currentMileage.toFixed(0)} km</strong>
+                    ✅ <strong style="color: #4ade80;">SERVICE RECORDED</strong> 
+                    <span style="color: #94a3b8;">at ${currentMileage.toFixed(0)} km</span>
                     <span style="color: #94a3b8; font-size: 0.8rem;">
                         (Next service due at ${(currentMileage + interval).toFixed(0)} km)
                     </span>
                 `;
                 statusText.className = 'service-status-success';
+                document.getElementById('lastServiceMileage').textContent = currentMileage.toFixed(0) + ' km';
+                document.getElementById('distanceSinceService').textContent = '0 km';
+                document.getElementById('serviceDuePreview').textContent = interval.toFixed(0) + ' km';
+                document.getElementById('currentLastService').textContent = currentMileage.toFixed(0) + ' km';
+                return;
             }
 
             document.getElementById('currentLastService').textContent = lastServiceMileage > 0 ?
                 lastServiceMileage.toFixed(0) + ' km' : 'No service record';
 
-            if (lastServiceMileage > 0 && !isService) {
+            if (lastServiceMileage > 0) {
                 const distanceSinceService = currentMileage - lastServiceMileage;
                 const interval = SERVICE_INTERVALS[vehicle] || 5000;
                 const dueKm = Math.max(0, interval - distanceSinceService);
 
-                document.getElementById('lastServiceMileage').textContent = lastServiceMileage.toFixed(0);
-                document.getElementById('distanceSinceService').textContent = distanceSinceService.toFixed(0);
+                document.getElementById('lastServiceMileage').textContent = lastServiceMileage.toFixed(0) + ' km';
+                document.getElementById('distanceSinceService').textContent = distanceSinceService.toFixed(0) + ' km';
+                document.getElementById('serviceDuePreview').textContent = dueKm.toFixed(0) + ' km';
 
                 if (distanceSinceService >= interval) {
-                    statusText.innerHTML = `⚠️ <strong>SERVICE OVERDUE!</strong> Overdue by ${Math.abs(dueKm).toFixed(0)} km`;
+                    statusText.innerHTML = `⚠️ <strong style="color: #f87171;">SERVICE OVERDUE!</strong> Overdue by ${Math.abs(dueKm).toFixed(0)} km`;
                     statusText.className = 'service-status-danger';
+                    document.getElementById('serviceDuePreview').style.color = '#f87171';
                 } else if (distanceSinceService > interval * 0.8) {
-                    statusText.innerHTML = `⚠️ <strong>Service due soon!</strong> ${dueKm.toFixed(0)} km remaining`;
+                    statusText.innerHTML = `⚠️ <strong style="color: #fbbf24;">Service due soon!</strong> ${dueKm.toFixed(0)} km remaining`;
                     statusText.className = 'service-status-warning';
+                    document.getElementById('serviceDuePreview').style.color = '#fbbf24';
                 } else {
-                    statusText.textContent = `✓ ${dueKm.toFixed(0)} km until next service`;
+                    statusText.innerHTML = `✓ <span style="color: #4ade80;">${dueKm.toFixed(0)} km</span> until next service`;
                     statusText.className = 'service-status-success';
+                    document.getElementById('serviceDuePreview').style.color = '#4ade80';
                 }
-            } else if (!isService) {
-                statusText.textContent = 'No service record found. Check "Service Performed" when servicing.';
-                statusText.className = 'service-status-warning';
+            } else {
+                statusText.innerHTML = 'ℹ️ <span style="color: #94a3b8;">No service record found. Check "SERVICE" checkbox when servicing.</span>';
+                statusText.className = '';
+                document.getElementById('lastServiceMileage').textContent = 'No service record';
+                document.getElementById('distanceSinceService').textContent = '-- km';
+                document.getElementById('serviceDuePreview').textContent = '-- km';
             }
-        }
-
-        function getLastServiceMileage(vehicle) {
-            const vehicleRecords = allRecords.filter(r => (r.Vehicle || '').trim() === vehicle);
-
-            if (vehicleRecords.length === 0) return 0;
-
-            // Look for records with "service" in comments (our flag)
-            let serviceRecords = vehicleRecords.filter(r => {
-                const comments = (r.Comments || '').toLowerCase();
-                return comments.includes('service') || comments.includes('serviced') || 
-                       comments.includes('maintenance') || comments.includes('servicing');
-            });
-
-            // If we have service records, use the latest one
-            if (serviceRecords.length > 0) {
-                let latestServiceMileage = 0;
-                serviceRecords.forEach(r => {
-                    const m = Number(r.Mileage) || 0;
-                    if (m > latestServiceMileage) {
-                        latestServiceMileage = m;
-                    }
-                });
-                return latestServiceMileage;
-            }
-
-            // Fallback: find the minimum mileage as baseline
-            let minMileage = Infinity;
-            vehicleRecords.forEach(r => {
-                const m = Number(r.Mileage) || 0;
-                if (m > 0 && m < minMileage) {
-                    minMileage = m;
-                }
-            });
-
-            return minMileage < Infinity ? minMileage : 0;
         }
 
         function updateBalancePreview() {
@@ -1431,10 +1578,11 @@
 
             const balance = (selectedName === "Expense") ? 0 : (target - cashIn);
             
-            // Add service flag to comments if checkbox is checked
             let comments = document.getElementById('inputComments').value || "";
             if (isService) {
-                comments = comments ? `SERVICE PERFORMED at ${mileage} km | ${comments}` : `SERVICE PERFORMED at ${mileage} km`;
+                comments = comments ? `SERVICE at ${mileage} km | ${comments}` : `SERVICE at ${mileage} km`;
+                // Update cache immediately
+                serviceMileageCache[vehicle] = mileage;
             }
 
             const record = {
@@ -1455,12 +1603,53 @@
             showLoading(false);
 
             if (success) {
-                showToast(`Transaction synced explicitly.`);
+                showToast(`Transaction synced successfully.`);
                 closeModal();
                 await loadRecords();
             } else {
                 showToast('Engine encountered connection synchronization fault.', true);
             }
+        }
+
+        // Reset service mileage for a vehicle
+        function resetServiceMileage(vehicle) {
+            const currentMileage = prompt(`Enter current mileage for ${vehicle}:`, '0');
+            if (currentMileage === null) return;
+            
+            const mileage = parseFloat(currentMileage);
+            if (isNaN(mileage) || mileage < 0) {
+                showToast('Please enter a valid mileage.', true);
+                return;
+            }
+
+            // Update cache
+            serviceMileageCache[vehicle] = mileage;
+            
+            // Create a service record
+            const today = new Date().toISOString().slice(0, 10);
+            const record = {
+                date: today,
+                name: 'Service Reset',
+                vehicle: vehicle,
+                timeIn: '',
+                timeOut: '',
+                target: 0,
+                cashIn: 0,
+                balance: 0,
+                mileage: mileage,
+                comments: `SERVICE RESET at ${mileage} km (manual reset)`
+            };
+
+            showLoading(true);
+            saveToSheet(record).then(success => {
+                showLoading(false);
+                if (success) {
+                    showToast(`Service reset for ${vehicle} to ${mileage} km`);
+                    loadRecords();
+                } else {
+                    showToast('Failed to save service reset.', true);
+                }
+            });
         }
 
         async function loadRecords() {
@@ -1480,6 +1669,9 @@
                     return dateA.localeCompare(dateB);
                 });
 
+                // Update service cache from records
+                updateServiceCache();
+
                 applyFilters();
 
             } catch (error) {
@@ -1487,6 +1679,63 @@
                     '<tr><td colspan="16" style="text-align:center; color:#f87171; padding:48px;">Failed to interface API database runtime matrix.</td></tr>';
                 showToast('Database link execution broken.', true);
             }
+        }
+
+        function updateServiceCache() {
+            ['Toyota IST BAH1996', 'Motorbike Honda 1751'].forEach(vehicle => {
+                serviceMileageCache[vehicle] = getLastServiceMileage(vehicle);
+            });
+            renderServiceManagement();
+        }
+
+        function renderServiceManagement() {
+            const container = document.getElementById('serviceManagementContainer');
+            let html = '';
+
+            ['Toyota IST BAH1996', 'Motorbike Honda 1751'].forEach(vehicle => {
+                const lastService = serviceMileageCache[vehicle] || 0;
+                const interval = SERVICE_INTERVALS[vehicle] || 5000;
+                const vehicleIcon = vehicle.includes('Motorbike') ? 'fa-motorcycle' : 'fa-car';
+                
+                // Find current max mileage for this vehicle
+                let currentMileage = 0;
+                allRecords.forEach(r => {
+                    if ((r.Vehicle || '').trim() === vehicle) {
+                        const m = Number(r.Mileage) || 0;
+                        if (m > currentMileage) currentMileage = m;
+                    }
+                });
+
+                const distanceSince = lastService > 0 ? currentMileage - lastService : 0;
+                const dueKm = Math.max(0, interval - distanceSince);
+                const statusColor = dueKm <= 0 ? '#f87171' : dueKm < interval * 0.2 ? '#fbbf24' : '#4ade80';
+                const statusText = dueKm <= 0 ? 'OVERDUE!' : `${dueKm.toFixed(0)} km remaining`;
+
+                html += `
+                    <div class="service-row">
+                        <div class="vehicle-name">
+                            <i class="fas ${vehicleIcon}"></i> ${vehicle}
+                        </div>
+                        <div>
+                            <span style="color: #94a3b8; font-size: 0.8rem;">Last Service:</span>
+                            <span class="service-mileage">${lastService > 0 ? lastService.toFixed(0) + ' km' : 'Not set'}</span>
+                        </div>
+                        <div>
+                            <span style="color: #94a3b8; font-size: 0.8rem;">Current:</span>
+                            <span style="color: #f8fafc;">${currentMileage > 0 ? currentMileage.toFixed(0) + ' km' : '--'}</span>
+                            <span style="color: #94a3b8; font-size: 0.8rem; margin-left: 8px;">| Distance: ${distanceSince > 0 ? distanceSince.toFixed(0) + ' km' : '0 km'}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                            <button class="btn-reset-service" onclick="resetServiceMileage('${vehicle}')">
+                                <i class="fas fa-sync"></i> Reset Service
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
         }
 
         function populateFilters() {
@@ -1743,10 +1992,9 @@
                     serviceDueColor = '#94a3b8';
                 }
 
-                // Check if this is a service record
-                const isServiceRecord = comments.toLowerCase().includes('service') || 
-                                       comments.toLowerCase().includes('serviced') ||
-                                       comments.toLowerCase().includes('maintenance');
+                const isServiceRecord = comments.toUpperCase().includes('SERVICE') || 
+                                       comments.toUpperCase().includes('SERVICED') ||
+                                       comments.toUpperCase().includes('MAINTENANCE');
 
                 html += `
                         <tr class="interactive-row" onclick="toggleRowCheckbox(${actualIndex})">
@@ -1903,7 +2151,6 @@
             else if (cumBalance < 0) cumBalElem.className = "card-metric-val val-positive";
             else cumBalElem.className = "card-metric-val val-neutral";
 
-            // Mileage card details
             const interval = SERVICE_INTERVALS[vehicleValue] || 5000;
             document.getElementById('cardServiceInterval').textContent = interval.toLocaleString();
             document.getElementById('cardMileage').innerText = mileage > 0 ? `${mileage.toFixed(0)} km` : '—';
@@ -2095,9 +2342,10 @@
             document.getElementById('inputMileage').value = '';
             document.getElementById('inputComments').value = '';
             document.getElementById('inputServicePerformed').checked = false;
-            document.getElementById('lastServiceMileage').textContent = '--';
-            document.getElementById('distanceSinceService').textContent = '--';
-            document.getElementById('currentLastService').textContent = '--';
+            document.getElementById('lastServiceMileage').textContent = '-- km';
+            document.getElementById('distanceSinceService').textContent = '-- km';
+            document.getElementById('serviceDuePreview').textContent = '-- km';
+            document.getElementById('currentLastService').textContent = '-- km';
             document.getElementById('serviceStatusText').textContent = '';
             document.getElementById('serviceStatusText').className = '';
             updateServiceIntervalInfo();
@@ -2149,6 +2397,7 @@
             populateFilters();
             applyFilters();
             updateServiceDue();
+            renderServiceManagement();
         };
 
         loadRecords();
