@@ -42,7 +42,6 @@
       flex-wrap: wrap;
     }
 
-    /* ---- WAVING FLAG (custom emoji with extra visibility) ---- */
     .flag-wave {
       display: inline-block;
       font-size: 3.6rem;
@@ -128,13 +127,11 @@
       min-width: 30px;
     }
 
-    /* ---- UPND: RED ---- */
     .upnd {
       background: linear-gradient(90deg, #b71c1c, #d32f2f, #f44336);
       box-shadow: 0 0 20px rgba(244, 67, 54, 0.6);
     }
 
-    /* ---- NRUPUP: BLUE ---- */
     .nrupup {
       background: linear-gradient(90deg, #0d47a1, #1976d2, #42a5f5);
       box-shadow: 0 0 20px rgba(33, 150, 243, 0.6);
@@ -145,7 +142,6 @@
       box-shadow: 0 0 12px rgba(158, 158, 158, 0.3);
     }
 
-    /* -------- BALLOON FACTORS (pop-out) -------- */
     .factor-balloon {
       position: absolute;
       top: -34px;
@@ -168,13 +164,11 @@
       z-index: 10;
     }
 
-    /* balloon pop effect */
     .factor-balloon.pop {
       transform: scale(1) translateY(-8px);
       opacity: 1;
     }
 
-    /* tiny tail (optional) */
     .factor-balloon::after {
       content: '';
       position: absolute;
@@ -189,7 +183,6 @@
       border-right: 2px solid #fff9e0;
     }
 
-    /* info cards */
     .info-box {
       margin-top: 30px;
       width: 100%;
@@ -240,21 +233,55 @@
 
     .footer {
       margin-top: 28px;
-      font-size: 1.1rem;
-      opacity: 0.85;
-      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
       background: rgba(0,0,0,0.3);
       padding: 12px 32px;
       border-radius: 60px;
       backdrop-filter: blur(4px);
       border: 1px solid rgba(255, 215, 0, 0.15);
-      color: #ffd966;
-      font-weight: 500;
     }
 
-    .footer span {
+    .footer .credit {
+      color: #ffd966;
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+
+    .footer .credit span {
       color: #fff;
       font-weight: 300;
+    }
+
+    .timer-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #a8d8ff;
+      font-size: 1rem;
+      font-weight: 400;
+      background: rgba(0, 40, 80, 0.4);
+      padding: 6px 20px;
+      border-radius: 40px;
+      border: 1px solid rgba(100, 200, 255, 0.15);
+    }
+
+    .timer-box .clock-icon {
+      font-size: 1.2rem;
+    }
+
+    .timer-box .time-display {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #7fc9ff;
+      min-width: 70px;
+      display: inline-block;
+      text-align: center;
+      letter-spacing: 1px;
     }
 
     @media (max-width: 700px) {
@@ -264,7 +291,10 @@
       .factor-balloon { font-size: 0.6rem; padding: 4px 12px; top: -28px; }
       .factor-balloon::after { display: none; }
       .card li { font-size: 0.85rem; }
-      .footer { font-size: 0.95rem; padding: 10px 20px; }
+      .footer { padding: 10px 18px; gap: 12px; }
+      .footer .credit { font-size: 0.9rem; }
+      .timer-box { font-size: 0.8rem; padding: 4px 14px; }
+      .timer-box .time-display { font-size: 1rem; min-width: 60px; }
     }
   </style>
 </head>
@@ -276,7 +306,6 @@
   </div>
 
   <div class="chart">
-    <!-- UPND Bar (RED) -->
     <div class="bar-container">
       <div class="label">
         <span>🔴 UPND</span>
@@ -289,7 +318,6 @@
       </div>
     </div>
 
-    <!-- NRUPUP Bar (BLUE) -->
     <div class="bar-container">
       <div class="label">
         <span>🔵 NRUPUP</span>
@@ -302,7 +330,6 @@
       </div>
     </div>
 
-    <!-- Others Bar (capped at 5%) -->
     <div class="bar-container">
       <div class="label">
         <span>⚪ Others</span>
@@ -316,7 +343,6 @@
     </div>
   </div>
 
-  <!-- factors cards (static) -->
   <div class="info-box">
     <div class="card"><h3>🔺 UPND ↑ factors</h3><ul><li>Improved economy</li><li>Investment in education</li><li>Growth in mining</li><li>CDF projects</li><li>NAPSA reforms</li><li>Reduced cadrism</li><li>UPND faithful</li></ul></div>
     <div class="card"><h3>🔻 UPND ↓ factors</h3><ul><li>High cost of living</li><li>Load shedding</li><li>Dissatisfied voters</li><li>Former PF/Lungu base</li></ul></div>
@@ -325,12 +351,21 @@
     <div class="card"><h3>⚪ Others</h3><ul><li>Limited political stamina</li><li>Low national visibility</li></ul></div>
   </div>
 
-  <div class="footer">@brainlynx <span>, the researcher</span></div>
+  <div class="footer">
+    <div class="credit">@brainlynx <span>, the researcher</span></div>
+    <div class="timer-box">
+      <span class="clock-icon">⏱️</span>
+      <span class="time-display" id="slideTimer">02:00</span>
+    </div>
+  </div>
 </div>
 
 <script>
   (function() {
-    // ---- factor pools (balloon texts) ----
+    // ---- CONFIG ----
+    const TOTAL_DURATION = 120; // 2 minutes in seconds
+
+    // ---- factor pools ----
     const upndFactors = [
       '📈 growth · CDF', '🏫 education boost', '⛏️ mining surge',
       '💼 NAPSA reforms', '🕊️ reduced cadrism', '🤝 UPND faithful',
@@ -355,18 +390,66 @@
     const balloonUpnd = document.getElementById('balloonUpnd');
     const balloonNrupup = document.getElementById('balloonNrupup');
     const balloonOthers = document.getElementById('balloonOthers');
+    const timerDisplay = document.getElementById('slideTimer');
 
-    // helper: random float
+    // ---- TIMER (countdown) ----
+    let remainingSeconds = TOTAL_DURATION;
+    let timerInterval = null;
+    let chartInterval = null;
+
+    function formatTime(seconds) {
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(Math.floor(seconds % 60)).padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function resetTimer() {
+      remainingSeconds = TOTAL_DURATION;
+      timerDisplay.textContent = formatTime(remainingSeconds);
+    }
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        remainingSeconds -= 0.5;
+        if (remainingSeconds <= 0) {
+          remainingSeconds = 0;
+          timerDisplay.textContent = formatTime(0);
+          // Restart the whole slide
+          resetTimer();
+          // Also refresh chart data immediately on restart
+          updateChart();
+          // Reset balloons
+          setTimeout(() => {
+            balloonUpnd.classList.remove('pop');
+            balloonNrupup.classList.remove('pop');
+            balloonOthers.classList.remove('pop');
+            setTimeout(() => {
+              balloonUpnd.textContent = '✨ growth · CDF';
+              balloonNrupup.textContent = '🔥 ECL faithful';
+              balloonOthers.textContent = '🌱 low visibility';
+              setTimeout(() => {
+                balloonUpnd.classList.add('pop');
+                balloonNrupup.classList.add('pop');
+                balloonOthers.classList.add('pop');
+              }, 100);
+            }, 50);
+          }, 100);
+        } else {
+          timerDisplay.textContent = formatTime(remainingSeconds);
+        }
+      }, 500);
+    }
+
+    // ---- CHART UPDATE ----
     function rand(min, max) {
       return Math.random() * (max - min) + min;
     }
 
-    // pick random item from array
     function pick(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    // update balloons with pop effect
     function popBalloon(balloonEl, text) {
       if (!balloonEl) return;
       balloonEl.classList.remove('pop');
@@ -376,45 +459,34 @@
     }
 
     function updateChart() {
-      // generate values
       let upnd = parseFloat(rand(52, 61).toFixed(1));
       let nrupup = parseFloat(rand(36, 43).toFixed(1));
-      
-      // OTHERS: strictly capped at 5% (0.5% to 4.5%)
       let others = parseFloat(rand(0.8, 4.2).toFixed(1));
 
-      // ensure sum ≈ 100
       let total = upnd + nrupup + others;
       if (total > 101) { upnd -= 0.5; nrupup -= 0.5; }
       else if (total < 99) { upnd += 0.5; nrupup += 0.5; }
-      
-      // clamp individual values
+
       upnd = Math.min(65, Math.max(48, upnd));
       nrupup = Math.min(47, Math.max(33, nrupup));
-      others = Math.min(5, Math.max(0.5, others));  // ← HARD CAP at 5%
-      
-      // rebalance to 100
+      others = Math.min(5, Math.max(0.5, others));
+
       let sum = upnd + nrupup + others;
       if (sum > 100.5) { upnd -= 0.3; nrupup -= 0.3; }
       else if (sum < 99.5) { upnd += 0.3; nrupup += 0.3; }
-      
-      // final clean
+
       upnd = parseFloat(upnd.toFixed(1));
       nrupup = parseFloat(nrupup.toFixed(1));
       others = parseFloat((100 - upnd - nrupup).toFixed(1));
-      
-      // enforce Others ≤ 5% one more time (if rebalancing pushed it over)
+
       if (others > 5) {
         let excess = others - 5;
         others = 5;
-        // distribute excess to UPND and NRUPUP proportionally
         let ratio = upnd / (upnd + nrupup);
         upnd = parseFloat((upnd + excess * ratio).toFixed(1));
         nrupup = parseFloat((nrupup + excess * (1 - ratio)).toFixed(1));
-        // re-clamp
         upnd = Math.min(65, upnd);
         nrupup = Math.min(47, nrupup);
-        // final adjust to 100
         let finalSum = upnd + nrupup + others;
         if (finalSum > 100.1) { upnd -= 0.1; nrupup -= 0.1; }
         else if (finalSum < 99.9) { upnd += 0.1; nrupup += 0.1; }
@@ -424,7 +496,6 @@
         if (others > 5) others = 5;
       }
 
-      // update bars
       upndBar.style.width = upnd + '%';
       nrupupBar.style.width = nrupup + '%';
       othersBar.style.width = others + '%';
@@ -433,7 +504,6 @@
       nrupupVal.textContent = nrupup + '%';
       othersVal.textContent = others + '%';
 
-      // refresh balloons
       const upndMsg = pick(upndFactors);
       const nrupupMsg = pick(nrupupFactors);
       const othersMsg = pick(othersFactors);
@@ -443,23 +513,32 @@
       popBalloon(balloonOthers, othersMsg);
     }
 
-    // initial call with pop
-    setTimeout(() => {
-      balloonUpnd.textContent = '✨ growth · CDF';
-      balloonNrupup.textContent = '🔥 ECL faithful';
-      balloonOthers.textContent = '🌱 low visibility';
+    // ---- INIT ----
+    function init() {
+      resetTimer();
+      startTimer();
+
+      // Initial balloon pop
       setTimeout(() => {
-        balloonUpnd.classList.add('pop');
-        balloonNrupup.classList.add('pop');
-        balloonOthers.classList.add('pop');
-      }, 100);
-    }, 50);
+        balloonUpnd.textContent = '✨ growth · CDF';
+        balloonNrupup.textContent = '🔥 ECL faithful';
+        balloonOthers.textContent = '🌱 low visibility';
+        setTimeout(() => {
+          balloonUpnd.classList.add('pop');
+          balloonNrupup.classList.add('pop');
+          balloonOthers.classList.add('pop');
+        }, 100);
+      }, 50);
 
-    setInterval(updateChart, 4000);
+      // Chart update interval (every 4 seconds)
+      chartInterval = setInterval(updateChart, 4000);
+      
+      // Initial chart update
+      setTimeout(updateChart, 600);
+    }
 
-    window.addEventListener('load', function() {
-      setTimeout(updateChart, 800);
-    });
+    // ---- START ----
+    init();
 
   })();
 </script>
