@@ -353,11 +353,11 @@
             <div class="bar-container">
                 <div class="label">
                     <span>🔵 NRPUP</span>
-                    <span id="nrupupValue">42%</span>
+                    <span id="nrpupValue">42%</span>
                 </div>
                 <div class="bar-bg">
-                    <div class="bar nrpup" id="nrupupBar" style="width:42%;">
-                        <span class="factor-balloon" id="balloonNrupup">🔥 ECL faithful</span>
+                    <div class="bar nrpup" id="nrpupBar" style="width:42%;">
+                        <span class="factor-balloon" id="balloonNrpup">🔥 ECL faithful</span>
                     </div>
                 </div>
             </div>
@@ -398,7 +398,7 @@
                 </ul>
             </div>
             <div class="card">
-                <h3>🔵 NRUPUP ↑ factors</h3>
+                <h3>🔵 NRPUP ↑ factors</h3>
                 <ul>
                     <li>ECL faithful supporters</li>
                     <li>Dissatisfied voters</li>
@@ -439,7 +439,7 @@
                 '💼 NAPSA reforms', '🕊️ reduced cadrism', '🤝 UPND faithful',
                 '💰 economic uptick', '🌾 farmer support', '🏗️ infrastructure'
             ];
-            const nrupupFactors = [
+            const nrpupFactors = [
                 '🔥 ECL faithful', '💪 loyal base', '🗳️ protest vote',
                 '⚡ energetic wave', '📢 social media', '🌟 fresh appeal'
             ];
@@ -449,13 +449,13 @@
             ];
 
             const upndBar = document.getElementById('upndBar');
-            const nrupupBar = document.getElementById('nrupupBar');
+            const nrpupBar = document.getElementById('nrpupBar');
             const othersBar = document.getElementById('othersBar');
             const upndVal = document.getElementById('upndValue');
-            const nrupupVal = document.getElementById('nrupupValue');
+            const nrpupVal = document.getElementById('nrpupValue');
             const othersVal = document.getElementById('othersValue');
             const balloonUpnd = document.getElementById('balloonUpnd');
-            const balloonNrupup = document.getElementById('balloonNrupup');
+            const balloonNrpup = document.getElementById('balloonNrpup');
             const balloonOthers = document.getElementById('balloonOthers');
             const timerDisplay = document.getElementById('slideTimer');
 
@@ -485,15 +485,15 @@
                         updateChart();
                         setTimeout(() => {
                             balloonUpnd.classList.remove('pop');
-                            balloonNrupup.classList.remove('pop');
+                            balloonNrpup.classList.remove('pop');
                             balloonOthers.classList.remove('pop');
                             setTimeout(() => {
                                 balloonUpnd.textContent = '✨ growth · CDF';
-                                balloonNrupup.textContent = '🔥 ECL faithful';
+                                balloonNrpup.textContent = '🔥 ECL faithful';
                                 balloonOthers.textContent = '🌱 low visibility';
                                 setTimeout(() => {
                                     balloonUpnd.classList.add('pop');
-                                    balloonNrupup.classList.add('pop');
+                                    balloonNrpup.classList.add('pop');
                                     balloonOthers.classList.add('pop');
                                 }, 100);
                             }, 50);
@@ -521,73 +521,73 @@
             }
 
             function updateChart() {
-                // Updated ranges: UPND 53-59%, NRPUP 37-26%, Others 0-5%
+                // UPND: 53-59%, NRPUP: 26-37%, Others: 0-5%
                 let upnd = parseFloat(rand(53, 59).toFixed(1));
-                let nrupup = parseFloat(rand(26, 37).toFixed(1));
-                let others = parseFloat(rand(0.5, 4.8).toFixed(1));
+                let nrpup = parseFloat(rand(26, 37).toFixed(1));
+                let others = parseFloat(rand(0, 5).toFixed(1));
 
-                let total = upnd + nrupup + others;
+                let total = upnd + nrpup + others;
                 if (total > 100.5) {
                     upnd -= 0.3;
-                    nrupup -= 0.3;
+                    nrpup -= 0.3;
                 } else if (total < 99.5) {
                     upnd += 0.3;
-                    nrupup += 0.3;
+                    nrpup += 0.3;
                 }
 
                 upnd = Math.min(60, Math.max(53, upnd));
-                nrupup = Math.min(37, Math.max(26, nrupup));
-                others = Math.min(5, Math.max(0.5, others));
+                nrpup = Math.min(37, Math.max(26, nrpup));
+                others = Math.min(5, Math.max(0, others));
 
-                let sum = upnd + nrupup + others;
+                let sum = upnd + nrpup + others;
                 if (sum > 100.5) {
                     upnd -= 0.3;
-                    nrupup -= 0.3;
+                    nrpup -= 0.3;
                 } else if (sum < 99.5) {
                     upnd += 0.3;
-                    nrupup += 0.3;
+                    nrpup += 0.3;
                 }
 
                 upnd = parseFloat(upnd.toFixed(1));
-                nrupup = parseFloat(nrupup.toFixed(1));
-                others = parseFloat((100 - upnd - nrupup).toFixed(1));
+                nrpup = parseFloat(nrpup.toFixed(1));
+                others = parseFloat((100 - upnd - nrpup).toFixed(1));
 
                 if (others > 5) {
                     let excess = others - 5;
                     others = 5;
-                    let ratio = upnd / (upnd + nrupup);
+                    let ratio = upnd / (upnd + nrpup);
                     upnd = parseFloat((upnd + excess * ratio).toFixed(1));
-                    nrupup = parseFloat((nrupup + excess * (1 - ratio)).toFixed(1));
+                    nrpup = parseFloat((nrpup + excess * (1 - ratio)).toFixed(1));
                     upnd = Math.min(60, upnd);
-                    nrupup = Math.min(37, nrupup);
-                    let finalSum = upnd + nrupup + others;
+                    nrpup = Math.min(37, nrpup);
+                    let finalSum = upnd + nrpup + others;
                     if (finalSum > 100.1) {
                         upnd -= 0.1;
-                        nrupup -= 0.1;
+                        nrpup -= 0.1;
                     } else if (finalSum < 99.9) {
                         upnd += 0.1;
-                        nrupup += 0.1;
+                        nrpup += 0.1;
                     }
                     upnd = parseFloat(upnd.toFixed(1));
-                    nrupup = parseFloat(nrupup.toFixed(1));
-                    others = parseFloat((100 - upnd - nrupup).toFixed(1));
+                    nrpup = parseFloat(nrpup.toFixed(1));
+                    others = parseFloat((100 - upnd - nrpup).toFixed(1));
                     if (others > 5) others = 5;
                 }
 
                 upndBar.style.width = upnd + '%';
-                nrupupBar.style.width = nrupup + '%';
+                nrpupBar.style.width = nrpup + '%';
                 othersBar.style.width = others + '%';
 
                 upndVal.textContent = upnd + '%';
-                nrupupVal.textContent = nrupup + '%';
+                nrpupVal.textContent = nrpup + '%';
                 othersVal.textContent = others + '%';
 
                 const upndMsg = pick(upndFactors);
-                const nrupupMsg = pick(nrupupFactors);
+                const nrpupMsg = pick(nrpupFactors);
                 const othersMsg = pick(othersFactors);
 
                 popBalloon(balloonUpnd, upndMsg);
-                popBalloon(balloonNrupup, nrupupMsg);
+                popBalloon(balloonNrpup, nrpupMsg);
                 popBalloon(balloonOthers, othersMsg);
             }
 
@@ -597,11 +597,11 @@
 
                 setTimeout(() => {
                     balloonUpnd.textContent = '✨ growth · CDF';
-                    balloonNrupup.textContent = '🔥 ECL faithful';
+                    balloonNrpup.textContent = '🔥 ECL faithful';
                     balloonOthers.textContent = '🌱 low visibility';
                     setTimeout(() => {
                         balloonUpnd.classList.add('pop');
-                        balloonNrupup.classList.add('pop');
+                        balloonNrpup.classList.add('pop');
                         balloonOthers.classList.add('pop');
                     }, 100);
                 }, 50);
