@@ -360,6 +360,10 @@
             color: #fbbf24;
             font-weight: 600;
         }
+        .val-offday {
+            color: #94a3b8;
+            font-weight: 600;
+        }
 
         .cumulative-row {
             background: #0f172a;
@@ -386,6 +390,15 @@
         }
         .btn-view:hover {
             background: #475569;
+        }
+
+        .badge-offday {
+            background: #475569;
+            color: #94a3b8;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
         /* Modal Layout */
@@ -541,6 +554,10 @@
         .pill-neutral {
             background: rgba(251, 191, 36, 0.15);
             color: #fbbf24;
+        }
+        .pill-offday {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
         }
 
         .card-section-title {
@@ -712,7 +729,7 @@
                 <div class="stat-content">
                     <h3>Total Records</h3>
                     <div class="stat-value" id="totalRecords">0</div>
-                    <div class="stat-label" id="recordsLabel">Logged statements</div>
+                    <div class="stat-label" id="recordsLabel">Active | Off Days</div>
                 </div>
             </div>
         </div>
@@ -943,12 +960,18 @@
         // Get day of cycle (1-4) for a given date
         function getCycleDay(dateString) {
             const date = new Date(dateString);
-            // Starting from a known date (e.g., 2026-01-01 is day 1)
             const startDate = new Date('2026-01-01');
             const diffTime = date - startDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const cycleDay = (diffDays % 4) + 1; // 1,2,3,4 repeating
+            const cycleDay = (diffDays % 4) + 1;
             return cycleDay;
+        }
+
+        // Check if a date is an off day for a specific person
+        function isOffDay(dateString, name) {
+            if (name === "Expense") return false;
+            const cycleDay = getCycleDay(dateString);
+            return cycleDay === 4;
         }
 
         function parseExcelDate(excelDate) {
@@ -1035,27 +1058,29 @@
                 document.getElementById('inputTarget').readOnly = true;
                 document.getElementById('inputCashIn').value = "";
                 document.getElementById('inputCashIn').placeholder = "Enter expense amount...";
+                document.getElementById('inputCashIn').disabled = false;
+                document.getElementById('inputBalance').value = "";
+                document.getElementById('inputBalance').style.color = "#fbbf24";
                 return;
             } else {
                 document.getElementById('inputTarget').readOnly = false;
                 document.getElementById('inputCashIn').placeholder = "";
+                document.getElementById('inputCashIn').disabled = false;
             }
 
-            // Apply target based on name and cycle day
             if (selectedDate) {
                 const cycleDay = getCycleDay(selectedDate);
                 if (selectedName === "Bernard") {
-                    // Bernard: K400 daily target, NO cash in on day 4
                     if (cycleDay === 4) {
                         document.getElementById('inputTarget').value = "0";
                         document.getElementById('inputTarget').readOnly = true;
                         document.getElementById('inputCashIn').value = "";
-                        document.getElementById('inputCashIn').placeholder = "NO CASH IN TODAY (Day 4)";
+                        document.getElementById('inputCashIn').placeholder = "❌ NO CASH IN TODAY (Day 4 - Off Day)";
                         document.getElementById('inputCashIn').disabled = true;
                         document.getElementById('inputTimeIn').value = "00:00";
                         document.getElementById('inputTimeOut').value = "00:00";
-                        document.getElementById('inputBalance').value = "OFF DAY - No Transaction";
-                        document.getElementById('inputBalance').style.color = "#fbbf24";
+                        document.getElementById('inputBalance').value = "⛔ OFF DAY - No Transaction";
+                        document.getElementById('inputBalance').style.color = "#94a3b8";
                         return;
                     } else {
                         document.getElementById('inputTarget').value = "400";
@@ -1066,17 +1091,16 @@
                         document.getElementById('inputTimeOut').value = "";
                     }
                 } else if (selectedName.startsWith("Rider")) {
-                    // Riders: K300 target after 3 days, NO cash in on day 4
                     if (cycleDay === 4) {
                         document.getElementById('inputTarget').value = "0";
                         document.getElementById('inputTarget').readOnly = true;
                         document.getElementById('inputCashIn').value = "";
-                        document.getElementById('inputCashIn').placeholder = "NO CASH IN TODAY (Day 4)";
+                        document.getElementById('inputCashIn').placeholder = "❌ NO CASH IN TODAY (Day 4 - Off Day)";
                         document.getElementById('inputCashIn').disabled = true;
                         document.getElementById('inputTimeIn').value = "00:00";
                         document.getElementById('inputTimeOut').value = "00:00";
-                        document.getElementById('inputBalance').value = "OFF DAY - No Transaction";
-                        document.getElementById('inputBalance').style.color = "#fbbf24";
+                        document.getElementById('inputBalance').value = "⛔ OFF DAY - No Transaction";
+                        document.getElementById('inputBalance').style.color = "#94a3b8";
                         return;
                     } else {
                         document.getElementById('inputTarget').value = "300";
@@ -1117,7 +1141,6 @@
             }
         }
 
-        // Update when date changes
         document.getElementById('inputDate').addEventListener('change', function() {
             handleNameChange();
         });
@@ -1181,7 +1204,6 @@
             let target = parseFloat(document.getElementById('inputTarget').value) || 0;
             let cashIn = parseFloat(document.getElementById('inputCashIn').value) || 0;
 
-            // Validate that cash in is not entered on day 4 for Bernard and Riders
             const cycleDay = getCycleDay(date);
             if ((selectedName === "Bernard" || selectedName.startsWith("Rider")) && cycleDay === 4) {
                 if (cashIn > 0) {
@@ -1299,7 +1321,6 @@
                 return matches;
             });
 
-            // Build filter status message
             let statusParts = [];
             if (dateFrom) statusParts.push(`From: ${formatDateForDisplay(dateFrom)}`);
             if (dateTo) statusParts.push(`To: ${formatDateForDisplay(dateTo)}`);
@@ -1353,7 +1374,9 @@
                 const target = Number(record.Target) || 0;
                 const cashIn = Number(record['Cash In']) || 0;
                 const nameValue = record.Name || '—';
+                const recordDate = parseExcelDate(record.Date);
 
+                const isOff = isOffDay(recordDate, nameValue);
                 const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
 
                 cumulativeTarget += target;
@@ -1361,8 +1384,15 @@
                 cumulativeBalance += (target - cashIn);
 
                 let balanceClass = 'val-neutral';
-                if (transactionBalance > 0) balanceClass = 'val-negative';
-                else if (transactionBalance < 0) balanceClass = 'val-positive';
+                if (nameValue === "Expense") {
+                    balanceClass = 'val-neutral';
+                } else if (isOff) {
+                    balanceClass = 'val-offday';
+                } else if (transactionBalance > 0) {
+                    balanceClass = 'val-negative';
+                } else if (transactionBalance < 0) {
+                    balanceClass = 'val-positive';
+                }
 
                 let cumulativeClass = 'val-neutral';
                 if (cumulativeBalance > 0) cumulativeClass = 'val-negative';
@@ -1375,18 +1405,21 @@
                 const formattedTimeIn = parseTimeValue(record['Time In']) || "—";
                 const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
 
+                // Show off day badge
+                const offBadge = isOff ? ' <span class="badge-offday">⛔ OFF</span>' : '';
+
                 html += `
                         <tr class="interactive-row" onclick="toggleRowCheckbox(${actualIndex})">
                             <td class="checkbox-col" onclick="event.stopPropagation()">
                                 <input type="checkbox" class="record-checkbox" id="cb_row_${actualIndex}" data-id="${record.Date}" data-index="${actualIndex}">
                             </td>
                             <td>${formattedDate}</td>
-                            <td style="font-weight: 600; color: #38bdf8;">${nameValue}</td>
+                            <td style="font-weight: 600; color: #38bdf8;">${nameValue}${offBadge}</td>
                             <td>${formattedTimeIn}</td>
                             <td>${formattedTimeOut}</td>
                             <td>K${target.toFixed(2)}</td>
                             <td>K${cashIn.toFixed(2)}</td>
-                            <td class="${balanceClass}">K${transactionBalance.toFixed(2)}</td>
+                            <td class="${balanceClass}">${isOff ? '⛔ OFF' : 'K' + transactionBalance.toFixed(2)}</td>
                             <td>K${cumulativeTarget.toFixed(2)}</td>
                             <td>K${cumulativeCashIn.toFixed(2)}</td>
                             <td class="${cumulativeClass}">K${cumulativeBalance.toFixed(2)}</td>
@@ -1421,18 +1454,42 @@
             let totalTarget = 0,
                 totalCashIn = 0,
                 cumulativeBalance = 0;
+            let activeCount = 0;
+            let offDayCount = 0;
             const displayRecords = filteredRecords.length > 0 ? filteredRecords : allRecords;
 
             displayRecords.forEach(record => {
-                totalTarget += Number(record.Target) || 0;
-                totalCashIn += Number(record['Cash In']) || 0;
+                const target = Number(record.Target) || 0;
+                const cashIn = Number(record['Cash In']) || 0;
+                const nameValue = record.Name || '—';
+                const recordDate = parseExcelDate(record.Date);
+
+                totalTarget += target;
+                totalCashIn += cashIn;
+
+                // Count active vs off days
+                if (nameValue !== "Expense") {
+                    const isOff = isOffDay(recordDate, nameValue);
+                    if (isOff) {
+                        offDayCount++;
+                    } else {
+                        activeCount++;
+                    }
+                } else {
+                    // Expenses are always counted as active
+                    activeCount++;
+                }
             });
             cumulativeBalance = totalTarget - totalCashIn;
 
             document.getElementById('totalCashIn').innerHTML = `K${totalCashIn.toFixed(2)}`;
             document.getElementById('totalTarget').innerHTML = `K${totalTarget.toFixed(2)}`;
             document.getElementById('finalCumulativeBalance').innerHTML = `K${cumulativeBalance.toFixed(2)}`;
-            document.getElementById('totalRecords').innerHTML = displayRecords.length;
+
+            // Show active | off days
+            const totalRecords = displayRecords.length;
+            document.getElementById('totalRecords').innerHTML = `${totalRecords}`;
+            document.getElementById('recordsLabel').innerHTML = `${activeCount} Active | ${offDayCount} Off Days`;
 
             const cumulativeElem = document.getElementById('finalCumulativeBalance');
             if (cumulativeBalance > 0) cumulativeElem.className = "stat-value val-negative";
@@ -1454,7 +1511,6 @@
             document.getElementById('cashInLabel').textContent = `${filterLabel} collected`;
             document.getElementById('targetLabel').textContent = `${filterLabel} expected sum`;
             document.getElementById('balanceLabel').textContent = `${filterLabel} net variance`;
-            document.getElementById('recordsLabel').textContent = `${filterLabel} statements`;
         }
 
         function toggleRowCheckbox(index) {
@@ -1470,6 +1526,8 @@
             const target = Number(record.Target) || 0;
             const cashIn = Number(record['Cash In']) || 0;
             const nameValue = record.Name || '—';
+            const recordDate = parseExcelDate(record.Date);
+            const isOff = isOffDay(recordDate, nameValue);
             const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
 
             activeCardIndex = index;
@@ -1480,7 +1538,7 @@
             const formattedTimeOut = parseTimeValue(record['Time Out']) || "—";
 
             document.getElementById('cardDateText').innerText = formattedDate;
-            document.getElementById('cardNameText').innerText = nameValue;
+            document.getElementById('cardNameText').innerText = nameValue + (isOff ? ' ⛔ OFF DAY' : '');
             document.getElementById('cardTimeIn').innerText = formattedTimeIn;
             document.getElementById('cardTimeOut').innerText = formattedTimeOut;
 
@@ -1488,13 +1546,21 @@
             document.getElementById('cardCashIn').innerText = `K${cashIn.toFixed(2)}`;
 
             const balElem = document.getElementById('cardBalance');
-            balElem.innerText = `K${transactionBalance.toFixed(2)}`;
+            if (isOff) {
+                balElem.innerText = '⛔ OFF DAY';
+                balElem.className = "card-metric-val val-offday";
+            } else {
+                balElem.innerText = `K${transactionBalance.toFixed(2)}`;
+            }
 
             const statusPill = document.getElementById('cardStatusPill');
             if (nameValue === "Expense") {
                 balElem.className = "card-metric-val val-neutral";
                 statusPill.innerText = "Expense Out";
                 statusPill.className = "card-status-pill pill-neutral";
+            } else if (isOff) {
+                statusPill.innerText = "Off Day";
+                statusPill.className = "card-status-pill pill-offday";
             } else if (transactionBalance > 0) {
                 balElem.className = "card-metric-val val-negative";
                 statusPill.innerText = "Shortage";
@@ -1538,6 +1604,8 @@
             const target = Number(r.Target) || 0;
             const cashIn = Number(r['Cash In']) || 0;
             const nameValue = r.Name || '—';
+            const recordDate = parseExcelDate(r.Date);
+            const isOff = isOffDay(recordDate, nameValue);
             const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
             const formattedDate = formatDateForDisplay(r.Date);
             const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
@@ -1545,11 +1613,11 @@
 
             const message = `📊 *CASH TRANSACTION EXPORT*\n\n` +
                 `📅 Date: ${formattedDate}\n` +
-                `👤 Assignment: ${nameValue}\n` +
+                `👤 Assignment: ${nameValue}${isOff ? ' ⛔ OFF DAY' : ''}\n` +
                 `⏰ Window: ${formattedTimeIn} → ${formattedTimeOut}\n` +
                 `🎯 Target Point: K${target.toFixed(2)}\n` +
                 `💰 Realized Cash: K${cashIn.toFixed(2)}\n` +
-                `⚖️ Delta Offset: K${transactionBalance.toFixed(2)}\n` +
+                `⚖️ Delta Offset: ${isOff ? '⛔ OFF DAY' : 'K' + transactionBalance.toFixed(2)}\n` +
                 `━━━━━━━━━━━━━━━━━━\n` +
                 `📈 *RUNNING TIMELINE TOTALS*\n` +
                 `🎯 Cum. Target: K${activeCardCumulate.cumTarget.toFixed(2)}\n` +
@@ -1571,18 +1639,22 @@
             let cumulativeTarget = 0,
                 cumulativeCashIn = 0,
                 cumulativeBalance = 0;
+            let offDayCount = 0;
             let message = "📊 *CASHFLOW LOG REPORT MATRIX*\n━━━━━━━━━━━━━━━━━━━━━━\n\n";
 
             selected.forEach((r, i) => {
                 const target = Number(r.Target) || 0;
                 const cashIn = Number(r['Cash In']) || 0;
                 const nameValue = r.Name || '—';
+                const recordDate = parseExcelDate(r.Date);
+                const isOff = isOffDay(recordDate, nameValue);
                 const transBal = (nameValue === "Expense") ? 0 : (target - cashIn);
                 cumulativeTarget += target;
                 cumulativeCashIn += cashIn;
+                if (isOff) offDayCount++;
                 const formattedDate = formatDateForDisplay(r.Date);
-                message += `${i+1}. *${formattedDate}* (${nameValue})\n`;
-                message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: K${transBal.toFixed(2)}\n`;
+                message += `${i+1}. *${formattedDate}* (${nameValue}${isOff ? ' ⛔ OFF' : ''})\n`;
+                message += `   Target: K${target.toFixed(2)} | Cash: K${cashIn.toFixed(2)} | Delta: ${isOff ? '⛔ OFF' : 'K' + transBal.toFixed(2)}\n`;
                 if (r.Comments) message += `   📝 ${r.Comments}\n`;
             });
 
@@ -1592,6 +1664,7 @@
             message += `🎯 Bound Target: K${cumulativeTarget.toFixed(2)}\n`;
             message += `💰 Liquid Sum: K${cumulativeCashIn.toFixed(2)}\n`;
             message += `⚖️ Balance Delta Portfolio: K${cumulativeBalance.toFixed(2)}\n`;
+            message += `📋 Off Days: ${offDayCount}\n`;
             message += `\n_System Dispatch: CashFlow Pro_`;
 
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
@@ -1608,7 +1681,9 @@
             selected.forEach((r, i) => {
                 const formattedDate = formatDateForDisplay(r.Date);
                 const nameValue = r.Name || '—';
-                message += `${i+1}. ${formattedDate} (${nameValue}) | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
+                const recordDate = parseExcelDate(r.Date);
+                const isOff = isOffDay(recordDate, nameValue);
+                message += `${i+1}. ${formattedDate} (${nameValue}${isOff ? ' OFF' : ''}) | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
             });
 
             window.open(`sms:${PHONE_NUMBER}?body=${encodeURIComponent(message)}`, '_blank');
@@ -1625,8 +1700,10 @@
             selected.forEach(r => {
                 const formattedDate = formatDateForDisplay(r.Date);
                 const nameValue = r.Name || '—';
+                const recordDate = parseExcelDate(r.Date);
+                const isOff = isOffDay(recordDate, nameValue);
                 body +=
-                    `${formattedDate} | Name: ${nameValue} | Target Base: K${Number(r.Target).toFixed(2)} | Cash Accumulation: K${Number(r['Cash In']).toFixed(2)}\n`;
+                    `${formattedDate} | Name: ${nameValue}${isOff ? ' (OFF DAY)' : ''} | Target: K${Number(r.Target).toFixed(2)} | Cash: K${Number(r['Cash In']).toFixed(2)}\n`;
             });
 
             window.location.href = `mailto:?subject=CashFlow Compiled Dataset Report&body=${encodeURIComponent(body)}`;
@@ -1696,7 +1773,6 @@
         document.getElementById('applyFilterBtn').onclick = applyFilters;
         document.getElementById('clearFilterBtn').onclick = clearFilters;
 
-        // Allow Enter key on filter inputs
         document.getElementById('filterDateFrom').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') applyFilters();
         });
@@ -1707,7 +1783,6 @@
             if (e.key === 'Enter') applyFilters();
         });
 
-        // Override loadRecords to populate name filter after loading
         const originalLoadRecords = loadRecords;
         loadRecords = async function() {
             await originalLoadRecords.call(this);
