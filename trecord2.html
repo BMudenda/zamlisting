@@ -1074,8 +1074,8 @@
                     if (cycleDay === 4) {
                         document.getElementById('inputTarget').value = "0";
                         document.getElementById('inputTarget').readOnly = true;
-                        document.getElementById('inputCashIn').value = "";
-                        document.getElementById('inputCashIn').placeholder = "❌ NO CASH IN TODAY (Day 4 - Off Day)";
+                        document.getElementById('inputCashIn').value = "0";
+                        document.getElementById('inputCashIn').placeholder = "❌ OFF DAY - No Cash In";
                         document.getElementById('inputCashIn').disabled = true;
                         document.getElementById('inputTimeIn').value = "00:00";
                         document.getElementById('inputTimeOut').value = "00:00";
@@ -1087,6 +1087,7 @@
                         document.getElementById('inputTarget').readOnly = false;
                         document.getElementById('inputCashIn').disabled = false;
                         document.getElementById('inputCashIn').placeholder = "";
+                        document.getElementById('inputCashIn').value = "";
                         document.getElementById('inputTimeIn').value = "";
                         document.getElementById('inputTimeOut').value = "";
                     }
@@ -1094,8 +1095,8 @@
                     if (cycleDay === 4) {
                         document.getElementById('inputTarget').value = "0";
                         document.getElementById('inputTarget').readOnly = true;
-                        document.getElementById('inputCashIn').value = "";
-                        document.getElementById('inputCashIn').placeholder = "❌ NO CASH IN TODAY (Day 4 - Off Day)";
+                        document.getElementById('inputCashIn').value = "0";
+                        document.getElementById('inputCashIn').placeholder = "❌ OFF DAY - No Cash In";
                         document.getElementById('inputCashIn').disabled = true;
                         document.getElementById('inputTimeIn').value = "00:00";
                         document.getElementById('inputTimeOut').value = "00:00";
@@ -1107,6 +1108,7 @@
                         document.getElementById('inputTarget').readOnly = false;
                         document.getElementById('inputCashIn').disabled = false;
                         document.getElementById('inputCashIn').placeholder = "";
+                        document.getElementById('inputCashIn').value = "";
                         document.getElementById('inputTimeIn').value = "";
                         document.getElementById('inputTimeOut').value = "";
                     }
@@ -1377,7 +1379,8 @@
                 const recordDate = parseExcelDate(record.Date);
 
                 const isOff = isOffDay(recordDate, nameValue);
-                const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
+                // For off days, balance is 0 (not shortage)
+                const transactionBalance = (nameValue === "Expense" || isOff) ? 0 : (target - cashIn);
 
                 cumulativeTarget += target;
                 cumulativeCashIn += cashIn;
@@ -1528,7 +1531,8 @@
             const nameValue = record.Name || '—';
             const recordDate = parseExcelDate(record.Date);
             const isOff = isOffDay(recordDate, nameValue);
-            const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
+            // For off days, balance is 0 (not shortage)
+            const transactionBalance = (nameValue === "Expense" || isOff) ? 0 : (target - cashIn);
 
             activeCardIndex = index;
             activeCardCumulate = { cumTarget, cumCashIn, cumBalance };
@@ -1606,7 +1610,7 @@
             const nameValue = r.Name || '—';
             const recordDate = parseExcelDate(r.Date);
             const isOff = isOffDay(recordDate, nameValue);
-            const transactionBalance = (nameValue === "Expense") ? 0 : (target - cashIn);
+            const transactionBalance = (nameValue === "Expense" || isOff) ? 0 : (target - cashIn);
             const formattedDate = formatDateForDisplay(r.Date);
             const formattedTimeIn = parseTimeValue(r['Time In']) || "—";
             const formattedTimeOut = parseTimeValue(r['Time Out']) || "—";
@@ -1648,7 +1652,7 @@
                 const nameValue = r.Name || '—';
                 const recordDate = parseExcelDate(r.Date);
                 const isOff = isOffDay(recordDate, nameValue);
-                const transBal = (nameValue === "Expense") ? 0 : (target - cashIn);
+                const transBal = (nameValue === "Expense" || isOff) ? 0 : (target - cashIn);
                 cumulativeTarget += target;
                 cumulativeCashIn += cashIn;
                 if (isOff) offDayCount++;
