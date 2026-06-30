@@ -1696,13 +1696,23 @@ async function handleRequest() {
       mode: 'no-cors'
     });
     clearTimeout(timeoutId);
+    
     if (!timeoutTriggered) {
-      clearInterval(interval);
-      progressTextSpan.textContent = "100%";
-      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly.";
-      statusText.style.color = "green";
-      finishRequestUI();
+    clearInterval(interval);
+    progressTextSpan.textContent = "100%";
+    
+    // Check which radio button is selected
+    const selectedVehicleType = document.querySelector('input[name="vehicleType"]:checked').value;
+    
+    if (selectedVehicleType === 'motorbike') {
+        statusText.innerHTML = "✅ Request sent! Rider will contact you shortly.";
+    } else if (selectedVehicleType === 'vehicle') {
+        statusText.innerHTML = "✅ Request sent! However, the vehicle is not available!";
     }
+    
+    statusText.style.color = "green";
+    finishRequestUI();
+}
   } catch(e) {
     clearTimeout(timeoutId);
     if (!timeoutTriggered) {
