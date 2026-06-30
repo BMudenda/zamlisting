@@ -1696,13 +1696,23 @@ async function handleRequest() {
       mode: 'no-cors'
     });
     clearTimeout(timeoutId);
+    
     if (!timeoutTriggered) {
-      clearInterval(interval);
-      progressTextSpan.textContent = "100%";
-      statusText.innerHTML = "✅ Request sent! Driver will contact you shortly.";
-      statusText.style.color = "green";
-      finishRequestUI();
+    clearInterval(interval);
+    progressTextSpan.textContent = "100%";
+    
+    // Check which transport mode is selected - using "mode" as the radio name
+    const selectedMode = document.querySelector('input[name="mode"]:checked');
+    
+    if (selectedMode && selectedMode.value === 'vehicle') {
+        statusText.innerHTML = "✅ Request sent! However, the vehicle is not available!";
+    } else {
+        statusText.innerHTML = "✅ Request sent! Rider will contact you shortly or Call.";
     }
+    
+    statusText.style.color = "green";
+    finishRequestUI();
+}
   } catch(e) {
     clearTimeout(timeoutId);
     if (!timeoutTriggered) {
