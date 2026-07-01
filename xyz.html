@@ -170,7 +170,7 @@
     .iris-group { transform: translate(var(--saccade-x, 0px), var(--saccade-y, 0px)); transition: transform 0.16s cubic-bezier(0.25, 1, 0.2, 1); }
     .pupil { transition: r 0.35s ease-out; }
 
-    /* ==================== SLIDE 15 - ELEGANT PLACES WITH FLYING POPUPS + ROUND MOTORBIKE ==================== */
+    /* ==================== SLIDE 15 - ELEGANT PLACES WITH FLYING POPUPS + MOVING MOTORBIKE (LIKE SLIDE 11) ==================== */
     .billboard-slide15 {
         position: absolute;
         top: 0;
@@ -234,7 +234,48 @@
         align-items: center;
         gap: 10px;
         flex: 1;
-        min-width: 200px;
+        min-width: 180px;
+        position: relative;
+        overflow: visible;
+    }
+    /* MOVING MOTORBIKE - exactly like slide 11 */
+    .billboard-slide15 .motorbike-moving {
+        width: 180px;
+        height: auto;
+        filter: drop-shadow(0 0 30px rgba(0, 255, 200, 0.6));
+        animation: bikeDrive15 4s linear infinite;
+        will-change: transform;
+        position: relative;
+    }
+    @keyframes bikeDrive15 {
+        0% { transform: translateX(-120px) scale(0.85); }
+        100% { transform: translateX(120px) scale(1.05); }
+    }
+    /* road track underneath the bike */
+    .billboard-slide15 .road-track-15 {
+        width: 80%;
+        max-width: 300px;
+        height: 4px;
+        margin-top: 5px;
+        background: repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 15px, rgba(255,255,255,0.6) 15px, rgba(255,255,255,0.6) 30px);
+        opacity: 0.5;
+        animation: roadMove15 1s linear infinite;
+        border-radius: 2px;
+    }
+    @keyframes roadMove15 {
+        0% { background-position: 0 0; }
+        100% { background-position: 30px 0; }
+    }
+    .billboard-slide15 .headline {
+        font-size: clamp(1.4rem, 3.5vw, 2.5rem);
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 4px 24px rgba(0, 20, 50, 0.7);
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+    .billboard-slide15 .headline span {
+        color: #9ac8ff;
     }
     .billboard-slide15 .right-column {
         display: flex;
@@ -242,39 +283,7 @@
         align-items: center;
         gap: 10px;
         flex: 2;
-        min-width: 280px;
-    }
-    .billboard-slide15 .headline {
-        font-size: clamp(1.6rem, 4vw, 2.8rem);
-        font-weight: 700;
-        color: #ffffff;
-        text-shadow: 0 4px 24px rgba(0, 20, 50, 0.7);
-        letter-spacing: 0.5px;
-        margin-bottom: 2px;
-        text-align: center;
-    }
-    .billboard-slide15 .headline span {
-        color: #9ac8ff;
-    }
-    /* ROUND MOTORBIKE IMAGE */
-    .billboard-slide15 .motorbike-round {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        border: 4px solid #ffd700;
-        box-shadow: 0 0 40px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.1);
-        object-fit: cover;
-        background: rgba(0, 0, 0, 0.2);
-        padding: 12px;
-        animation: floatBike 3s ease-in-out infinite;
-        transition: transform 0.3s;
-    }
-    .billboard-slide15 .motorbike-round:hover {
-        transform: scale(1.08);
-    }
-    @keyframes floatBike {
-        0%, 100% { transform: translateY(0px) rotate(-2deg); }
-        50% { transform: translateY(-12px) rotate(2deg); }
+        min-width: 260px;
     }
     .billboard-slide15 .places-list {
         display: flex;
@@ -282,7 +291,7 @@
         align-items: center;
         gap: 10px;
         width: 100%;
-        max-width: 480px;
+        max-width: 450px;
         padding: 5px 0;
     }
     .billboard-slide15 .place-item {
@@ -327,7 +336,7 @@
     }
 
     .billboard-slide15 .transport-cost {
-        margin-top: 6px;
+        margin-top: 4px;
         display: flex;
         justify-content: center;
         width: 100%;
@@ -349,7 +358,7 @@
         50% { box-shadow: 0 6px 50px rgba(255, 215, 0, 0.7), 0 0 80px rgba(255, 215, 0, 0.2); }
     }
     .billboard-slide15 .footer-link {
-        margin-top: 8px;
+        margin-top: 6px;
         font-size: clamp(0.8rem, 1.4vw, 1.05rem);
         font-weight: 500;
     }
@@ -370,13 +379,22 @@
         .billboard-slide15 .top-right-group { top: 12px; right: 14px; gap: 6px; }
         .billboard-slide15 .tag,
         .billboard-slide15 .vote-straight { font-size: 10px; padding: 4px 12px; }
-        .billboard-slide15 .motorbike-round { width: 100px; height: 100px; padding: 8px; }
+        .billboard-slide15 .motorbike-moving { width: 120px; }
+        @keyframes bikeDrive15 {
+            0% { transform: translateX(-80px) scale(0.85); }
+            100% { transform: translateX(80px) scale(1.05); }
+        }
         .billboard-slide15 .place-item { padding: 6px 14px; font-size: 0.85rem; }
         .billboard-slide15 .cost-badge { padding: 6px 18px; font-size: 0.95rem; }
         .billboard-slide15 .main-content { gap: 15px; }
+        .billboard-slide15 .road-track-15 { width: 70%; max-width: 200px; }
     }
     @media (max-width: 480px) {
-        .billboard-slide15 .motorbike-round { width: 80px; height: 80px; }
+        .billboard-slide15 .motorbike-moving { width: 90px; }
+        @keyframes bikeDrive15 {
+            0% { transform: translateX(-60px) scale(0.85); }
+            100% { transform: translateX(60px) scale(1.05); }
+        }
         .billboard-slide15 .place-item { font-size: 0.75rem; padding: 5px 10px; }
     }
   </style>
@@ -537,16 +555,17 @@
         </svg>
     </div>
 
-    <!-- SLIDE 15 - ELEGANT FLYING/POPPING PLACES + ROUND MOTORBIKE (BLUE BACKGROUND) -->
+    <!-- SLIDE 15 - ELEGANT FLYING/POPPING PLACES + MOVING MOTORBIKE (LIKE SLIDE 11) -->
     <div class="billboard-slide billboard-slide15">
         <div class="top-right-group">
             <div class="tag">✅ PLACES CHECKED</div>
             <div class="vote-straight">🚐 K15</div>
         </div>
         <div class="main-content">
-            <!-- LEFT COLUMN: round motorbike + headline -->
+            <!-- LEFT COLUMN: moving motorbike + road track + headline -->
             <div class="left-column">
-                <img class="motorbike-round" src="motorbike.png" alt="Motorbike">
+                <img class="motorbike-moving" src="motorbike.png" alt="Motorbike">
+                <div class="road-track-15"></div>
                 <div class="headline">
                     Luangwa <span>Places</span>
                 </div>
