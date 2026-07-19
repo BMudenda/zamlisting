@@ -1585,12 +1585,51 @@ const btnIcon = document.getElementById('btn-icon');
 const btnLoader = document.getElementById('btn-loader');
 const progressTextSpan = document.getElementById('progress-text');
 
+// ========== CUSTOMER DATABASE ==========
+const customers = {
+    '0978167546': 'Brian',
+    '0974462327': 'Brian',
+    '0979146191': 'Brian',
+    '0979401457': 'Alick',
+    '0976785753': 'Patrick',
+    '0971223101': 'Annes',
+    '0974028478': 'Victor',
+    '0977885430': 'Malu',
+    '0974623779': 'Eric',
+    '0776357574': 'Mercy',
+    '0978879700': 'Musa',
+    '0976367308': 'Steve',
+    '0977945992': 'Nelson',
+    '0977655146': 'fashion',
+    '0770813325': 'Blessings',
+    '0974998852': 'Kelvin',
+    '0972755389': 'Matias',
+    '0779578090': 'Chungu',
+    '0976785794': 'Matilda'
+};
+
+// ========== PHONE INPUT ==========
 phoneInput.oninput = () => {
-  if (/^0[0-9]{9}$/.test(phoneInput.value)) {
+  const phone = phoneInput.value.trim();
+  
+  if (/^0[0-9]{9}$/.test(phone)) {
     tripDiv.style.display = 'block';
+    
+    // Find the Profile legend
+    const legend = document.querySelector('fieldset legend');
+    
+    if (customers[phone]) {
+      legend.innerHTML = `<span class="material-icons">account_circle</span> ${customers[phone]}`;
+    } else {
+      legend.innerHTML = `<span class="material-icons">account_circle</span> Profile`;
+    }
   } else {
     tripDiv.style.display = 'none';
     summaryDiv.style.display = 'none';
+    
+    // Reset to Profile
+    const legend = document.querySelector('fieldset legend');
+    legend.innerHTML = `<span class="material-icons">account_circle</span> Profile`;
   }
 };
 
