@@ -223,7 +223,129 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 .fd-heart{position:absolute;color:rgba(255,255,255,0.2);animation:fdRise linear infinite;z-index:1}
 @keyframes fdRise{from{transform:translateY(110vh) rotate(0) scale(.5)}to{transform:translateY(-120px) rotate(360deg) scale(1)}}
 
-/* ========== RESPONSIVE SYSTEM AND MEDIA QUERIES ========== */
+/* ========== SLIDE 16 - CANDIDATES TABLE & SEARCH STYLES ========== */
+.billboard-slide16 {
+  background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.directory-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.directory-header {
+  color: #ffdd77;
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.directory-card .search-box {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.directory-card .search-box i {
+  color: #ffdd77;
+  font-size: 14px;
+}
+
+.directory-card .search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  width: 100%;
+  font-size: 14px;
+}
+
+.directory-card .search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.table-container {
+  max-height: 45vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.directory-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+  color: #fff;
+}
+
+.directory-table th {
+  background: #0f172a;
+  color: #ffdd77;
+  padding: 10px;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.directory-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.directory-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.gender-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.gender-badge.F {
+  background: rgba(236, 72, 153, 0.2);
+  color: #f472b6;
+}
+
+.gender-badge.M {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.no-results {
+  color: #ffaa33;
+  font-size: 13px;
+  margin-top: 12px;
+  font-style: italic;
+}
+/* ========== SLIDE 16 - CANDIDATES TABLE & SEARCH STYLES ========== */
+  
+            
+          
+  /* ========== RESPONSIVE SYSTEM AND MEDIA QUERIES ========== */
 @media(max-width:1024px){
   .welcome-billboard{font-size:clamp(24px,4.5vw,55px)}
 }
@@ -534,7 +656,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
             </g>
         </svg>
     </div>
-
+     
     <div class="billboard-slide billboard-slide15">
         <div class="fathers-day-card">
             <div class="fd-badge">🙏 A Grateful Heart</div>
@@ -559,6 +681,38 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
     </div>
 </div>
 
+  <!-- ========== SLIDE 16 - CANDIDATES DIRECTORY & SEARCH ========== -->
+<div class="billboard-slide billboard-slide16">
+    <div class="directory-card">
+        <div class="directory-header">
+            <i class="fas fa-list-ol"></i> Candidate List (1 - 645)
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="candidateSearchInput" placeholder="Search by NRC, Exam No, or SN..." oninput="filterCandidates()">
+        </div>
+
+        <div class="table-container">
+            <table class="directory-table" id="candidatesTable">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Gender</th>
+                        <th>NRC</th>
+                        <th>Exam No.</th>
+                    </tr>
+                </thead>
+                <tbody id="candidatesTableBody">
+                    <!-- Populated dynamically via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="noCandidatesFound" class="no-results" style="display: none;">No matching candidates found.</div>
+    </div>
+</div>
+  <!-- ========== SLIDE 16 - CANDIDATES DIRECTORY & SEARCH ========== -->
 <div class="app-interface-wrapper">
   <main class="product-container" id="booking-form-popup">
     <div class="booking-container">
@@ -2143,6 +2297,65 @@ function createFathersDayElements() {
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(createFathersDayElements, 100);
 });
+  
+  // Complete Data Array (S/N 1 - 645)
+const fullCandidates = [
+    // Page 1 (1 - 21)
+    { sn: "1", gender: "F", nrc: "139923/14/1", examNo: "768" },
+    { sn: "2", gender: "F", nrc: "117933/18/1", examNo: "106" },
+    { sn: "3", gender: "M", nrc: "137422/14/1", examNo: "367" }
+    // Paste remaining array items here...
+];
+
+// Function to populate table rows dynamically
+function renderCandidatesTable(data) {
+    const tbody = document.getElementById('candidatesTableBody');
+    const noResults = document.getElementById('noCandidatesFound');
+    
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        noResults.style.display = 'block';
+        return;
+    }
+
+    noResults.style.display = 'none';
+
+    const fragment = document.createDocumentFragment();
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${item.sn}</strong></td>
+            <td><span class="gender-badge ${item.gender}">${item.gender}</span></td>
+            <td>${item.nrc}</td>
+            <td>${item.examNo}</td>
+        `;
+        fragment.appendChild(tr);
+    });
+
+    tbody.appendChild(fragment);
+}
+
+// Function to filter dataset as user types
+function filterCandidates() {
+    const query = document.getElementById('candidateSearchInput').value.toLowerCase().trim();
+    
+    const filtered = fullCandidates.filter(item => {
+        return item.sn.toLowerCase().includes(query) ||
+               item.nrc.toLowerCase().includes(query) ||
+               item.examNo.toLowerCase().includes(query) ||
+               item.gender.toLowerCase() === query;
+    });
+
+    renderCandidatesTable(filtered);
+}
+
+// Initial render on load
+document.addEventListener('DOMContentLoaded', () => {
+    renderCandidatesTable(fullCandidates);
+});
+
   
 </script>
 </body>
