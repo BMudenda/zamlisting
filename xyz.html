@@ -2538,74 +2538,220 @@ function finishRequestUI() {
   };
 }
   
+// ========== LOCATION & SHARING ==========
+
 let mapLink = "";
 
 function getLocation() {
   const status = document.getElementById("locationStatus");
-  if (navigator.geolocation) {
-    status.innerHTML = "📍 Getting location...";
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-        status.innerHTML = "🌐 ✅ Location ready!";
-      },
-      () => { status.innerHTML = "❌ Failed!"; }
-    );
+
+  if (!status) return;
+
+  if (!navigator.geolocation) {
+    status.innerHTML = "❌ Location is not supported.";
+    return;
   }
+
+  status.innerHTML = "📍 Getting location...";
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      mapLink =
+        `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      status.innerHTML = "🌐 ✅ Location ready!";
+    },
+    () => {
+      mapLink = "";
+      status.innerHTML = "❌ Failed to get location.";
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 30000
+    }
+  );
 }
+
 
 function shareWhatsApp() {
-  if (!mapLink) { alert("Please get your location first using 'Get My Location'"); return; }
-  window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + mapLink)}`, "_blank");
+  if (!mapLink) {
+    alert(
+      "Please get your location first using 'Get My Location'."
+    );
+    return;
+  }
+
+  const message = "📍 My current location:\n" + mapLink;
+
+  window.open(
+    `https://wa.me/260777737047?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
 }
+
 
 function shareSMS() {
-  if (!mapLink) { alert("Please get your location first using 'Get My Location'"); return; }
-  window.location.href = `sms:0777737047?body=📍 ${mapLink}`;
+  if (!mapLink) {
+    alert(
+      "Please get your location first using 'Get My Location'."
+    );
+    return;
+  }
+
+  const message = `📍 My current location: ${mapLink}`;
+
+  window.location.href =
+    `sms:0777737047?body=${encodeURIComponent(message)}`;
 }
+
 
 function visitStore() {
-  window.open("https://www.zamlisting.com", "_blank");
+  window.open(
+    "https://www.zamlisting.com",
+    "_blank"
+  );
 }
 
-setupAuto('gm-origin', 'origin-container', 'originList');
-setupAuto('gm-destination', 'dest-container', 'destinationList');
-document.getElementById('mode-group').onchange = checkReady;
+
+// ========== AUTOCOMPLETE ==========
+
+setupAuto(
+  "gm-origin",
+  "origin-container",
+  "originList"
+);
+
+setupAuto(
+  "gm-destination",
+  "dest-container",
+  "destinationList"
+);
+
+
+// ========== TRANSPORT MODE ==========
+
+const modeGroup =
+  document.getElementById("mode-group");
+
+if (modeGroup) {
+  modeGroup.onchange = checkReady;
+}
+
+
+// ========== HEADER DROPDOWN ==========
 
 function toggleDropdown(event) {
-  if (event) event.stopPropagation(); 
-  const menu = document.getElementById("header-menu-dropdown");
-  menu.classList.toggle("show");
+  if (event) {
+    event.stopPropagation();
+  }
+
+  const menu =
+    document.getElementById(
+      "header-menu-dropdown"
+    );
+
+  if (menu) {
+    menu.classList.toggle("show");
+  }
 }
 
-// Global window event interceptor
-window.onclick = (event) => {
-  const menu = document.getElementById("header-menu-dropdown");
-  const formPopup = document.getElementById("booking-form-popup");
-  const companyInfo = document.querySelector(".company-info");
-  const toggleActionBtn = document.querySelector(".form-toggle-action-btn");
-  
-  if (formPopup && formPopup.contains(event.target)) {
-      return; 
-  }
-  
-  if (formPopup && formPopup.classList.contains('show')) {
-      if (!companyInfo.contains(event.target) && 
-          !toggleActionBtn.contains(event.target) && 
-          !menu.contains(event.target) &&
-          !event.target.closest('.request-billboard')) {
-          formPopup.classList.remove('show');
-          menu.classList.remove('show');
-      }
-  }
-};
 
-window.toggleDropdown = toggleDropdown;
-window.toggleForm = toggleForm;
-window.getLocation = getLocation;
-window.shareWhatsApp = shareWhatsApp;
-window.shareSMS = shareSMS;
-window.visitStore = visitStore;
+// ========== GLOBAL WINDOW CLICK ==========
+
+window.addEventListener("click", (event) => {
+
+  const menu =
+    document.getElementById(
+      "header-menu-dropdown"
+    );
+
+  const formPopup =
+    document.getElementById(
+      "booking-form-popup"
+    );
+
+  const companyInfo =
+    document.querySelector(
+      ".company-info"
+    );
+
+  const toggleActionBtn =
+    document.querySelector(
+      ".form-toggle-action-btn"
+    );
+
+
+  // Close dropdown when clicking outside it
+  if (
+    menu &&
+    menu.classList.contains("show") &&
+    !menu.contains(event.target)
+  ) {
+    menu.classList.remove("show");
+  }
+
+
+  // If there is no old popup form,
+  // nothing else needs to be processed.
+  if (!formPopup) {
+    return;
+  }
+
+
+  // Do not close when clicking inside the form
+  if (formPopup.contains(event.target)) {
+    return;
+  }
+
+
+  // Close the old popup form when clicking outside
+  if (
+    formPopup.classList.contains("show") &&
+    companyInfo &&
+    toggleActionBtn &&
+    !companyInfo.contains(event.target) &&
+    !toggleActionBtn.contains(event.target) &&
+    (!menu || !menu.contains(event.target)) &&
+    !event.target.closest(".request-billboard")
+  ) {
+    formPopup.classList.remove("show");
+
+    if (menu) {
+      menu.classList.remove("show");
+    }
+  }
+
+});
+
+
+// ========== GLOBAL FUNCTIONS ==========
+
+window.toggleDropdown =
+  toggleDropdown;
+
+window.getLocation =
+  getLocation;
+
+window.shareWhatsApp =
+  shareWhatsApp;
+
+window.shareSMS =
+  shareSMS;
+
+window.visitStore =
+  visitStore;
+
+
+// Only expose toggleForm if it
+// actually exists in the current HTML.
+if (typeof toggleForm === "function") {
+  window.toggleForm = toggleForm;
+}
+
 
 // ========== COUNTDOWN ENGINE FOR ECZ SLIDE ==========
 
