@@ -1878,157 +1878,527 @@ const customers = {
 };
 
 // ========== PHONE INPUT ==========
+
+// ========== PHONE INPUT ==========
 phoneInput.oninput = () => {
-  const phone = phoneInput.value.trim();
-  
-  if (/^0[0-9]{9}$/.test(phone)) {
-    tripDiv.style.display = 'block';
-    
-    // Find the Profile legend
-    const legend = document.querySelector('fieldset legend');
-    
-    if (customers[phone]) {
-      legend.innerHTML = `<span class="material-icons">account_circle</span> ${customers[phone]}`;
+    const phone = phoneInput.value.trim();
+
+    if (/^0[0-9]{9}$/.test(phone)) {
+
+        tripDiv.style.display = 'block';
+
+        // Find the Profile legend
+        const legend = document.querySelector('fieldset legend');
+
+        if (customers[phone]) {
+            legend.innerHTML =
+                `<span>👤</span> ${customers[phone]}`;
+        } else {
+            legend.innerHTML =
+                `<span>👤</span> Profile`;
+        }
+
     } else {
-      legend.innerHTML = `<span class="material-icons">account_circle</span> Profile`;
+
+        tripDiv.style.display = 'none';
+        summaryDiv.style.display = 'none';
+
+        // Clear route/map when phone is invalid
+        clearRouteMap();
+
+        const legend = document.querySelector('fieldset legend');
+
+        if (legend) {
+            legend.innerHTML =
+                `<span>👤</span> Profile`;
+        }
     }
-  } else {
-    tripDiv.style.display = 'none';
-    summaryDiv.style.display = 'none';
-    
-    // Reset to Profile
-    const legend = document.querySelector('fieldset legend');
-    legend.innerHTML = `<span class="material-icons">account_circle</span> Profile`;
-  }
 };
 
+
+// ========== PLACE AUTOCOMPLETE ==========
 function setupAuto(inputId, containerId, listId) {
-  const input = document.getElementById(inputId);
-  const container = document.getElementById(containerId);
-  const list = document.getElementById(listId);
-  
-  input.oninput = () => {
-    const val = input.value.toLowerCase().trim();
-    list.innerHTML = '';
-    container.classList.remove('field-error');
-    if (!val || val.length < 1) return;
-    const matches = MASTER_PLACES_LIST.filter(place => place.toLowerCase().includes(val)).slice(0, 6);
-    matches.forEach(place => {
-      const div = document.createElement('div');
-      div.className = 'suggestion';
-      div.textContent = place;
-      div.onclick = (e) => {
-        e.stopPropagation(); 
-        input.value = place;
+
+    const input = document.getElementById(inputId);
+    const container = document.getElementById(containerId);
+    const list = document.getElementById(listId);
+
+    if (!input || !container || !list) return;
+
+    input.oninput = () => {
+
+        const val = input.value.toLowerCase().trim();
+
         list.innerHTML = '';
-        checkReady();
-      };
-      list.appendChild(div);
-    });
-  };
-}
+        container.classList.remove('field-error');
 
-function updateRouteInfo(pickup, destination) {
-  if (!pickup || !destination) return;
-  const totalDist = calculateTotalDistance(pickup, destination);
-  const infoDiv = document.getElementById('map-route-info');
-  if (infoDiv && totalDist.total) {
-    const estimatedMinutes = Math.ceil((totalDist.trip / config.avgSpeed) * 60);
-    infoDiv.innerHTML = `<i class="fas fa-route"></i> ${pickup} → ${destination}<br>📏 ${totalDist.trip?.toFixed(1)} km | Via: ${totalDist.hub}<br>⏱️ Est. Time: ${estimatedMinutes} mins`;
-  }
-  const pickupCoord = getCoordinates(pickup);
-  const destCoord = getCoordinates(destination);
-  const openLink = document.getElementById('openMapsLink');
-  openLink.href = `https://www.google.com/maps/dir/${pickupCoord.lat},${pickupCoord.lng}/${destCoord.lat},${destCoord.lng}`;
-}
+        // Clear map and summary while the user is changing a location
+        clearRouteMap();
+        summaryDiv.style.display = 'none';
 
-function toggleForm(event) {
-  if (event) event.stopPropagation(); 
-  const formPopup = document.getElementById("booking-form-popup");
-  const menu = document.getElementById("header-menu-dropdown");
-  if (menu && menu.classList.contains("show")) {
-      menu.classList.remove("show");
-  }
-  formPopup.classList.toggle("show");
-}
+        if (!val) {
+            checkReady();
+            return;
+        }
 
-function checkReady() {
-  const from = document.getElementById('gm-origin').value;
-  const to = document.getElementById('gm-destination').value;
-  const mode = document.querySelector('input[name="mode"]:checked');
-  
-  if (MASTER_PLACES_LIST.includes(from) && MASTER_PLACES_LIST.includes(to)) {
-    if (!mode) {
-      statusText.innerHTML = "⚠️ Please select a transport mode.";
-      summaryDiv.style.display = 'none';
-    } else {
-      statusText.innerHTML = "";
-      calculate(from, to, mode.value);
-      updateRouteInfo(from, to);
-    }
-  } else if (from && to) {
-    statusText.innerHTML = "⚠️ Please select valid locations from the list.";
-    summaryDiv.style.display = 'none';
-  }
-}
+        const matches = MASTER_PLACES_LIST
+            .filter(place =>
+                place.toLowerCase().includes(val)
+            )
+            .slice(0, 8);
 
-function calculate(from, to, mode) {
-  const spinner = document.getElementById('spinner');
-  spinner.style.display = 'block';
-  summaryDiv.style.display = 'none';
-  
-  setTimeout(() => {
-    spinner.style.display = 'none';
-    const res = calculateTotalDistance(from, to);
-    
-    if (res.total === null) {
-      statusText.innerHTML = "❌ Route not available. Please try different locations.";
-      return;
-    }
-    
-    summaryDiv.style.display = 'block';
-    document.getElementById('hub-tooltip').textContent = `✨ 50% Discount! Calculated via: ${res.hub}`;
-    
-    let rate, minPrice, extra;
-    if (mode === 'vehicle') {
-      rate = config.vehiclePricePerKm;
-      minPrice = config.vehicleMinPrice;
-      extra = config.vehicleExtra;
-    } else {
-      rate = config.motorbikePricePerKm;
-      minPrice = config.motorbikeMinPrice;
-      extra = config.motorbikeExtra;
-    }
-    
-    let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-    
-    document.getElementById('summary-cards').innerHTML = `
-      <div class="summary-card"><span>Total Price</span><span style="font-weight:bold;color:#ff9900;">K${price}</span></div>
-      <div class="summary-card"><span>Trip Distance</span><span>${res.trip.toFixed(2)} km</span></div>
-    `;
-    
-    let formattedPhone = phoneInput.value.startsWith('0') ? '+260' + phoneInput.value.substring(1) : phoneInput.value;
-    rideData = {
-      preferredMode: mode,
-      phone: formattedPhone,
-      hub: res.hub,
-      from: from,
-      to: to,
-      tripDistance: res.trip.toFixed(2),
-      totalDistance: res.total.toFixed(2),
-      price: price,
-      estimatedTime: Math.ceil((res.trip / config.avgSpeed) * 60) + " mins"
+        matches.forEach(place => {
+
+            const div = document.createElement('div');
+
+            div.className = 'suggestion';
+            div.textContent = place;
+
+            div.onclick = (e) => {
+
+                e.stopPropagation();
+
+                input.value = place;
+
+                list.innerHTML = '';
+
+                container.classList.remove('field-error');
+
+                checkReady();
+            };
+
+            list.appendChild(div);
+        });
     };
-    
-    submitBtn.style.background = "var(--primary-color)";
-    btnIcon.className = "fas fa-paper-plane";
-    btnIcon.style.display = "block";
-    btnLoader.style.display = "none";
-    progressTextSpan.style.display = "none";
-    document.getElementById('action-label').innerHTML = "Request Now";
-    submitBtn.onclick = handleRequest;
-  }, 500);
+
+
+    // Clear suggestions when input loses focus
+    input.addEventListener('blur', () => {
+
+        setTimeout(() => {
+            list.innerHTML = '';
+        }, 150);
+
+    });
 }
+
+
+// ========== ROUTE INFORMATION ==========
+function updateRouteInfo(pickup, destination) {
+
+    const infoDiv =
+        document.getElementById('map-route-info');
+
+    if (!pickup || !destination) {
+
+        if (infoDiv) {
+            infoDiv.innerHTML = '';
+        }
+
+        return;
+    }
+
+    const result =
+        calculateTotalDistance(pickup, destination);
+
+    if (!result || result.total === null) {
+
+        if (infoDiv) {
+            infoDiv.innerHTML =
+                '⚠️ Route not available.';
+        }
+
+        return;
+    }
+
+    const estimatedMinutes =
+        Math.ceil(
+            (result.trip / config.avgSpeed) * 60
+        );
+
+    if (infoDiv) {
+
+        infoDiv.innerHTML = `
+            <strong>${pickup} → ${destination}</strong><br>
+            📏 ${result.trip.toFixed(2)} km<br>
+            Via: ${result.hub}<br>
+            ⏱️ Est. Time: ${estimatedMinutes} mins
+        `;
+    }
+
+    // Draw and animate only the actual
+    // pickup → destination route.
+    if (
+        result.tripPath &&
+        result.tripPath.length > 0 &&
+        typeof drawRouteOnMap === 'function'
+    ) {
+        drawRouteOnMap(
+            result.tripPath,
+            true
+        );
+    }
+}
+
+
+// ========== CLEAR MAP / ROUTE ==========
+function clearRouteMap() {
+
+    const infoDiv =
+        document.getElementById('map-route-info');
+
+    if (infoDiv) {
+        infoDiv.innerHTML = '';
+    }
+
+    // Use the custom map's clearing function
+    // if it has been defined.
+    if (typeof clearMap === 'function') {
+        clearMap();
+    }
+
+    if (typeof hideMap === 'function') {
+        hideMap();
+    }
+}
+
+
+// ========== CHECK WHETHER BOOKING IS READY ==========
+function checkReady() {
+
+    const from =
+        document.getElementById('gm-origin').value.trim();
+
+    const to =
+        document.getElementById('gm-destination').value.trim();
+
+    const mode =
+        document.querySelector(
+            'input[name="mode"]:checked'
+        );
+
+
+    // Nothing selected yet
+    if (!from || !to) {
+
+        summaryDiv.style.display = 'none';
+
+        clearRouteMap();
+
+        statusText.innerHTML = '';
+
+        return;
+    }
+
+
+    // Make sure both locations actually exist
+    // in the master searchable list.
+    if (
+        !MASTER_PLACES_LIST.includes(from) ||
+        !MASTER_PLACES_LIST.includes(to)
+    ) {
+
+        summaryDiv.style.display = 'none';
+
+        clearRouteMap();
+
+        statusText.innerHTML =
+            '⚠️ Please select valid locations from the list.';
+
+        return;
+    }
+
+
+    // Pickup and destination cannot be the same
+    if (from === to) {
+
+        summaryDiv.style.display = 'none';
+
+        clearRouteMap();
+
+        statusText.innerHTML =
+            '⚠️ Pickup and destination cannot be the same.';
+
+        return;
+    }
+
+
+    // Transport mode must be selected
+    if (!mode) {
+
+        summaryDiv.style.display = 'none';
+
+        clearRouteMap();
+
+        statusText.innerHTML =
+            '⚠️ Please select a transport mode.';
+
+        return;
+    }
+
+
+    statusText.innerHTML = '';
+
+    // Calculate fare and display route
+    calculate(
+        from,
+        to,
+        mode.value
+    );
+}
+
+
+// ========== CALCULATE FARE ==========
+function calculate(from, to, mode) {
+
+    const spinner =
+        document.getElementById('spinner');
+
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
+
+    summaryDiv.style.display = 'none';
+
+    // Clear previous route before calculating
+    clearRouteMap();
+
+
+    // Small delay gives the loader time to display
+    setTimeout(() => {
+
+        const res =
+            calculateTotalDistance(from, to);
+
+
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
+
+
+        // No route
+        if (
+            !res ||
+            res.total === null
+        ) {
+
+            statusText.innerHTML =
+                '❌ Route not available. Please try different locations.';
+
+            summaryDiv.style.display = 'none';
+
+            clearRouteMap();
+
+            return;
+        }
+
+
+        // Display summary
+        summaryDiv.style.display = 'block';
+
+        const hubTooltip =
+            document.getElementById('hub-tooltip');
+
+        if (hubTooltip) {
+            hubTooltip.textContent =
+                `Calculated via: ${res.hub}`;
+        }
+
+
+        // Select fare configuration
+        let rate;
+        let minPrice;
+        let extra;
+
+        if (mode === 'vehicle') {
+
+            rate =
+                config.vehiclePricePerKm;
+
+            minPrice =
+                config.vehicleMinPrice;
+
+            extra =
+                config.vehicleExtra;
+
+        } else {
+
+            rate =
+                config.motorbikePricePerKm;
+
+            minPrice =
+                config.motorbikeMinPrice;
+
+            extra =
+                config.motorbikeExtra;
+        }
+
+
+        // Your existing fare formula
+        const price =
+            Math.max(
+                minPrice,
+                Math.ceil(
+                    (res.total * rate) + extra
+                )
+            );
+
+
+        // Estimated travel time is based on
+        // the actual pickup → destination trip,
+        // NOT the hub-inclusive fare distance.
+        const estimatedMinutes =
+            Math.ceil(
+                (res.trip / config.avgSpeed) * 60
+            );
+
+
+        // Summary cards
+        document.getElementById(
+            'summary-cards'
+        ).innerHTML = `
+
+            <div class="summary-card">
+                <span>Total Price</span>
+                <span style="font-weight:bold;color:#ff9900;">
+                    K${price}
+                </span>
+            </div>
+
+            <div class="summary-card">
+                <span>Trip Distance</span>
+                <span>
+                    ${res.trip.toFixed(2)} km
+                </span>
+            </div>
+
+            <div class="summary-card">
+                <span>Fare Distance</span>
+                <span>
+                    ${res.total.toFixed(2)} km
+                </span>
+            </div>
+
+            <div class="summary-card">
+                <span>Estimated Time</span>
+                <span>
+                    ${estimatedMinutes} mins
+                </span>
+            </div>
+        `;
+
+
+        // Convert Zambian phone number
+        // 097xxxxxxx → +26097xxxxxxx
+        const phone =
+            phoneInput.value.trim();
+
+        const formattedPhone =
+            phone.startsWith('0')
+                ? '+260' + phone.substring(1)
+                : phone;
+
+
+        // Store booking information
+        rideData = {
+
+            preferredMode: mode,
+
+            phone: formattedPhone,
+
+            hub: res.hub,
+
+            from: from,
+
+            to: to,
+
+            tripDistance:
+                res.trip.toFixed(2),
+
+            totalDistance:
+                res.total.toFixed(2),
+
+            hubToPickup:
+                res.hubToPickup !== null
+                    ? res.hubToPickup.toFixed(2)
+                    : null,
+
+            destinationToHub:
+                res.destinationToHub !== null
+                    ? res.destinationToHub.toFixed(2)
+                    : null,
+
+            price: price,
+
+            estimatedTime:
+                estimatedMinutes + " mins",
+
+            route:
+                res.tripPath || []
+        };
+
+
+        // Draw the actual pickup →
+        // destination route.
+        if (
+            res.tripPath &&
+            res.tripPath.length > 0 &&
+            typeof drawRouteOnMap === 'function'
+        ) {
+
+            drawRouteOnMap(
+                res.tripPath,
+                true
+            );
+        }
+
+
+        // Update route information
+        updateRouteInfo(
+            from,
+            to
+        );
+
+
+        // Prepare submit button
+        submitBtn.style.background =
+            "var(--primary-color)";
+
+        if (btnIcon) {
+
+            btnIcon.textContent = "➤";
+            btnIcon.className = "";
+            btnIcon.style.display = "block";
+        }
+
+        if (btnLoader) {
+            btnLoader.style.display = "none";
+        }
+
+        if (progressTextSpan) {
+            progressTextSpan.style.display = "none";
+        }
+
+        const actionLabel =
+            document.getElementById(
+                'action-label'
+            );
+
+        if (actionLabel) {
+            actionLabel.innerHTML =
+                "Request Now";
+        }
+
+
+        // Attach booking request handler
+        submitBtn.onclick =
+            handleRequest;
+
+    }, 500);
+}
+
+
+             
 
 async function handleRequest() {
   submitBtn.disabled = true;
