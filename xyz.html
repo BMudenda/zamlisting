@@ -1629,29 +1629,102 @@ function findShortestDistance(start, end) {
 }
 
 function calculateTotalDistance(pickup, dest) {
-  if (pickup === dest) return { total: 0, trip: 0, hub: "N/A" };
-  let nearestHub = null, minTotal = Infinity;
-  for (let hub of hubs) {
-    let hubToPickup = findShortestDistance(hub, pickup);
-    let tripDist = findShortestDistance(pickup, dest);
-    let destToHub = findShortestDistance(dest, hub);
-    if (hubToPickup !== null && tripDist !== null && destToHub !== null) {
-      let total = hubToPickup + tripDist + destToHub;
-      if (total < minTotal) { minTotal = total; nearestHub = hub; }
+    if (!pickup || !dest) {
+        return {
+            total: null,
+            trip: null,
+            hub: null,
+            hubToPickup: null,
+            destinationToHub: null,
+            tripPath: []
+        };
     }
-  }
-  if (!nearestHub) return { total: null, trip: null, hub: null };
-  return { hub: nearestHub, trip: findShortestDistance(pickup, dest), total: minTotal };
+
+    // Same pickup and destination
+    if (pickup === dest) {
+        return {
+            total: 0,
+            trip: 0,
+            hub: "N/A",
+            hubToPickup: 0,
+            destinationToHub: 0,
+            tripPath: [pickup]
+        };
+    }
+
+    // Calculate the actual pickup → destination route once.
+    // This should return both distance and the actual Dijkstra path.
+    const tripRoute = findShortestRoute(pickup, dest);
+
+    if (!tripRoute) {
+        return {
+            total: null,
+            trip: null,
+            hub: null,
+            hubToPickup: null,
+            destinationToHub: null,
+            tripPath: []
+        };
+    }
+
+    let selectedHub = null;
+    let minTotal = Infinity;
+    let selectedHubToPickup = null;
+    let selectedDestinationToHub = null;
+
+    // Find the hub that gives the lowest complete
+    // hub → pickup → destination → hub distance.
+    for (const hub of hubs) {
+
+        const hubToPickupRoute = findShortestRoute(hub, pickup);
+        const destinationToHubRoute = findShortestRoute(dest, hub);
+
+        if (hubToPickupRoute && destinationToHubRoute) {
+
+            const total =
+                hubToPickupRoute.distance +
+                tripRoute.distance +
+                destinationToHubRoute.distance;
+
+            if (total < minTotal) {
+                minTotal = total;
+                selectedHub = hub;
+                selectedHubToPickup = hubToPickupRoute.distance;
+                selectedDestinationToHub = destinationToHubRoute.distance;
+            }
+        }
+    }
+
+    if (!selectedHub) {
+        return {
+            total: null,
+            trip: tripRoute.distance,
+            hub: null,
+            hubToPickup: null,
+            destinationToHub: null,
+            tripPath: tripRoute.path
+        };
+    }
+
+    return {
+        hub: selectedHub,
+        trip: tripRoute.distance,
+        total: minTotal,
+        hubToPickup: selectedHubToPickup,
+        destinationToHub: selectedDestinationToHub,
+        tripPath: tripRoute.path
+    };
 }
 
+
 const config = {
-  vehiclePricePerKm: 4.50,
-  motorbikePricePerKm: 2.50,
-  vehicleMinPrice: 25,
-  motorbikeMinPrice: 15,
-  vehicleExtra: 6.00,
-  motorbikeExtra: 3.00,
-  avgSpeed: 60
+    vehiclePricePerKm: 4.50,
+    motorbikePricePerKm: 2.50,
+    vehicleMinPrice: 25,
+    motorbikeMinPrice: 15,
+    vehicleExtra: 6.00,
+    motorbikeExtra: 3.00,
+    avgSpeed: 60
 };
 
 let rideData = null;
