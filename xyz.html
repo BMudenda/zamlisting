@@ -2696,33 +2696,137 @@ window.addEventListener("click", (event) => {
 
 
   // If there is no old popup form,
-  // nothing else needs to be processed.
+// ========== HEADER DROPDOWN ==========
+
+function toggleDropdown(event) {
+  if (event) {
+    event.stopPropagation();
+  }
+
+  const menu =
+    document.getElementById("header-menu-dropdown");
+
+  if (menu) {
+    menu.classList.toggle("show");
+  }
+}
+
+
+// ========== REQUEST FORM ==========
+
+function toggleForm(event) {
+  if (event) {
+    event.stopPropagation();
+  }
+
+  const formPopup =
+    document.getElementById("booking-form-popup");
+
+  if (!formPopup) {
+    return;
+  }
+
+  formPopup.classList.toggle("show");
+
+  // Close the header dropdown when
+  // opening/closing the request form
+  const menu =
+    document.getElementById("header-menu-dropdown");
+
+  if (menu) {
+    menu.classList.remove("show");
+  }
+}
+
+
+// ========== GLOBAL WINDOW CLICK ==========
+
+window.addEventListener("click", function(event) {
+
+  const menu =
+    document.getElementById(
+      "header-menu-dropdown"
+    );
+
+  const formPopup =
+    document.getElementById(
+      "booking-form-popup"
+    );
+
+  const companyInfo =
+    document.querySelector(
+      ".company-info"
+    );
+
+  const toggleActionBtn =
+    document.querySelector(
+      ".form-toggle-action-btn"
+    );
+
+
+  // -------------------------------
+  // HEADER DROPDOWN
+  // -------------------------------
+
+  if (
+    menu &&
+    menu.classList.contains("show") &&
+    !menu.contains(event.target)
+  ) {
+    menu.classList.remove("show");
+  }
+
+
+  // -------------------------------
+  // REQUESTING FORM
+  // -------------------------------
+
   if (!formPopup) {
     return;
   }
 
 
-  // Do not close when clicking inside the form
+  // Do not close the form when
+  // clicking anywhere inside it
   if (formPopup.contains(event.target)) {
     return;
   }
 
 
-  // Close the old popup form when clicking outside
+  // Do not close when clicking
+  // the button that opens the form
   if (
-    formPopup.classList.contains("show") &&
-    companyInfo &&
     toggleActionBtn &&
-    !companyInfo.contains(event.target) &&
-    !toggleActionBtn.contains(event.target) &&
-    (!menu || !menu.contains(event.target)) &&
-    !event.target.closest(".request-billboard")
+    toggleActionBtn.contains(event.target)
+  ) {
+    return;
+  }
+
+
+  // Do not close when clicking
+  // company information
+  if (
+    companyInfo &&
+    companyInfo.contains(event.target)
+  ) {
+    return;
+  }
+
+
+  // Do not close when clicking
+  // the request billboard
+  if (
+    event.target.closest(".request-billboard")
+  ) {
+    return;
+  }
+
+
+  // Close form when clicking outside
+  if (
+    formPopup.classList.contains("show")
   ) {
     formPopup.classList.remove("show");
-
-    if (menu) {
-      menu.classList.remove("show");
-    }
   }
 
 });
@@ -2732,6 +2836,9 @@ window.addEventListener("click", (event) => {
 
 window.toggleDropdown =
   toggleDropdown;
+
+window.toggleForm =
+  toggleForm;
 
 window.getLocation =
   getLocation;
@@ -2744,6 +2851,9 @@ window.shareSMS =
 
 window.visitStore =
   visitStore;
+
+
+
 
 
 // Only expose toggleForm if it
