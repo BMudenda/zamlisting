@@ -1598,34 +1598,128 @@ const hubs = [
      
 
 const graph = {};
+
 segments.forEach(({ from, to, distance }) => {
   if (!graph[from]) graph[from] = [];
   if (!graph[to]) graph[to] = [];
-  graph[from].push({ node: to, distance });
-  graph[to].push({ node: from, distance });
+
+  // Roads are bidirectional
+  graph[from].push({
+    node: to,
+    distance: Number(distance)
+  });
+
+  graph[to].push({
+    node: from,
+    distance: Number(distance)
+  });
 });
 
-function findShortestDistance(start, end) {
-  if (start === end) return 0;
-  if (!graph[start] || !graph[end]) return null;
+
+function findShortestRoute(start, end) {
+
+  if (!start || !end) return null;
+
+  if (start === end) {
+    return {
+      distance: 0,
+      path: [start]
+    };
+  }
+
+  if (!graph[start] || !graph[end]) {
+    return null;
+  }
+
   const distances = {};
+  const previous = {};
   const unvisited = new Set(Object.keys(graph));
-  for (let node of unvisited) distances[node] = Infinity;
+
+  // Initialise distances
+  for (const node of unvisited) {
+    distances[node] = Infinity;
+    previous[node] = null;
+  }
+
   distances[start] = 0;
-  while (unvisited.size) {
+
+  while (unvisited.size > 0) {
+
     let current = null;
-    for (let node of unvisited) {
-      if (current === null || distances[node] < distances[current]) current = node;
+
+    // Find the unvisited node with the smallest distance
+    for (const node of unvisited) {
+      if (
+        current === null ||
+        distances[node] < distances[current]
+      ) {
+        current = node;
+      }
     }
-    if (!current || distances[current] === Infinity) break;
-    if (current === end) return distances[end];
+
+    // No route exists
+    if (
+      current === null ||
+      distances[current] === Infinity
+    ) {
+      break;
+    }
+
+    // Destination reached
+    if (current === end) {
+      break;
+    }
+
     unvisited.delete(current);
-    for (let neighbor of graph[current]) {
-      let newDist = distances[current] + neighbor.distance;
-      if (newDist < distances[neighbor.node]) distances[neighbor.node] = newDist;
+
+    // Check connected roads
+    for (const neighbor of graph[current]) {
+
+      if (!unvisited.has(neighbor.node)) {
+        continue;
+      }
+
+      const newDistance =
+        distances[current] + neighbor.distance;
+
+      if (newDistance < distances[neighbor.node]) {
+
+        distances[neighbor.node] = newDistance;
+
+        // Remember how we reached this place
+        previous[neighbor.node] = current;
+      }
     }
   }
-  return null;
+
+  // No route found
+  if (distances[end] === Infinity) {
+    return null;
+  }
+
+  // Reconstruct the actual route
+  const path = [];
+  let current = end;
+
+  while (current !== null) {
+    path.unshift(current);
+
+    if (current === start) {
+      break;
+    }
+
+    current = previous[current];
+  }
+
+  // Safety check
+  if (path[0] !== start) {
+    return null;
+  }
+
+  return {
+    distance: distances[end],
+    path: path
+  };
 }
 
 function calculateTotalDistance(pickup, dest) {
