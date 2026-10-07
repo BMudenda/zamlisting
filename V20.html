@@ -466,15 +466,15 @@
     }
 
     /* ----------------------------------------------------------------------
-       5. SUMMARY (Price & Distance Only) & TOOLTIP
+       5. SUMMARY (Price, Distance & Estimated Time) & TOOLTIP
        ---------------------------------------------------------------------- */
     .summary-card-grid {
       background: #f1f5f9;
       border-radius: 12px;
       padding: 16px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
       text-align: center;
     }
 
@@ -485,7 +485,7 @@
     }
 
     .summary-card-item .label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: #64748b;
@@ -493,13 +493,17 @@
     }
 
     .summary-card-item .value {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--font-color-dark);
     }
 
     .summary-card-item .value.price-val {
       color: var(--success-color);
+    }
+
+    .summary-card-item .value.time-val {
+      color: var(--primary-color);
     }
 
     /* Tooltip styles */
@@ -583,7 +587,7 @@
       border-radius: 12px;
       overflow: hidden;
       background: #f8fcfe;
-      touch-action: none; /* Required for gesture intervention */
+      touch-action: none;
     }
 
     #mapSvg {
@@ -790,6 +794,13 @@
         padding: 0 15px;
       }
       .product-container { width: 100%; }
+      .summary-card-grid {
+        gap: 4px;
+        padding: 12px 8px;
+      }
+      .summary-card-item .value {
+        font-size: 0.95rem;
+      }
     }
 
     ::-webkit-scrollbar { display: none; }
@@ -891,7 +902,7 @@
           </fieldset>
         </div>
 
-        <!-- Step 3: Trip Summary (Only Trip Distance and Price) -->
+        <!-- Step 3: Trip Summary (Distance, Price & Estimated Time) -->
         <div id="summary-section" class="hidden-section">
           <fieldset>
             <legend>
@@ -904,8 +915,12 @@
             
             <div class="summary-card-grid">
               <div class="summary-card-item">
-                <span class="label">Trip Distance</span>
+                <span class="label">Distance</span>
                 <span class="value" id="summary-distance">0.0 km</span>
+              </div>
+              <div class="summary-card-item">
+                <span class="label">Est. Time</span>
+                <span class="value time-val" id="summary-time">0 mins</span>
               </div>
               <div class="summary-card-item">
                 <span class="label">Price</span>
@@ -1005,7 +1020,8 @@
       motorbikeMinPrice: 15,
       vehicleExtra: 6.00,
       motorbikeExtra: 3.00,
-      avgSpeed: 60
+      vehicleSpeedKmH: 65,
+      motorbikeSpeedKmH: 45
     };
 
     const PLACES_DATA = [
@@ -1157,6 +1173,19 @@
       return Math.max(minimum, Math.ceil((distance * rate) + extra));
     }
 
+    function calculateEstimatedTime(mode, distance) {
+      const speed = mode === "vehicle" ? config.vehicleSpeedKmH : config.motorbikeSpeedKmH;
+      const totalMinutes = Math.round((distance / speed) * 60);
+
+      if (totalMinutes < 60) {
+        return `${Math.max(1, totalMinutes)} mins`;
+      } else {
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
+      }
+    }
+
     /* ----------------------------------------------------------------------
        4. UI LOGIC & EVENT HANDLERS
        ---------------------------------------------------------------------- */
@@ -1277,9 +1306,11 @@
         }
 
         const fare = calculateFare(mode.value, result.total);
+        const estTime = calculateEstimatedTime(mode.value, result.trip);
         
-        // Update summary text (Strictly Trip Distance and Price)
+        // Update summary text (Distance, Est Time, Price)
         document.getElementById("summary-distance").textContent = `${result.trip.toFixed(1)} km`;
+        document.getElementById("summary-time").textContent = estTime;
         document.getElementById("summary-price").textContent = `K${fare.toFixed(2)}`;
         document.getElementById("hub-tooltip").textContent = `Calculated via nearest hub (${places[result.hub]?.name || result.hub})`;
 
@@ -1291,6 +1322,7 @@
           pickup: places[pickup].name,
           destination: places[destination].name,
           distance: result.trip.toFixed(1),
+          estimatedTime: estTime,
           price: fare
         };
 
