@@ -2397,78 +2397,116 @@ function calculate(from, to, mode) {
     }, 500);
 }
 
-
-             
-
 async function handleRequest() {
+  if (!rideData) {
+    statusText.innerHTML =
+      "⚠️ Please select your pickup and destination first.";
+    statusText.style.color = "red";
+    return;
+  }
+
   submitBtn.disabled = true;
   btnIcon.style.display = "none";
   btnLoader.style.display = "block";
   progressTextSpan.style.display = "block";
-  
+
   const startTime = Date.now();
+
   const interval = setInterval(() => {
-    let p = Math.min(98, Math.floor(((Date.now() - startTime) / 13000) * 98));
+    const p = Math.min(
+      98,
+      Math.floor(((Date.now() - startTime) / 13000) * 98)
+    );
+
     progressTextSpan.textContent = p + "%";
   }, 100);
-  
-  const payload = { ...rideData, timestamp: new Date().toISOString() };
-  
+
+  const payload = {
+    ...rideData,
+    timestamp: new Date().toISOString()
+  };
+
   let timeoutTriggered = false;
+
   const timeoutId = setTimeout(() => {
     if (!timeoutTriggered) {
       timeoutTriggered = true;
       clearInterval(interval);
-      statusText.innerHTML = "⏰ Timeout! Connecting you to driver...";
+
+      statusText.innerHTML =
+        "⏰ Timeout! Connecting you to driver...";
       statusText.style.color = "orange";
+
       finishRequestUI();
-      setTimeout(() => { if (submitBtn) submitBtn.click(); }, 100);
     }
   }, 15000);
-  
+
   try {
-    await fetch("https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec", {
-      method: 'POST',
-      body: new URLSearchParams(payload),
-      mode: 'no-cors'
-    });
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbxpvhvgnjkRcZmuly7uNzPeAC5OwVUq8-qUJ2WXrOqOnSsNgCn0ZHbuz6BGslW83_rB5Q/exec",
+      {
+        method: "POST",
+        body: new URLSearchParams(payload),
+        mode: "no-cors"
+      }
+    );
+
     clearTimeout(timeoutId);
-    
-    if (!timeoutTriggered) {
-    clearInterval(interval);
-    progressTextSpan.textContent = "100%";
-    
-    // Check which transport mode is selected - using "mode" as the radio name
-    const selectedMode = document.querySelector('input[name="mode"]:checked');
-    
-    if (selectedMode && selectedMode.value === 'vehicle') {
-        statusText.innerHTML = "✅ Request sent! However, the vehicle is not available!";
-    } else {
-        statusText.innerHTML = "✅ Request sent! Rider will contact you shortly or Call.";
-    }
-    
-    statusText.style.color = "green";
-    finishRequestUI();
-}
-  } catch(e) {
-    clearTimeout(timeoutId);
+
     if (!timeoutTriggered) {
       clearInterval(interval);
-      statusText.innerHTML = "⚠️ Network issue. Please call!";
+
+      progressTextSpan.textContent = "100%";
+
+      // Check selected transport mode
+      const selectedMode =
+        document.querySelector('input[name="mode"]:checked');
+
+      if (
+        selectedMode &&
+        selectedMode.value === "vehicle"
+      ) {
+        statusText.innerHTML =
+          "✅ Request sent! However, the vehicle is not available!";
+      } else {
+        statusText.innerHTML =
+          "✅ Request sent! Rider will contact you shortly or Call.";
+      }
+
+      statusText.style.color = "green";
+
+      finishRequestUI();
+    }
+
+  } catch (e) {
+    clearTimeout(timeoutId);
+
+    if (!timeoutTriggered) {
+      clearInterval(interval);
+
+      statusText.innerHTML =
+        "⚠️ Network issue. Please call!";
+
       statusText.style.color = "red";
+
       finishRequestUI();
     }
   }
 }
 
+
 function finishRequestUI() {
   btnLoader.style.display = "none";
   progressTextSpan.style.display = "none";
+
+  // Keep the existing Font Awesome phone icon
   btnIcon.style.display = "block";
   btnIcon.className = "fas fa-phone";
-  
+
   let callNumber = "0777737047";
+
   if (rideData && rideData.hub) {
+
     const hubNumbers = {
       "Luangwa Bus Station": "0777737047",
       "Luangwa Town": "0777737047",
@@ -2477,15 +2515,29 @@ function finishRequestUI() {
       "Luanshya Town": "0777737047",
       "Chipata Town": "0777737047"
     };
-    if (hubNumbers[rideData.hub]) callNumber = hubNumbers[rideData.hub];
-  }
-  
-  submitBtn.style.background = "var(--success-color)";
-  submitBtn.disabled = false;
-  document.getElementById('action-label').innerHTML = "Call Now";
-  submitBtn.onclick = () => window.location.href = `tel:${callNumber}`;
-}
 
+    if (hubNumbers[rideData.hub]) {
+      callNumber = hubNumbers[rideData.hub];
+    }
+  }
+
+  submitBtn.style.background =
+    "var(--success-color)";
+
+  submitBtn.disabled = false;
+
+  const actionLabel =
+    document.getElementById("action-label");
+
+  if (actionLabel) {
+    actionLabel.innerHTML = "Call Now";
+  }
+
+  submitBtn.onclick = () => {
+    window.location.href = `tel:${callNumber}`;
+  };
+}
+  
 let mapLink = "";
 
 function getLocation() {
