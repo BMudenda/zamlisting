@@ -1,1 +1,5270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0288D1">
 
+<title>Luangwa Feira Rides</title>
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+:root{
+    --primary-color:#0288D1;
+    --primary-dark:#0277BD;
+    --secondary-color:#008000;
+    --sky:#87CEEB;
+    --light-blue:#E1F5FE;
+    --border:#B3E5FC;
+    --danger:#D32F2F;
+    --text:#17313D;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+    min-height:100%;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--sky);
+    color:var(--text);
+}
+
+button,
+input{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app-interface-wrapper{
+    width:100%;
+    min-height:100vh;
+}
+
+.product-container{
+    width:100%;
+    max-width:700px;
+    margin:auto;
+    min-height:100vh;
+}
+
+.booking-container{
+    min-height:100vh;
+    padding-bottom:25px;
+}
+
+
+/* =========================================================
+   FORM HEADER
+========================================================= */
+
+.form-header-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
+    background:white;
+
+    padding:15px 17px;
+
+    border-bottom:1px solid #ddd;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.12);
+
+    position:sticky;
+    top:0;
+    z-index:4000;
+}
+
+.form-title-text{
+    font-size:19px;
+    font-weight:bold;
+    color:var(--primary-dark);
+}
+
+.form-title-icon{
+    margin-right:7px;
+}
+
+.form-close-btn{
+    width:36px;
+    height:36px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#F2F2F2;
+    color:#555;
+
+    font-size:20px;
+
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.form-content{
+    padding:13px;
+}
+
+
+/* =========================================================
+   FIELDSETS
+========================================================= */
+
+fieldset{
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:white;
+    padding:14px;
+    margin-bottom:13px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.08);
+}
+
+legend{
+    padding:0 8px;
+    color:var(--primary-dark);
+    font-size:15px;
+    font-weight:bold;
+}
+
+
+/* =========================================================
+   INPUT BOX
+========================================================= */
+
+.input-box{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.input-icon{
+    width:38px;
+    min-width:38px;
+
+    text-align:center;
+
+    color:var(--primary-color);
+    font-size:20px;
+}
+
+.input-box input{
+    flex:1;
+
+    width:100%;
+
+    border:2px solid var(--border);
+    border-radius:12px;
+
+    padding:14px 13px;
+
+    outline:none;
+
+    background:white;
+
+    color:#222;
+
+    font-size:15px;
+}
+
+.input-box input:focus{
+    border-color:var(--primary-color);
+}
+
+
+/* =========================================================
+   PHONE
+========================================================= */
+
+.phone-help{
+    text-align:center;
+
+    color:#777;
+
+    font-size:12px;
+
+    margin-top:8px;
+}
+
+.customer-profile{
+    margin-top:10px;
+
+    padding:9px 12px;
+
+    background:#E8F5E9;
+
+    color:#2E7D32;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+    text-align:center;
+}
+
+
+/* =========================================================
+   TRIP DETAILS
+========================================================= */
+
+.hidden-section{
+    display:none;
+}
+
+.hidden-section.show{
+    display:block;
+}
+
+.mode-help{
+    font-size:.8rem;
+    color:#999;
+    margin:8px 0 12px;
+    text-align:center;
+    font-style:italic;
+}
+
+
+/* =========================================================
+   MODE GROUP
+========================================================= */
+
+#mode-group{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.mode-option{
+    position:relative;
+
+    min-height:125px;
+
+    border:2px solid var(--border);
+
+    border-radius:16px;
+
+    background:#F8FDFF;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:6px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.mode-option:hover{
+    transform:translateY(-2px);
+}
+
+.mode-option input{
+    position:absolute;
+    opacity:0;
+}
+
+.mode-option.selected{
+    border-color:var(--secondary-color);
+
+    background:#E8F5E9;
+
+    box-shadow:
+        0 0 0 3px rgba(0,128,0,.1);
+}
+
+.mode-icon{
+    font-size:39px;
+}
+
+.mode-name{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.mode-rate{
+    color:#777;
+    font-size:11px;
+}
+
+
+/* =========================================================
+   AUTOCOMPLETE
+========================================================= */
+
+.autocomplete-wrapper{
+    position:relative;
+}
+
+.autocomplete-list{
+    position:absolute;
+
+    top:100%;
+    left:38px;
+    right:0;
+
+    background:white;
+
+    border:1px solid #ccc;
+
+    border-top:none;
+
+    border-radius:
+        0 0 12px 12px;
+
+    overflow:hidden;
+
+    z-index:5000;
+
+    box-shadow:
+        0 7px 18px rgba(0,0,0,.2);
+}
+
+.autocomplete-item{
+    padding:12px;
+
+    border-bottom:1px solid #eee;
+
+    cursor:pointer;
+}
+
+.autocomplete-item:last-child{
+    border-bottom:none;
+}
+
+.autocomplete-item:hover{
+    background:#E1F5FE;
+}
+
+.autocomplete-item strong{
+    display:block;
+    color:#222;
+}
+
+.autocomplete-item small{
+    display:block;
+    color:#777;
+    margin-top:3px;
+}
+
+
+/* =========================================================
+   CALCULATION LOADER
+========================================================= */
+
+.calc-loader{
+    width:32px;
+    height:32px;
+
+    border-radius:50%;
+
+    border:
+        4px solid #B3E5FC;
+
+    border-top-color:
+        var(--primary-color);
+
+    animation:
+        spin .8s linear infinite;
+
+    margin:
+        10px auto;
+
+    display:none;
+}
+
+.calc-loader.show{
+    display:block;
+}
+
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+#status{
+    color:var(--primary-dark);
+
+    font-size:13px;
+
+    padding:0 8px;
+
+    min-height:25px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-fieldset{
+    margin-top:5px;
+}
+
+.summary-cards{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+
+    padding:10px 3px;
+
+    border-bottom:1px solid #E1EFF4;
+
+    font-size:13px;
+}
+
+.summary-row:last-child{
+    border-bottom:none;
+}
+
+.summary-label{
+    color:#666;
+}
+
+.summary-value{
+    text-align:right;
+    font-weight:bold;
+    color:#17313D;
+}
+
+.summary-price{
+    color:var(--secondary-color);
+    font-size:24px;
+}
+
+
+/* =========================================================
+   TOOLTIP
+========================================================= */
+
+.tooltip-container{
+    display:inline-block;
+    position:relative;
+    margin-left:5px;
+}
+
+.tooltip-icon{
+    color:#888;
+    font-size:14px;
+    cursor:help;
+}
+
+.tooltip-text{
+    visibility:hidden;
+
+    position:absolute;
+
+    bottom:125%;
+    left:50%;
+
+    transform:
+        translateX(-50%);
+
+    width:230px;
+
+    background:#263238;
+
+    color:white;
+
+    padding:9px;
+
+    border-radius:8px;
+
+    font-size:11px;
+
+    font-weight:normal;
+
+    text-align:center;
+
+    z-index:6000;
+}
+
+.tooltip-container:hover .tooltip-text{
+    visibility:visible;
+}
+
+
+/* =========================================================
+   REQUEST BUTTON
+========================================================= */
+
+.action-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    margin-top:18px;
+}
+
+.submit-btn{
+    width:100%;
+    min-height:55px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:var(--secondary-color);
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:9px;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.submit-btn:disabled{
+    background:#9E9E9E;
+    cursor:not-allowed;
+}
+
+.btn-loader{
+    display:none;
+
+    width:19px;
+    height:19px;
+
+    border:
+        3px solid rgba(255,255,255,.4);
+
+    border-top-color:white;
+
+    border-radius:50%;
+
+    animation:
+        spin .7s linear infinite;
+}
+
+.submit-btn.loading .btn-loader{
+    display:block;
+}
+
+.submit-btn.loading #btn-icon{
+    display:none;
+}
+
+.action-label{
+    margin-top:8px;
+
+    font-weight:bold;
+
+    color:var(--primary-color);
+}
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+.map-fieldset{
+    margin-top:13px;
+}
+
+.map-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:7px;
+
+    margin-bottom:10px;
+}
+
+.map-toolbar-title{
+    color:var(--primary-dark);
+    font-weight:bold;
+}
+
+.map-buttons{
+    display:flex;
+    gap:5px;
+}
+
+.map-btn{
+    border:none;
+
+    background:var(--primary-color);
+
+    color:white;
+
+    padding:8px 10px;
+
+    border-radius:8px;
+
+    font-size:11px;
+}
+
+.map-container{
+    position:relative;
+
+    width:100%;
+    height:390px;
+
+    border:
+        2px solid #90CAF9;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    background:#F8FCFE;
+
+    touch-action:none;
+}
+
+#mapSvg{
+    display:block;
+
+    width:100%;
+    height:100%;
+
+    cursor:grab;
+}
+
+#mapSvg.dragging{
+    cursor:grabbing;
+}
+
+.map-background{
+    fill:#F7FCFE;
+}
+
+.route-line{
+    stroke:#00A000;
+
+    stroke-width:6;
+
+    fill:none;
+
+    stroke-linecap:round;
+
+    stroke-linejoin:round;
+}
+
+.route-place{
+    fill:#00A000;
+
+    stroke:white;
+
+    stroke-width:3;
+}
+
+.start-place{
+    fill:#1565C0;
+
+    stroke:white;
+
+    stroke-width:3;
+}
+
+.end-place{
+    fill:#D32F2F;
+
+    stroke:white;
+
+    stroke-width:3;
+}
+
+.place-label{
+    font-size:9px;
+
+    font-weight:bold;
+
+    fill:#263238;
+
+    paint-order:stroke;
+
+    stroke:white;
+
+    stroke-width:3px;
+}
+
+.route-label{
+    font-size:9px;
+
+    font-weight:bold;
+
+    fill:#008000;
+
+    paint-order:stroke;
+
+    stroke:white;
+
+    stroke-width:3px;
+}
+
+.route-dot{
+    fill:white;
+
+    stroke:#008000;
+
+    stroke-width:4;
+}
+
+.map-blank{
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    color:#78909C;
+
+    pointer-events:none;
+
+    padding:20px;
+}
+
+.map-blank.hidden{
+    display:none;
+}
+
+.zoom-controls{
+    position:absolute;
+
+    right:9px;
+
+    top:9px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+}
+
+.zoom-control{
+    width:38px;
+    height:38px;
+
+    border:none;
+
+    border-radius:9px;
+
+    background:white;
+
+    color:var(--primary-dark);
+
+    font-size:22px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.2);
+}
+
+
+/* =========================================================
+   PROGRESS OVERLAY
+========================================================= */
+
+.progress-overlay{
+    position:fixed;
+
+    inset:0;
+
+    background:
+        rgba(0,0,0,.65);
+
+    z-index:10000;
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+}
+
+.progress-overlay.show{
+    display:flex;
+}
+
+.progress-card{
+    width:min(400px,100%);
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:28px;
+
+    text-align:center;
+}
+
+.progress-spinner{
+    width:58px;
+    height:58px;
+
+    border-radius:50%;
+
+    border:
+        6px solid #B3E5FC;
+
+    border-top-color:
+        var(--primary-color);
+
+    animation:
+        spin .8s linear infinite;
+
+    margin:0 auto 15px;
+}
+
+.progress-percent{
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:var(--primary-dark);
+}
+
+.progress-bar{
+    height:10px;
+
+    background:#ddd;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    margin-top:16px;
+}
+
+.progress-fill{
+    height:100%;
+
+    width:0%;
+
+    background:var(--secondary-color);
+
+    transition:
+        width .15s linear;
+}
+
+
+/* =========================================================
+   SUCCESS
+========================================================= */
+
+.success-page{
+    display:none;
+
+    padding:40px 15px;
+}
+
+.success-page.show{
+    display:block;
+}
+
+.success-card{
+    background:white;
+
+    border-radius:20px;
+
+    padding:30px 20px;
+
+    text-align:center;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.15);
+}
+
+.success-icon{
+    width:75px;
+    height:75px;
+
+    border-radius:50%;
+
+    background:var(--secondary-color);
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:42px;
+
+    margin:0 auto 15px;
+}
+
+.success-card h2{
+    color:var(--secondary-color);
+
+    margin-bottom:10px;
+}
+
+.new-booking{
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--primary-color);
+
+    color:white;
+
+    font-size:16px;
+
+    margin-top:20px;
+}
+
+
+/* =========================================================
+   INSTALL PROMPT
+========================================================= */
+
+.install-banner{
+    position:fixed;
+
+    top:15px;
+    right:15px;
+
+    background:#2B6EF6;
+
+    color:white;
+
+    border-radius:10px;
+
+    padding:9px 13px;
+
+    font-size:13px;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,.2);
+
+    z-index:9999;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+}
+
+.install-close{
+    cursor:pointer;
+
+    font-weight:bold;
+
+    font-size:18px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:480px){
+
+    .form-title-text{
+        font-size:17px;
+    }
+
+    .form-content{
+        padding:10px;
+    }
+
+    fieldset{
+        padding:12px;
+    }
+
+    .map-container{
+        height:340px;
+    }
+
+    .tooltip-text{
+        width:190px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     MAIN APP
+====================================================== -->
+
+<div class="app-interface-wrapper">
+
+<main
+    class="product-container"
+    id="booking-form-popup">
+
+
+<div class="booking-container">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="form-header-bar">
+
+        <div class="form-title-text">
+
+            <span class="form-title-icon">
+                📄
+            </span>
+
+            Luangwa Feira Rides
+
+        </div>
+
+        <!--
+            Kept as a visual close/reset button.
+            It does not create a popup.
+        -->
+
+        <div
+            class="form-close-btn"
+            onclick="resetBooking()"
+            title="Reset Form">
+
+            ×
+
+        </div>
+
+    </div>
+
+
+    <div class="form-content">
+
+
+        <!-- =================================================
+             PROFILE
+        ================================================== -->
+
+        <fieldset>
+
+            <legend>
+                👤 Profile
+            </legend>
+
+
+            <div
+                class="input-box"
+                id="phone-box">
+
+                <span class="input-icon">
+                    ☎
+                </span>
+
+                <input
+                    type="tel"
+                    id="customer-phone"
+                    maxlength="10"
+                    placeholder="Enter your phone number eg 0xxxxxxxxx"
+                    inputmode="numeric"
+                    autocomplete="tel">
+
+            </div>
+
+
+            <div class="phone-help">
+
+                Enter a valid 10-digit Zambian mobile number.
+
+            </div>
+
+
+            <div
+                id="customer-profile"
+                class="customer-profile hidden">
+
+            </div>
+
+        </fieldset>
+
+
+
+        <!-- =================================================
+             TRIP DETAILS
+        ================================================== -->
+
+        <div
+            id="trip-details"
+            class="hidden-section">
+
+
+            <!-- TRANSPORT MODE -->
+
+            <fieldset>
+
+                <legend>
+                    🛵 Transport Mode
+                </legend>
+
+
+                <p class="mode-help">
+
+                    Choose your preferred transport mode
+
+                </p>
+
+
+                <div id="mode-group">
+
+
+                    <label
+                        class="mode-option"
+                        data-mode="motorbike">
+
+                        <input
+                            type="radio"
+                            name="mode"
+                            value="motorbike">
+
+                        <div class="mode-icon">
+                            🏍️
+                        </div>
+
+                        <div class="mode-name">
+                            Motorbike
+                        </div>
+
+                        <div class="mode-rate">
+                            K2.50/km
+                        </div>
+
+                    </label>
+
+
+
+                    <label
+                        class="mode-option"
+                        data-mode="vehicle">
+
+                        <input
+                            type="radio"
+                            name="mode"
+                            value="vehicle">
+
+                        <div class="mode-icon">
+                            🚗
+                        </div>
+
+                        <div class="mode-name">
+                            Car
+                        </div>
+
+                        <div class="mode-rate">
+                            K4.50/km
+                        </div>
+
+                    </label>
+
+
+                </div>
+
+            </fieldset>
+
+
+
+            <!-- PICKUP -->
+
+            <fieldset>
+
+                <legend>
+                    Pickup Location
+                </legend>
+
+
+                <div
+                    class="input-box autocomplete-wrapper"
+                    id="origin-container">
+
+                    <span class="input-icon">
+                        📍
+                    </span>
+
+                    <input
+                        type="text"
+                        id="gm-origin"
+                        placeholder="Where should we pick you up?"
+                        autocomplete="off">
+
+
+                    <div
+                        id="originList"
+                        class="autocomplete-list hidden">
+                    </div>
+
+                </div>
+
+            </fieldset>
+
+
+
+            <!-- DESTINATION -->
+
+            <fieldset>
+
+                <legend>
+                    Destination
+                </legend>
+
+
+                <div
+                    class="input-box autocomplete-wrapper"
+                    id="dest-container">
+
+                    <span class="input-icon">
+                        📌
+                    </span>
+
+                    <input
+                        type="text"
+                        id="gm-destination"
+                        placeholder="Where are you going?"
+                        autocomplete="off">
+
+
+                    <div
+                        id="destinationList"
+                        class="autocomplete-list hidden">
+                    </div>
+
+                </div>
+
+            </fieldset>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <div
+            id="summary-section"
+            class="hidden-section">
+
+
+            <fieldset class="summary-fieldset">
+
+                <legend>
+
+                    🧾 Trip Summary
+
+                    <span class="tooltip-container">
+
+                        ?
+
+                        <span
+                            class="tooltip-text"
+                            id="hub-tooltip">
+
+                            Calculated via nearest transport hub
+
+                        </span>
+
+                    </span>
+
+                </legend>
+
+
+                <div
+                    id="summary-cards"
+                    class="summary-cards">
+
+                </div>
+
+
+                <div class="action-area">
+
+                    <button
+                        class="submit-btn"
+                        id="submit-btn"
+                        disabled>
+
+                        <span id="btn-icon">
+                            ➤
+                        </span>
+
+                        <div
+                            class="btn-loader"
+                            id="btn-loader">
+                        </div>
+
+                        <span id="progress-text">
+                            Request Now
+                        </span>
+
+                    </button>
+
+
+                    <p
+                        id="action-label"
+                        class="action-label">
+
+                        Request Now
+
+                    </p>
+
+                </div>
+
+            </fieldset>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             MAP
+        ================================================== -->
+
+        <div
+            id="map-section"
+            class="hidden-section">
+
+
+            <fieldset class="map-fieldset">
+
+                <legend>
+                    🗺️ Route Map
+                </legend>
+
+
+                <div class="map-toolbar">
+
+                    <div class="map-toolbar-title">
+                        Shortest Road Route
+                    </div>
+
+
+                    <div class="map-buttons">
+
+                        <button
+                            class="map-btn"
+                            id="map-toggle-btn"
+                            onclick="toggleMap()">
+
+                            Hide Map
+
+                        </button>
+
+
+                        <button
+                            class="map-btn"
+                            onclick="focusRoute()">
+
+                            Focus
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="map-container"
+                    class="map-container">
+
+
+                    <svg
+                        id="mapSvg"
+                        viewBox="0 0 1000 650">
+
+
+                        <rect
+                            class="map-background"
+                            x="0"
+                            y="0"
+                            width="1000"
+                            height="650">
+                        </rect>
+
+
+                        <g id="routeLayer"></g>
+
+                        <g id="placesLayer"></g>
+
+                        <g id="labelsLayer"></g>
+
+
+                        <circle
+                            id="routeDot"
+                            class="route-dot"
+                            r="7"
+                            style="display:none">
+                        </circle>
+
+
+                    </svg>
+
+
+                    <div
+                        id="mapBlank"
+                        class="map-blank">
+
+                        <div>
+
+                            <strong>
+                                Route Map
+                            </strong>
+
+                            <br><br>
+
+                            Select pickup and destination
+                            to display the route.
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="zoom-controls">
+
+                        <button
+                            class="zoom-control"
+                            onclick="zoomMap(1.25)">
+
+                            +
+
+                        </button>
+
+
+                        <button
+                            class="zoom-control"
+                            onclick="zoomMap(.8)">
+
+                            −
+
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+
+            </fieldset>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             CALCULATION SPINNER
+        ================================================== -->
+
+        <div
+            class="calc-loader"
+            id="spinner">
+        </div>
+
+
+        <p id="status"></p>
+
+
+    </div>
+
+</div>
+
+</main>
+
+</div>
+
+
+
+<!-- =====================================================
+     SUCCESS PAGE
+====================================================== -->
+
+<div
+    id="success-page"
+    class="success-page">
+
+    <div class="success-card">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>
+            Request Sent
+        </h2>
+
+        <p>
+            Your ride request has been submitted successfully.
+        </p>
+
+        <button
+            class="new-booking"
+            onclick="newBooking()">
+
+            New Booking
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PROGRESS OVERLAY
+====================================================== -->
+
+<div
+    id="progress-overlay"
+    class="progress-overlay">
+
+    <div class="progress-card">
+
+        <div class="progress-spinner"></div>
+
+
+        <div
+            id="progress-percent"
+            class="progress-percent">
+
+            0%
+
+        </div>
+
+
+        <div>
+            Sending ride request...
+        </div>
+
+
+        <div class="progress-bar">
+
+            <div
+                id="progress-fill"
+                class="progress-fill">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================================
+   GOOGLE APPS SCRIPT
+========================================================= */
+
+const GOOGLE_SCRIPT_URL = "";
+
+
+/* =========================================================
+   CUSTOMER DATABASE
+========================================================= */
+
+const customers = {
+
+    "0978167546":"Brian",
+    "0974462327":"Brian",
+    "0979146191":"Brian",
+    "0979401457":"Alick",
+    "0976785753":"Patrick",
+    "0971223101":"Annes",
+    "0974028478":"Victor",
+    "0977885430":"Malu",
+    "0974623779":"Mwizl",
+    "0776357574":"Mercy",
+    "0978879700":"Musa",
+    "0976367308":"Steve",
+    "0977945992":"Nelson",
+    "0977655146":"fashion",
+    "0770813325":"Blessings",
+    "0974998852":"Kelvin",
+    "0972755389":"Matias",
+    "0974742243":"Francis",
+    "0774722903":"Christopher",
+    "0779442536":"Joel",
+    "0777449952":"Joe",
+    "0773295934":"Royd",
+    "0979339751":"Mulope",
+    "0951897541":"Isaac",
+    "0777539863":"Shilla",
+    "0971616593":"Womderson",
+    "0779578090":"Chungu",
+    "0775817091":"Milliam",
+    "0978919708":"Anthony",
+    "0777977044":"Celeb",
+    "0978953059":"Sepo",
+    "0972250287":"Shupikai",
+    "0955493744":"Fanwell",
+    "0570600463":"Queran",
+    "0977462377":"Nchimunya",
+    "0973014571":"Acrass",
+    "0975692320":"Elliot",
+    "0974002427":"Elisha",
+    "0976785794":"Doreen"
+
+};
+
+
+/* =========================================================
+   FARE CONFIGURATION
+========================================================= */
+
+const config = {
+
+    vehiclePricePerKm:4.50,
+
+    motorbikePricePerKm:2.50,
+
+    vehicleMinPrice:25,
+
+    motorbikeMinPrice:15,
+
+    vehicleExtra:6.00,
+
+    motorbikeExtra:3.00,
+
+    avgSpeed:60
+
+};
+
+
+/* =========================================================
+   PLACES
+========================================================= */
+
+const PLACES_DATA = [
+
+    {
+        id:"LUSAKA",
+        name:"Lusaka",
+        lat:-15.4167,
+        lon:28.2833,
+        type:"City"
+    },
+
+    {
+        id:"AIRPORT",
+        name:"Lusaka Airport",
+        lat:-15.3302,
+        lon:28.4526,
+        type:"Airport"
+    },
+
+    {
+        id:"CHONGWE",
+        name:"Chongwe",
+        lat:-15.3292,
+        lon:28.6820,
+        type:"Town"
+    },
+
+    {
+        id:"RUFUNSA",
+        name:"Rufunsa",
+        lat:-15.1500,
+        lon:29.0000,
+        type:"Town"
+    },
+
+    {
+        id:"LUANGWA",
+        name:"Luangwa",
+        lat:-15.6167,
+        lon:30.4167,
+        type:"Town"
+    },
+
+    {
+        id:"LUANGWA_BUS",
+        name:"Luangwa Bus Station",
+        lat:-15.6160,
+        lon:30.4100,
+        type:"Transport Hub"
+    },
+
+    {
+        id:"CHITOPE",
+        name:"Chitope",
+        lat:-15.6000,
+        lon:30.3700,
+        type:"Community"
+    },
+
+    {
+        id:"LUANGWA_BRIDGE",
+        name:"Luangwa Bridge",
+        lat:-15.6200,
+        lon:30.4300,
+        type:"Junction"
+    },
+
+    {
+        id:"MWANAMWALI",
+        name:"Mwanamwali",
+        lat:-15.3500,
+        lon:29.4500,
+        type:"Community"
+    },
+
+    {
+        id:"NYIMBA",
+        name:"Nyimba",
+        lat:-14.5560,
+        lon:30.8140,
+        type:"Town"
+    },
+
+    {
+        id:"PETAUKE",
+        name:"Petauke",
+        lat:-14.2412,
+        lon:31.3196,
+        type:"Town"
+    },
+
+    {
+        id:"CHIPATA",
+        name:"Chipata",
+        lat:-13.6333,
+        lon:32.6500,
+        type:"City"
+    },
+
+    {
+        id:"KAFUE",
+        name:"Kafue",
+        lat:-15.7691,
+        lon:28.1814,
+        type:"Town"
+    },
+
+    {
+        id:"MAZABUKA",
+        name:"Mazabuka",
+        lat:-15.8560,
+        lon:27.7480,
+        type:"Town"
+    },
+
+    {
+        id:"MONZE",
+        name:"Monze",
+        lat:-16.2833,
+        lon:27.4833,
+        type:"Town"
+    },
+
+    {
+        id:"NDOLA",
+        name:"Ndola",
+        lat:-12.9587,
+        lon:28.6366,
+        type:"City"
+    },
+
+    {
+        id:"MPONGWE",
+        name:"Mpongwe",
+        lat:-13.5090,
+        lon:28.1550,
+        type:"Town"
+    }
+
+];
+
+
+/* =========================================================
+   ROADS
+
+   These are actual road/network distances.
+
+   The system does NOT calculate road distance using
+   straight-line latitude/longitude distance.
+========================================================= */
+
+const ROADS_DATA = [
+
+    {
+        from:"LUSAKA",
+        to:"CHONGWE",
+        distanceKm:35,
+        roadName:"Great East Road"
+    },
+
+    {
+        from:"LUSAKA",
+        to:"AIRPORT",
+        distanceKm:25,
+        roadName:"Airport Road"
+    },
+
+    {
+        from:"LUSAKA",
+        to:"KAFUE",
+        distanceKm:45,
+        roadName:"Kafue Road"
+    },
+
+    {
+        from:"AIRPORT",
+        to:"CHONGWE",
+        distanceKm:45,
+        roadName:"Airport Connection"
+    },
+
+    {
+        from:"KAFUE",
+        to:"MAZABUKA",
+        distanceKm:80,
+        roadName:"T1"
+    },
+
+    {
+        from:"MAZABUKA",
+        to:"MONZE",
+        distanceKm:75,
+        roadName:"T1"
+    },
+
+    {
+        from:"CHONGWE",
+        to:"RUFUNSA",
+        distanceKm:70,
+        roadName:"Great East Road"
+    },
+
+    {
+        from:"RUFUNSA",
+        to:"LUANGWA",
+        distanceKm:95,
+        roadName:"M4"
+    },
+
+    {
+        from:"RUFUNSA",
+        to:"NYIMBA",
+        distanceKm:110,
+        roadName:"Great East Road"
+    },
+
+    {
+        from:"NYIMBA",
+        to:"PETAUKE",
+        distanceKm:80,
+        roadName:"Great East Road"
+    },
+
+    {
+        from:"PETAUKE",
+        to:"CHIPATA",
+        distanceKm:105,
+        roadName:"Great East Road"
+    },
+
+    {
+        from:"LUANGWA",
+        to:"LUANGWA_BUS",
+        distanceKm:5,
+        roadName:"Local Road"
+    },
+
+    {
+        from:"LUANGWA_BUS",
+        to:"CHITOPE",
+        distanceKm:18,
+        roadName:"Local Road"
+    },
+
+    {
+        from:"LUANGWA_BUS",
+        to:"LUANGWA_BRIDGE",
+        distanceKm:7,
+        roadName:"Local Road"
+    },
+
+    {
+        from:"CHITOPE",
+        to:"MWANAMWALI",
+        distanceKm:12,
+        roadName:"Local Road"
+    },
+
+    {
+        from:"MWANAMWALI",
+        to:"RUFUNSA",
+        distanceKm:65,
+        roadName:"Connecting Road"
+    },
+
+    {
+        from:"NDOLA",
+        to:"MPONGWE",
+        distanceKm:45,
+        roadName:"Copperbelt Road"
+    },
+
+    {
+        from:"MPONGWE",
+        to:"LUSAKA",
+        distanceKm:300,
+        roadName:"Connecting Road"
+    }
+
+];
+
+
+/* =========================================================
+   OPERATIONAL HUBS
+========================================================= */
+
+const hubs = [
+
+    "LUSAKA",
+    "CHONGWE",
+    "RUFUNSA",
+    "LUANGWA_BUS",
+    "NYIMBA",
+    "PETAUKE",
+    "CHIPATA",
+    "KAFUE",
+    "NDOLA",
+    "MPONGWE"
+
+];
+
+
+/* =========================================================
+   APPLICATION STATE
+========================================================= */
+
+const places = {};
+
+let graph = {};
+
+let currentRoute = null;
+
+let rideData = null;
+
+let calculationTimer = null;
+
+let progressTimer = null;
+
+let mapVisible = true;
+
+let mapTransform = {
+
+    x:0,
+
+    y:0,
+
+    scale:1
+
+};
+
+
+PLACES_DATA.forEach(
+    place => {
+
+        places[place.id] = {
+            ...place
+        };
+
+    }
+);
+
+
+/* =========================================================
+   MAP COORDINATES
+========================================================= */
+
+function calculateCoordinates(){
+
+    const all =
+        Object.values(places);
+
+    const lats =
+        all.map(
+            p => p.lat
+        );
+
+    const lons =
+        all.map(
+            p => p.lon
+        );
+
+    const minLat =
+        Math.min(...lats);
+
+    const maxLat =
+        Math.max(...lats);
+
+    const minLon =
+        Math.min(...lons);
+
+    const maxLon =
+        Math.max(...lons);
+
+    const padding = 70;
+
+
+    all.forEach(
+        place => {
+
+            place.x =
+                padding +
+                (
+                    (
+                        place.lon -
+                        minLon
+                    ) /
+                    (
+                        maxLon -
+                        minLon
+                    )
+                ) *
+                (
+                    1000 -
+                    padding*2
+                );
+
+
+            place.y =
+                padding +
+                (
+                    (
+                        maxLat -
+                        place.lat
+                    ) /
+                    (
+                        maxLat -
+                        minLat
+                    )
+                ) *
+                (
+                    650 -
+                    padding*2
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BUILD GRAPH
+========================================================= */
+
+function buildGraph(){
+
+    graph = {};
+
+
+    Object.keys(places)
+        .forEach(
+            id => {
+
+                graph[id] = [];
+
+            }
+        );
+
+
+    ROADS_DATA.forEach(
+        (road,index) => {
+
+            if(
+                !places[road.from] ||
+                !places[road.to]
+            ){
+
+                return;
+
+            }
+
+
+            graph[road.from].push({
+
+                node:road.to,
+
+                distance:
+                    Number(
+                        road.distanceKm
+                    ),
+
+                roadIndex:index
+
+            });
+
+
+            graph[road.to].push({
+
+                node:road.from,
+
+                distance:
+                    Number(
+                        road.distanceKm
+                    ),
+
+                roadIndex:index
+
+            });
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DIJKSTRA
+========================================================= */
+
+function shortestPath(
+    start,
+    end
+){
+
+    if(
+        !graph[start] ||
+        !graph[end]
+    ){
+
+        return null;
+
+    }
+
+
+    const distances = {};
+
+    const previous = {};
+
+    const previousRoad = {};
+
+    const unvisited =
+        new Set(
+            Object.keys(graph)
+        );
+
+
+    Object.keys(graph)
+        .forEach(
+            id => {
+
+                distances[id] =
+                    Infinity;
+
+                previous[id] =
+                    null;
+
+                previousRoad[id] =
+                    null;
+
+            }
+        );
+
+
+    distances[start] = 0;
+
+
+    while(
+        unvisited.size
+    ){
+
+        let current = null;
+
+        let smallest = Infinity;
+
+
+        for(
+            const node of unvisited
+        ){
+
+            if(
+                distances[node] <
+                smallest
+            ){
+
+                smallest =
+                    distances[node];
+
+                current =
+                    node;
+
+            }
+
+        }
+
+
+        if(current === null){
+
+            break;
+
+        }
+
+
+        unvisited.delete(
+            current
+        );
+
+
+        if(
+            current === end
+        ){
+
+            break;
+
+        }
+
+
+        graph[current]
+            .forEach(
+                edge => {
+
+                    if(
+                        !unvisited.has(
+                            edge.node
+                        )
+                    ){
+
+                        return;
+
+                    }
+
+
+                    const newDistance =
+                        distances[current] +
+                        edge.distance;
+
+
+                    if(
+                        newDistance <
+                        distances[edge.node]
+                    ){
+
+                        distances[edge.node] =
+                            newDistance;
+
+                        previous[edge.node] =
+                            current;
+
+                        previousRoad[
+                            edge.node
+                        ] =
+                            edge.roadIndex;
+
+                    }
+
+                }
+            );
+
+    }
+
+
+    if(
+        start !== end &&
+        previous[end] === null
+    ){
+
+        return null;
+
+    }
+
+
+    const path = [];
+
+    const roadIndexes = [];
+
+    let current = end;
+
+
+    while(
+        current !== null
+    ){
+
+        path.unshift(
+            current
+        );
+
+
+        if(
+            previousRoad[current] !== null
+        ){
+
+            roadIndexes.unshift(
+                previousRoad[current]
+            );
+
+        }
+
+
+        current =
+            previous[current];
+
+    }
+
+
+    return {
+
+        path,
+
+        roadIndexes,
+
+        distance:
+            distances[end]
+
+    };
+
+}
+
+
+/* =========================================================
+   DISTANCE
+========================================================= */
+
+function findShortestDistance(
+    start,
+    end
+){
+
+    const result =
+        shortestPath(
+            start,
+            end
+        );
+
+
+    return result
+        ? result.distance
+        : null;
+
+}
+
+
+/* =========================================================
+   HUB-BASED TOTAL DISTANCE
+========================================================= */
+
+function calculateTotalDistance(
+    pickup,
+    destination
+){
+
+    if(
+        pickup === destination
+    ){
+
+        return {
+
+            total:0,
+
+            trip:0,
+
+            hub:"N/A",
+
+            hubToPickup:0,
+
+            destinationToHub:0
+
+        };
+
+    }
+
+
+    const tripResult =
+        shortestPath(
+            pickup,
+            destination
+        );
+
+
+    if(!tripResult){
+
+        return null;
+
+    }
+
+
+    const trip =
+        tripResult.distance;
+
+
+    let bestHub = null;
+
+    let bestTotal = Infinity;
+
+    let bestHubToPickup = null;
+
+    let bestDestinationToHub = null;
+
+
+    for(
+        const hub of hubs
+    ){
+
+        const hubToPickup =
+            shortestPath(
+                hub,
+                pickup
+            );
+
+
+        const destinationToHub =
+            shortestPath(
+                destination,
+                hub
+            );
+
+
+        if(
+            !hubToPickup ||
+            !destinationToHub
+        ){
+
+            continue;
+
+        }
+
+
+        const total =
+            hubToPickup.distance +
+            trip +
+            destinationToHub.distance;
+
+
+        if(
+            total <
+            bestTotal
+        ){
+
+            bestTotal =
+                total;
+
+            bestHub =
+                hub;
+
+            bestHubToPickup =
+                hubToPickup.distance;
+
+            bestDestinationToHub =
+                destinationToHub.distance;
+
+        }
+
+    }
+
+
+    if(!bestHub){
+
+        return null;
+
+    }
+
+
+    return {
+
+        hub:bestHub,
+
+        trip,
+
+        total:bestTotal,
+
+        hubToPickup:
+            bestHubToPickup,
+
+        destinationToHub:
+            bestDestinationToHub
+
+    };
+
+}
+
+
+/* =========================================================
+   FARE
+========================================================= */
+
+function calculateFare(
+    mode,
+    distance
+){
+
+    let rate;
+
+    let minimum;
+
+    let extra;
+
+
+    if(
+        mode === "vehicle"
+    ){
+
+        rate =
+            config.vehiclePricePerKm;
+
+        minimum =
+            config.vehicleMinPrice;
+
+        extra =
+            config.vehicleExtra;
+
+    }else{
+
+        rate =
+            config.motorbikePricePerKm;
+
+        minimum =
+            config.motorbikeMinPrice;
+
+        extra =
+            config.motorbikeExtra;
+
+    }
+
+
+    const fare =
+        Math.max(
+            minimum,
+            Math.ceil(
+                (
+                    distance *
+                    rate
+                ) +
+                extra
+            )
+        );
+
+
+    return {
+
+        rate,
+
+        minimum,
+
+        extra,
+
+        price:fare
+
+    };
+
+}
+
+
+/* =========================================================
+   CUSTOMER NAME
+========================================================= */
+
+function getCustomerName(){
+
+    const phone =
+        document
+            .getElementById(
+                "customer-phone"
+            )
+            .value
+            .trim();
+
+
+    return customers[phone]
+        || "New Customer";
+
+}
+
+
+/* =========================================================
+   PHONE
+========================================================= */
+
+const phoneInput =
+    document.getElementById(
+        "customer-phone"
+    );
+
+
+phoneInput.addEventListener(
+    "input",
+    function(){
+
+        this.value =
+            this.value
+                .replace(/\D/g,"")
+                .slice(0,10);
+
+
+        const phone =
+            this.value.trim();
+
+
+        const trip =
+            document.getElementById(
+                "trip-details"
+            );
+
+
+        const profile =
+            document.getElementById(
+                "customer-profile"
+            );
+
+
+        if(
+            /^0[0-9]{9}$/.test(
+                phone
+            )
+        ){
+
+            trip.classList.add(
+                "show"
+            );
+
+
+            if(
+                customers[phone]
+            ){
+
+                profile.textContent =
+                    "Welcome, " +
+                    customers[phone];
+
+            }else{
+
+                profile.textContent =
+                    "New Customer";
+
+            }
+
+
+            profile.classList.remove(
+                "hidden"
+            );
+
+        }else{
+
+            trip.classList.remove(
+                "show"
+            );
+
+
+            document
+                .getElementById(
+                    "summary-section"
+                )
+                .classList.remove(
+                    "show"
+                );
+
+
+            document
+                .getElementById(
+                    "map-section"
+                )
+                .classList.remove(
+                    "show"
+                );
+
+
+            profile.classList.add(
+                "hidden"
+            );
+
+            rideData =
+                null;
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   MODE SELECTION
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".mode-option"
+    )
+    .forEach(
+        option => {
+
+            option.addEventListener(
+                "click",
+                function(){
+
+                    document
+                        .querySelectorAll(
+                            ".mode-option"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "selected"
+                                )
+                        );
+
+
+                    this.classList.add(
+                        "selected"
+                    );
+
+
+                    const radio =
+                        this.querySelector(
+                            "input"
+                        );
+
+
+                    radio.checked =
+                        true;
+
+
+                    scheduleCalculation();
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   AUTOCOMPLETE
+========================================================= */
+
+function setupAutocomplete(
+    inputId,
+    listId,
+    type
+){
+
+    const input =
+        document.getElementById(
+            inputId
+        );
+
+
+    const list =
+        document.getElementById(
+            listId
+        );
+
+
+    input.addEventListener(
+        "input",
+        function(){
+
+            this.dataset.placeId =
+                "";
+
+
+            const value =
+                this.value
+                    .trim()
+                    .toLowerCase();
+
+
+            list.innerHTML =
+                "";
+
+
+            if(!value){
+
+                list.classList.add(
+                    "hidden"
+                );
+
+                scheduleCalculation();
+
+                return;
+
+            }
+
+
+            const matches =
+                PLACES_DATA
+                    .filter(
+                        place =>
+                            place.name
+                                .toLowerCase()
+                                .includes(
+                                    value
+                                )
+                    )
+                    .slice(0,6);
+
+
+            matches.forEach(
+                place => {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "autocomplete-item";
+
+
+                    item.innerHTML = `
+
+                        <strong>
+                            ${escapeHtml(
+                                place.name
+                            )}
+                        </strong>
+
+                        <small>
+                            ${escapeHtml(
+                                place.type
+                            )}
+                        </small>
+
+                    `;
+
+
+                    const choose =
+                        function(event){
+
+                            if(event){
+
+                                event.preventDefault();
+
+                            }
+
+
+                            input.value =
+                                place.name;
+
+
+                            input.dataset.placeId =
+                                place.id;
+
+
+                            list.classList.add(
+                                "hidden"
+                            );
+
+
+                            list.innerHTML =
+                                "";
+
+
+                            scheduleCalculation();
+
+                        };
+
+
+                    item.addEventListener(
+                        "mousedown",
+                        choose
+                    );
+
+
+                    item.addEventListener(
+                        "touchstart",
+                        choose,
+                        {
+                            passive:false
+                        }
+                    );
+
+
+                    list.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+
+            if(matches.length){
+
+                list.classList.remove(
+                    "hidden"
+                );
+
+            }else{
+
+                list.classList.add(
+                    "hidden"
+                );
+
+            }
+
+        }
+    );
+
+
+    input.addEventListener(
+        "blur",
+        function(){
+
+            setTimeout(
+                () => {
+
+                    list.classList.add(
+                        "hidden"
+                    );
+
+                },
+                150
+            );
+
+        }
+    );
+
+}
+
+
+setupAutocomplete(
+    "gm-origin",
+    "originList",
+    "pickup"
+);
+
+
+setupAutocomplete(
+    "gm-destination",
+    "destinationList",
+    "destination"
+);
+
+
+/* =========================================================
+   GET SELECTED PLACE
+========================================================= */
+
+function getSelectedPlace(
+    inputId
+){
+
+    const input =
+        document.getElementById(
+            inputId
+        );
+
+
+    const id =
+        input.dataset.placeId;
+
+
+    if(
+        id &&
+        places[id] &&
+        input.value.trim() ===
+        places[id].name
+    ){
+
+        return id;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   SCHEDULE CALCULATION
+========================================================= */
+
+function scheduleCalculation(){
+
+    if(calculationTimer){
+
+        clearTimeout(
+            calculationTimer
+        );
+
+    }
+
+
+    calculationTimer =
+        setTimeout(
+            calculateBooking,
+            250
+        );
+
+}
+
+
+/* =========================================================
+   CALCULATE BOOKING
+========================================================= */
+
+function calculateBooking(){
+
+    const pickup =
+        getSelectedPlace(
+            "gm-origin"
+        );
+
+
+    const destination =
+        getSelectedPlace(
+            "gm-destination"
+        );
+
+
+    const mode =
+        document.querySelector(
+            'input[name="mode"]:checked'
+        );
+
+
+    const summary =
+        document.getElementById(
+            "summary-section"
+        );
+
+
+    const map =
+        document.getElementById(
+            "map-section"
+        );
+
+
+    const submit =
+        document.getElementById(
+            "submit-btn"
+        );
+
+
+    const spinner =
+        document.getElementById(
+            "spinner"
+        );
+
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+    if(
+        !pickup ||
+        !destination ||
+        !mode
+    ){
+
+        summary.classList.remove(
+            "show"
+        );
+
+
+        map.classList.remove(
+            "show"
+        );
+
+
+        submit.disabled =
+            true;
+
+
+        currentRoute =
+            null;
+
+
+        clearMap();
+
+
+        if(
+            pickup &&
+            destination &&
+            !mode
+        ){
+
+            status.textContent =
+                "Please choose your preferred transport mode.";
+
+        }else{
+
+            status.textContent =
+                "";
+
+        }
+
+
+        return;
+
+    }
+
+
+    spinner.classList.add(
+        "show"
+    );
+
+
+    summary.classList.remove(
+        "show"
+    );
+
+
+    submit.disabled =
+        true;
+
+
+    status.textContent =
+        "Calculating route and fare...";
+
+
+    setTimeout(
+        () => {
+
+            performCalculation(
+                pickup,
+                destination,
+                mode.value
+            );
+
+        },
+        450
+    );
+
+}
+
+
+/* =========================================================
+   PERFORM CALCULATION
+========================================================= */
+
+function performCalculation(
+    pickup,
+    destination,
+    mode
+){
+
+    const result =
+        calculateTotalDistance(
+            pickup,
+            destination
+        );
+
+
+    const spinner =
+        document.getElementById(
+            "spinner"
+        );
+
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+    const submit =
+        document.getElementById(
+            "submit-btn"
+        );
+
+
+    if(
+        !result ||
+        result.total === null
+    ){
+
+        spinner.classList.remove(
+            "show"
+        );
+
+
+        status.textContent =
+            "No connected road route was found between these locations.";
+
+        status.style.color =
+            "#D32F2F";
+
+
+        return;
+
+    }
+
+
+    const fare =
+        calculateFare(
+            mode,
+            result.total
+        );
+
+
+    const estimatedMinutes =
+        Math.max(
+            1,
+            Math.ceil(
+                (
+                    result.trip /
+                    config.avgSpeed
+                ) * 60
+            )
+        );
+
+
+    const customer =
+        getCustomerName();
+
+
+    /*
+       Format phone for Apps Script.
+    */
+
+    const rawPhone =
+        phoneInput.value.trim();
+
+
+    const formattedPhone =
+        rawPhone.startsWith("0")
+            ? "+260" +
+              rawPhone.substring(1)
+            : rawPhone;
+
+
+    /*
+       Store complete ride data.
+    */
+
+    rideData = {
+
+        preferredMode:
+            mode,
+
+        phone:
+            formattedPhone,
+
+        customer:
+            customer,
+
+        hub:
+            places[result.hub].name,
+
+        hubId:
+            result.hub,
+
+        from:
+            places[pickup].name,
+
+        fromId:
+            pickup,
+
+        to:
+            places[destination].name,
+
+        toId:
+            destination,
+
+        tripDistance:
+            result.trip.toFixed(2),
+
+        hubToPickup:
+            result.hubToPickup.toFixed(2),
+
+        destinationToHub:
+            result.destinationToHub.toFixed(2),
+
+        totalDistance:
+            result.total.toFixed(2),
+
+        price:
+            fare.price,
+
+        rate:
+            fare.rate,
+
+        estimatedTime:
+            estimatedMinutes +
+            " mins"
+
+    };
+
+
+    /* =====================================================
+       SUMMARY
+    ================================================== */
+
+    const summaryCards =
+        document.getElementById(
+            "summary-cards"
+        );
+
+
+    summaryCards.innerHTML = `
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Customer
+            </span>
+
+            <span class="summary-value">
+                ${escapeHtml(customer)}
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Transport
+            </span>
+
+            <span class="summary-value">
+                ${
+                    mode === "vehicle"
+                    ? "Car"
+                    : "Motorbike"
+                }
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Pickup
+            </span>
+
+            <span class="summary-value">
+                ${escapeHtml(
+                    places[pickup].name
+                )}
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Destination
+            </span>
+
+            <span class="summary-value">
+                ${escapeHtml(
+                    places[destination].name
+                )}
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Transport Hub
+            </span>
+
+            <span class="summary-value">
+                ${escapeHtml(
+                    places[result.hub].name
+                )}
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Trip Distance
+            </span>
+
+            <span class="summary-value">
+                ${result.trip.toFixed(2)} km
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Hub Distance
+            </span>
+
+            <span class="summary-value">
+                ${(
+                    result.hubToPickup +
+                    result.destinationToHub
+                ).toFixed(2)} km
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Fare Distance
+            </span>
+
+            <span class="summary-value">
+                ${result.total.toFixed(2)} km
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Estimated Time
+            </span>
+
+            <span class="summary-value">
+                ${estimatedMinutes} mins
+            </span>
+        </div>
+
+
+        <div class="summary-row">
+            <span class="summary-label">
+                Total Fare
+            </span>
+
+            <span class="summary-value summary-price">
+                K${fare.price}
+            </span>
+        </div>
+
+    `;
+
+
+    document
+        .getElementById(
+            "hub-tooltip"
+        )
+        .textContent =
+        "Calculated via " +
+        places[result.hub].name +
+        " using the lowest complete hub → pickup → destination → hub distance.";
+
+
+    document
+        .getElementById(
+            "summary-section"
+        )
+        .classList.add(
+            "show"
+        );
+
+
+    spinner.classList.remove(
+        "show"
+    );
+
+
+    status.textContent =
+        "";
+
+
+    status.style.color =
+        "";
+
+
+    submit.disabled =
+        false;
+
+
+    /*
+       Draw customer route only.
+
+       Hub distance is used for fare calculation,
+       but the passenger map shows pickup → destination.
+    */
+
+    const route =
+        shortestPath(
+            pickup,
+            destination
+        );
+
+
+    drawRoute(
+        route
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+){
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   SVG
+========================================================= */
+
+function svgElement(
+    tag,
+    attrs={}
+){
+
+    const element =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            tag
+        );
+
+
+    Object.entries(attrs)
+        .forEach(
+            ([key,value]) => {
+
+                element.setAttribute(
+                    key,
+                    value
+                );
+
+            }
+        );
+
+
+    return element;
+
+}
+
+
+/* =========================================================
+   CLEAR MAP
+========================================================= */
+
+function clearMap(){
+
+    document
+        .getElementById(
+            "routeLayer"
+        )
+        .innerHTML = "";
+
+
+    document
+        .getElementById(
+            "placesLayer"
+        )
+        .innerHTML = "";
+
+
+    document
+        .getElementById(
+            "labelsLayer"
+        )
+        .innerHTML = "";
+
+
+    document
+        .getElementById(
+            "routeDot"
+        )
+        .style.display =
+        "none";
+
+
+    document
+        .getElementById(
+            "mapBlank"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    currentRoute =
+        null;
+
+}
+
+
+/* =========================================================
+   DRAW ROUTE
+========================================================= */
+
+function drawRoute(
+    result
+){
+
+    clearMap();
+
+
+    if(!result){
+
+        return;
+
+    }
+
+
+    const routeLayer =
+        document.getElementById(
+            "routeLayer"
+        );
+
+
+    const placesLayer =
+        document.getElementById(
+            "placesLayer"
+        );
+
+
+    const labelsLayer =
+        document.getElementById(
+            "labelsLayer"
+        );
+
+
+    result.roadIndexes
+        .forEach(
+            roadIndex => {
+
+                const road =
+                    ROADS_DATA[
+                        roadIndex
+                    ];
+
+
+                const from =
+                    places[
+                        road.from
+                    ];
+
+
+                const to =
+                    places[
+                        road.to
+                    ];
+
+
+                if(
+                    !from ||
+                    !to
+                ){
+
+                    return;
+
+                }
+
+
+                const line =
+                    svgElement(
+                        "line",
+                        {
+                            x1:from.x,
+                            y1:from.y,
+                            x2:to.x,
+                            y2:to.y,
+                            class:"route-line"
+                        }
+                    );
+
+
+                routeLayer.appendChild(
+                    line
+                );
+
+
+                const label =
+                    svgElement(
+                        "text",
+                        {
+                            x:
+                                (
+                                    from.x +
+                                    to.x
+                                ) / 2,
+
+                            y:
+                                (
+                                    from.y +
+                                    to.y
+                                ) / 2 - 8,
+
+                            class:
+                                "route-label",
+
+                            "text-anchor":
+                                "middle"
+                        }
+                    );
+
+
+                label.textContent =
+                    road.distanceKm +
+                    " km";
+
+
+                labelsLayer.appendChild(
+                    label
+                );
+
+            }
+        );
+
+
+    result.path
+        .forEach(
+            (id,index) => {
+
+                const place =
+                    places[id];
+
+
+                let className =
+                    "route-place";
+
+
+                if(index === 0){
+
+                    className =
+                        "start-place";
+
+                }
+
+
+                if(
+                    index ===
+                    result.path.length - 1
+                ){
+
+                    className =
+                        "end-place";
+
+                }
+
+
+                const circle =
+                    svgElement(
+                        "circle",
+                        {
+                            cx:place.x,
+                            cy:place.y,
+                            r:10,
+                            class:className
+                        }
+                    );
+
+
+                placesLayer.appendChild(
+                    circle
+                );
+
+
+                const label =
+                    svgElement(
+                        "text",
+                        {
+                            x:place.x,
+                            y:place.y-15,
+                            class:"place-label",
+                            "text-anchor":"middle"
+                        }
+                    );
+
+
+                label.textContent =
+                    place.name;
+
+
+                labelsLayer.appendChild(
+                    label
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "mapBlank"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "map-section"
+        )
+        .classList.add(
+            "show"
+        );
+
+
+    document
+        .getElementById(
+            "map-toggle-btn"
+        )
+        .textContent =
+        "Hide Map";
+
+
+    mapVisible =
+        true;
+
+
+    currentRoute =
+        result;
+
+
+    setTimeout(
+        () => {
+
+            focusRoute();
+
+            animateRoute(
+                result
+            );
+
+        },
+        80
+    );
+
+}
+
+
+/* =========================================================
+   ANIMATE ROUTE
+========================================================= */
+
+function animateRoute(
+    result
+){
+
+    const dot =
+        document.getElementById(
+            "routeDot"
+        );
+
+
+    if(
+        !result ||
+        !result.path.length
+    ){
+
+        dot.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    const points =
+        result.path.map(
+            id => places[id]
+        );
+
+
+    if(
+        points.length === 1
+    ){
+
+        dot.setAttribute(
+            "cx",
+            points[0].x
+        );
+
+        dot.setAttribute(
+            "cy",
+            points[0].y
+        );
+
+        dot.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    const lengths = [];
+
+    let totalLength = 0;
+
+
+    for(
+        let i=0;
+        i<points.length-1;
+        i++
+    ){
+
+        const dx =
+            points[i+1].x -
+            points[i].x;
+
+
+        const dy =
+            points[i+1].y -
+            points[i].y;
+
+
+        const length =
+            Math.sqrt(
+                dx*dx +
+                dy*dy
+            );
+
+
+        lengths.push(
+            length
+        );
+
+
+        totalLength +=
+            length;
+
+    }
+
+
+    const start =
+        performance.now();
+
+
+    const duration =
+        Math.max(
+            1800,
+            result.distance * 18
+        );
+
+
+    dot.style.display =
+        "block";
+
+
+    function frame(now){
+
+        const progress =
+            Math.min(
+                (
+                    now-start
+                ) /
+                duration,
+                1
+            );
+
+
+        const target =
+            progress *
+            totalLength;
+
+
+        let travelled = 0;
+
+        let x =
+            points[0].x;
+
+        let y =
+            points[0].y;
+
+
+        for(
+            let i=0;
+            i<lengths.length;
+            i++
+        ){
+
+            if(
+                travelled +
+                lengths[i] >=
+                target
+            ){
+
+                const local =
+                    (
+                        target -
+                        travelled
+                    ) /
+                    lengths[i];
+
+
+                x =
+                    points[i].x +
+                    (
+                        points[i+1].x -
+                        points[i].x
+                    ) *
+                    local;
+
+
+                y =
+                    points[i].y +
+                    (
+                        points[i+1].y -
+                        points[i].y
+                    ) *
+                    local;
+
+
+                break;
+
+            }
+
+
+            travelled +=
+                lengths[i];
+
+        }
+
+
+        dot.setAttribute(
+            "cx",
+            x
+        );
+
+
+        dot.setAttribute(
+            "cy",
+            y
+        );
+
+
+        if(
+            progress < 1
+        ){
+
+            requestAnimationFrame(
+                frame
+            );
+
+        }
+
+    }
+
+
+    requestAnimationFrame(
+        frame
+    );
+
+}
+
+
+/* =========================================================
+   MAP TRANSFORM
+========================================================= */
+
+function applyMapTransform(){
+
+    const transform =
+
+        `translate(
+            ${mapTransform.x}
+            ${mapTransform.y}
+        )
+        scale(
+            ${mapTransform.scale}
+        )`;
+
+
+    [
+        "routeLayer",
+        "placesLayer",
+        "labelsLayer"
+    ]
+    .forEach(
+        id => {
+
+            document
+                .getElementById(id)
+                .setAttribute(
+                    "transform",
+                    transform
+                );
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "routeDot"
+        )
+        .setAttribute(
+            "transform",
+            transform
+        );
+
+}
+
+
+/* =========================================================
+   FOCUS ROUTE
+========================================================= */
+
+function focusRoute(){
+
+    if(
+        !currentRoute ||
+        !currentRoute.path.length
+    ){
+
+        return;
+
+    }
+
+
+    const points =
+        currentRoute.path.map(
+            id => places[id]
+        );
+
+
+    const xs =
+        points.map(
+            p => p.x
+        );
+
+
+    const ys =
+        points.map(
+            p => p.y
+        );
+
+
+    const minX =
+        Math.min(...xs);
+
+    const maxX =
+        Math.max(...xs);
+
+    const minY =
+        Math.min(...ys);
+
+    const maxY =
+        Math.max(...ys);
+
+
+    const width =
+        Math.max(
+            maxX-minX,
+            80
+        );
+
+
+    const height =
+        Math.max(
+            maxY-minY,
+            80
+        );
+
+
+    mapTransform.scale =
+        Math.min(
+            Math.max(
+                Math.min(
+                    900/width,
+                    550/height
+                ),
+                .65
+            ),
+            2.5
+        );
+
+
+    mapTransform.x =
+        500 -
+        (
+            (minX+maxX)/2
+        ) *
+        mapTransform.scale;
+
+
+    mapTransform.y =
+        325 -
+        (
+            (minY+maxY)/2
+        ) *
+        mapTransform.scale;
+
+
+    applyMapTransform();
+
+}
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
+
+function zoomMap(
+    factor
+){
+
+    mapTransform.scale *=
+        factor;
+
+
+    mapTransform.scale =
+        Math.max(
+            .4,
+            Math.min(
+                4,
+                mapTransform.scale
+            )
+        );
+
+
+    applyMapTransform();
+
+}
+
+
+/* =========================================================
+   MAP DRAG
+========================================================= */
+
+const mapSvg =
+    document.getElementById(
+        "mapSvg"
+    );
+
+
+let dragging = false;
+
+let lastX = 0;
+
+let lastY = 0;
+
+
+mapSvg.addEventListener(
+    "pointerdown",
+    event => {
+
+        dragging = true;
+
+        lastX =
+            event.clientX;
+
+        lastY =
+            event.clientY;
+
+
+        mapSvg.classList.add(
+            "dragging"
+        );
+
+
+        mapSvg.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+);
+
+
+mapSvg.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!dragging){
+
+            return;
+
+        }
+
+
+        mapTransform.x +=
+            event.clientX -
+            lastX;
+
+
+        mapTransform.y +=
+            event.clientY -
+            lastY;
+
+
+        lastX =
+            event.clientX;
+
+        lastY =
+            event.clientY;
+
+
+        applyMapTransform();
+
+    }
+);
+
+
+mapSvg.addEventListener(
+    "pointerup",
+    event => {
+
+        dragging = false;
+
+        mapSvg.classList.remove(
+            "dragging"
+        );
+
+
+        try{
+
+            mapSvg.releasePointerCapture(
+                event.pointerId
+            );
+
+        }catch(e){}
+
+    }
+);
+
+
+mapSvg.addEventListener(
+    "wheel",
+    event => {
+
+        event.preventDefault();
+
+
+        zoomMap(
+            event.deltaY < 0
+                ? 1.15
+                : .87
+        );
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   TOGGLE MAP
+========================================================= */
+
+function toggleMap(){
+
+    const map =
+        document.getElementById(
+            "map-section"
+        );
+
+
+    if(!currentRoute){
+
+        return;
+
+    }
+
+
+    mapVisible =
+        !mapVisible;
+
+
+    if(mapVisible){
+
+        map.classList.add(
+            "show"
+        );
+
+
+        document
+            .getElementById(
+                "map-toggle-btn"
+            )
+            .textContent =
+            "Hide Map";
+
+    }else{
+
+        map.classList.remove(
+            "show"
+        );
+
+
+        document
+            .getElementById(
+                "map-toggle-btn"
+            )
+            .textContent =
+            "Show Map";
+
+    }
+
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+document
+    .getElementById(
+        "submit-btn"
+    )
+    .addEventListener(
+        "click",
+        submitBooking
+    );
+
+
+async function submitBooking(){
+
+    if(!rideData){
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "submit-btn"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    button.classList.add(
+        "loading"
+    );
+
+
+    document
+        .getElementById(
+            "btn-icon"
+        )
+        .style.display =
+        "none";
+
+
+    document
+        .getElementById(
+            "action-label"
+        )
+        .textContent =
+        "Sending request...";
+
+
+    showProgress();
+
+
+    const payload = {
+
+        ...rideData,
+
+        timestamp:
+            new Date().toISOString()
+
+    };
+
+
+    try{
+
+        if(
+            GOOGLE_SCRIPT_URL &&
+            GOOGLE_SCRIPT_URL.trim()
+        ){
+
+            await fetch(
+                GOOGLE_SCRIPT_URL,
+                {
+                    method:"POST",
+
+                    mode:"no-cors",
+
+                    body:
+                        new URLSearchParams(
+                            payload
+                        )
+                }
+            );
+
+        }else{
+
+            /*
+               Test mode until your Apps Script
+               URL is inserted.
+            */
+
+            console.log(
+                "Ride booking:",
+                payload
+            );
+
+
+            await wait(1000);
+
+        }
+
+
+        completeProgress();
+
+
+        await wait(500);
+
+
+        document
+            .getElementById(
+                "progress-overlay"
+            )
+            .classList.remove(
+                "show"
+            );
+
+
+        document
+            .getElementById(
+                "booking-form-popup"
+            )
+            .style.display =
+            "none";
+
+
+        document
+            .getElementById(
+                "success-page"
+            )
+            .classList.add(
+                "show"
+            );
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+
+        document
+            .getElementById(
+                "progress-overlay"
+            )
+            .classList.remove(
+                "show"
+            );
+
+
+        button.disabled =
+            false;
+
+
+        button.classList.remove(
+            "loading"
+        );
+
+
+        document
+            .getElementById(
+                "action-label"
+            )
+            .textContent =
+            "Request Now";
+
+
+        document
+            .getElementById(
+                "btn-icon"
+            )
+            .style.display =
+            "inline";
+
+
+        alert(
+            "Unable to send the request. Please try again."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function showProgress(){
+
+    const overlay =
+        document.getElementById(
+            "progress-overlay"
+        );
+
+
+    const fill =
+        document.getElementById(
+            "progress-fill"
+        );
+
+
+    const percent =
+        document.getElementById(
+            "progress-percent"
+        );
+
+
+    overlay.classList.add(
+        "show"
+    );
+
+
+    fill.style.width =
+        "0%";
+
+
+    percent.textContent =
+        "0%";
+
+
+    let value = 0;
+
+
+    if(progressTimer){
+
+        clearInterval(
+            progressTimer
+        );
+
+    }
+
+
+    progressTimer =
+        setInterval(
+            () => {
+
+                value +=
+                    Math.floor(
+                        Math.random()*5
+                    ) + 2;
+
+
+                if(
+                    value >= 90
+                ){
+
+                    value = 90;
+
+                    clearInterval(
+                        progressTimer
+                    );
+
+                }
+
+
+                fill.style.width =
+                    value + "%";
+
+
+                percent.textContent =
+                    value + "%";
+
+            },
+            120
+        );
+
+}
+
+
+/* =========================================================
+   COMPLETE PROGRESS
+========================================================= */
+
+function completeProgress(){
+
+    if(progressTimer){
+
+        clearInterval(
+            progressTimer
+        );
+
+    }
+
+
+    document
+        .getElementById(
+            "progress-fill"
+        )
+        .style.width =
+        "100%";
+
+
+    document
+        .getElementById(
+            "progress-percent"
+        )
+        .textContent =
+        "100%";
+
+}
+
+
+/* =========================================================
+   RESET FORM
+========================================================= */
+
+function resetBooking(){
+
+    if(
+        !confirm(
+            "Clear this booking and start again?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    newBooking();
+
+}
+
+
+/* =========================================================
+   NEW BOOKING
+========================================================= */
+
+function newBooking(){
+
+    document
+        .getElementById(
+            "success-page"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    document
+        .getElementById(
+            "booking-form-popup"
+        )
+        .style.display =
+        "";
+
+
+    phoneInput.value =
+        "";
+
+
+    document
+        .getElementById(
+            "customer-profile"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "trip-details"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    document
+        .getElementById(
+            "summary-section"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    document
+        .getElementById(
+            "map-section"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    document
+        .getElementById(
+            "gm-origin"
+        )
+        .value =
+        "";
+
+
+    document
+        .getElementById(
+            "gm-destination"
+        )
+        .value =
+        "";
+
+
+    delete document
+        .getElementById(
+            "gm-origin"
+        )
+        .dataset.placeId;
+
+
+    delete document
+        .getElementById(
+            "gm-destination"
+        )
+        .dataset.placeId;
+
+
+    document
+        .querySelectorAll(
+            'input[name="mode"]'
+        )
+        .forEach(
+            radio => {
+
+                radio.checked =
+                    false;
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".mode-option"
+        )
+        .forEach(
+            option =>
+                option.classList.remove(
+                    "selected"
+                )
+        );
+
+
+    document
+        .getElementById(
+            "submit-btn"
+        )
+        .disabled =
+        true;
+
+
+    document
+        .getElementById(
+            "action-label"
+        )
+        .textContent =
+        "Request Now";
+
+
+    document
+        .getElementById(
+            "status"
+        )
+        .textContent =
+        "";
+
+
+    document
+        .getElementById(
+            "spinner"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    clearMap();
+
+
+    rideData =
+        null;
+
+
+    currentRoute =
+        null;
+
+}
+
+
+/* =========================================================
+   WAIT
+========================================================= */
+
+function wait(ms){
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+
+}
+
+
+/* =========================================================
+   SERVICE WORKER REGISTRATION
+========================================================= */
+
+if(
+    "serviceWorker" in navigator
+){
+
+    window.addEventListener(
+        "load",
+        function(){
+
+            navigator
+                .serviceWorker
+                .register("sw.js")
+                .then(
+                    function(reg){
+
+                        console.log(
+                            "ServiceWorker registered",
+                            reg
+                        );
+
+                    },
+                    function(err){
+
+                        console.log(
+                            "ServiceWorker registration failed:",
+                            err
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PWA INSTALL PROMPT
+========================================================= */
+
+let deferredPrompt = null;
+
+
+window.addEventListener(
+    "beforeinstallprompt",
+    event => {
+
+        event.preventDefault();
+
+        deferredPrompt =
+            event;
+
+
+        /*
+           Only display the custom
+           install banner on larger
+           screens, following your
+           original logic.
+        */
+
+        if(
+            window.innerWidth > 600
+        ){
+
+            createInstallBanner();
+
+        }
+
+    }
+);
+
+
+function createInstallBanner(){
+
+    if(
+        document.querySelector(
+            ".install-banner"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    const banner =
+        document.createElement(
+            "div"
+        );
+
+
+    banner.className =
+        "install-banner";
+
+
+    banner.innerHTML = `
+
+        <span id="installText">
+            📱 Install App
+        </span>
+
+        <span
+            class="install-close"
+            id="closeInstall">
+
+            ×
+
+        </span>
+
+    `;
+
+
+    document.body.appendChild(
+        banner
+    );
+
+
+    document
+        .getElementById(
+            "installText"
+        )
+        .addEventListener(
+            "click",
+            async () => {
+
+                if(!deferredPrompt){
+
+                    return;
+
+                }
+
+
+                deferredPrompt.prompt();
+
+
+                try{
+
+                    const result =
+                        await deferredPrompt.userChoice;
+
+
+                    console.log(
+                        "Install result:",
+                        result.outcome
+                    );
+
+                }catch(error){
+
+                    console.log(
+                        error
+                    );
+
+                }
+
+
+                deferredPrompt =
+                    null;
+
+
+                banner.remove();
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "closeInstall"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                banner.remove();
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   OPTIONAL APK DOWNLOAD SUPPORT
+=========================================================
+
+   If your page contains an element with:
+
+       id="menu-install-btn"
+
+   this code will download:
+
+       Luangwa_Feira_Rides.apk
+
+   Otherwise nothing happens.
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        const menuInstallBtn =
+            document.getElementById(
+                "menu-install-btn"
+            );
+
+
+        if(menuInstallBtn){
+
+            menuInstallBtn.addEventListener(
+                "click",
+                function(){
+
+                    const link =
+                        document.createElement(
+                            "a"
+                        );
+
+
+                    link.href =
+                        "Luangwa_Feira_Rides.apk";
+
+
+                    link.download =
+                        "Luangwa_Feira_Rides.apk";
+
+
+                    document.body.appendChild(
+                        link
+                    );
+
+
+                    link.click();
+
+
+                    document.body.removeChild(
+                        link
+                    );
+
+
+                    alert(
+                        "Download started!\n\nOpen the APK file to install the app."
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+
+calculateCoordinates();
+
+buildGraph();
+
+clearMap();
+
+</script>
+
+</body>
+</html>
