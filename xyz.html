@@ -1597,14 +1597,12 @@
 
       let points = result.path.map(id => places[id]).filter(Boolean);
       
-      // FIXED FOR SHORT DISTANCES: Guarantee visible separation in SVG space if points are extremely close
       if (points.length === 2) {
         const dx = points[1].x - points[0].x;
         const dy = points[1].y - points[0].y;
         const pixelDist = Math.hypot(dx, dy);
         
         if (pixelDist < 25) {
-          // If points overlap or are too close on screen, offset second point slightly so the line and pins are distinct
           points[1] = {
             ...points[1],
             x: points[0].x + 22,
@@ -1673,7 +1671,6 @@
       let minX = Math.min(...xs), maxX = Math.max(...xs);
       let minY = Math.min(...ys), maxY = Math.max(...ys);
 
-      // FIXED FOR SHORT DISTANCES: Enforce a minimum bounding box span so short distances don't over-zoom or collapse
       const minSpan = 220; 
       let width = maxX - minX;
       let height = maxY - minY;
