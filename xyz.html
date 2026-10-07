@@ -1,1 +1,1526 @@
 https://github.com/BMudenda/zamlisting/edit/main/xyz.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Find cheap taxis, motorbikes, car rides, and transport services in Luangwa Feira, Zambia on ZamListing.">
+  <title>Luangwa Feira Rides – Taxi Booking</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  
+  <!-- PWA & Mobile Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Luangwa Feira Rides">
+  <link rel="apple-touch-icon" href="lfr.jpg">
+
+  <style>
+    /* ----------------------------------------------------------------------
+       1. VARIABLES & RESET
+       ---------------------------------------------------------------------- */
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e3a8a;
+      --secondary-color: #ff9900;
+      --secondary-dark: #ff5500;
+      --success-color: #16a34a;
+      --error-color: #dc2626;
+      --bg-color-body: #f5f5f5;
+      --bg-color-card: #ffffff;
+      --border-color-light: #e0e0e0;
+      --font-color-dark: #333333;
+      --sky: #87ceeb;
+      --border: #b3e5fc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: var(--bg-color-body);
+      color: var(--font-color-dark);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    button, input {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ----------------------------------------------------------------------
+       2. BILLBOARD HEADER & OVERLAYS
+       ---------------------------------------------------------------------- */
+    .billboard-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #1e40af);
+      z-index: 1;
+    }
+
+    .billboard-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+      animation: floatParticles 18s ease-in-out infinite;
+    }
+
+    @keyframes floatParticles {
+      0%, 100% { transform: translateX(0) translateY(0); opacity: 0.4; }
+      50% { transform: translateX(25px) translateY(-25px); opacity: 0.7; }
+    }
+
+    .header-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(6px);
+    }
+
+    .company-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .corner-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid #ffaa33;
+      box-shadow: 0 0 12px rgba(255, 170, 51, 0.6);
+    }
+
+    .zam {
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffdd77;
+      text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.6);
+      font-size: 1.4rem;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      position: relative;
+    }
+
+    .menu-header-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-header-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.05);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-toggle-action-btn {
+      background: linear-gradient(135deg, #ff9900, #ff5500);
+      color: #fff;
+      font-weight: 700;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 50px;
+      font-size: 12px;
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .form-toggle-action-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(255, 153, 0, 0.6);
+    }
+
+    .billboard-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+      z-index: 1;
+      padding: 20px;
+    }
+
+    .billboard-slide.active {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .welcome-billboard {
+      font-size: clamp(22px, 5vw, 72px);
+      color: #ffd966;
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 5px solid #ffcc33;
+      width: 0;
+      animation: typing 5s steps(30, end) infinite, blink-cursor 0.8s step-end infinite;
+      padding: 0 15px;
+      max-width: 95vw;
+      display: inline-block;
+      margin: 0 auto;
+    }
+
+    @keyframes typing {
+      0% { width: 0; }
+      30%, 70% { width: 100%; }
+      100% { width: 0; }
+    }
+
+    @keyframes blink-cursor {
+      0%, 100% { border-color: #ffcc33; }
+      50% { border-color: transparent; }
+    }
+
+    .menu-dropdown {
+      display: none;
+      background: #fff;
+      width: 340px;
+      max-width: calc(100vw - 32px);
+      max-height: 75vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      color: #333;
+      padding: 16px;
+      border: 1px solid #e0e0e0;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      z-index: 200005;
+    }
+
+    .menu-dropdown.show {
+      display: block;
+    }
+
+    /* ----------------------------------------------------------------------
+       3. APP INTERFACE & BOOKING FORM CONTAINER
+       ---------------------------------------------------------------------- */
+    .app-interface-wrapper {
+      position: fixed;
+      right: 20px;
+      top: 75px;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      width: auto;
+      max-width: calc(100% - 40px);
+    }
+
+    .product-container {
+      display: none;
+      width: 380px;
+      max-width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      position: relative;
+    }
+
+    .product-container.show {
+      display: block;
+    }
+
+    .booking-container {
+      background: var(--bg-color-card);
+      padding: 16px;
+      border-radius: 16px;
+      position: relative;
+    }
+
+    .form-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color-light);
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 10;
+    }
+
+    .form-title-text {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--font-color-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-close-btn {
+      background: #f2f2f2;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .form-close-btn:hover {
+      color: var(--error-color);
+      transform: scale(1.1);
+    }
+
+    fieldset {
+      border: 1px solid var(--border-color-light);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+      margin-bottom: 15px;
+      width: 100%;
+      position: relative;
+    }
+
+    legend {
+      font-weight: 700;
+      color: var(--primary-color);
+      padding: 0 8px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .input-box {
+      background: #fff;
+      border: 1.5px solid var(--border-color-light);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .input-box .material-icons {
+      color: var(--primary-color);
+      font-size: 20px;
+      margin-right: 10px;
+    }
+
+    .input-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      font-weight: 700;
+      background: transparent;
+      width: 100%;
+    }
+
+    .input-box input::placeholder {
+      font-style: italic;
+      color: #999;
+      font-weight: 400;
+      font-size: 0.85rem;
+    }
+
+    .customer-profile {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 8px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    /* ----------------------------------------------------------------------
+       4. TRANSPORT SELECTION & AUTOCOMPLETE
+       ---------------------------------------------------------------------- */
+    .hidden-section {
+      display: none;
+    }
+
+    .hidden-section.show {
+      display: block;
+    }
+
+    #mode-group {
+      display: flex !important;
+      justify-content: space-around !important;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 0;
+    }
+
+    .mode-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      flex: 1;
+      justify-content: center;
+      padding: 8px;
+      border: 2px solid var(--border-color-light);
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .mode-option input {
+      display: none;
+    }
+
+    .mode-option.selected {
+      border-color: var(--success-color);
+      background: #e8f5e9;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .autocomplete-item {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+
+    .autocomplete-item:hover {
+      background: #e8f0fe;
+      color: var(--primary-color);
+    }
+
+    /* ----------------------------------------------------------------------
+       5. SUMMARY (Price, Distance & Estimated Time) & TOOLTIP
+       ---------------------------------------------------------------------- */
+    .summary-card-grid {
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .summary-card-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-card-item .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .summary-card-item .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--font-color-dark);
+    }
+
+    .summary-card-item .value.price-val {
+      color: var(--success-color);
+    }
+
+    .summary-card-item .value.time-val {
+      color: var(--primary-color);
+    }
+
+    /* Tooltip styles */
+    .tooltip-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      cursor: help;
+      margin-left: 6px;
+    }
+
+    .tooltip-icon { 
+      font-size: 18px !important; 
+      color: var(--primary-color); 
+    }
+
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #ffffff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 8px 12px;
+      z-index: 9999;
+      font-size: 0.75rem;
+      font-weight: 400;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e293b transparent transparent transparent;
+    }
+
+    .tooltip-container:hover .tooltip-text,
+    .tooltip-container:focus .tooltip-text { 
+      display: block; 
+    }
+
+    /* View Map Button inside fieldset */
+    .view-map-trigger-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      background: #e2e8f0;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .view-map-trigger-btn:hover {
+      background: #cbd5e1;
+    }
+
+    /* ----------------------------------------------------------------------
+       6. MAP COMPONENTS & TOUCH ZOOM
+       ---------------------------------------------------------------------- */
+    .map-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      border: 1.5px solid var(--border-color-light);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f8fcfe;
+      touch-action: none;
+    }
+
+    #mapSvg {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    #mapSvg:active { cursor: grabbing; }
+
+    .route-line {
+      stroke: #00a000;
+      stroke-width: 6;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .start-place { fill: #1565c0; stroke: #fff; stroke-width: 3; }
+    .end-place { fill: #d32f2f; stroke: #fff; stroke-width: 3; }
+    .route-place { fill: #00a000; stroke: #fff; stroke-width: 3; }
+    
+    .place-label, .route-label {
+      font-size: 9px;
+      font-weight: 700;
+      fill: #263238;
+      paint-order: stroke;
+      stroke: #ffffff;
+      stroke-width: 3px;
+    }
+
+    .route-dot { fill: #ffffff; stroke: #008000; stroke-width: 4; }
+
+    .zoom-controls {
+      position: absolute;
+      right: 9px;
+      top: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .zoom-control {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--primary-dark);
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ----------------------------------------------------------------------
+       7. ROUND ACTION / CALL BUTTON
+       ---------------------------------------------------------------------- */
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    .action-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--primary-color);
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+    }
+
+    .action-btn:disabled {
+      background-color: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .action-btn:not(:disabled):hover {
+      transform: scale(1.06);
+    }
+
+    .action-btn:not(:disabled):active {
+      transform: scale(0.95);
+    }
+
+    .action-btn svg {
+      width: 26px;
+      height: 26px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Call Mode State */
+    .action-btn.call-mode {
+      background-color: var(--success-color) !important;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4) !important;
+    }
+
+    /* ----------------------------------------------------------------------
+       8. OVERLAYS & LOADERS
+       ---------------------------------------------------------------------- */
+    .calc-loader {
+      width: 30px;
+      height: 30px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--secondary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 15px auto;
+      display: none;
+    }
+
+    .calc-loader.show { display: block; }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 1000000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .progress-overlay.show { display: flex; }
+
+    .progress-card {
+      width: min(400px, 100%);
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .progress-spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 5px solid #b3e5fc;
+      border-top-color: var(--primary-color);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--success-color);
+      transition: width 0.15s linear;
+    }
+
+    .map-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .map-btn {
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .app-interface-wrapper {
+        right: 50%;
+        transform: translateX(50%);
+        top: 70px;
+        width: 100%;
+        max-width: 420px;
+        padding: 0 15px;
+      }
+      .product-container { width: 100%; }
+      .summary-card-grid {
+        gap: 4px;
+        padding: 12px 8px;
+      }
+      .summary-card-item .value {
+        font-size: 0.95rem;
+      }
+    }
+
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+
+<body>
+  <!-- ==========================================================================
+       1. BACKGROUND & HEADER OVERLAYS
+       ========================================================================== -->
+  <header class="billboard-header">
+    <div class="header-overlay">
+      <div class="company-info">
+        <img src="lfr.jpg" alt="Logo" class="corner-logo" onerror="this.style.display='none'">
+        <span class="zam">Luangwa<span style="color:#16a34a;">Feira</span>Rides</span>
+      </div>
+      <div class="header-buttons">
+        <button class="form-toggle-action-btn" onclick="toggleForm(event)">
+          <i class="fas fa-taxi"></i> Book Ride
+        </button>
+        <button class="menu-header-btn" onclick="toggleMenu(event)">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <div id="menu-dropdown" class="menu-dropdown">
+          <div class="dropdown-content-section">
+            <h4 style="margin-bottom:8px;"><i class="fas fa-info-circle"></i> Quick Links</h4>
+            <p style="font-size:0.85rem; line-height:1.4;">Select pickup & destination to view fare estimates and shortest transit routes across Luangwa Feira.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="billboard-slide active">
+      <div class="welcome-billboard">Welcome to Luangwa Feira Rides</div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       2. APP INTERFACE & BOOKING POPUP
+       ========================================================================== -->
+  <div class="app-interface-wrapper">
+    <main class="product-container" id="booking-form-popup">
+      <div class="booking-container">
+        
+        <!-- Header Bar -->
+        <div class="form-header-bar">
+          <div class="form-title-text">
+            <i class="fas fa-route" style="color: var(--primary-color);"></i> Luangwa Feira Rides
+          </div>
+          <button class="form-close-btn" onclick="toggleForm(event)" title="Close Form">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Step 1: Customer Phone -->
+        <fieldset>
+          <legend><span class="material-icons">account_circle</span> Profile</legend>
+          <div class="input-box" id="phone-box">
+            <span class="material-icons">phone</span>
+            <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter phone e.g. 097xxxxxxx" inputmode="numeric">
+          </div>
+          <div id="customer-profile" class="customer-profile hidden"></div>
+        </fieldset>
+
+        <!-- Step 2: Trip Details -->
+        <div id="trip-details" class="hidden-section">
+          <fieldset>
+            <legend><span class="material-icons">commute</span> Transport Mode</legend>
+            <div id="mode-group">
+              <label class="mode-option">
+                <input type="radio" name="mode" value="motorbike">
+                <i class="fas fa-motorcycle" style="font-size:24px; color:var(--primary-color);"></i>
+                <small>Motorbike</small>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="mode" value="vehicle">
+                <i class="fas fa-car" style="font-size:24px; color:var(--primary-color);"></i>
+                <small>Car</small>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Pickup Location</legend>
+            <div class="input-box" id="origin-container">
+              <span class="material-icons">my_location</span>
+              <input type="text" id="gm-origin" placeholder="Where should we pick you up?" autocomplete="off">
+              <div id="originList" class="autocomplete-list hidden"></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Destination</legend>
+            <div class="input-box" id="dest-container">
+              <span class="material-icons">pin_drop</span>
+              <input type="text" id="gm-destination" placeholder="Where are you going?" autocomplete="off">
+              <div id="destinationList" class="autocomplete-list hidden"></div>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Step 3: Trip Summary (Distance, Price & Estimated Time) -->
+        <div id="summary-section" class="hidden-section">
+          <fieldset>
+            <legend>
+              <span class="material-icons">receipt_long</span> Trip Summary
+              <span class="tooltip-container" tabindex="0">
+                <span class="material-icons tooltip-icon">help_outline</span>
+                <span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span>
+              </span>
+            </legend>
+            
+            <div class="summary-card-grid">
+              <div class="summary-card-item">
+                <span class="label">Distance</span>
+                <span class="value" id="summary-distance">0.0 km</span>
+              </div>
+              <div class="summary-card-item">
+                <span class="label">Est. Time</span>
+                <span class="value time-val" id="summary-time">0 mins</span>
+              </div>
+              <div class="summary-card-item">
+                <span class="label">Price</span>
+                <span class="value price-val" id="summary-price">K0.00</span>
+              </div>
+            </div>
+
+            <button type="button" class="view-map-trigger-btn" id="view-map-trigger" onclick="toggleMapVisibility()">
+              <i class="fas fa-map-marked-alt"></i> <span id="map-btn-label">View Map</span>
+            </button>
+          </fieldset>
+
+          <!-- Round Action / Call Button -->
+          <div class="btn-container">
+            <button type="button" class="action-btn" id="submit-btn" disabled title="Submit Booking">
+              <!-- Submit Icon (Paper Plane) -->
+              <svg id="submitIcon" viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <!-- Call Icon (Phone) -->
+              <svg id="callIcon" viewBox="0 0 24 24" style="display: none;">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Route Map (Hidden by Default) -->
+        <div id="map-section" class="hidden-section" style="margin-top: 15px;">
+          <fieldset>
+            <legend>🗺️ Route Map</legend>
+            <div class="map-toolbar">
+              <span style="font-size:0.8rem; font-weight:bold; color:var(--primary-dark);">Interactive Route</span>
+              <button class="map-btn" onclick="focusRoute()">Focus Route</button>
+            </div>
+
+            <div id="map-container" class="map-container">
+              <svg id="mapSvg" viewBox="0 0 1000 650">
+                <rect width="1000" height="650" fill="#f7fcfe"></rect>
+                <g id="routeLayer"></g>
+                <g id="placesLayer"></g>
+                <g id="labelsLayer"></g>
+                <circle id="routeDot" class="route-dot" r="7" style="display:none"></circle>
+              </svg>
+
+              <div class="zoom-controls">
+                <button class="zoom-control" onclick="zoomMap(1.25)">+</button>
+                <button class="zoom-control" onclick="zoomMap(0.8)">−</button>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Status and Loaders -->
+        <div class="calc-loader" id="spinner"></div>
+        <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; font-size:0.85rem; min-height: 20px;"></p>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Progress Overlay -->
+  <div id="progress-overlay" class="progress-overlay">
+    <div class="progress-card">
+      <div class="progress-spinner"></div>
+      <div id="progress-percent" style="font-size: 24px; font-weight: bold; color: var(--primary-dark);">0%</div>
+      <div style="margin-top: 5px; font-size: 0.9rem; color: #666;">Sending ride request...</div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       3. JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    /* ----------------------------------------------------------------------
+       1. DATA STRUCTURES & CONFIG
+       ---------------------------------------------------------------------- */
+    const GOOGLE_SCRIPT_URL = "";
+    const DRIVER_PHONE_NUMBER = "+260970000000";
+
+    const customers = {
+      "0978167546": "Brian", "0974462327": "Brian", "0979146191": "Brian",
+      "0979401457": "Alick", "0976785753": "Patrick", "0971223101": "Annes",
+      "0974028478": "Victor", "0977885430": "Malu", "0974623779": "Mwizl",
+      "0776357574": "Mercy", "0978879700": "Musa", "0976367308": "Steve",
+      "0977945992": "Nelson", "0977655146": "fashion", "0770813325": "Blessings"
+    };
+
+    const config = {
+      vehiclePricePerKm: 4.50,
+      motorbikePricePerKm: 2.50,
+      vehicleMinPrice: 25,
+      motorbikeMinPrice: 15,
+      vehicleExtra: 6.00,
+      motorbikeExtra: 3.00,
+      vehicleSpeedKmH: 65,
+      motorbikeSpeedKmH: 45
+    };
+
+    const PLACES_DATA = [
+      { id: "LUSAKA", name: "Lusaka", lat: -15.4167, lon: 28.2833, type: "City" },
+      { id: "AIRPORT", name: "Lusaka Airport", lat: -15.3302, lon: 28.4526, type: "Airport" },
+      { id: "CHONGWE", name: "Chongwe", lat: -15.3292, lon: 28.6820, type: "Town" },
+      { id: "RUFUNSA", name: "Rufunsa", lat: -15.1500, lon: 29.0000, type: "Town" },
+      { id: "LUANGWA", name: "Luangwa", lat: -15.6167, lon: 30.4167, type: "Town" },
+      { id: "LUANGWA_BUS", name: "Luangwa Bus Station", lat: -15.6160, lon: 30.4100, type: "Transport Hub" },
+      { id: "CHITOPE", name: "Chitope", lat: -15.6000, lon: 30.3700, type: "Community" },
+      { id: "LUANGWA_BRIDGE", name: "Luangwa Bridge", lat: -15.6200, lon: 30.4300, type: "Junction" },
+      { id: "MWANAMWALI", name: "Mwanamwali", lat: -15.3500, lon: 29.4500, type: "Community" },
+      { id: "NYIMBA", name: "Nyimba", lat: -14.5560, lon: 30.8140, type: "Town" },
+      { id: "PETAUKE", name: "Petauke", lat: -14.2412, lon: 31.3196, type: "Town" },
+      { id: "CHIPATA", name: "Chipata", lat: -13.6333, lon: 32.6500, type: "City" },
+      { id: "KAFUE", name: "Kafue", lat: -15.7691, lon: 28.1814, type: "Town" }
+    ];
+
+    const ROADS_DATA = [
+      { from: "LUSAKA", to: "CHONGWE", distanceKm: 35 },
+      { from: "LUSAKA", to: "AIRPORT", distanceKm: 25 },
+      { from: "LUSAKA", to: "KAFUE", distanceKm: 45 },
+      { from: "AIRPORT", to: "CHONGWE", distanceKm: 45 },
+      { from: "CHONGWE", to: "RUFUNSA", distanceKm: 70 },
+      { from: "RUFUNSA", to: "LUANGWA", distanceKm: 95 },
+      { from: "RUFUNSA", to: "NYIMBA", distanceKm: 110 },
+      { from: "NYIMBA", to: "PETAUKE", distanceKm: 80 },
+      { from: "PETAUKE", to: "CHIPATA", distanceKm: 105 },
+      { from: "LUANGWA", to: "LUANGWA_BUS", distanceKm: 5 },
+      { from: "LUANGWA_BUS", to: "CHITOPE", distanceKm: 18 },
+      { from: "LUANGWA_BUS", to: "LUANGWA_BRIDGE", distanceKm: 7 },
+      { from: "CHITOPE", to: "MWANAMWALI", distanceKm: 12 },
+      { from: "MWANAMWALI", to: "RUFUNSA", distanceKm: 65 }
+    ];
+
+    const hubs = ["LUSAKA", "CHONGWE", "RUFUNSA", "LUANGWA_BUS", "NYIMBA", "PETAUKE", "CHIPATA"];
+
+    /* ----------------------------------------------------------------------
+       2. APP STATE
+       ---------------------------------------------------------------------- */
+    const places = {};
+    let graph = {};
+    let currentRoute = null;
+    let rideData = null;
+    let calculationTimer = null;
+    let progressTimer = null;
+    let isSubmitted = false;
+    let mapVisible = false;
+    let mapTransform = { x: 0, y: 0, scale: 1 };
+
+    PLACES_DATA.forEach(place => { places[place.id] = { ...place }; });
+
+    /* ----------------------------------------------------------------------
+       3. ROUTING & CALCULATIONS
+       ---------------------------------------------------------------------- */
+    function calculateCoordinates() {
+      const all = Object.values(places);
+      const lats = all.map(p => p.lat), lons = all.map(p => p.lon);
+      const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+      const minLon = Math.min(...lons), maxLon = Math.max(...lons);
+      const padding = 70;
+
+      all.forEach(place => {
+        place.x = padding + ((place.lon - minLon) / (maxLon - minLon)) * (1000 - padding * 2);
+        place.y = padding + ((maxLat - place.lat) / (maxLat - minLat)) * (650 - padding * 2);
+      });
+    }
+
+    function buildGraph() {
+      graph = {};
+      Object.keys(places).forEach(id => { graph[id] = []; });
+      ROADS_DATA.forEach((road, index) => {
+        if (!places[road.from] || !places[road.to]) return;
+        graph[road.from].push({ node: road.to, distance: Number(road.distanceKm), roadIndex: index });
+        graph[road.to].push({ node: road.from, distance: Number(road.distanceKm), roadIndex: index });
+      });
+    }
+
+    function shortestPath(start, end) {
+      if (!graph[start] || !graph[end]) return null;
+      const distances = {}, previous = {}, previousRoad = {};
+      const unvisited = new Set(Object.keys(graph));
+
+      Object.keys(graph).forEach(id => {
+        distances[id] = Infinity;
+        previous[id] = null;
+        previousRoad[id] = null;
+      });
+      distances[start] = 0;
+
+      while (unvisited.size) {
+        let current = null, smallest = Infinity;
+        for (const node of unvisited) {
+          if (distances[node] < smallest) {
+            smallest = distances[node];
+            current = node;
+          }
+        }
+        if (current === null || current === end) break;
+        unvisited.delete(current);
+
+        graph[current].forEach(edge => {
+          if (!unvisited.has(edge.node)) return;
+          const newDistance = distances[current] + edge.distance;
+          if (newDistance < distances[edge.node]) {
+            distances[edge.node] = newDistance;
+            previous[edge.node] = current;
+            previousRoad[edge.node] = edge.roadIndex;
+          }
+        });
+      }
+
+      if (start !== end && previous[end] === null) return null;
+      const path = [], roadIndexes = [];
+      let current = end;
+      while (current !== null) {
+        path.unshift(current);
+        if (previousRoad[current] !== null) roadIndexes.unshift(previousRoad[current]);
+        current = previous[current];
+      }
+      return { path, roadIndexes, distance: distances[end] };
+    }
+
+    function calculateTotalDistance(pickup, destination) {
+      if (pickup === destination) return { total: 0, trip: 0, hub: "N/A" };
+      const tripResult = shortestPath(pickup, destination);
+      if (!tripResult) return null;
+
+      const trip = tripResult.distance;
+      let bestHub = null, bestTotal = Infinity;
+
+      for (const hub of hubs) {
+        const hubToPickup = shortestPath(hub, pickup);
+        const destinationToHub = shortestPath(destination, hub);
+        if (!hubToPickup || !destinationToHub) continue;
+        const total = hubToPickup.distance + trip + destinationToHub.distance;
+        if (total < bestTotal) {
+          bestTotal = total;
+          bestHub = hub;
+        }
+      }
+      return { hub: bestHub || "LUANGWA_BUS", trip, total: bestTotal === Infinity ? trip : bestTotal };
+    }
+
+    function calculateFare(mode, distance) {
+      let rate = mode === "vehicle" ? config.vehiclePricePerKm : config.motorbikePricePerKm;
+      let minimum = mode === "vehicle" ? config.vehicleMinPrice : config.motorbikeMinPrice;
+      let extra = mode === "vehicle" ? config.vehicleExtra : config.motorbikeExtra;
+      return Math.max(minimum, Math.ceil((distance * rate) + extra));
+    }
+
+    function calculateEstimatedTime(mode, distance) {
+      const speed = mode === "vehicle" ? config.vehicleSpeedKmH : config.motorbikeSpeedKmH;
+      const totalMinutes = Math.round((distance / speed) * 60);
+
+      if (totalMinutes < 60) {
+        return `${Math.max(1, totalMinutes)} mins`;
+      } else {
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
+      }
+    }
+
+    /* ----------------------------------------------------------------------
+       4. UI LOGIC & EVENT HANDLERS
+       ---------------------------------------------------------------------- */
+    function toggleForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById("booking-form-popup").classList.toggle("show");
+    }
+
+    function toggleMenu(e) {
+      if (e) e.preventDefault();
+      document.getElementById("menu-dropdown").classList.toggle("show");
+    }
+
+    const phoneInput = document.getElementById("customer-phone");
+    phoneInput.addEventListener("input", function() {
+      this.value = this.value.replace(/\D/g, "").slice(0, 10);
+      const phone = this.value.trim();
+      const trip = document.getElementById("trip-details");
+      const profile = document.getElementById("customer-profile");
+
+      if (/^0[0-9]{9}$/.test(phone)) {
+        trip.classList.add("show");
+        // Display only the owner name if recognized, or 'Profile' if not.
+        profile.textContent = customers[phone] ? customers[phone] : "Profile";
+        profile.classList.remove("hidden");
+      } else {
+        trip.classList.remove("show");
+        document.getElementById("summary-section").classList.remove("show");
+        document.getElementById("map-section").classList.remove("show");
+        profile.classList.add("hidden");
+        resetSubmitButton();
+      }
+    });
+
+    document.querySelectorAll(".mode-option").forEach(option => {
+      option.addEventListener("click", function() {
+        document.querySelectorAll(".mode-option").forEach(item => item.classList.remove("selected"));
+        this.classList.add("selected");
+        this.querySelector("input").checked = true;
+        scheduleCalculation();
+      });
+    });
+
+    function setupAutocomplete(inputId, listId) {
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+
+      input.addEventListener("input", function() {
+        this.dataset.placeId = "";
+        const value = this.value.trim().toLowerCase();
+        list.innerHTML = "";
+        if (!value) {
+          list.classList.add("hidden");
+          scheduleCalculation();
+          return;
+        }
+
+        const matches = PLACES_DATA.filter(place => place.name.toLowerCase().includes(value)).slice(0, 5);
+        matches.forEach(place => {
+          const item = document.createElement("div");
+          item.className = "autocomplete-item";
+          item.innerHTML = `<strong>${place.name}</strong> <small style="color:#777;">(${place.type})</small>`;
+          item.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            input.value = place.name;
+            input.dataset.placeId = place.id;
+            list.classList.add("hidden");
+            scheduleCalculation();
+          });
+          list.appendChild(item);
+        });
+        list.classList.toggle("hidden", matches.length === 0);
+      });
+
+      input.addEventListener("blur", () => setTimeout(() => list.classList.add("hidden"), 150));
+    }
+
+    setupAutocomplete("gm-origin", "originList");
+    setupAutocomplete("gm-destination", "destinationList");
+
+    function getSelectedPlace(inputId) {
+      const input = document.getElementById(inputId);
+      const id = input.dataset.placeId;
+      return (id && places[id] && input.value.trim() === places[id].name) ? id : null;
+    }
+
+    function scheduleCalculation() {
+      if (calculationTimer) clearTimeout(calculationTimer);
+      calculationTimer = setTimeout(calculateBooking, 250);
+    }
+
+    function calculateBooking() {
+      const pickup = getSelectedPlace("gm-origin");
+      const destination = getSelectedPlace("gm-destination");
+      const mode = document.querySelector('input[name="mode"]:checked');
+      const summary = document.getElementById("summary-section");
+      const submitBtn = document.getElementById("submit-btn");
+      const spinner = document.getElementById("spinner");
+      const status = document.getElementById("status");
+
+      if (!pickup || !destination || !mode) {
+        summary.classList.remove("show");
+        document.getElementById("map-section").classList.remove("show");
+        submitBtn.disabled = true;
+        return;
+      }
+
+      spinner.classList.add("show");
+      summary.classList.remove("show");
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        const result = calculateTotalDistance(pickup, destination);
+        spinner.classList.remove("show");
+
+        if (!result) {
+          status.textContent = "No valid route found.";
+          return;
+        }
+
+        const fare = calculateFare(mode.value, result.total);
+        const estTime = calculateEstimatedTime(mode.value, result.trip);
+        
+        // Update summary text (Distance, Est Time, Price)
+        document.getElementById("summary-distance").textContent = `${result.trip.toFixed(1)} km`;
+        document.getElementById("summary-time").textContent = estTime;
+        document.getElementById("summary-price").textContent = `K${fare.toFixed(2)}`;
+        document.getElementById("hub-tooltip").textContent = `Calculated via nearest hub (${places[result.hub]?.name || result.hub})`;
+
+        summary.classList.add("show");
+        submitBtn.disabled = false;
+        resetSubmitButton();
+
+        rideData = {
+          pickup: places[pickup].name,
+          destination: places[destination].name,
+          distance: result.trip.toFixed(1),
+          estimatedTime: estTime,
+          price: fare
+        };
+
+        const route = shortestPath(pickup, destination);
+        drawRoute(route);
+      }, 400);
+    }
+
+    /* ----------------------------------------------------------------------
+       5. MAP TOGGLE, SVG GRAPHICS & PINCH-ZOOM
+       ---------------------------------------------------------------------- */
+    function toggleMapVisibility() {
+      const mapSection = document.getElementById("map-section");
+      const label = document.getElementById("map-btn-label");
+      mapVisible = !mapVisible;
+      
+      if (mapVisible) {
+        mapSection.classList.add("show");
+        label.textContent = "Hide Map";
+        focusRoute();
+      } else {
+        mapSection.classList.remove("show");
+        label.textContent = "View Map";
+      }
+    }
+
+    function svgElement(tag, attrs = {}) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attrs).forEach(([k, v]) => element.setAttribute(k, v));
+      return element;
+    }
+
+    function drawRoute(result) {
+      if (!result) return;
+      const routeLayer = document.getElementById("routeLayer");
+      const placesLayer = document.getElementById("placesLayer");
+      const labelsLayer = document.getElementById("labelsLayer");
+
+      routeLayer.innerHTML = "";
+      placesLayer.innerHTML = "";
+      labelsLayer.innerHTML = "";
+
+      result.roadIndexes.forEach(roadIndex => {
+        const road = ROADS_DATA[roadIndex];
+        const from = places[road.from], to = places[road.to];
+        if (!from || !to) return;
+        routeLayer.appendChild(svgElement("line", { x1: from.x, y1: from.y, x2: to.x, y2: to.y, class: "route-line" }));
+      });
+
+      result.path.forEach((id, idx) => {
+        const place = places[id];
+        let className = "route-place";
+        if (idx === 0) className = "start-place";
+        if (idx === result.path.length - 1) className = "end-place";
+
+        placesLayer.appendChild(svgElement("circle", { cx: place.x, cy: place.y, r: 9, class: className }));
+        const label = svgElement("text", { x: place.x, y: place.y - 14, class: "place-label", "text-anchor": "middle" });
+        label.textContent = place.name;
+        labelsLayer.appendChild(label);
+      });
+
+      currentRoute = result;
+    }
+
+    function focusRoute() {
+      if (!currentRoute || !currentRoute.path.length) return;
+      const points = currentRoute.path.map(id => places[id]);
+      const xs = points.map(p => p.x), ys = points.map(p => p.y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+
+      const width = Math.max(maxX - minX, 80);
+      const height = Math.max(maxY - minY, 80);
+
+      mapTransform.scale = Math.min(Math.max(Math.min(900 / width, 550 / height), 0.65), 2.5);
+      mapTransform.x = 500 - ((minX + maxX) / 2) * mapTransform.scale;
+      mapTransform.y = 325 - ((minY + maxY) / 2) * mapTransform.scale;
+
+      applyMapTransform();
+    }
+
+    function zoomMap(factor) {
+      mapTransform.scale = Math.max(0.4, Math.min(4, mapTransform.scale * factor));
+      applyMapTransform();
+    }
+
+    function applyMapTransform() {
+      const t = `translate(${mapTransform.x} ${mapTransform.y}) scale(${mapTransform.scale})`;
+      ["routeLayer", "placesLayer", "labelsLayer"].forEach(id => {
+        document.getElementById(id).setAttribute("transform", t);
+      });
+    }
+
+    /* Mobile Finger Touch Pinch-Zoom & Pan Gesture Logic */
+    const svgMap = document.getElementById("mapSvg");
+    let touchStartDist = 0;
+    let initialScale = 1;
+    let isDragging = false;
+    let startTouchX = 0, startTouchY = 0;
+
+    svgMap.addEventListener("touchstart", function(e) {
+      if (e.touches.length === 2) {
+        touchStartDist = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        initialScale = mapTransform.scale;
+      } else if (e.touches.length === 1) {
+        isDragging = true;
+        startTouchX = e.touches[0].clientX - mapTransform.x;
+        startTouchY = e.touches[0].clientY - mapTransform.y;
+      }
+    }, { passive: true });
+
+    svgMap.addEventListener("touchmove", function(e) {
+      if (e.touches.length === 2 && touchStartDist > 0) {
+        const currentDist = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        mapTransform.scale = Math.max(0.4, Math.min(4, initialScale * (currentDist / touchStartDist)));
+        applyMapTransform();
+      } else if (e.touches.length === 1 && isDragging) {
+        mapTransform.x = e.touches[0].clientX - startTouchX;
+        mapTransform.y = e.touches[0].clientY - startTouchY;
+        applyMapTransform();
+      }
+    }, { passive: true });
+
+    svgMap.addEventListener("touchend", function() {
+      isDragging = false;
+      touchStartDist = 0;
+    });
+
+    /* ----------------------------------------------------------------------
+       6. ACTION BUTTON TRANSFORMATION & SUBMISSION
+       ---------------------------------------------------------------------- */
+    const submitBtn = document.getElementById("submit-btn");
+    const submitIcon = document.getElementById("submitIcon");
+    const callIcon = document.getElementById("callIcon");
+
+    function resetSubmitButton() {
+      isSubmitted = false;
+      submitBtn.classList.remove("call-mode");
+      submitBtn.title = "Submit Request";
+      submitIcon.style.display = "block";
+      callIcon.style.display = "none";
+    }
+
+    submitBtn.addEventListener("click", function() {
+      if (!isSubmitted) {
+        // First click: Simulate processing submit
+        showProgress();
+      } else {
+        // Second click (Call Mode): Launch call handler
+        window.location.href = `tel:${DRIVER_PHONE_NUMBER}`;
+      }
+    });
+
+    function showProgress() {
+      const overlay = document.getElementById("progress-overlay");
+      const fill = document.getElementById("progress-fill");
+      const percent = document.getElementById("progress-percent");
+
+      overlay.classList.add("show");
+      fill.style.width = "0%";
+      percent.textContent = "0%";
+
+      let val = 0;
+      if (progressTimer) clearInterval(progressTimer);
+
+      progressTimer = setInterval(() => {
+        val += 10;
+        fill.style.width = val + "%";
+        percent.textContent = val + "%";
+
+        if (val >= 100) {
+          clearInterval(progressTimer);
+          setTimeout(() => {
+            overlay.classList.remove("show");
+            // Successful Transformation into Call Button
+            isSubmitted = true;
+            submitBtn.classList.add("call-mode");
+            submitBtn.title = "Call Driver";
+            submitIcon.style.display = "none";
+            callIcon.style.display = "block";
+          }, 300);
+        }
+      }, 100);
+    }
+
+    /* Page Setup Init */
+    window.addEventListener("DOMContentLoaded", () => {
+      calculateCoordinates();
+      buildGraph();
+    });
+  </script>
+</body>
+</html>
