@@ -318,41 +318,6 @@
       transform: scale(1.02);
     }
 
-    .route-container {
-      margin-top: 8px;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      padding: 10px;
-    }
-
-    .route-info {
-      font-size: 0.8rem;
-      margin-bottom: 10px;
-      padding: 8px;
-      background: #f0f9ff;
-      border-radius: 6px;
-      text-align: center;
-      color: #1e293b;
-    }
-
-    .open-maps-link {
-      display: block;
-      padding: 10px;
-      background: var(--primary-color);
-      color: #fff !important;
-      text-decoration: none;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      text-align: center;
-      transition: background 0.2s;
-      font-weight: 500;
-    }
-
-    .open-maps-link:hover {
-      background: #1d4ed8;
-    }
-
     /* ==========================================================================
        3. INTERFACE & FORM LAYOUT
        ========================================================================== */
@@ -495,12 +460,12 @@
       display: block;
     }
 
-    /* Transport Option Radio Toggle */
+    /* Transport Option Radio Toggle Enhancements */
     #mode-group {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
       padding: 4px 0;
     }
@@ -509,24 +474,58 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 6px;
       cursor: pointer;
       flex: 1;
-      justify-content: center;
-      padding: 8px;
+      padding: 12px 8px;
       border: 2px solid var(--border-color-light);
-      border-radius: 10px;
-      transition: all 0.2s ease;
+      border-radius: 12px;
+      transition: all 0.25s ease;
       background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
-    .mode-option input {
-      display: none;
+    .mode-option input[type="radio"] {
+      appearance: auto;
+      -webkit-appearance: radio;
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+
+    .mode-option .icon-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      transition: transform 0.2s ease;
+    }
+
+    .mode-option small {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+
+    .mode-option:hover {
+      border-color: var(--primary-color);
+      background: #f0f7ff;
+    }
+
+    .mode-option:hover .icon-img {
+      transform: scale(1.08);
     }
 
     .mode-option.selected {
       border-color: var(--success-color);
-      background: #e8f5e9;
+      background: #f0fdf4;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+    }
+
+    .mode-option.selected small {
+      color: var(--success-color);
     }
 
     /* Autocomplete Popups */
@@ -984,14 +983,22 @@
 
         <!-- Step 2: Ride Preferences -->
         <div id="trip-details" class="hidden-section">
-        <fieldset>
-          <legend><span class="material-icons">commute</span> Transport Mode</legend>
-          <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">Choose your preferred transport mode</p>
-          <div id="mode-group">
-            <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
-            <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
-          </div>
-        </fieldset>
+          <fieldset>
+            <legend><span class="material-icons">commute</span> Transport Mode</legend>
+            <p style="font-size: 0.8rem; color: #999; margin: 4px 0 10px 0; text-align: center; font-style: italic;">Choose your preferred transport mode</p>
+            <div id="mode-group">
+              <label class="mode-option">
+                <input type="radio" name="mode" value="motorbike">
+                <img src="motorbike.png" class="icon-img" alt="Motorbike">
+                <small>Motorbike</small>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="mode" value="vehicle">
+                <img src="car.png" class="icon-img" alt="Car">
+                <small>Car</small>
+              </label>
+            </div>
+          </fieldset>
 
           <fieldset>
             <legend>Pickup Location</legend>
@@ -1325,7 +1332,7 @@
       } else {
         const hours = Math.floor(totalMinutes / 60);
         const mins = totalMinutes % 60;
-        return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
+        return mins > 0 ? `${hours}h${mins}m` : `${hours} hrs`;
       }
     }
 
@@ -1359,12 +1366,14 @@
       }
     });
 
-    document.querySelectorAll(".mode-option").forEach(option => {
-      option.addEventListener("click", function() {
+    // Handle Transport Mode Selection cleanly on change / click
+    document.querySelectorAll(".mode-option input[type='radio']").forEach(radio => {
+      radio.addEventListener("change", function() {
         document.querySelectorAll(".mode-option").forEach(item => item.classList.remove("selected"));
-        this.classList.add("selected");
-        this.querySelector("input").checked = true;
-        scheduleCalculation();
+        if (this.checked) {
+          this.closest(".mode-option").classList.add("selected");
+          scheduleCalculation();
+        }
       });
     });
 
@@ -1604,7 +1613,7 @@
       const percent = document.getElementById("progress-percent");
 
       overlay.classList.add("show");
-      fill.style.width = "0%";
+      fill.style.width = "0%`";
       percent.textContent = "0%";
 
       let val = 0;
