@@ -1025,69 +1025,39 @@
          HTML BODY / DOM STRUCTURE
          ========================================================================== -->
 
-    <!-- MAIN APP CONTAINER -->
-    <div class="app-interface-wrapper">
-        <main class="product-container" id="booking-form-popup">
-            <div class="booking-container">
+<!-- ========== APP INTERFACE AND WRAPPERS ========== -->
+<div class="app-interface-wrapper">
+<main class="product-container" id="booking-form-popup">
+    <div class="booking-container">
+      
+      <div class="form-header-bar">
+          <div class="form-title-text">
+              <i class="fas fa-file-alt" style="color: var(--primary-color);"></i> Luangwa Feira Rides
+          </div>
+          <div class="form-close-btn" onclick="toggleForm(event)" title="Close Form">
+              <i class="fas fa-times"></i>
+          </div>
+      </div>
 
-                <!-- 1. HEADER -->
-                <div class="form-header-bar">
-                    <div class="form-title-text">
-                        <span class="form-title-icon">📄</span>
-                        Luangwa Feira Rides
-                    </div>
-
-                    <!-- Visual close/reset button -->
-                    <div class="form-close-btn" onclick="resetBooking()" title="Reset Form">
-                        ×
-                    </div>
-                </div>
-
-                <!-- 2. FORM CONTENT AREA -->
-                <div class="form-content">
-
-                    <!-- SECTION: PROFILE -->
-                    <fieldset>
-                        <legend>👤 Profile</legend>
-
-                        <div class="input-box" id="phone-box">
-                            <span class="input-icon">☎</span>
-                            <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric" autocomplete="tel">
-                        </div>
-
-                        <div class="phone-help">
-                            Enter a valid 10-digit Zambian mobile number.
-                        </div>
-
-                        <div id="customer-profile" class="customer-profile hidden"></div>
-                    </fieldset>
-
-                    <!-- SECTION: TRIP DETAILS -->
-                    <div id="trip-details" class="hidden-section">
-
-                        <!-- Transport Mode Selection -->
-                        <fieldset>
-                            <legend>🛵 Transport Mode</legend>
-                            <p class="mode-help">Choose your preferred transport mode</p>
-
-                            <div id="mode-group">
-                                <label class="mode-option" data-mode="motorbike">
-                                    <input type="radio" name="mode" value="motorbike">
-                                    <div class="mode-icon">🏍️</div>
-                                    <div class="mode-name">Motorbike</div>
-                                    <div class="mode-rate">K2.50/km</div>
-                                </label>
-
-                                <label class="mode-option" data-mode="vehicle">
-                                    <input type="radio" name="mode" value="vehicle">
-                                    <div class="mode-icon">🚗</div>
-                                    <div class="mode-name">Car</div>
-                                    <div class="mode-rate">K4.50/km</div>
-                                </label>
-                            </div>
-                        </fieldset>
-
-     <fieldset>
+      <fieldset>
+        <legend><span class="material-icons">account_circle</span> Profile</legend>
+        <div class="input-box" id="phone-box">
+          <span class="material-icons">phone</span>
+          <input type="tel" id="customer-phone" maxlength="10" placeholder="Enter your phone number eg 0xxxxxxxxx" inputmode="numeric">
+        </div>
+      </fieldset>
+      
+      <div id="trip-details" class="hidden-section">
+        <fieldset>
+          <legend><span class="material-icons">commute</span> Transport Mode</legend>
+          <p style="font-size: 0.8rem; color: #999; margin: 8px 0 12px 0; text-align: center; font-style: italic;">Choose your preferred transport mode</p>
+          <div id="mode-group">
+            <label class="mode-option"><input type="radio" name="mode" value="motorbike"><img src="motorbike.png" class="icon-img" alt="bike"><small>Motorbike</small></label>
+            <label class="mode-option"><input type="radio" name="mode" value="vehicle"><img src="car.png" class="icon-img" alt="car"><small>Car</small></label>
+          </div>
+        </fieldset>
+        
+        <fieldset>
           <legend>Pickup Location</legend>
           <div class="input-box" id="origin-container">
             <span class="material-icons">my_location</span>
@@ -1105,33 +1075,21 @@
           </div>
         </fieldset>
       </div>
-
-                    <!-- SECTION: TRIP SUMMARY -->
-                    <div id="summary-section" class="hidden-section">
-                        <fieldset class="summary-fieldset">
-                            <legend>
-                                🧾 Trip Summary
-                                <span class="tooltip-container">
-                                    ?
-                                    <span class="tooltip-text" id="hub-tooltip">
-                                        Calculated via nearest transport hub
-                                    </span>
-                                </span>
-                            </legend>
-
-                            <div id="summary-cards" class="summary-cards"></div>
-
-                            <div class="action-area">
-                                <button class="submit-btn" id="submit-btn" disabled>
-                                    <span id="btn-icon">➤</span>
-                                    <div class="btn-loader" id="btn-loader"></div>
-                                    <span id="progress-text">Request Now</span>
-                                </button>
-
-                                <p id="action-label" class="action-label">Request Now</p>
-                            </div>
-                        </fieldset>
-                    </div>
+      
+      <div id="summary-section" class="hidden-section">
+        <fieldset>
+          <legend><span class="material-icons">receipt_long</span> Trip Summary <span class="tooltip-container"><span class="material-icons tooltip-icon">help_outline</span><span class="tooltip-text" id="hub-tooltip">Calculated via nearest transport hub</span></span></legend>
+          <div id="summary-cards"></div>
+        </fieldset>
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:20px;">
+          <button class="submit-btn" id="submit-btn"><i class="fas fa-paper-plane" id="btn-icon"></i><div class="btn-loader" id="btn-loader"></div><span id="progress-text">0%</span></button>
+          <p id="action-label" style="margin-top:8px; font-weight:bold; color:var(--primary-color);">Request Now</p>
+        </div>
+      </div>
+      
+      <div class="calc-loader" id="spinner"></div>
+      <p id="status" style="text-align:center; margin-top:10px; font-weight:bold; min-height: 40px;"></p>
+    </div>
 
                     <!-- SECTION: ROUTE MAP -->
                     <div id="map-section" class="hidden-section">
