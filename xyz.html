@@ -38,6 +38,7 @@ body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-colo
 button, input { font-family: inherit; cursor: pointer; }
 .hidden { display: none !important; }
 .hidden-section { display: none; }
+.show-section { display: block !important; }
 ::-webkit-scrollbar { display: none; }
 
 @keyframes shake {
@@ -55,7 +56,7 @@ button, input { font-family: inherit; cursor: pointer; }
 .store-button{z-index:100;position:relative}
 
 /* ========== BILLBOARD NAVIGATION ARROWS (FIXED & RESTORED) ========== */
-.billboard-nav {
+.billboard-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -78,15 +79,15 @@ button, input { font-family: inherit; cursor: pointer; }
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
-.billboard-nav:hover {
+.billboard-arrow:hover {
   background: rgba(37, 99, 235, 0.8);
   color: #ffffff;
   border-color: #ffffff;
   transform: translateY(-50%) scale(1.1);
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
 }
-.billboard-nav-prev { left: 20px; }
-.billboard-nav-next { right: 20px; }
+.billboard-prev { left: 20px; }
+.billboard-next { right: 20px; }
 
 /* ========== BILLBOARD HEADER ========== */
 .billboard-header{position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(135deg,#1e3a8a,#2563eb,#1e40af);border-bottom:none;z-index:1}
@@ -286,14 +287,38 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 .mode-option{display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;justify-content:center}
 .icon-img{width:40px;height:40px;object-fit:contain}
 .autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;z-index:1000;max-height:200px;overflow-y:auto;border-radius:0 0 8px 8px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
-.suggestion{padding:10px;cursor:pointer;border-bottom:1px solid #eee;font-size:.9rem;transition:background .2s}
-.suggestion:hover{background:#e8f0fe;color:var(--primary-color)}
+.autocomplete-item{padding:10px;cursor:pointer;border-bottom:1px solid #eee;font-size:.9rem;transition:background .2s}
+.autocomplete-item:hover{background:#e8f0fe;color:var(--primary-color)}
 .summary-card{background:#fff;border:1px solid var(--border-color-light);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.submit-btn{background:var(--primary-color);color:#fff;width:65px;height:65px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;border:none;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.2);transition:.3s;position:relative}
-.btn-loader{width:45px;height:45px;border:4px solid rgba(255,255,255,0.3);border-top:4px solid #fff;border-radius:50%;animation:spin .8s linear infinite;display:none}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.summary-item{background:#f8fafc;padding:8px;border-radius:6px;text-align:center;border:1px solid #e2e8f0}
+.summary-item .label{display:block;font-size:0.7rem;color:#64748b;margin-bottom:2px}
+.summary-item .value{font-size:0.85rem;font-weight:700;color:#1e293b}
+.view-map-btn{width:100%;background:#f1f5f9;color:#2563eb;border:1px solid #cbd5e1;padding:8px;border-radius:6px;font-weight:600;font-size:0.85srem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
+.view-map-btn:hover{background:#e2e8f0}
+.btn-container{margin-top:12px;text-align:center}
+.action-btn{background:var(--primary-color);color:#fff;width:65px;height:65px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;border:none;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.2);transition:.3s;position:relative;margin:0 auto}
+.action-btn:hover{transform:scale(1.05)}
+.action-btn.call-mode{background:var(--success-color)!important}
+.btn-label-text{display:block;margin-top:6px;font-size:0.8rem;font-weight:700;color:#333}
+.btn-loader{width:45px;height:45px;border:4px solid rgba(255,255,255,0.3);border-top:4px solid #fff;border-radius:50%;animation:spin .8s linear infinite;display:none;position:absolute}
 #progress-text{position:absolute;font-size:11px;font-weight:700;color:#fff;display:none}
 .calc-loader{width:30px;height:30px;border:4px solid #f3f3f3;border-top:4px solid var(--secondary-color);border-radius:50%;animation:spin 1s linear infinite;margin:15px auto;display:none}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+/* MAP STYLES */
+.map-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.map-btn{background:var(--primary-color);color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer}
+.map-container{position:relative;width:100%;height:220px;background:#f8fcfe;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+.zoom-controls{position:absolute;bottom:8px;right:8px;display:flex;flex-direction:column;gap:4px;z-index:10}
+.zoom-control{width:28px;height:28px;background:#fff;border:1px solid #cbd5e1;border-radius:4px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.route-line{stroke:#2563eb;stroke-width:4;stroke-linecap:round;stroke-dasharray:6,6;animation:dashMove 1s linear infinite}
+@keyframes dashMove{to{stroke-dashoffset:-12}}
+.route-distance-label{font-size:10px;fill:#1e293b;font-weight:bold}
+.route-place{fill:#2563eb;stroke:#fff;stroke-width:2}
+.start-place{fill:#16a34a;stroke:#fff;stroke-width:2}
+.end-place{fill:#dc2626;stroke:#fff;stroke-width:2}
+.place-label{font-size:10px;fill:#1e293b;font-weight:bold}
 
 /* TOOLTIP & RESPONSIVE BREAKPOINTS */
 .tooltip-container{position:relative;display:inline-flex;align-items:center;cursor:help;margin-left:4px;vertical-align:middle}
@@ -307,9 +332,9 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
   .menu-dropdown{right:16px;left:auto;width:340px}
   .product-container{width:100%}
   .welcome-billboard{font-size:clamp(18px,4vw,32px);white-space:normal;border-right:none;width:auto;animation:none;padding:0 20px;max-width:90vw}
-  .billboard-nav{width:40px;height:40px;font-size:20px}
-  .billboard-nav-prev{left:10px}
-  .billboard-nav-next{right:10px}
+  .billboard-arrow{width:40px;height:40px;font-size:20px}
+  .billboard-prev{left:10px}
+  .billboard-next{right:10px}
 }
 </style>
 
@@ -326,7 +351,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
         <h2 class="zam"><span class="z-green">Z</span><span class="z-black">a</span><span class="z-red">m</span><span>Listing</span></h2>
       </div>
       <div class="header-buttons">
-        <button class="form-toggle-action-btn" onclick="window.open('https://www.zamlisting.com/store', '_blank');">
+        <button class="form-toggle-action-btn shop-btn" onclick="window.open('https://www.zamlisting.com/store', '_blank');">
           <i class="fas fa-shopping-cart"></i> SHOP
         </button>
         <button class="form-toggle-action-btn" onclick="toggleForm(event)">
@@ -338,7 +363,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 
         <!-- Dropdown Menu -->
         <div id="menu-dropdown" class="menu-dropdown">
-          <div class="dropdown-section">
+          <div class="dropdown-content-section">
             <h4><i class="fas fa-info-circle"></i> Service Details</h4>
             <p>Affordable motorbikes & vehicle hailing across Luangwa, Rufunsa & surrounding hubs.</p>
             <button id="menu-install-btn" class="store-button" style="width:100%; background:linear-gradient(135deg, #ff9900, #ff5500); color:#fff; border:none; border-radius:6px; padding:8px; font-size:13px; font-weight:700; margin-top:4px;">
@@ -348,7 +373,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 
           <div class="menu-divider"></div>
 
-          <div class="dropdown-section">
+          <div class="dropdown-content-section">
             <h4><i class="fas fa-map-marker-alt"></i> Share My Location</h4>
             <p>Pickup/drop-off within 1 km incurs no extra fees.</p>
             <a href="#" onclick="getLocation()"><i class="fas fa-location-arrow"></i><span>Get My GPS Location</span></a>
@@ -359,17 +384,17 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 
           <div class="menu-divider"></div>
 
-          <div class="dropdown-section">
+          <div class="dropdown-content-section">
             <h4><i class="fas fa-map-marked-alt"></i> Active Route Map</h4>
-            <div class="route-compact-box">
-              <div id="map-route-info" class="route-info-text"><i class="fas fa-route"></i> Select locations on booking form</div>
+            <div class="route-container">
+              <div id="map-route-info" class="route-info"><i class="fas fa-route"></i> Select locations on booking form</div>
               <a id="openMapsLink" href="#" target="_blank" class="open-maps-link">🌍 Open Google Maps Route</a>
             </div>
           </div>
 
           <div class="menu-divider"></div>
 
-          <div class="dropdown-section">
+          <div class="dropdown-content-section">
             <h4><i class="fas fa-headset"></i> Support & Socials</h4>
             <a href="tel:0777737047"><i class="fas fa-phone"></i><span>Call Helpline</span></a>
             <a href="https://wa.me/260777737047" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp Support</span></a>
@@ -381,7 +406,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       </div>
     </div>
 
-    <!-- Billboard Slides Container (Clean Single-Instance Set) -->
+    <!-- Billboard Slides Container -->
     <div class="billboard-slide active">
       <div class="welcome-billboard">RELIABLE & AFFORDABLE RIDES ACROSS LUANGWA</div>
     </div>
@@ -503,21 +528,21 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 
     <!-- Slide: Dynamic Eyes Animation -->
     <div class="billboard-slide">
-      <div class="eyes-container">
+      <div class="eyes-container" style="display:flex; gap:20px; align-items:center; justify-content:center;">
         <svg class="eye-svg" viewBox="0 0 140 90">
           <g class="eye-lid">
-            <ellipse cx="70" cy="45" rx="65" ry="40" class="eye-ball" />
+            <ellipse cx="70" cy="45" rx="65" ry="40" fill="#fff" class="eye-ball" />
             <g class="pupil" id="leftPupil">
-              <circle cx="70" cy="45" r="22" class="iris" />
+              <circle cx="70" cy="45" r="22" fill="#2563eb" class="iris" />
               <circle cx="63" cy="38" r="7" fill="#ffffff" />
             </g>
           </g>
         </svg>
         <svg class="eye-svg" viewBox="0 0 140 90">
           <g class="eye-lid">
-            <ellipse cx="70" cy="45" rx="65" ry="40" class="eye-ball" />
+            <ellipse cx="70" cy="45" rx="65" ry="40" fill="#fff" class="eye-ball" />
             <g class="pupil" id="rightPupil">
-              <circle cx="70" cy="45" r="22" class="iris" />
+              <circle cx="70" cy="45" r="22" fill="#2563eb" class="iris" />
               <circle cx="63" cy="38" r="7" fill="#ffffff" />
             </g>
           </g>
@@ -538,13 +563,13 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       </div>
     </div>
 
-    <div class="billboard-slide">
+    <div class="billboard-slide billboard-slide16">
       <div class="directory-card">
         <div class="directory-header">
           <i class="fas fa-users-cog"></i> Luangwa Council – ECZ Poll Staff List
         </div>
         <div class="search-box">
-          <i class="fas fa-search" style="color:var(--primary);"></i>
+          <i class="fas fa-search"></i>
           <input type="text" id="candidateSearchInput" placeholder="Search by S/N, Gender, or NRC..." oninput="filterCandidates()">
         </div>
         <div class="table-container">
@@ -553,10 +578,10 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
               <tr><th>S/N</th><th>Gender</th><th>NRC</th><th>Phone (Last 3)</th></tr>
             </thead>
             <tbody id="candidatesTableBody">
-              <tr><td>1</td><td>M</td><td>123456/74/1</td><td>047</td></tr>
-              <tr><td>2</td><td>F</td><td>987654/74/1</td><td>321</td></tr>
-              <tr><td>3</td><td>M</td><td>456123/74/1</td><td>889</td></tr>
-              <tr><td>4</td><td>F</td><td>789123/74/1</td><td>554</td></tr>
+              <tr><td>1</td><td><span class="gender-badge M">M</span></td><td>123456/74/1</td><td>047</td></tr>
+              <tr><td>2</td><td><span class="gender-badge F">F</span></td><td>987654/74/1</td><td>321</td></tr>
+              <tr><td>3</td><td><span class="gender-badge M">M</span></td><td>456123/74/1</td><td>889</td></tr>
+              <tr><td>4</td><td><span class="gender-badge F">F</span></td><td>789123/74/1</td><td>554</td></tr>
             </tbody>
           </table>
         </div>
@@ -575,14 +600,14 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
   <!-- ==========================================================================
        2. BOOKING APP POPUP CONTAINER
        ========================================================================== -->
-  <div class="app-wrapper">
+  <div class="app-interface-wrapper">
     <main class="product-container" id="booking-form-popup">
       <div class="booking-container">
         
         <!-- Form Header Bar -->
         <div class="form-header-bar">
-          <div class="form-title">
-            <i class="fas fa-taxi"></i> Luangwa Feira Rides
+          <div class="form-title-text">
+            <i class="fas fa-taxi" style="color:var(--primary-color);"></i> Luangwa Feira Rides
           </div>
           <button class="form-close-btn" onclick="toggleForm(event)" title="Close Form">
             <i class="fas fa-times"></i>
@@ -1038,13 +1063,13 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
     function showFieldError(containerId, errorMsgId) {
       const container = document.getElementById(containerId);
       const errorMsg = document.getElementById(errorMsgId);
-      container.classList.add("shake-error");
+      container.classList.add("field-error");
       errorMsg.classList.add("show");
-      setTimeout(() => container.classList.remove("shake-error"), 400);
+      setTimeout(() => container.classList.remove("field-error"), 400);
     }
 
     function clearFieldError(containerId, errorMsgId) {
-      document.getElementById(containerId).classList.remove("shake-error");
+      document.getElementById(containerId).classList.remove("field-error");
       document.getElementById(errorMsgId).classList.remove("show");
     }
 
