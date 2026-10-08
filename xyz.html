@@ -1230,22 +1230,87 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       });
       currentRoute = result;
     }
+function focusRoute() {
+  if (!currentRoute || !currentRoute.path.length) return;
 
-    function focusRoute() {
-      if (!currentRoute || !currentRoute.path.length) return;
-      const points = currentRoute.path.map(id => places[id]).filter(Boolean);
-      if (!points.length) return;
+  const points = currentRoute.path
+    .map(id => places[id])
+    .filter(Boolean);
 
-      const xs = points.map(p => p.x), ys = points.map(p => p.y);
-      let minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-      let width = Math.max(maxX - minX, 220), height = Math.max(maxY - minY, 220);
+  if (!points.length) return;
 
-      mapTransform.scale = Math.min(Math.max(Math.min(900 / width, 550 / height), 0.8), 3.5);
-      mapTransform.x = 500 - ((minX + maxX) / 2) * mapTransform.scale;
-      mapTransform.y = 325 - ((minY + maxY) / 2) * mapTransform.scale;
-      applyMapTransform();
-    }
+  const xs = points.map(p => p.x);
+  const ys = points.map(p => p.y);
 
+  let minX = Math.min(...xs);
+  let maxX = Math.max(...xs);
+  let minY = Math.min(...ys);
+  let maxY = Math.max(...ys);
+
+  /*
+   * Minimum visual spacing.
+   *
+   * This is ONLY for displaying the map.
+   * It does NOT change the actual road distance,
+   * Dijkstra distance or fare calculation.
+   */
+  const MIN_VISUAL_WIDTH = 180;
+  const MIN_VISUAL_HEIGHT = 140;
+
+  let width = maxX - minX;
+  let height = maxY - minY;
+
+  /*
+   * If places are extremely close together,
+   * create a larger visual area around them.
+   */
+  if (width < MIN_VISUAL_WIDTH) {
+    const centreX = (minX + maxX) / 2;
+
+    minX = centreX - MIN_VISUAL_WIDTH / 2;
+    maxX = centreX + MIN_VISUAL_WIDTH / 2;
+
+    width = MIN_VISUAL_WIDTH;
+  }
+
+  if (height < MIN_VISUAL_HEIGHT) {
+    const centreY = (minY + maxY) / 2;
+
+    minY = centreY - MIN_VISUAL_HEIGHT / 2;
+    maxY = centreY + MIN_VISUAL_HEIGHT / 2;
+
+    height = MIN_VISUAL_HEIGHT;
+  }
+
+  /*
+   * Calculate the zoom level.
+   */
+  mapTransform.scale = Math.min(
+    Math.max(
+      Math.min(
+        900 / width,
+        550 / height
+      ),
+      0.8
+    ),
+    3.5
+  );
+
+  /*
+   * Centre the route on the map.
+   */
+  mapTransform.x =
+    500 -
+    ((minX + maxX) / 2) *
+      mapTransform.scale;
+
+  mapTransform.y =
+    325 -
+    ((minY + maxY) / 2) *
+      mapTransform.scale;
+
+  applyMapTransform();
+}
     function zoomMap(factor) {
       mapTransform.scale = Math.max(0.4, Math.min(4, mapTransform.scale * factor));
       applyMapTransform();
