@@ -520,7 +520,7 @@
     function manualSlide(direction) {
       clearInterval(slideInterval);
       showSlide(currentSlide + direction);
-      slideInterval = setInterval(autoAdvanceSlide, 4500); // Restart auto timer on manual action
+      slideInterval = setInterval(autoAdvanceSlide, 4500);
     }
 
     // ========== CONFIG & LOCATIONS DATA ==========
@@ -586,6 +586,14 @@
     let rideData = null;
 
     PLACES_DATA.forEach(place => { places[place.id] = { ...place }; });
+
+    function getCoordinates(placeId) {
+      const place = places[placeId];
+      if (place) {
+        return { lat: place.lat, lng: place.lon };
+      }
+      return { lat: -15.6167, lng: 30.4167 };
+    }
 
     function calculateCoordinates() {
       const all = Object.values(places);
@@ -725,22 +733,16 @@
 
       if (/^0[0-9]{9}$/.test(phone)) {
         profileTitleText.textContent = customers[phone] || "Profile";
-        
-        // Automatically reveal the rest of the sections with smooth animation
         trip.classList.add("show-section");
-        
         setTimeout(() => {
           trip.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 100);
       } else {
         trip.classList.remove("show-section");
         summarySection.classList.remove("show-section");
-        
-        // Hide map section and reset visibility state on profile reset
         mapVisible = false;
         document.getElementById("map-section").classList.add("hidden");
         document.getElementById("map-btn-label").textContent = "View Map";
-
         profileTitleText.textContent = "Profile";
         resetSubmitButton();
       }
@@ -871,6 +873,14 @@
 
         summary.classList.add("show-section");
         document.getElementById("hub-tooltip").textContent = `✨ Calculated via hub: ${places[res.hub]?.name || res.hub}`;
+
+        // Fixed Google Maps Link using standard api=1 format parameters
+        const pickupCoord = getCoordinates(pickup);
+        const destCoord = getCoordinates(destination);
+        const openLink = document.getElementById('openMapsLink');
+        openLink.href = `https://www.google.com/maps/dir/?api=1&origin=${pickupCoord.lat},${pickupCoord.lng}&destination=${destCoord.lat},${destCoord.lng}`;
+
+        document.getElementById("map-route-info").innerHTML = `<i class="fas fa-route"></i> Route: ${places[pickup].name} → ${places[destination].name}`;
 
         let rate = mode.value === 'vehicle' ? config.vehiclePricePerKm : config.motorbikePricePerKm;
         let minPrice = mode.value === 'vehicle' ? config.vehicleMinPrice : config.motorbikeMinPrice;
@@ -1020,7 +1030,6 @@
       });
     }
 
-    // Touch events for SVG Map
     const svgMap = document.getElementById("mapSvg");
     let touchStartDist = 0, initialScale = 1, isDragging = false, startTouchX = 0, startTouchY = 0;
     svgMap.addEventListener("touchstart", (e) => {
@@ -1048,7 +1057,7 @@
 
     svgMap.addEventListener("touchend", () => { isDragging = false; touchStartDist = 0; });
 
-    // ========== SUBMIT & CALL BUTTON FLOW WITH ROUND IN-BUTTON LOADER ==========
+    // ========== SUBMIT & CALL BUTTON FLOW ==========
     const submitBtn = document.getElementById("submit-btn");
     const submitIcon = document.getElementById("submitIcon");
     const callIcon = document.getElementById("callIcon");
