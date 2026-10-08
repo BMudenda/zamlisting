@@ -1604,6 +1604,33 @@
         drawRoute(route);
       }, 400);
     }
+      
+    // ========== coordnate fetch and submit ==========
+    let mapLink = "";
+
+function getLocation() {
+  const status = document.getElementById("locationStatus");
+  if (navigator.geolocation) {
+    status.innerHTML = "📍 Getting location...";
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+        status.innerHTML = "🌐 ✅ Location ready!";
+      },
+      () => { status.innerHTML = "❌ Failed!"; }
+    );
+  }
+}
+
+function shareWhatsApp() {
+  if (!mapLink) { alert("Please get your location first using 'Get My Location'"); return; }
+  window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + mapLink)}`, "_blank");
+}
+
+function shareSMS() {
+  if (!mapLink) { alert("Please get your location first using 'Get My Location'"); return; }
+  window.location.href = `sms:0777737047?body=📍 ${mapLink}`;
+}
 
     // ========== MAP DISPLAY & TOUCH ZOOM ==========
     function toggleMapVisibility() {
