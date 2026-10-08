@@ -1196,6 +1196,36 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       return element;
     }
 
+    function getVisualPosition(place, index, allPlaces) {
+  let x = place.x;
+  let y = place.y;
+
+  for (let i = 0; i < index; i++) {
+    const other = allPlaces[i];
+    if (!other) continue;
+
+    const dx = x - other.x;
+    const dy = y - other.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < MIN_PLACE_PIXEL_DISTANCE) {
+      const angle =
+        Math.atan2(dy, dx) ||
+        (index % 2 === 0 ? 0 : Math.PI);
+
+      x =
+        other.x +
+        Math.cos(angle) * MIN_PLACE_PIXEL_DISTANCE;
+
+      y =
+        other.y +
+        Math.sin(angle) * MIN_PLACE_PIXEL_DISTANCE;
+    }
+  }
+
+  return { x, y };
+    }
+
     function drawRoute(result) {
       if (!result) return;
       const routeLayer = document.getElementById("routeLayer");
