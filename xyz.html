@@ -692,33 +692,61 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
        3. CONSOLIDATED JAVASCRIPT
        ========================================================================== -->
   <script>
-    // ========== SERVICE WORKER REGISTER ==========
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(err => console.error("SW failed:", err));
-      });
-    }
+    // ========== SERVICE WORKER REGISTRATION ==========
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("sw.js").then(
+      function(reg) { console.log("ServiceWorker registered"); },
+      function(err) { console.log("ServiceWorker registration failed:", err); }
+    );
+  });
+}
 
-    let deferredPrompt = null;
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-    });
+// ========== PWA INSTALL & APK DOWNLOAD LOGIC ==========
+let deferredPrompt = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const menuInstallBtn = document.getElementById('menu-install-btn');
-      if (menuInstallBtn) {
-        menuInstallBtn.addEventListener('click', () => {
-          const link = document.createElement('a');
-          link.href = 'Luangwa_Feira_Rides.apk';
-          link.download = 'Luangwa_Feira_Rides.apk';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          alert("📱 Download initiated!\n\nOpen downloaded APK to install.");
-        });
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Show banner for screens wider than 400px (covers tablets and desktops)
+  if (window.innerWidth > 400) {
+    const installBox = document.createElement("div");
+    installBox.style.cssText = "position:fixed; top:15px; right:15px; background:#2b6ef6; color:#fff; border-radius:8px; padding:8px 14px; font-family:system-ui, sans-serif; font-size:14px; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.2); z-index:9999; display:flex; align-items:center; gap:8px;";
+    installBox.innerHTML = `<span id="installText">📱 Install App</span><span id="closeInstall" style="cursor:pointer;font-weight:bold;margin-left:5px;">×</span>`;
+    document.body.appendChild(installBox);
+    
+    document.getElementById("installText").addEventListener("click", async () => {
+      installBox.remove();
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
       }
     });
+    
+    document.getElementById("closeInstall").addEventListener("click", () => { 
+      installBox.remove(); 
+    });
+  }
+});
+
+// Keep your menu button working for APK downloads
+document.addEventListener('DOMContentLoaded', () => {
+  const menuInstallBtn = document.getElementById('menu-install-btn');
+  if (menuInstallBtn) {
+    menuInstallBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = 'Luangwa_Feira_Rides.apk';
+      link.download = 'Luangwa_Feira_Rides.apk';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      alert("📱 Download initiated!\n\nOpen downloaded APK to install.");
+    });
+  }
+});
+
 
     // ========== BILLBOARD SLIDER ROTATION & CONTROLS ==========
     const slides = document.querySelectorAll('.billboard-slide');
