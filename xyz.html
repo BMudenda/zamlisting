@@ -1046,475 +1046,463 @@ const ROADS_DATA = [
   { from: "KATONDWE_CHAZ_HOTEL", to: "KAKARO_PRIMARY_SCHOOL", distanceKm: 42.5 }
 ];
 
-    
+ const hubs = ["LUSAKA", "CHONGWE", "RUFUNSA", "LUANGWA_BUS", "LUANGWA_BRIDGE_MARKET", "NYIMBA", "PETAUKE", "CHIPATA"];
 
-    const hubs = ["LUSAKA", "CHONGWE", "RUFUNSA", "LUANGWA_BUS", "LUANGWA_BRIDGE_MARKET", "NYIMBA", "PETAUKE", "CHIPATA"];
+const places = {};
+let graph = {};
+let currentRoute = null;
+let calculationTimer = null;
+let isSubmitted = false;
+let rideData = null;
 
-    const places = {};
-    let graph = {};
-    let currentRoute = null;
-    let calculationTimer = null;
-    let isSubmitted = false;
-    
-    let rideData = null;
+PLACES_DATA.forEach(place => { places[place.id] = { ...place }; });
 
-    PLACES_DATA.forEach(place => { places[place.id] = { ...place }; });
+function getCoordinates(placeId) {
+  const place = places[placeId];
+  return place ? { lat: place.lat, lng: place.lon } : { lat: -15.6167, lng: 30.4167 };
+}
 
-    function getCoordinates(placeId) {
-      const place = places[placeId];
-      return place ? { lat: place.lat, lng: place.lon } : { lat: -15.6167, lng: 30.4167 };
-    }
+function buildGraph() {
+  graph = {};
+  Object.keys(places).forEach(id => { graph[id] = []; });
+  ROADS_DATA.forEach((road, index) => {
+    if (!places[road.from] || !places[road.to]) return;
+    graph[road.from].push({ node: road.to, distance: Number(road.distanceKm), roadIndex: index });
+    graph[road.to].push({ node: road.from, distance: Number(road.distanceKm), roadIndex: index });
+  });
+}
 
-    function calculateCoordinates() {
-      const all = Object.values(places);
-      const lats = all.map(p => p.lat), lons = all.map(p => p.lon);
-      const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-      const minLon = Math.min(...lons), maxLon = Math.max(...lons);
-      const padding = 70;
+function shortestPath(start, end) {
+  if (!graph[start] || !graph[end]) return null;
+  if (start === end) return { path: [start], roadIndexes: [], distance: 0 };
 
-      const latSpan = Math.max(maxLat - minLat, 0.0001);
-      const lonSpan = Math.max(maxLon - minLon, 0.0001);
+  const distances = {}, previous = {}, previousRoad = {};
+  const unvisited = new Set(Object.keys(graph));
 
-      all.forEach(place => {
-        place.x = padding + ((place.lon - minLon) / lonSpan) * (1000 - padding * 2);
-        place.y = padding + ((maxLat - place.lat) / latSpan) * (650 - padding * 2);
-      });
-    }
+  Object.keys(graph).forEach(id => {
+    distances[id] = Infinity;
+    previous[id] = null;
+    previousRoad[id] = null;
+  });
+  distances[start] = 0;
 
-    function buildGraph() {
-      graph = {};
-      Object.keys(places).forEach(id => { graph[id] = []; });
-      ROADS_DATA.forEach((road, index) => {
-        if (!places[road.from] || !places[road.to]) return;
-        graph[road.from].push({ node: road.to, distance: Number(road.distanceKm), roadIndex: index });
-        graph[road.to].push({ node: road.from, distance: Number(road.distanceKm), roadIndex: index });
-      });
-    }
-
-    function shortestPath(start, end) {
-      if (!graph[start] || !graph[end]) return null;
-      if (start === end) return { path: [start], roadIndexes: [], distance: 0 };
-
-      const distances = {}, previous = {}, previousRoad = {};
-      const unvisited = new Set(Object.keys(graph));
-
-      Object.keys(graph).forEach(id => {
-        distances[id] = Infinity;
-        previous[id] = null;
-        previousRoad[id] = null;
-      });
-      distances[start] = 0;
-
-      while (unvisited.size) {
-        let current = null, smallest = Infinity;
-        for (const node of unvisited) {
-          if (distances[node] < smallest) {
-            smallest = distances[node];
-            current = node;
-          }
-        }
-        if (current === null || current === end) break;
-        unvisited.delete(current);
-
-        graph[current].forEach(edge => {
-          if (!unvisited.has(edge.node)) return;
-          const newDistance = distances[current] + edge.distance;
-          if (newDistance < distances[edge.node]) {
-            distances[edge.node] = newDistance;
-            previous[edge.node] = current;
-            previousRoad[edge.node] = edge.roadIndex;
-          }
-        });
-      }
-
-      if (start !== end && previous[end] === null) {
-        const p1 = places[start], p2 = places[end];
-        if (p1 && p2) {
-          const directDist = Math.hypot(p1.lat - p2.lat, p1.lon - p2.lon) * 111;
-          return { path: [start, end], roadIndexes: [], distance: Math.max(0.001, directDist) };
-        }
-        return null;
-      }
-
-      const path = [], roadIndexes = [];
-      let current = end;
-      while (current !== null) {
-        path.unshift(current);
-        if (previousRoad[current] !== null && previousRoad[current] !== undefined) {
-          roadIndexes.unshift(previousRoad[current]);
-        }
-        current = previous[current];
-      }
-      return { path, roadIndexes, distance: distances[end] };
-    }
-
-    function calculateTotalDistance(pickup, destination) {
-      if (pickup === destination) return { total: 0, trip: 0, hub: "N/A" };
-      const tripResult = shortestPath(pickup, destination);
-      if (!tripResult) return null;
-
-      const trip = tripResult.distance;
-      let bestHub = null, bestTotal = Infinity;
-
-      for (const hub of hubs) {
-        const hubToPickup = shortestPath(hub, pickup);
-        const destinationToHub = shortestPath(destination, hub);
-        if (!hubToPickup || !destinationToHub) continue;
-        const total = hubToPickup.distance + trip + destinationToHub.distance;
-        if (total < bestTotal) {
-          bestTotal = total;
-          bestHub = hub;
-        }
-      }
-      return { hub: bestHub || "LUANGWA_BUS", trip, total: bestTotal === Infinity ? trip : bestTotal };
-    }
-
-    function calculateEstimatedTime(mode, distance) {
-      const speed = mode === "vehicle" ? config.vehicleSpeedKmH : config.motorbikeSpeedKmH;
-      const totalMinutes = Math.round((distance / speed) * 60);
-
-      if (totalMinutes < 60) {
-        return `${Math.max(1, totalMinutes)} mins`;
-      } else {
-        const hours = Math.floor(totalMinutes / 60);
-        const mins = totalMinutes % 60;
-        return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
+  while (unvisited.size) {
+    let current = null, smallest = Infinity;
+    for (const node of unvisited) {
+      if (distances[node] < smallest) {
+        smallest = distances[node];
+        current = node;
       }
     }
+    if (current === null || current === end) break;
+    unvisited.delete(current);
 
-    // ========== UI HANDLERS ==========
-    function toggleForm(e) {
-      if (e) e.preventDefault();
-      document.getElementById("booking-form-popup").classList.toggle("show");
-    }
-
-    function toggleMenu(e) {
-      if (e) e.preventDefault();
-      document.getElementById("menu-dropdown").classList.toggle("show");
-    }
-
-    const phoneInput = document.getElementById("customer-phone");
-    phoneInput.addEventListener("input", function() {
-      this.value = this.value.replace(/\D/g, "").slice(0, 10);
-      const phone = this.value.trim();
-      const trip = document.getElementById("trip-details");
-      const summarySection = document.getElementById("summary-section");
-      const profileTitleText = document.getElementById("profile-title-text");
-
-      if (/^0[0-9]{9}$/.test(phone)) {
-        profileTitleText.textContent = customers[phone] || "Profile";
-        trip.classList.add("show-section");
-      } else {
-        trip.classList.remove("show-section");
-        summarySection.classList.remove("show-section");
-        document.getElementById("summary-calc-loader").style.display = "none";
-        profileTitleText.textContent = "Profile";
-        resetSubmitButton();
+    graph[current].forEach(edge => {
+      if (!unvisited.has(edge.node)) return;
+      const newDistance = distances[current] + edge.distance;
+      if (newDistance < distances[edge.node]) {
+        distances[edge.node] = newDistance;
+        previous[edge.node] = current;
+        previousRoad[edge.node] = edge.roadIndex;
       }
     });
+  }
 
-    document.querySelectorAll(".mode-option input[type='radio']").forEach(radio => {
-      radio.addEventListener("change", function() {
-        document.querySelectorAll(".mode-option").forEach(item => item.classList.remove("selected"));
-        if (this.checked) {
-          this.closest(".mode-option").classList.add("selected");
-          scheduleCalculation();
-        }
-      });
-    });
+  if (start !== end && previous[end] === null) {
+    const p1 = places[start], p2 = places[end];
+    if (p1 && p2) {
+      const directDist = Math.hypot(p1.lat - p2.lat, p1.lon - p2.lon) * 111;
+      return { path: [start, end], roadIndexes: [], distance: Math.max(0.001, directDist) };
+    }
+    return null;
+  }
 
-    function showFieldError(containerId, errorMsgId) {
-      const container = document.getElementById(containerId);
-      const errorMsg = document.getElementById(errorMsgId);
-      container.classList.add("field-error");
-      errorMsg.classList.add("show");
-      setTimeout(() => container.classList.remove("field-error"), 400);
+  const path = [], roadIndexes = [];
+  let current = end;
+  while (current !== null) {
+    path.unshift(current);
+    if (previousRoad[current] !== null && previousRoad[current] !== undefined) {
+      roadIndexes.unshift(previousRoad[current]);
+    }
+    current = previous[current];
+  }
+  return { path, roadIndexes, distance: distances[end] };
+}
+
+function calculateTotalDistance(pickup, destination) {
+  if (pickup === destination) return { total: 0, trip: 0, hub: "N/A" };
+  const tripResult = shortestPath(pickup, destination);
+  if (!tripResult) return null;
+
+  const trip = tripResult.distance;
+  let bestHub = null, bestTotal = Infinity;
+
+  for (const hub of hubs) {
+    const hubToPickup = shortestPath(hub, pickup);
+    const destinationToHub = shortestPath(destination, hub);
+    if (!hubToPickup || !destinationToHub) continue;
+    const total = hubToPickup.distance + trip + destinationToHub.distance;
+    if (total < bestTotal) {
+      bestTotal = total;
+      bestHub = hub;
+    }
+  }
+  return { hub: bestHub || "LUANGWA_BUS", trip, total: bestTotal === Infinity ? trip : bestTotal };
+}
+
+function calculateEstimatedTime(mode, distance) {
+  const speed = mode === "vehicle" ? config.vehicleSpeedKmH : config.motorbikeSpeedKmH;
+  const totalMinutes = Math.round((distance / speed) * 60);
+
+  if (totalMinutes < 60) {
+    return `${Math.max(1, totalMinutes)} mins`;
+  } else {
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
+  }
+}
+
+// ========== UI HANDLERS ==========
+function toggleForm(e) {
+  if (e) e.preventDefault();
+  document.getElementById("booking-form-popup").classList.toggle("show");
+}
+
+function toggleMenu(e) {
+  if (e) e.preventDefault();
+  document.getElementById("menu-dropdown").classList.toggle("show");
+}
+
+const phoneInput = document.getElementById("customer-phone");
+phoneInput.addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g, "").slice(0, 10);
+  const phone = this.value.trim();
+  const trip = document.getElementById("trip-details");
+  const summarySection = document.getElementById("summary-section");
+  const profileTitleText = document.getElementById("profile-title-text");
+
+  if (/^0[0-9]{9}$/.test(phone)) {
+    profileTitleText.textContent = customers[phone] || "Profile";
+    trip.classList.add("show-section");
+  } else {
+    trip.classList.remove("show-section");
+    summarySection.classList.remove("show-section");
+    document.getElementById("summary-calc-loader").style.display = "none";
+    profileTitleText.textContent = "Profile";
+    resetSubmitButton();
+  }
+});
+
+document.querySelectorAll(".mode-option input[type='radio']").forEach(radio => {
+  radio.addEventListener("change", function() {
+    document.querySelectorAll(".mode-option").forEach(item => item.classList.remove("selected"));
+    if (this.checked) {
+      this.closest(".mode-option").classList.add("selected");
+      scheduleCalculation();
+    }
+  });
+});
+
+function showFieldError(containerId, errorMsgId) {
+  const container = document.getElementById(containerId);
+  const errorMsg = document.getElementById(errorMsgId);
+  container.classList.add("field-error");
+  errorMsg.classList.add("show");
+  setTimeout(() => container.classList.remove("field-error"), 400);
+}
+
+function clearFieldError(containerId, errorMsgId) {
+  document.getElementById(containerId).classList.remove("field-error");
+  document.getElementById(errorMsgId).classList.remove("show");
+}
+
+function setupAutocomplete(inputId, listId, containerId, errorMsgId) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+
+  input.addEventListener("input", function() {
+    this.dataset.placeId = "";
+    clearFieldError(containerId, errorMsgId);
+    const value = this.value.trim().toLowerCase();
+    list.innerHTML = "";
+    if (!value) {
+      list.classList.add("hidden");
+      scheduleCalculation();
+      return;
     }
 
-    function clearFieldError(containerId, errorMsgId) {
-      document.getElementById(containerId).classList.remove("field-error");
-      document.getElementById(errorMsgId).classList.remove("show");
-    }
-
-    function setupAutocomplete(inputId, listId, containerId, errorMsgId) {
-      const input = document.getElementById(inputId);
-      const list = document.getElementById(listId);
-
-      input.addEventListener("input", function() {
-        this.dataset.placeId = "";
+    const matches = PLACES_DATA.filter(place => place.name.toLowerCase().includes(value)).slice(0, 5);
+    matches.forEach(place => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.innerHTML = `<strong>${place.name}</strong> <small style="color:#64748b;">(${place.type})</small>`;
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        input.value = place.name;
+        input.dataset.placeId = place.id;
+        list.classList.add("hidden");
         clearFieldError(containerId, errorMsgId);
-        const value = this.value.trim().toLowerCase();
-        list.innerHTML = "";
-        if (!value) {
-          list.classList.add("hidden");
+        scheduleCalculation();
+      });
+      list.appendChild(item);
+    });
+    list.classList.toggle("hidden", matches.length === 0);
+  });
+
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      list.classList.add("hidden");
+      const val = input.value.trim();
+      if (val && !input.dataset.placeId) {
+        const matchedObj = PLACES_DATA.find(p => p.name.toLowerCase() === val.toLowerCase());
+        if (matchedObj) {
+          input.dataset.placeId = matchedObj.id;
+          input.value = matchedObj.name;
+          clearFieldError(containerId, errorMsgId);
           scheduleCalculation();
-          return;
+        } else {
+          showFieldError(containerId, errorMsgId);
         }
-
-        const matches = PLACES_DATA.filter(place => place.name.toLowerCase().includes(value)).slice(0, 5);
-        matches.forEach(place => {
-          const item = document.createElement("div");
-          item.className = "autocomplete-item";
-          item.innerHTML = `<strong>${place.name}</strong> <small style="color:#64748b;">(${place.type})</small>`;
-          item.addEventListener("mousedown", (e) => {
-            e.preventDefault();
-            input.value = place.name;
-            input.dataset.placeId = place.id;
-            list.classList.add("hidden");
-            clearFieldError(containerId, errorMsgId);
-            scheduleCalculation();
-          });
-          list.appendChild(item);
-        });
-        list.classList.toggle("hidden", matches.length === 0);
-      });
-
-      input.addEventListener("blur", () => {
-        setTimeout(() => {
-          list.classList.add("hidden");
-          const val = input.value.trim();
-          if (val && !input.dataset.placeId) {
-            const matchedObj = PLACES_DATA.find(p => p.name.toLowerCase() === val.toLowerCase());
-            if (matchedObj) {
-              input.dataset.placeId = matchedObj.id;
-              input.value = matchedObj.name;
-              clearFieldError(containerId, errorMsgId);
-              scheduleCalculation();
-            } else {
-              showFieldError(containerId, errorMsgId);
-            }
-          }
-        }, 200);
-      });
-    }
-
-    setupAutocomplete("gm-origin", "originList", "origin-container", "origin-error-msg");
-    setupAutocomplete("gm-destination", "destinationList", "dest-container", "dest-error-msg");
-
-    function getSelectedPlace(inputId) {
-      const input = document.getElementById(inputId);
-      const id = input.dataset.placeId;
-      return (id && places[id] && input.value.trim().toLowerCase() === places[id].name.toLowerCase()) ? id : null;
-    }
-
-    function scheduleCalculation() {
-      if (calculationTimer) clearTimeout(calculationTimer);
-      calculationTimer = setTimeout(calculateBooking, 250);
-    }
-
-    function calculateBooking() {
-      const pickup = getSelectedPlace("gm-origin");
-      const destination = getSelectedPlace("gm-destination");
-      const mode = document.querySelector('input[name="mode"]:checked');
-      const summary = document.getElementById("summary-section");
-      const calcLoader = document.getElementById("summary-calc-loader");
-      const submitBtn = document.getElementById("submit-btn");
-      const status = document.getElementById("status");
-
-      if (!pickup || !destination || !mode) {
-        summary.classList.remove("show-section");
-        calcLoader.style.display = "none";
-        submitBtn.disabled = true;
-        return;
       }
+    }, 200);
+  });
+}
 
-      // Display the calculations loader before showing the summary table
-      calcLoader.style.display = "block";
-      summary.classList.remove("show-section");
-      submitBtn.disabled = true;
-      status.textContent = "";
+setupAutocomplete("gm-origin", "originList", "origin-container", "origin-error-msg");
+setupAutocomplete("gm-destination", "destinationList", "dest-container", "dest-error-msg");
+
+function getSelectedPlace(inputId) {
+  const input = document.getElementById(inputId);
+  const id = input.dataset.placeId;
+  return (id && places[id] && input.value.trim().toLowerCase() === places[id].name.toLowerCase()) ? id : null;
+}
+
+function scheduleCalculation() {
+  if (calculationTimer) clearTimeout(calculationTimer);
+  calculationTimer = setTimeout(calculateBooking, 250);
+}
+
+function calculateBooking() {
+  const pickup = getSelectedPlace("gm-origin");
+  const destination = getSelectedPlace("gm-destination");
+  const mode = document.querySelector('input[name="mode"]:checked');
+  const summary = document.getElementById("summary-section");
+  const calcLoader = document.getElementById("summary-calc-loader");
+  const submitBtn = document.getElementById("submit-btn");
+  const status = document.getElementById("status");
+
+  // Reminder check: If locations are chosen but transport mode is missing
+  if (pickup && destination && !mode) {
+    status.textContent = "⚠️ Please select a transport mode (Vehicle or Motorbike).";
+    status.style.color = "#d97706";
+    summary.classList.remove("show-section");
+    calcLoader.style.display = "none";
+    submitBtn.disabled = true;
+    return;
+  }
+
+  if (!pickup || !destination || !mode) {
+    summary.classList.remove("show-section");
+    calcLoader.style.display = "none";
+    submitBtn.disabled = true;
+    return;
+  }
+
+  // Display calculation loader before showing summary table
+  calcLoader.style.display = "block";
+  summary.classList.remove("show-section");
+  submitBtn.disabled = true;
+  status.textContent = "";
+
+  setTimeout(() => {
+    calcLoader.style.display = "none";
+    const res = calculateTotalDistance(pickup, destination);
+
+    if (!res || res.total === null) {
+      status.textContent = "❌ Route not available. Try different locations.";
+      status.style.color = "#dc2626";
+      return;
+    }
+
+    summary.classList.add("show-section");
+    document.getElementById("hub-tooltip").textContent = `✨ Calculated via hub: ${places[res.hub]?.name || res.hub}`;
+
+    const pickupCoord = getCoordinates(pickup);
+    const destCoord = getCoordinates(destination);
+    document.getElementById('openMapsLink').href = `https://www.google.com/maps/dir/?api=1&origin=${pickupCoord.lat},${pickupCoord.lng}&destination=${destCoord.lat},${destCoord.lng}`;
+    document.getElementById("map-route-info").innerHTML = `<i class="fas fa-route"></i> Route: ${places[pickup].name} → ${places[destination].name}`;
+
+    let rate = mode.value === 'vehicle' ? config.vehiclePricePerKm : config.motorbikePricePerKm;
+    let minPrice = mode.value === 'vehicle' ? config.vehicleMinPrice : config.motorbikeMinPrice;
+    let extra = mode.value === 'vehicle' ? config.vehicleExtra : config.motorbikeExtra;
+
+    let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
+    const estTime = calculateEstimatedTime(mode.value, res.trip);
+
+    document.getElementById("summary-distance").textContent = res.trip < 1 ? `${Math.max(2, (res.trip * 1000)).toFixed(0)}m` : `${res.trip.toFixed(1)} km`;
+    document.getElementById("summary-time").textContent = estTime;
+    document.getElementById("summary-price").textContent = `K${price.toFixed(2)}`;
+
+    let rawPhone = phoneInput.value.trim();
+    let formattedPhone = rawPhone.startsWith('0') ? '+260' + rawPhone.substring(1) : rawPhone;
+
+    rideData = {
+      preferredMode: mode.value,
+      phone: formattedPhone,
+      hub: places[res.hub]?.name || res.hub,
+      from: places[pickup]?.name || pickup,
+      to: places[destination]?.name || destination,
+      tripDistance: res.trip.toFixed(2),
+      totalDistance: res.total.toFixed(2),
+      price: price,
+      estimatedTime: estTime
+    };
+
+    resetSubmitButton();
+    submitBtn.disabled = false;
+  }, 300);
+}
+
+let mapLink = "";
+function getLocation() {
+  const status = document.getElementById("locationStatus");
+  if (navigator.geolocation) {
+    status.innerHTML = "📍 Getting GPS location...";
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+        status.innerHTML = "🌐 ✅ Location ready!";
+      },
+      () => { status.innerHTML = "❌ GPS Failed!"; }
+    );
+  }
+}
+
+function shareWhatsApp() {
+  if (!mapLink) { alert("Please click 'Get My GPS Location' first."); return; }
+  window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + mapLink)}`, "_blank");
+}
+
+function shareSMS() {
+  if (!mapLink) { alert("Please click 'Get My GPS Location' first."); return; }
+  window.location.href = `sms:0777737047?body=📍 ${mapLink}`;
+}
+
+// ========== SUBMIT & CALL BUTTON FLOW ==========
+const submitBtn = document.getElementById("submit-btn");
+const submitIcon = document.getElementById("submitIcon");
+const callIcon = document.getElementById("callIcon");
+const btnLoader = document.getElementById("btn-loader");
+const progressText = document.getElementById("progress-text");
+const btnLabelText = document.getElementById("btn-label-text");
+
+function resetSubmitButton() {
+  isSubmitted = false;
+  submitBtn.disabled = false;
+  submitBtn.classList.remove("call-mode");
+  submitBtn.title = "Request Now";
+  submitIcon.style.display = "block";
+  callIcon.style.display = "none";
+  btnLoader.style.display = "none";
+  progressText.style.display = "none";
+  btnLabelText.innerText = "Request Now";
+}
+
+function startSubmissionProgress() {
+  submitBtn.disabled = true;
+  submitIcon.style.display = "none";
+  callIcon.style.display = "none";
+  btnLoader.style.display = "block";
+  progressText.style.display = "block";
+  progressText.innerText = "0%";
+  btnLabelText.innerText = "Requesting...";
+}
+
+function updateSubmissionProgress(percent) {
+  progressText.innerText = `${percent}%`;
+}
+
+function transitionToCallMode(buttonText = "Call Driver", labelText = "Call Driver") {
+  isSubmitted = true;
+  submitBtn.disabled = false;
+  submitBtn.classList.add("call-mode");
+  submitBtn.title = buttonText;
+  btnLoader.style.display = "none";
+  progressText.style.display = "none";
+  submitIcon.style.display = "none";
+  callIcon.style.display = "block";
+  btnLabelText.innerText = labelText;
+}
+
+submitBtn.addEventListener("click", () => {
+  if (!isSubmitted) {
+    handleRequest();
+  } else {
+    window.location.href = `tel:0777737047`;
+  }
+});
+
+async function handleRequest() {
+  startSubmissionProgress();
+  const statusText = document.getElementById("status");
+  statusText.textContent = "";
+
+  let currentPercent = 0;
+  const progressInterval = setInterval(() => {
+    if (currentPercent < 90) {
+      currentPercent += 15;
+      updateSubmissionProgress(currentPercent);
+    }
+  }, 150);
+
+  const payload = { ...rideData, timestamp: new Date().toISOString() };
+  let timeoutTriggered = false;
+
+  const timeoutId = setTimeout(() => {
+    if (!timeoutTriggered) {
+      timeoutTriggered = true;
+      clearInterval(progressInterval);
+      statusText.innerHTML = "⏰ Connection slow. Click button to call directly.";
+      statusText.style.color = "orange";
+      transitionToCallMode("Call Driver Now", "Call Driver");
+    }
+  }, 12000);
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: new URLSearchParams(payload),
+      mode: 'no-cors'
+    });
+    clearTimeout(timeoutId);
+
+    if (!timeoutTriggered) {
+      clearInterval(progressInterval);
+      updateSubmissionProgress(100);
 
       setTimeout(() => {
-        calcLoader.style.display = "none";
-        const res = calculateTotalDistance(pickup, destination);
-
-        if (!res || res.total === null) {
-          status.textContent = "❌ Route not available. Try different locations.";
-          return;
-        }
-
-        summary.classList.add("show-section");
-        document.getElementById("hub-tooltip").textContent = `✨ Calculated via hub: ${places[res.hub]?.name || res.hub}`;
-
-        const pickupCoord = getCoordinates(pickup);
-        const destCoord = getCoordinates(destination);
-        document.getElementById('openMapsLink').href = `https://www.google.com/maps/dir/?api=1&origin=${pickupCoord.lat},${pickupCoord.lng}&destination=${destCoord.lat},${destCoord.lng}`;
-        document.getElementById("map-route-info").innerHTML = `<i class="fas fa-route"></i> Route: ${places[pickup].name} → ${places[destination].name}`;
-
-        let rate = mode.value === 'vehicle' ? config.vehiclePricePerKm : config.motorbikePricePerKm;
-        let minPrice = mode.value === 'vehicle' ? config.vehicleMinPrice : config.motorbikeMinPrice;
-        let extra = mode.value === 'vehicle' ? config.vehicleExtra : config.motorbikeExtra;
-
-        let price = Math.max(minPrice, Math.ceil((res.total * rate) + extra));
-        const estTime = calculateEstimatedTime(mode.value, res.trip);
-
-        document.getElementById("summary-distance").textContent = res.trip < 1 ? `${Math.max(2, (res.trip * 1000)).toFixed(0)}m` : `${res.trip.toFixed(1)} km`;
-        document.getElementById("summary-time").textContent = estTime;
-        document.getElementById("summary-price").textContent = `K${price.toFixed(2)}`;
-
-        let rawPhone = phoneInput.value.trim();
-        let formattedPhone = rawPhone.startsWith('0') ? '+260' + rawPhone.substring(1) : rawPhone;
-
-        rideData = {
-          preferredMode: mode.value,
-          phone: formattedPhone,
-          hub: places[res.hub]?.name || res.hub,
-          from: places[pickup]?.name || pickup,
-          to: places[destination]?.name || destination,
-          tripDistance: res.trip.toFixed(2),
-          totalDistance: res.total.toFixed(2),
-          price: price,
-          estimatedTime: estTime
-        };
-
-        resetSubmitButton();
-        submitBtn.disabled = false;
-        drawRoute(shortestPath(pickup, destination));
-      }, 300);
+        statusText.innerHTML = "✅ Request sent! Rider will contact you shortly.";
+        statusText.style.color = "#16a34a";
+        transitionToCallMode("Call Driver / Hub", "Call Driver");
+      }, 400);
     }
-
-    let mapLink = "";
-    function getLocation() {
-      const status = document.getElementById("locationStatus");
-      if (navigator.geolocation) {
-        status.innerHTML = "📍 Getting GPS location...";
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-            status.innerHTML = "🌐 ✅ Location ready!";
-          },
-          () => { status.innerHTML = "❌ GPS Failed!"; }
-        );
-      }
+  } catch(e) {
+    clearTimeout(timeoutId);
+    if (!timeoutTriggered) {
+      clearInterval(progressInterval);
+      statusText.innerHTML = "⚠️ Network issue. Please call directly.";
+      statusText.style.color = "#dc2626";
+      transitionToCallMode("Call Driver Now", "Call Driver");
     }
+  }
+}
 
-    function shareWhatsApp() {
-      if (!mapLink) { alert("Please click 'Get My GPS Location' first."); return; }
-      window.open(`https://wa.me/260777737047?text=${encodeURIComponent("📍 " + mapLink)}`, "_blank");
-    }
-
-    function shareSMS() {
-      if (!mapLink) { alert("Please click 'Get My GPS Location' first."); return; }
-      window.location.href = `sms:0777737047?body=📍 ${mapLink}`;
-    }
-
-    // ========== MAP RENDERING & INTERNAL HELPERS ==========
-    
-
-    // ========== SUBMIT & CALL BUTTON FLOW ==========
-    const submitBtn = document.getElementById("submit-btn");
-    const submitIcon = document.getElementById("submitIcon");
-    const callIcon = document.getElementById("callIcon");
-    const btnLoader = document.getElementById("btn-loader");
-    const progressText = document.getElementById("progress-text");
-    const btnLabelText = document.getElementById("btn-label-text");
-
-    function resetSubmitButton() {
-      isSubmitted = false;
-      submitBtn.disabled = false;
-      submitBtn.classList.remove("call-mode");
-      submitBtn.title = "Request Now";
-      submitIcon.style.display = "block";
-      callIcon.style.display = "none";
-      btnLoader.style.display = "none";
-      progressText.style.display = "none";
-      btnLabelText.innerText = "Request Now";
-    }
-
-    function startSubmissionProgress() {
-      submitBtn.disabled = true;
-      submitIcon.style.display = "none";
-      callIcon.style.display = "none";
-      btnLoader.style.display = "block";
-      progressText.style.display = "block";
-      progressText.innerText = "0%";
-      btnLabelText.innerText = "Requesting...";
-    }
-
-    function updateSubmissionProgress(percent) {
-      progressText.innerText = `${percent}%`;
-    }
-
-    function transitionToCallMode(buttonText = "Call Driver", labelText = "Call Driver") {
-      isSubmitted = true;
-      submitBtn.disabled = false;
-      submitBtn.classList.add("call-mode");
-      submitBtn.title = buttonText;
-      btnLoader.style.display = "none";
-      progressText.style.display = "none";
-      submitIcon.style.display = "none";
-      callIcon.style.display = "block";
-      btnLabelText.innerText = labelText;
-    }
-
-    submitBtn.addEventListener("click", () => {
-      if (!isSubmitted) {
-        handleRequest();
-      } else {
-        window.location.href = `tel:0777737047`;
-      }
-    });
-
-    async function handleRequest() {
-      startSubmissionProgress();
-      const statusText = document.getElementById("status");
-      statusText.textContent = "";
-
-      let currentPercent = 0;
-      const progressInterval = setInterval(() => {
-        if (currentPercent < 90) {
-          currentPercent += 15;
-          updateSubmissionProgress(currentPercent);
-        }
-      }, 150);
-
-      const payload = { ...rideData, timestamp: new Date().toISOString() };
-      let timeoutTriggered = false;
-
-      const timeoutId = setTimeout(() => {
-        if (!timeoutTriggered) {
-          timeoutTriggered = true;
-          clearInterval(progressInterval);
-          statusText.innerHTML = "⏰ Connection slow. Click button to call directly.";
-          statusText.style.color = "orange";
-          transitionToCallMode("Call Driver Now", "Call Driver");
-        }
-      }, 12000);
-
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: new URLSearchParams(payload),
-          mode: 'no-cors'
-        });
-        clearTimeout(timeoutId);
-
-        if (!timeoutTriggered) {
-          clearInterval(progressInterval);
-          updateSubmissionProgress(100);
-
-          setTimeout(() => {
-            statusText.innerHTML = "✅ Request sent! Rider will contact you shortly.";
-            statusText.style.color = "#16a34a";
-            transitionToCallMode("Call Driver / Hub", "Call Driver");
-          }, 400);
-        }
-      } catch(e) {
-        clearTimeout(timeoutId);
-        if (!timeoutTriggered) {
-          clearInterval(progressInterval);
-          statusText.innerHTML = "⚠️ Network issue. Please call directly.";
-          statusText.style.color = "#dc2626";
-          transitionToCallMode("Call Driver Now", "Call Driver");
-        }
-      }
-    }
-
-    // INITIALIZATION
+// INITIALIZATION
 window.addEventListener("DOMContentLoaded", () => {
   buildGraph();
-  // Add any other non-map setup functions here (e.g., populating dropdowns)
 });
+
 
   </script>
 </body>
