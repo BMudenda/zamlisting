@@ -294,8 +294,6 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
 .summary-item{background:#f8fafc;padding:8px;border-radius:6px;text-align:center;border:1px solid #e2e8f0}
 .summary-item .label{display:block;font-size:0.7rem;color:#64748b;margin-bottom:2px}
 .summary-item .value{font-size:0.85rem;font-weight:700;color:#1e293b}
-.view-map-btn{width:100%;background:#f1f5f9;color:#2563eb;border:1px solid #cbd5e1;padding:8px;border-radius:6px;font-weight:600;font-size:0.85srem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
-.view-map-btn:hover{background:#e2e8f0}
 .btn-container{margin-top:12px;text-align:center}
 .action-btn{background:var(--primary-color);color:#fff;width:65px;height:65px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;border:none;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.2);transition:.3s;position:relative;margin:0 auto}
 .action-btn:hover{transform:scale(1.05)}
@@ -485,7 +483,6 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       </div>
     </div>
 
-    
     <div class="billboard-slide">
       <div class="fathers-day-card">
         <div class="fd-badge">🙏 A Grateful Heart</div>
@@ -598,6 +595,9 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
           </fieldset>
         </div>
 
+        <!-- Calculations Loader (Displayed before Summary Table) -->
+        <div class="calc-loader" id="summary-calc-loader"></div>
+
         <!-- Trip Summary -->
         <div id="summary-section" class="hidden-section">
           <fieldset>
@@ -623,10 +623,6 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
                 <span class="value price-val" id="summary-price">K0.00</span>
               </div>
             </div>
-
-            <button type="button" class="view-map-btn" id="view-map-trigger" onclick="toggleMapVisibility()">
-              <i class="fas fa-map-marked-alt"></i> <span id="map-btn-label">View Map</span>
-            </button>
           </fieldset>
 
           <!-- Action Button -->
@@ -641,33 +637,19 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
           </div>
         </div>
 
-        <!-- Map View Section -->
-        <div id="map-section" class="hidden" style="margin-top: 8px;">
-          <fieldset>
-            <legend>🗺️ Route Map</legend>
-            <div class="map-toolbar">
-              <span style="font-size:0.75rem; font-weight:bold; color:var(--primary-dark);">Graph Network</span>
-              <button class="map-btn" onclick="focusRoute()">Focus Route</button>
-            </div>
-
-            <div id="map-container" class="map-container">
-              <svg id="mapSvg" viewBox="0 0 1000 650">
-                <rect width="1000" height="650" fill="#f8fcfe"></rect>
-                <g id="routeLayer"></g>
-                <g id="placesLayer"></g>
-                <g id="labelsLayer"></g>
-              </svg>
-
-              <div class="zoom-controls">
-                <button class="zoom-control" onclick="zoomMap(1.25)">+</button>
-                <button class="zoom-control" onclick="zoomMap(0.8)">−</button>
-              </div>
-            </div>
-          </fieldset>
+        <!-- Hidden Map Section (Retained for Internal Route Calculations & Mapping) -->
+        <div id="map-section" class="hidden">
+          <div id="map-container" class="map-container">
+            <svg id="mapSvg" viewBox="0 0 1000 650">
+              <rect width="1000" height="650" fill="#f8fcfe"></rect>
+              <g id="routeLayer"></g>
+              <g id="placesLayer"></g>
+              <g id="labelsLayer"></g>
+            </svg>
+          </div>
         </div>
 
-        <!-- Loaders & Status Messages -->
-        <div class="calc-loader" id="spinner"></div>
+        <!-- Status Messages -->
         <p id="status" style="text-align:center; margin-top:8px; font-weight:bold; font-size:0.82rem; min-height: 18px;"></p>
 
       </div>
@@ -784,79 +766,67 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       vehicleExtra: 6.00, motorbikeExtra: 3.00,
       vehicleSpeedKmH: 65, motorbikeSpeedKmH: 45
     };
-    const PLACES_DATA = [
-  // Major towns and transport hubs
-  { id: "LUSAKA", name: "Lusaka", lat: -15.4167, lon: 28.2833, type: "City" },
-  { id: "AIRPORT", name: "Lusaka Airport", lat: -15.3302, lon: 28.4526, type: "Airport" },
-  { id: "CHONGWE", name: "Chongwe", lat: -15.3292, lon: 28.6820, type: "Town" },
-  { id: "RUFUNSA", name: "Rufunsa", lat: -15.1500, lon: 29.0000, type: "Town" },
-  { id: "LUANGWA", name: "Luangwa", lat: -15.6167, lon: 30.4167, type: "Town" },
-  { id: "LUANGWA_BUS", name: "Luangwa Bus Station", lat: -15.621248, lon: 30.406526, type: "Transport Hub" },
-  { id: "CHITOPE", name: "Chitope", lat: -15.1902, lon: 30.2055, type: "Community" },
-  { id: "LUANGWA_BRIDGE", name: "Luangwa Bridge", lat: -14.9758399, lon: 30.2122713, type: "Bridge" },
-  { id: "MWANAMWALI", name: "Mwanamwali", lat: -15.3500, lon: 29.4500, type: "Community" },
-  { id: "NYIMBA", name: "Nyimba", lat: -14.5560, lon: 30.8140, type: "Town" },
-  { id: "PETAUKE", name: "Petauke", lat: -14.2412, lon: 31.3196, type: "Town" },
-  { id: "CHIPATA", name: "Chipata", lat: -13.6333, lon: 32.6500, type: "City" },
-  { id: "KAFUE", name: "Kafue", lat: -15.7691, lon: 28.1814, type: "Town" },
 
-  // Central Luangwa locations
-  { id: "FEIRA_GARDENS", name: "Feira Gardens", lat:-16.040709, lon: 30.821960, type: "Community" },
-  { id: "KANTULENI_EXECUTIVE_LODGE", name: "Kantuleni Executive Lodge", lat: -16.241051, lon: 31.033074, type: "Lodge" },
-  { id: "DISTRICT_COMMISSIONER_OFFICE", name: "District Commissioner Office", lat: -16.462513, lon: 31.033074, type: "Government Office" },
-  { id: "ZICB_LUANGWA", name: "ZICB Luangwa Branch", lat: -17.621789, lon: 31.033074, type: "Bank" },
-  { id: "LUANGWA_HARBOUR", name: "Luangwa Harbour", lat: -18.621157, lon: 31.033074, type: "Transport Hub" },
-  { id: "LUANGWA_IMMIGRATION_BORDER_POST", name: "Luangwa Immigration Border Post", lat: -15.623948, lon: 30.413214, type: "Government Office" },
-  { id: "LUANGWA_POLICE_STATION", name: "Luangwa Police Station", lat: -15.623076, lon: 30.411386, type: "Police Station" },
-  { id: "LUANGWA_DISTRICT_EDUCATION_BOARD_OFFICES", name: "Luangwa District Education Board Offices", lat: -15.623683, lon: 30.410997, type: "Government Office" },
-  { id: "YANGOMA", name: "Yangoma", lat: -15.626264, lon: 30.408453, type: "Community" },
-  { id: "LUANGWA_BOMA_CLINIC", name: "Luangwa Boma Clinic", lat: -15.624016, lon: 30.408032, type: "Health Facility" },
-  { id: "LUANGWA_PRIMARY_SCHOOL", name: "Luangwa Primary School", lat: -15.622760, lon: 30.409239, type: "School" },
-  { id: "NYABOTA", name: "Nyabota", lat: -15.621683, lon: 30.409747, type: "Community" },
-  { id: "RIVER_SPOT", name: "River Spot", lat: -15.621214, lon: 30.407910, type: "Landmark" },
-  { id: "YELLOW_SHOP", name: "Yellow Shop", lat: -15.421005, lon: 30.204357, type: "Shop" }
-];
+    const PLACES_DATA = [
+      { id: "LUSAKA", name: "Lusaka", lat: -15.4167, lon: 28.2833, type: "City" },
+      { id: "AIRPORT", name: "Lusaka Airport", lat: -15.3302, lon: 28.4526, type: "Airport" },
+      { id: "CHONGWE", name: "Chongwe", lat: -15.3292, lon: 28.6820, type: "Town" },
+      { id: "RUFUNSA", name: "Rufunsa", lat: -15.1500, lon: 29.0000, type: "Town" },
+      { id: "LUANGWA", name: "Luangwa", lat: -15.6167, lon: 30.4167, type: "Town" },
+      { id: "LUANGWA_BUS", name: "Luangwa Bus Station", lat: -15.621248, lon: 30.406526, type: "Transport Hub" },
+      { id: "CHITOPE", name: "Chitope", lat: -15.1902, lon: 30.2055, type: "Community" },
+      { id: "LUANGWA_BRIDGE", name: "Luangwa Bridge", lat: -14.9758399, lon: 30.2122713, type: "Bridge" },
+      { id: "MWANAMWALI", name: "Mwanamwali", lat: -15.3500, lon: 29.4500, type: "Community" },
+      { id: "NYIMBA", name: "Nyimba", lat: -14.5560, lon: 30.8140, type: "Town" },
+      { id: "PETAUKE", name: "Petauke", lat: -14.2412, lon: 31.3196, type: "Town" },
+      { id: "CHIPATA", name: "Chipata", lat: -13.6333, lon: 32.6500, type: "City" },
+      { id: "KAFUE", name: "Kafue", lat: -15.7691, lon: 28.1814, type: "Town" },
+      { id: "FEIRA_GARDENS", name: "Feira Gardens", lat:-16.040709, lon: 30.821960, type: "Community" },
+      { id: "KANTULENI_EXECUTIVE_LODGE", name: "Kantuleni Executive Lodge", lat: -16.241051, lon: 31.033074, type: "Lodge" },
+      { id: "DISTRICT_COMMISSIONER_OFFICE", name: "District Commissioner Office", lat: -16.462513, lon: 31.033074, type: "Government Office" },
+      { id: "ZICB_LUANGWA", name: "ZICB Luangwa Branch", lat: -17.621789, lon: 31.033074, type: "Bank" },
+      { id: "LUANGWA_HARBOUR", name: "Luangwa Harbour", lat: -18.621157, lon: 31.033074, type: "Transport Hub" },
+      { id: "LUANGWA_IMMIGRATION_BORDER_POST", name: "Luangwa Immigration Border Post", lat: -15.623948, lon: 30.413214, type: "Government Office" },
+      { id: "LUANGWA_POLICE_STATION", name: "Luangwa Police Station", lat: -15.623076, lon: 30.411386, type: "Police Station" },
+      { id: "LUANGWA_DISTRICT_EDUCATION_BOARD_OFFICES", name: "Luangwa District Education Board Offices", lat: -15.623683, lon: 30.410997, type: "Government Office" },
+      { id: "YANGOMA", name: "Yangoma", lat: -15.626264, lon: 30.408453, type: "Community" },
+      { id: "LUANGWA_BOMA_CLINIC", name: "Luangwa Boma Clinic", lat: -15.624016, lon: 30.408032, type: "Health Facility" },
+      { id: "LUANGWA_PRIMARY_SCHOOL", name: "Luangwa Primary School", lat: -15.622760, lon: 30.409239, type: "School" },
+      { id: "NYABOTA", name: "Nyabota", lat: -15.621683, lon: 30.409747, type: "Community" },
+      { id: "RIVER_SPOT", name: "River Spot", lat: -15.621214, lon: 30.407910, type: "Landmark" },
+      { id: "YELLOW_SHOP", name: "Yellow Shop", lat: -15.421005, lon: 30.204357, type: "Shop" }
+    ];
 
     const ROADS_DATA = [
-  // Main inter-town routes
-  { from: "LUSAKA", to: "CHONGWE", distanceKm: 35 },
-  { from: "LUSAKA", to: "AIRPORT", distanceKm: 25 },
-  { from: "LUSAKA", to: "KAFUE", distanceKm: 45 },
-  { from: "AIRPORT", to: "CHONGWE", distanceKm: 45 },
-  { from: "CHONGWE", to: "RUFUNSA", distanceKm: 70 },
-  { from: "RUFUNSA", to: "LUANGWA", distanceKm: 95 },
-  { from: "RUFUNSA", to: "NYIMBA", distanceKm: 110 },
-  { from: "NYIMBA", to: "PETAUKE", distanceKm: 80 },
-  { from: "PETAUKE", to: "CHIPATA", distanceKm: 105 },
-  { from: "LUANGWA", to: "LUANGWA_BUS", distanceKm: 0.002 },
-  { from: "MWANAMWALI", to: "RUFUNSA", distanceKm: 65 },
-
-  // Kapoche and Kakaro routes
-  { from: "KAPOCHE", to: "KAKARO_LIBERATION_HERITAGE_SITE", distanceKm: 16.0 },
-  { from: "KAKARO_PRIMARY_SCHOOL", to: "KAKARO_LIBERATION_HERITAGE_SITE", distanceKm: 1.2 },
-  { from: "KAKARO_PRIMARY_SCHOOL", to: "LUANGWA_DISTRICT_HOSPITAL", distanceKm: 7.1 },
-
-  // Bus station and central Luangwa
-  { from: "ZRA_LUANGWA_CUSTOMS", to: "LUANGWA_BUS", distanceKm: 1.3 },
-  { from: "ZICB_LUANGWA_BRANCH", to: "LUANGWA_BUS", distanceKm: 0.75 },
-  { from: "LUANGWA_BUS", to: "YELLOW_SHOP", distanceKm: 0.015 },
-  { from: "LUANGWA_BUS", to: "BOMA_FILLING_STATION", distanceKm: 0.4 },
-  { from: "LUANGWA_MARKET", to: "MAKICHILO_LODGE", distanceKm: 0.4 },
-  { from: "MAKICHILO_LODGE", to: "GERASMOS_SAFARI_LODGE", distanceKm: 0.3 },
-  { from: "MAKICHILO_LODGE", to: "UCZ_FEIRA", distanceKm: 0.5 },
-  { from: "UCZ_FEIRA", to: "PENTECOSTAL_ASSEMBLY_OF_GOD_JOSHUA_ASSEMBLY", distanceKm: 0.8 },
-  { from: "BOMA_FILLING_STATION", to: "FEIRA_GARDENS", distanceKm: 0.01 },
-  { from: "FEIRA_GARDENS", to: "ZICB_LUANGWA_BRANCH", distanceKm: 0.85 },
-  { from: "ZICB_LUANGWA_BRANCH", to: "LUANGWA_IMMIGRATION_BORDER_POST", distanceKm: 0.28 },
-  { from: "LUANGWA_IMMIGRATION_BORDER_POST", to: "YELLOW_SHOP", distanceKm: 1.4 },
-  { from: "LUANGWA_IMMIGRATION_BORDER_POST", to: "DISTRICT_COMMISSIONER", distanceKm: 0.5 },
-
-
-
-  // Luangwa Bridge and market
-  { from: "LUANGWA_BRIDGE_MARKET", to: "LUANGWA_BRIDGE", distanceKm: 3.0 }
-];
-
+      { from: "LUSAKA", to: "CHONGWE", distanceKm: 35 },
+      { from: "LUSAKA", to: "AIRPORT", distanceKm: 25 },
+      { from: "LUSAKA", to: "KAFUE", distanceKm: 45 },
+      { from: "AIRPORT", to: "CHONGWE", distanceKm: 45 },
+      { from: "CHONGWE", to: "RUFUNSA", distanceKm: 70 },
+      { from: "RUFUNSA", to: "LUANGWA", distanceKm: 95 },
+      { from: "RUFUNSA", to: "NYIMBA", distanceKm: 110 },
+      { from: "NYIMBA", to: "PETAUKE", distanceKm: 80 },
+      { from: "PETAUKE", to: "CHIPATA", distanceKm: 105 },
+      { from: "LUANGWA", to: "LUANGWA_BUS", distanceKm: 0.002 },
+      { from: "MWANAMWALI", to: "RUFUNSA", distanceKm: 65 },
+      { from: "KAPOCHE", to: "KAKARO_LIBERATION_HERITAGE_SITE", distanceKm: 16.0 },
+      { from: "KAKARO_PRIMARY_SCHOOL", to: "KAKARO_LIBERATION_HERITAGE_SITE", distanceKm: 1.2 },
+      { from: "KAKARO_PRIMARY_SCHOOL", to: "LUANGWA_DISTRICT_HOSPITAL", distanceKm: 7.1 },
+      { from: "ZRA_LUANGWA_CUSTOMS", to: "LUANGWA_BUS", distanceKm: 1.3 },
+      { from: "ZICB_LUANGWA_BRANCH", to: "LUANGWA_BUS", distanceKm: 0.75 },
+      { from: "LUANGWA_BUS", to: "YELLOW_SHOP", distanceKm: 0.015 },
+      { from: "LUANGWA_BUS", to: "BOMA_FILLING_STATION", distanceKm: 0.4 },
+      { from: "LUANGWA_MARKET", to: "MAKICHILO_LODGE", distanceKm: 0.4 },
+      { from: "MAKICHILO_LODGE", to: "GERASMOS_SAFARI_LODGE", distanceKm: 0.3 },
+      { from: "MAKICHILO_LODGE", to: "UCZ_FEIRA", distanceKm: 0.5 },
+      { from: "UCZ_FEIRA", to: "PENTECOSTAL_ASSEMBLY_OF_GOD_JOSHUA_ASSEMBLY", distanceKm: 0.8 },
+      { from: "BOMA_FILLING_STATION", to: "FEIRA_GARDENS", distanceKm: 0.01 },
+      { from: "FEIRA_GARDENS", to: "ZICB_LUANGWA_BRANCH", distanceKm: 0.85 },
+      { from: "ZICB_LUANGWA_BRANCH", to: "LUANGWA_IMMIGRATION_BORDER_POST", distanceKm: 0.28 },
+      { from: "LUANGWA_IMMIGRATION_BORDER_POST", to: "YELLOW_SHOP", distanceKm: 1.4 },
+      { from: "LUANGWA_IMMIGRATION_BORDER_POST", to: "DISTRICT_COMMISSIONER", distanceKm: 0.5 },
+      { from: "LUANGWA_BRIDGE_MARKET", to: "LUANGWA_BRIDGE", distanceKm: 3.0 }
+    ];
 
     const hubs = ["LUSAKA", "CHONGWE", "RUFUNSA", "LUANGWA_BUS", "NYIMBA", "PETAUKE", "CHIPATA"];
 
@@ -865,7 +835,6 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
     let currentRoute = null;
     let calculationTimer = null;
     let isSubmitted = false;
-    let mapVisible = false;
     let mapTransform = { x: 0, y: 0, scale: 1 };
     let rideData = null;
 
@@ -1018,9 +987,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       } else {
         trip.classList.remove("show-section");
         summarySection.classList.remove("show-section");
-        mapVisible = false;
-        document.getElementById("map-section").classList.add("hidden");
-        document.getElementById("map-btn-label").textContent = "View Map";
+        document.getElementById("summary-calc-loader").style.display = "none";
         profileTitleText.textContent = "Profile";
         resetSubmitButton();
       }
@@ -1120,26 +1087,25 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       const destination = getSelectedPlace("gm-destination");
       const mode = document.querySelector('input[name="mode"]:checked');
       const summary = document.getElementById("summary-section");
+      const calcLoader = document.getElementById("summary-calc-loader");
       const submitBtn = document.getElementById("submit-btn");
-      const spinner = document.getElementById("spinner");
       const status = document.getElementById("status");
 
       if (!pickup || !destination || !mode) {
         summary.classList.remove("show-section");
-        mapVisible = false;
-        document.getElementById("map-section").classList.add("hidden");
-        document.getElementById("map-btn-label").textContent = "View Map";
+        calcLoader.style.display = "none";
         submitBtn.disabled = true;
         return;
       }
 
-      spinner.classList.add("show");
+      // Display the calculations loader before showing the summary table
+      calcLoader.style.display = "block";
       summary.classList.remove("show-section");
       submitBtn.disabled = true;
       status.textContent = "";
 
       setTimeout(() => {
-        spinner.classList.remove("show");
+        calcLoader.style.display = "none";
         const res = calculateTotalDistance(pickup, destination);
 
         if (!res || res.total === null) {
@@ -1212,58 +1178,11 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       window.location.href = `sms:0777737047?body=📍 ${mapLink}`;
     }
 
-    // ========== MAP RENDERING & ZOOM CONTROLS ==========
-    const MIN_PLACE_PIXEL_DISTANCE = 25;
-    
-    function toggleMapVisibility() {
-      const mapSection = document.getElementById("map-section");
-      const label = document.getElementById("map-btn-label");
-      mapVisible = !mapVisible;
-      
-      if (mapVisible) {
-        mapSection.classList.remove("hidden");
-        label.textContent = "Hide Map";
-        focusRoute();
-      } else {
-        mapSection.classList.add("hidden");
-        label.textContent = "View Map";
-      }
-    }
-
+    // ========== MAP RENDERING & INTERNAL HELPERS ==========
     function svgElement(tag, attrs = {}) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
       Object.entries(attrs).forEach(([k, v]) => element.setAttribute(k, v));
       return element;
-    }
-
-    function getVisualPosition(place, index, allPlaces) {
-  let x = place.x;
-  let y = place.y;
-
-  for (let i = 0; i < index; i++) {
-    const other = allPlaces[i];
-    if (!other) continue;
-
-    const dx = x - other.x;
-    const dy = y - other.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance < MIN_PLACE_PIXEL_DISTANCE) {
-      const angle =
-        Math.atan2(dy, dx) ||
-        (index % 2 === 0 ? 0 : Math.PI);
-
-      x =
-        other.x +
-        Math.cos(angle) * MIN_PLACE_PIXEL_DISTANCE;
-
-      y =
-        other.y +
-        Math.sin(angle) * MIN_PLACE_PIXEL_DISTANCE;
-    }
-  }
-
-  return { x, y };
     }
 
     function drawRoute(result) {
@@ -1302,90 +1221,44 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
         labelsLayer.appendChild(label);
       });
       currentRoute = result;
+      focusRoute();
     }
-function focusRoute() {
-  if (!currentRoute || !currentRoute.path.length) return;
 
-  const points = currentRoute.path
-    .map(id => places[id])
-    .filter(Boolean);
+    function focusRoute() {
+      if (!currentRoute || !currentRoute.path.length) return;
+      const points = currentRoute.path.map(id => places[id]).filter(Boolean);
+      if (!points.length) return;
 
-  if (!points.length) return;
+      const xs = points.map(p => p.x);
+      const ys = points.map(p => p.y);
 
-  const xs = points.map(p => p.x);
-  const ys = points.map(p => p.y);
+      let minX = Math.min(...xs), maxX = Math.max(...xs);
+      let minY = Math.min(...ys), maxY = Math.max(...ys);
 
-  let minX = Math.min(...xs);
-  let maxX = Math.max(...xs);
-  let minY = Math.min(...ys);
-  let maxY = Math.max(...ys);
+      const MIN_VISUAL_WIDTH = 180;
+      const MIN_VISUAL_HEIGHT = 140;
 
-  /*
-   * Minimum visual spacing.
-   *
-   * This is ONLY for displaying the map.
-   * It does NOT change the actual road distance,
-   * Dijkstra distance or fare calculation.
-   */
-  const MIN_VISUAL_WIDTH = 180;
-  const MIN_VISUAL_HEIGHT = 140;
+      let width = maxX - minX;
+      let height = maxY - minY;
 
-  let width = maxX - minX;
-  let height = maxY - minY;
+      if (width < MIN_VISUAL_WIDTH) {
+        const centreX = (minX + maxX) / 2;
+        minX = centreX - MIN_VISUAL_WIDTH / 2;
+        maxX = centreX + MIN_VISUAL_WIDTH / 2;
+        width = MIN_VISUAL_WIDTH;
+      }
 
-  /*
-   * If places are extremely close together,
-   * create a larger visual area around them.
-   */
-  if (width < MIN_VISUAL_WIDTH) {
-    const centreX = (minX + maxX) / 2;
+      if (height < MIN_VISUAL_HEIGHT) {
+        const centreY = (minY + maxY) / 2;
+        minY = centreY - MIN_VISUAL_HEIGHT / 2;
+        maxY = centreY + MIN_VISUAL_HEIGHT / 2;
+        height = MIN_VISUAL_HEIGHT;
+      }
 
-    minX = centreX - MIN_VISUAL_WIDTH / 2;
-    maxX = centreX + MIN_VISUAL_WIDTH / 2;
+      mapTransform.scale = Math.min(Math.max(Math.min(900 / width, 550 / height), 0.8), 3.5);
+      mapTransform.x = 500 - ((minX + maxX) / 2) * mapTransform.scale;
+      mapTransform.y = 325 - ((minY + maxY) / 2) * mapTransform.scale;
 
-    width = MIN_VISUAL_WIDTH;
-  }
-
-  if (height < MIN_VISUAL_HEIGHT) {
-    const centreY = (minY + maxY) / 2;
-
-    minY = centreY - MIN_VISUAL_HEIGHT / 2;
-    maxY = centreY + MIN_VISUAL_HEIGHT / 2;
-
-    height = MIN_VISUAL_HEIGHT;
-  }
-
-  /*
-   * Calculate the zoom level.
-   */
-  mapTransform.scale = Math.min(
-    Math.max(
-      Math.min(
-        900 / width,
-        550 / height
-      ),
-      0.8
-    ),
-    3.5
-  );
-
-  /*
-   * Centre the route on the map.
-   */
-  mapTransform.x =
-    500 -
-    ((minX + maxX) / 2) *
-      mapTransform.scale;
-
-  mapTransform.y =
-    325 -
-    ((minY + maxY) / 2) *
-      mapTransform.scale;
-
-  applyMapTransform();
-}
-    function zoomMap(factor) {
-      mapTransform.scale = Math.max(0.4, Math.min(4, mapTransform.scale * factor));
       applyMapTransform();
     }
 
@@ -1397,7 +1270,7 @@ function focusRoute() {
       });
     }
 
-    // ========== SUBMIT & CALL BUTTON FLOW 1==========
+    // ========== SUBMIT & CALL BUTTON FLOW ==========
     const submitBtn = document.getElementById("submit-btn");
     const submitIcon = document.getElementById("submitIcon");
     const callIcon = document.getElementById("callIcon");
