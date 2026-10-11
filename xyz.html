@@ -528,7 +528,7 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
             </g>
         </svg>
     </div>
-    xxxxxx
+    
     <div class="billboard-slide">
       <div class="fathers-day-card">
         <div class="fd-badge">🙏 A Grateful Heart</div>
@@ -541,7 +541,8 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
         <div class="fd-signature">💫 Best Wishes & Blessings 💫</div>
       </div>
     </div>
-
+    
+    <!-- ecz -->
     <div class="billboard-slide billboard-slide16">
       <div class="directory-card">
         <div class="directory-header">
@@ -755,19 +756,79 @@ legend{font-weight:700;color:var(--primary-color);padding:0 8px;font-size:.9rem;
       slideInterval = setInterval(autoAdvanceSlide, 4500);
     }
 
-    // ========== EYES PUPIL TRACKING ANIMATION ==========
-    document.addEventListener('mousemove', (e) => {
-      const leftPupil = document.getElementById('leftPupil');
-      const rightPupil = document.getElementById('rightPupil');
-      if (!leftPupil || !rightPupil) return;
+   
+    // ========== BIOLOGICAL SVGS BIOMETRIC EYE GEOMETRY RUNTIME ==========
+    
+const eyeElements = document.querySelectorAll('.billboard-slide14 .eye-svg');
+const irisGroups = document.querySelectorAll('.billboard-slide14 .iris-group');
+const pupilElements = document.querySelectorAll('.billboard-slide14 .pupil');
 
-      const x = (e.clientX / window.innerWidth - 0.5) * 30;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+let eyeIsAsleep = false;
+let microBlinkTimeout, macroGazeTimeout;
 
-      leftPupil.style.transform = `translate(${x}px, ${y}px)`;
-      rightPupil.style.transform = `translate(${x}px, ${y}px)`;
+function runEyeMasterLifecycle() {
+    eyeIsAsleep = false;
+    eyeElements.forEach(eye => eye.classList.remove('closed'));
+    
+    executeMicroBlinks();
+    executeMacroGazeSaccades();
+
+    setTimeout(() => {
+        executeCompleteSleepState(6000);
+    }, 14000);
+}
+
+function executeCompleteSleepState(duration) {
+    eyeIsAsleep = true;
+    clearTimeout(microBlinkTimeout);
+    clearTimeout(macroGazeTimeout);
+    
+    eyeElements.forEach(eye => eye.classList.add('closed'));
+
+    setTimeout(() => {
+        eyeElements.forEach(eye => {
+            eye.classList.remove('closed');
+            eye.classList.add('blinking');
+        });
+        
+        setTimeout(() => {
+            eyeElements.forEach(eye => eye.classList.remove('blinking'));
+            runEyeMasterLifecycle();
+        }, 150);
+    }, duration);
+}
+
+function executeMicroBlinks() {
+    if (eyeIsAsleep) return;
+    eyeElements.forEach(eye => eye.classList.add('blinking'));
+    setTimeout(() => {
+        eyeElements.forEach(eye => eye.classList.remove('blinking'));
+    }, 120);
+    microBlinkTimeout = setTimeout(executeMicroBlinks, Math.random() * 3000 + 1500);
+}
+
+function executeMacroGazeSaccades() {
+    if (eyeIsAsleep) return;
+    const maxX = 24, maxY = 10;
+    const targetX = (Math.random() - 0.5) * maxX;
+    const targetY = (Math.random() - 0.5) * maxY;
+    
+    irisGroups.forEach(iris => {
+        iris.style.setProperty('--saccade-x', `${targetX}px`);
+        iris.style.setProperty('--saccade-y', `${targetY}px`);
     });
 
+    const baseRadius = 15;
+    const moveIntensity = Math.sqrt(targetX*targetX + targetY*targetY) / 26;
+    const customRadius = baseRadius + (baseRadius * (moveIntensity * 0.12));
+    pupilElements.forEach(pupil => pupil.setAttribute('r', customRadius));
+
+    macroGazeTimeout = setTimeout(executeMacroGazeSaccades, Math.random() * 2000 + 500);
+}
+
+runEyeMasterLifecycle();
+
+    
     // ========== ECZ COUNTDOWN TIMER ==========
     function updateCountdown() {
       const electionDate = new Date("August 13, 2026 06:00:00").getTime();
