@@ -1120,7 +1120,19 @@ const ROADS_DATA = [
   { from: "KATONDWE_CHAZ_HOTEL", to: "KAKARO_PRIMARY_SCHOOL", distanceKm: 42.5 }
 ];
 
- const hubs = ["LUSAKA", "CHONGWE", "RUFUNSA", "LUANGWA_BUS", "LUANGWA_BRIDGE_MARKET", "NYIMBA", "PETAUKE", "CHIPATA"];
+    const hubs = ["LUSAKA", "CHONGWE", "RUFUNSA", "LUANGWA_BUS", "LUANGWA_BRIDGE_MARKET", "NYIMBA", "PETAUKE", "CHIPATA"];
+
+// Hub-specific phone number directory for nearest dispatchers/drivers
+const HUB_PHONE_NUMBERS = {
+  "LUSAKA": "07777370zz",
+  "CHONGWE": "07777370xx",
+  "RUFUNSA": "07777370xx",
+  "LUANGWA_BUS": "0777737047",
+  "LUANGWA_BRIDGE_MARKET": "0777737047",
+  "NYIMBA": "0777737047",
+  "PETAUKE": "0777737047",
+  "CHIPATA": "0777737047"
+};
 
 const places = {};
 let graph = {};
@@ -1420,11 +1432,15 @@ function calculateBooking() {
 
     let rawPhone = phoneInput.value.trim();
     let formattedPhone = rawPhone.startsWith('0') ? '+260' + rawPhone.substring(1) : rawPhone;
+    
+    // Get phone number mapped to the nearest calculated hub
+    let activeHubPhone = HUB_PHONE_NUMBERS[res.hub] || "0777737047";
 
     rideData = {
       preferredMode: mode.value,
       phone: formattedPhone,
       hub: places[res.hub]?.name || res.hub,
+      hubPhone: activeHubPhone,
       from: places[pickup]?.name || pickup,
       to: places[destination]?.name || destination,
       tripDistance: res.trip.toFixed(2),
@@ -1513,7 +1529,9 @@ submitBtn.addEventListener("click", () => {
   if (!isSubmitted) {
     handleRequest();
   } else {
-    window.location.href = `tel:0777737047`;
+    // Dynamically call the nearest hub phone stored in rideData, falling back safely
+    const dialPhone = (rideData && rideData.hubPhone) ? rideData.hubPhone : "0777737047";
+    window.location.href = `tel:${dialPhone}`;
   }
 });
 
@@ -1576,6 +1594,7 @@ async function handleRequest() {
 window.addEventListener("DOMContentLoaded", () => {
   buildGraph();
 });
+
 
 
   </script>
