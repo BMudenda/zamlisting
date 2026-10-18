@@ -1260,13 +1260,25 @@ function calculateEstimatedTime(mode, distance) {
 // ========== UI HANDLERS ==========
 function toggleForm(e) {
   if (e) e.preventDefault();
-  document.getElementById("booking-form-popup").classList.toggle("show");
-}
+  const formPopup = document.getElementById("booking-form-popup");
+  formPopup.classList.toggle("show");
+
+  if (!formPopup.classList.contains("show")) {
+    const phoneInput = document.getElementById("customer-phone");
+    phoneInput.value = "";
+    phoneInput.dispatchEvent(new Event('input'));
+    
+    const originInput = document.getElementById("gm-origin");
+    const destInput = document.getElementById("gm-destination");
+    if (originInput) { originInput.value = ""; originInput.dataset.placeId = ""; }
+    if (destInput) { destInput.value = ""; destInput.dataset.placeId = ""; }
+  }
+};
 
 function toggleMenu(e) {
   if (e) e.preventDefault();
   document.getElementById("menu-dropdown").classList.toggle("show");
-}
+};
 
 const phoneInput = document.getElementById("customer-phone");
 phoneInput.addEventListener("input", function() {
@@ -1287,6 +1299,7 @@ phoneInput.addEventListener("input", function() {
     resetSubmitButton();
   }
 });
+
 
 document.querySelectorAll(".mode-option input[type='radio']").forEach(radio => {
   radio.addEventListener("change", function() {
