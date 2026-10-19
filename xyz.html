@@ -1256,7 +1256,6 @@ function calculateEstimatedTime(mode, distance) {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
   }
 }
-
 // ========== UI HANDLERS ==========
 function toggleForm(e) {
   if (e) e.preventDefault();
@@ -1272,6 +1271,13 @@ function toggleForm(e) {
     const destInput = document.getElementById("gm-destination");
     if (originInput) { originInput.value = ""; originInput.dataset.placeId = ""; }
     if (destInput) { destInput.value = ""; destInput.dataset.placeId = ""; }
+
+    // Clear any leftover status messages (e.g., Network issue, Request sent)
+    const statusEl = document.getElementById("status");
+    if (statusEl) {
+      statusEl.textContent = "";
+      statusEl.style.color = "";
+    }
   }
 };
 
@@ -1338,6 +1344,9 @@ function setupAutocomplete(inputId, listId, containerId, errorMsgId) {
       scheduleCalculation();
       return;
     }
+
+// ========== UI HANDLERS ==========
+
 
     const matches = PLACES_DATA.filter(place => place.name.toLowerCase().includes(value)).slice(0, 5);
     matches.forEach(place => {
