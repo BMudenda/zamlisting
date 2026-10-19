@@ -886,7 +886,7 @@ runEyeMasterLifecycle();
 
     const config = {
       vehiclePricePerKm: 5.0, motorbikePricePerKm: 2.50,
-      vehicleMinPrice: 25, motorbikeMinPrice: 15,
+      vehicleMinPrice: 28, motorbikeMinPrice: 18,
       vehicleExtra: 6.00, motorbikeExtra: 3.00,
       vehicleSpeedKmH: 65, motorbikeSpeedKmH: 45
     };
@@ -919,7 +919,7 @@ runEyeMasterLifecycle();
   { id: "AIRSTRIP", name: "Airstrip", lat: -15.6200, lon: 30.4000, type: "Transport Hub Luangwa" },
 
   // --- Government & Public Services ---
-  { id: "DISTRICT_COMMISSIONER_OFFICE", name: "District Commissioner Office", lat: -15.6224, lon: 30.4134, type: "Government Office Luangwa" },
+  { id: "DISTRICT_COMMISSIONER_OFFICE", name: "District Commissioner (DC) Office", lat: -15.6224, lon: 30.4134, type: "Government Office Luangwa" },
   { id: "LUANGWA_TOWN_COUNCIL", name: "Luangwa Town Council", lat: -15.6268, lon: 30.3957, type: "Government Office Luangwa" },
   { id: "LUANGWA_IMMIGRATION_BORDER_POST", name: "Luangwa Immigration Border Post", lat: -15.6239, lon: 30.4132, type: "Government Office Luangwa" },
   { id: "LUANGWA_POLICE_STATION", name: "Luangwa Police Station", lat: -15.6178, lon: 30.4130, type: "Police Station Luangwa" },
@@ -1034,6 +1034,7 @@ const ROADS_DATA = [
   { from: "LUANGWA_MARKET", to: "MAKICHILO_LODGE", distanceKm: 0.4 },
   { from: "MAKICHILO_LODGE", to: "GERASMOS_SAFARI_LODGE", distanceKm: 0.3 },
   { from: "MAKICHILO_LODGE", to: "UCZ_FEIRA", distanceKm: 0.5 },
+  { from: "YELLOW_SHOP", to: "UCZ_FEIRA", distanceKm: 0.6 },
   { from: "UCZ_FEIRA", to: "PENTECOSTAL_ASSEMBLY", distanceKm: 0.08 },
   { from: "BOMA_FILLING_STATION", to: "FEIRA_GARDENS", distanceKm: 0.01 },
   { from: "FEIRA_GARDENS", to: "ZICB_LUANGWA", distanceKm: 0.85 },
@@ -1256,7 +1257,6 @@ function calculateEstimatedTime(mode, distance) {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours} hrs`;
   }
 }
-
 // ========== UI HANDLERS ==========
 function toggleForm(e) {
   if (e) e.preventDefault();
@@ -1272,6 +1272,13 @@ function toggleForm(e) {
     const destInput = document.getElementById("gm-destination");
     if (originInput) { originInput.value = ""; originInput.dataset.placeId = ""; }
     if (destInput) { destInput.value = ""; destInput.dataset.placeId = ""; }
+
+    // Clear any leftover status messages (e.g., Network issue, Request sent)
+    const statusEl = document.getElementById("status");
+    if (statusEl) {
+      statusEl.textContent = "";
+      statusEl.style.color = "";
+    }
   }
 };
 
@@ -1338,6 +1345,9 @@ function setupAutocomplete(inputId, listId, containerId, errorMsgId) {
       scheduleCalculation();
       return;
     }
+
+// ========== UI HANDLERS ==========
+
 
     const matches = PLACES_DATA.filter(place => place.name.toLowerCase().includes(value)).slice(0, 5);
     matches.forEach(place => {
