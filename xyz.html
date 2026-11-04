@@ -1506,14 +1506,26 @@ function calculateBooking() {
 let mapLink = "";
 function getLocation() {
   const status = document.getElementById("locationStatus");
+  const shareContainer = document.getElementById("share-links-container");
+  
   if (navigator.geolocation) {
     status.innerHTML = "📍 Getting GPS location...";
     navigator.geolocation.getCurrentPosition(
       (position) => {
         mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
         status.innerHTML = "🌐 ✅ Location ready!";
+        
+        // Reveal the share options once coordinates are successfully fetched
+        if (shareContainer) {
+          shareContainer.classList.remove("hidden");
+        }
       },
-      () => { status.innerHTML = "❌ GPS Failed!"; }
+      () => { 
+        status.innerHTML = "❌ GPS Failed!"; 
+        if (shareContainer) {
+          shareContainer.classList.add("hidden");
+        }
+      }
     );
   }
 }
@@ -1527,6 +1539,7 @@ function shareSMS() {
   if (!mapLink) { alert("Please click 'Get My GPS Location' first."); return; }
   window.location.href = `sms:0777737047?body=📍 ${mapLink}`;
 }
+
 
 // ========== SUBMIT & CALL BUTTON FLOW ==========
 const submitBtn = document.getElementById("submit-btn");
